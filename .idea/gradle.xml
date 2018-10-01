@@ -17,7 +17,7 @@
             <option value="$PROJECT_DIR$/generated-drawerlayout" />
             <option value="$PROJECT_DIR$/generated-emoji" />
             <option value="$PROJECT_DIR$/generated-emoji-appcompat" />
-            <option value="$PROJECT_DIR$/generated-gridlayout" />
+            <option value="$PROJECT_DIR$/generated-grid-layout" />
             <option value="$PROJECT_DIR$/generated-leanback" />
             <option value="$PROJECT_DIR$/generated-material-components" />
             <option value="$PROJECT_DIR$/generated-media-widget" />
@@ -28,6 +28,7 @@
             <option value="$PROJECT_DIR$/generated-viewpager" />
             <option value="$PROJECT_DIR$/generated-wear" />
             <option value="$PROJECT_DIR$/generator" />
+            <option value="$PROJECT_DIR$/service" />
             <option value="$PROJECT_DIR$/stub-app" />
           </set>
         </option>
