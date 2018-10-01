@@ -1,0 +1,56 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+
+buildscript {
+    // declare version numbers manually, buildscript {} block is evaluated before anything else in the script (regardless of location in file).
+    ext.kotlin_version = '1.2.71'
+    repositories {
+        google()
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        maven { url "https://kotlin.bintray.com/kotlinx" }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.2.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+Properties properties = new Properties()
+def localPropertiesFile = project.rootProject.file('local.properties')
+def definedSdkDir = ""
+if (localPropertiesFile.exists()) {
+    properties.load(localPropertiesFile.newDataInputStream())
+    definedSdkDir = properties.getProperty('sdk.dir')
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+    ext {
+        // defined in build script --> kotlin_version
+        minSdkVersion = 15
+        targetSdkVersion = 28
+        compileSdkVersion = 28
+        sdkDir = definedSdkDir
+        usingJetpack = true
+        androidX = "1.0.0"
+        androidXcar="1.0.0-alpha5"
+        androidXmediaWidget = "1.0.0-alpha5"
+        materialDesign="1.0.0"
+        moshi = "1.6.0"
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

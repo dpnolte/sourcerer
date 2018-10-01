@@ -1,0 +1,59 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.laidpack.sourcerer"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin/'
+        test.java.srcDirs += 'src/test/kotlin/'
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "com.squareup.moshi:moshi:$moshi"
+    implementation 'com.github.dpnolte.ts-rhymer:annotation:0.1'
+    implementation "com.google.android.material:material:$materialDesign"
+    implementation "androidx.appcompat:appcompat:$androidX"
+    implementation "androidx.car:car:$androidXcar"
+    implementation "androidx.cardview:cardview:$androidX"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidX"
+    implementation "androidx.core:core:$androidX"
+    implementation "androidx.drawerlayout:drawerlayout:$androidX"
+    implementation "androidx.emoji:emoji:$androidX"
+    implementation "androidx.emoji:emoji-appcompat:$androidX"
+    implementation "androidx.gridlayout:gridlayout:$androidX"
+    implementation "androidx.leanback:leanback:$androidX"
+    implementation "androidx.media:media:$androidX"
+    implementation "androidx.media:media-widget:$androidXmediaWidget"
+    implementation "androidx.recyclerview:recyclerview:$androidX"
+    implementation "androidx.slice:slice-core:$androidX"
+    implementation "androidx.slice:slice-view:$androidX"
+    implementation "androidx.slidingpanelayout:slidingpanelayout:$androidX"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$androidX"
+    implementation "androidx.viewpager:viewpager:$androidX"
+    implementation "androidx.wear:wear:$androidX"
+}
+
+
+

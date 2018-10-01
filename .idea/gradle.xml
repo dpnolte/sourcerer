@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/generated" />
+            <option value="$PROJECT_DIR$/generated-appcompat" />
+            <option value="$PROJECT_DIR$/generated-car" />
+            <option value="$PROJECT_DIR$/generated-cardview" />
+            <option value="$PROJECT_DIR$/generated-coordinatorlayout" />
+            <option value="$PROJECT_DIR$/generated-core" />
+            <option value="$PROJECT_DIR$/generated-drawerlayout" />
+            <option value="$PROJECT_DIR$/generated-emoji" />
+            <option value="$PROJECT_DIR$/generated-emoji-appcompat" />
+            <option value="$PROJECT_DIR$/generated-gridlayout" />
+            <option value="$PROJECT_DIR$/generated-leanback" />
+            <option value="$PROJECT_DIR$/generated-material-components" />
+            <option value="$PROJECT_DIR$/generated-media-widget" />
+            <option value="$PROJECT_DIR$/generated-recyclerview" />
+            <option value="$PROJECT_DIR$/generated-slice-view" />
+            <option value="$PROJECT_DIR$/generated-slidingpanelayout" />
+            <option value="$PROJECT_DIR$/generated-swiperefreshlayout" />
+            <option value="$PROJECT_DIR$/generated-viewpager" />
+            <option value="$PROJECT_DIR$/generated-wear" />
+            <option value="$PROJECT_DIR$/generator" />
+            <option value="$PROJECT_DIR$/stub-app" />
+          </set>
+        </option>
+        <option name="resolveModulePerSourceSet" value="false" />
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

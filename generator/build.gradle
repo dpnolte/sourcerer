@@ -1,0 +1,122 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin/'
+    test.java.srcDirs += 'src/test/kotlin/'
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    // bug -> https://youtrack.jetbrains.com/issue/KT-23744
+    implementation files("$sdkDir/platforms/android-$compileSdkVersion/android.jar")
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'com.squareup:kotlinpoet:1.0.0-RC1'
+    implementation "com.squareup.moshi:moshi:$moshi"
+    implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.6.20'
+    implementation 'org.jetbrains.xodus:xodus-openAPI:1.2.3'
+    implementation 'org.jetbrains.xodus:xodus-entity-store:1.2.3'
+    implementation 'org.jetbrains.xodus:dnq:1.1.325'
+    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
+    api 'com.github.dpnolte.ts-rhymer:annotation:0.1'
+}
+
+sourceCompatibility = "8"
+targetCompatibility = "8"
+
+evaluationDependsOn(':stub-app')
+def componentIds = project(":stub-app").configurations.debugCompileClasspath.incoming.resolutionResult.allDependencies
+        .findAll {
+           it.selected.id.group == "com.google.android.material" || it.selected.id.group.startsWith("androidx.")
+        }
+        .collect { it.selected.id}
+
+def result = dependencies.createArtifactResolutionQuery()
+        .forComponents(componentIds)
+        .withArtifacts(JvmLibrary, SourcesArtifact, JavadocArtifact)
+        .execute()
+
+def sourceArtifacts = []
+def i = 0
+for (component in result.resolvedComponents) {
+    component.getArtifacts(SourcesArtifact).each {
+        sourceArtifacts.add(i, it.file)
+        i += 1
+    }
+}
+
+def taskArgs = [
+        rootDir.absolutePath,
+        compileSdkVersion,
+        sdkDir,
+        project(":stub-app").configurations.debugCompileClasspath.files,
+        sourceArtifacts
+]
+task analyzeSource(type: JavaExec) {
+    main = 'com.laidpack.sourcerer.generator.AnalyzeSourceKt'
+    classpath = sourceSets.main.runtimeClasspath
+    args = taskArgs
+}
+task analyzeClass(type: JavaExec) {
+    main = 'com.laidpack.sourcerer.generator.AnalyzeClassKt'
+    classpath = sourceSets.main.runtimeClasspath
+    args = taskArgs
+}
+
+// add extra task in sourcerer.. otherwise app:lint gets executed before analyze sourceProvider
+task performLint() {
+    dependsOn(":stub-app:lint")
+}
+
+task generate(type: JavaExec) {
+    dependsOn analyzeSource
+    dependsOn performLint
+    main = 'com.laidpack.sourcerer.generator.LintResolverKt'
+    classpath = sourceSets.main.runtimeClasspath
+    args = taskArgs
+}
+
+
+task printAllFormats(type: JavaExec) {
+    main = 'com.laidpack.sourcerer.generator.PrintAllFormatsKt'
+    classpath = sourceSets.main.runtimeClasspath
+    args = taskArgs
+}
+
+task printEnvArguments(type: JavaExec) {
+    main = 'com.laidpack.sourcerer.generator.PrintArgumentsKt'
+    classpath = sourceSets.main.runtimeClasspath
+    args = taskArgs
+    doFirst {
+        project(":stub-app").configurations.debugCompileClasspath.files.each {
+            println "file in stub-app classpath: $it"
+        }
+        classpath.each {
+            println "file in classpath: $it"
+        }
+        project(":stub-app").configurations.debugCompileClasspath.dependencies.each {
+            println "dependency: $it"
+        }
+        sourceArtifacts.each {
+            println "source artifact: $it"
+        }
+    }
+}
+
+task printUsedAndroidXLibs(type: JavaExec) {
+    main = 'com.laidpack.sourcerer.generator.PrintUsedAndroidXLibsKt'
+    classpath = sourceSets.main.runtimeClasspath
+    args = taskArgs
+}
+
+task resolveLint(type: JavaExec) {
+    main = 'com.laidpack.sourcerer.generator.LintResolverKt'
+    classpath = sourceSets.main.runtimeClasspath
+    args = taskArgs
+}
+
+task copyAndroidJar(type: Copy) {
+    from "$sdkDir/platforms/android-$compileSdkVersion/android.jar"
+    into 'libs'
+}
+//build.dependsOn copyAndroidJar
