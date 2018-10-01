@@ -21,13 +21,15 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
             updatedModules.add(moduleName)
         } else if (!updatedModules.contains(moduleName)) {
             // always update gradle build file
-            
+            generateBuildGradleFile(moduleName, parser.getDependencies(widget))
+            updatedModules.add(moduleName)
         }
         return sourcePath.toFile()
     }
 
+
     fun generateModule(moduleName: String, extraDependencies: List<String>) {
-        val modulePath = env.rootPath.resolve(moduleName)
+        val modulePath = getModulePath(moduleName)
         val mainPath = modulePath.resolve("src/main")
         val paths = mapOf(
                 "modulePath" to modulePath,
@@ -48,10 +50,18 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
         addModuleToGradleSettings(moduleName)
     }
 
+    private fun getModulePath(moduleName: String): Path {
+        return env.rootPath.resolve(moduleName)
+    }
+
     private fun generateGitIgnoreFile(modulePath: Path) {
         val gitIgnoreFilePath = modulePath.resolve(".gitignore")
         val file =  createFile(gitIgnoreFilePath)
         file.writeText("/build\n")
+    }
+
+    private fun generateBuildGradleFile(moduleName: String, extraDependencies: List<String>) {
+        return generateBuildGradleFile(getModulePath(moduleName), extraDependencies)
     }
 
     private fun generateBuildGradleFile(modulePath: Path, extraDependencies: List<String>) {
