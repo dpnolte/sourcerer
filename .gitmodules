@@ -1,3 +1,3 @@
 [submodule "source-material-components"]
 	path = source-material-components
-	url = https://github.com/material-components/material-components-android
+	url = https://github.com/material-components/material-components-android.git
