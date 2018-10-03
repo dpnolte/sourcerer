@@ -25,7 +25,7 @@ fun generateHelperFiles(targetPath: Path, env: SourcererEnvironment) {
     val file2 = FormatEnumGenerator().generateFile()
     file2.writeTo(targetDir)
 
-    ApiGenerator(targetPath, env.apiSourcePath).writeFiles()
+    //ApiGenerator(targetPath, env.apiSourcePath).writeFiles()
     println("Created helper classes...")
     println("=================================")
 }
@@ -66,10 +66,17 @@ fun generateFactoryFiles(targetDir: File, result: SourcererResult) {
 
 fun deleteOldGeneratedFiles(env: SourcererEnvironment) {
     println("=================================")
-    for (file in env.generatedPackageDir.listFiles()) {
-        file.deleteRecursively()
+    for (file in env.rootPath.toFile().listFiles()) {
+        if (file.isDirectory && file.name.startsWith("generated")) {
+            val sourceDir = file.toPath().resolve("src/main/kotlin").toFile()
+            if (sourceDir.exists() && sourceDir.isDirectory) {
+                for (generatedFile in sourceDir.listFiles()) {
+                    file.deleteRecursively()
+                }
+            }
+        }
     }
-    println("Deleted old generated files @ ${env.generatedPackageDir}")
+    println("Deleted old generated files")
     println("=================================")
 }
 

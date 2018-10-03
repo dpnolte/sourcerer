@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
     initParserAndStore(env)
 
     //Store.deleteSourcererResult("ViewStubCompat")
-    //Store.deleteSourcererResults()
+    // Store.deleteSourcererResults()
 
     val widgetRegistry = getWidgetRegistry(env)
     val attrsXmlManager = StyleableAttributeManager()
@@ -21,7 +21,8 @@ fun main(args: Array<String>) {
     val classRegistry = ClassRegistry(attrsXmlManager)
     classRegistry.resolveAnyNewIdentifiedWidgetClasses()
 
-    deleteOldGeneratedFiles(env)
+    deleteTempFiles(env)
+
     val sourcerer = Sourcerer(classRegistry, env)
     sourcerer.generateFactoriesForAllWidgets()
     generateHelperFiles(env.stubAppPath, env)

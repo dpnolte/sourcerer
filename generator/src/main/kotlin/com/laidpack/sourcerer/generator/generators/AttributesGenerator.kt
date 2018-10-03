@@ -5,14 +5,15 @@ import com.laidpack.sourcerer.generator.TypePhilosopher
 import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.peeker.ClassCategory
 import com.laidpack.sourcerer.generator.peeker.ClassRegistry
+import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.target.AttributeTypesForSetter
 import com.squareup.kotlinpoet.*
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 fun String.toCamelCase(): String {
-    return this.split('_').map {
-        it.capitalize() } .joinToString("")
+    return this.split('_').joinToString("") {
+        it.capitalize() }
 }
 
 class AttributesGenerator(
@@ -25,6 +26,7 @@ class AttributesGenerator(
     private val propertySpecs = mutableListOf<PropertySpec>()
     private val formatsUsed = mutableSetOf<ClassName>()
     private val className = getAttributesClassName(targetClassName, classCategory)
+    private val adapterClassName = ClassName(className.packageName, className.simpleName + "JsonAdapter")
 
     fun generateFile(): FileSpec {
         for (attribute in attributes.values) {
@@ -66,6 +68,19 @@ class AttributesGenerator(
                                 .build()
                 )
                 .addAnnotation(TypeScript::class.java)
+                .addSuperinterface(attributesInterfaceName)
+                .addType(TypeSpec.companionObjectBuilder()
+                        .addInitializerBlock(CodeBlock.Builder()
+                                .addStatement(
+                                        "%T.registerAdapter(%T::class, %T::class, %S)",
+                                        sourcererServiceClassName,
+                                        className, adapterClassName,
+                                        targetClassName.simpleName.decapitalize()
+                                )
+                                .build()
+                        )
+                        .build()
+                )
                 .addProperties(propertySpecs)
         if (superClassName != null) {
             classTypeSpec.superclass(getAttributesClassName(superClassName, classCategory))
@@ -181,7 +196,7 @@ class AttributesGenerator(
 
 
     companion object {
-        const val packageName = TypePhilosopher.generatedPackageName
+        const val packageName = SourcererEnvironment.generatedPackageName
         fun getAttributesClassName(originalClassName: ClassName, classCategory: ClassCategory): ClassName {
             return if (classCategory == ClassCategory.LayoutParams) {
                 val splitClassNameString = originalClassName.canonicalName.split(".")
@@ -193,7 +208,8 @@ class AttributesGenerator(
         }
 
         private val usedEnumClassNames = mutableSetOf<ClassName>()
-
+        private val sourcererServiceClassName = ClassName(SourcererEnvironment.servicePackageName,"SourcererService")
+        private val attributesInterfaceName = ClassName(SourcererEnvironment.serviceApiPackageName, "IAttributes")
     }
 
 }

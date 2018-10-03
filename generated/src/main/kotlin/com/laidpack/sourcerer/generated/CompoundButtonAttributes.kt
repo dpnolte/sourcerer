@@ -1,6 +1,10 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.ColorQualifier
+import com.laidpack.sourcerer.service.api.IAttributes
+import com.laidpack.sourcerer.service.api.ReferenceQualifier
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.Boolean
@@ -9,7 +13,7 @@ import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class CompoundButtonAttributes : ButtonAttributes() {
+open class CompoundButtonAttributes : ButtonAttributes(), IAttributes {
     var checked: Boolean? = null
 
     @field:ReferenceQualifier
@@ -19,6 +23,12 @@ open class CompoundButtonAttributes : ButtonAttributes() {
     var buttonTint: Int? = null
 
     var buttonTintMode: ButtonTintModeEnum? = null
+
+    companion object {
+        init {
+            SourcererService.registerAdapter(CompoundButtonAttributes::class, CompoundButtonAttributesJsonAdapter::class, "compoundButton")
+        }
+    }
 }
 
 enum class ButtonTintModeEnum(val attributeName: String, val value: Int) {

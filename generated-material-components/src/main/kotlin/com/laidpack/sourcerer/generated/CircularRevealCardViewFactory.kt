@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.circularreveal.cardview.CircularRevealCardView
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
 import kotlin.String
 
 open class CircularRevealCardViewFactory<TView : CircularRevealCardView, TAttributes : CircularRevealCardViewAttributes> : CardViewFactory<TView, TAttributes>() {
@@ -23,5 +20,6 @@ open class CircularRevealCardViewFactory<TView : CircularRevealCardView, TAttrib
         context: Context,
         attributes: TAttributes
     ) {
+        super.init(v, context, attributes)
     }
 }

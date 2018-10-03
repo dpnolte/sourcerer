@@ -23,10 +23,13 @@ buildscript {
 
 Properties properties = new Properties()
 def localPropertiesFile = project.rootProject.file('local.properties')
-def definedSdkDir = ""
+def definedSdkDir = "${System.env.ADROID_HOME}"
 if (localPropertiesFile.exists()) {
     properties.load(localPropertiesFile.newDataInputStream())
     definedSdkDir = properties.getProperty('sdk.dir')
+}
+if (!file(definedSdkDir).exists()) {
+    throw new GradleException('Sdk dir is not defined. It requires either to be set in local.properties or via env variable $ANDROID_HOME')
 }
 
 allprojects {
@@ -47,10 +50,14 @@ allprojects {
         androidXcar="1.0.0-alpha5"
         androidXmediaWidget = "1.0.0-alpha5"
         materialDesign="1.0.0"
-        moshi = "1.6.0"
+        moshi = "1.7.0"
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+task generate(dependsOn: [':generator:generate']) {
+    description 'Generating view factories and attribute container classes..'
 }

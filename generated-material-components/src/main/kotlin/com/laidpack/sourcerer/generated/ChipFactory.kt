@@ -4,10 +4,8 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.chip.Chip
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
+import com.laidpack.sourcerer.service.api.init
 import kotlin.String
 
 open class ChipFactory<TView : Chip, TAttributes : ChipAttributes> : ButtonFactory<TView, TAttributes>() {

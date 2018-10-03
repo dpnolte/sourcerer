@@ -1,6 +1,10 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.ColorQualifier
+import com.laidpack.sourcerer.service.api.IAttributes
+import com.laidpack.sourcerer.service.api.ReferenceQualifier
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.Int
@@ -8,7 +12,7 @@ import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class ProgressBarAttributes : ViewAttributes() {
+open class ProgressBarAttributes : ViewAttributes(), IAttributes {
     @field:ReferenceQualifier
     var interpolator: Int? = null
 
@@ -31,6 +35,12 @@ open class ProgressBarAttributes : ViewAttributes() {
     var indeterminateTint: Int? = null
 
     var indeterminateTintMode: IndeterminateTintModeEnum? = null
+
+    companion object {
+        init {
+            SourcererService.registerAdapter(ProgressBarAttributes::class, ProgressBarAttributesJsonAdapter::class, "progressBar")
+        }
+    }
 }
 
 enum class ProgressTintModeEnum(val attributeName: String, val value: Int) {

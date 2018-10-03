@@ -8,10 +8,9 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
+import com.laidpack.sourcerer.service.api.init
+import com.laidpack.sourcerer.service.api.toPorterDuffMode
 import kotlin.String
 
 open class CompoundButtonFactory<TView : CompoundButton, TAttributes : CompoundButtonAttributes> : ButtonFactory<TView, TAttributes>() {
@@ -41,13 +40,13 @@ open class CompoundButtonFactory<TView : CompoundButton, TAttributes : CompoundB
                 attributes.buttonTint?.let {
                     val immutableButtonTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                     if (buttonTintList != immutableButtonTint) {
-                        setButtonTintList(immutableButtonTint)
+                        buttonTintList = immutableButtonTint
                     }
                 }
                 attributes.buttonTintMode?.let {
                     val immutableButtonTintMode = it.value.toPorterDuffMode()
                     if (buttonTintMode != immutableButtonTintMode) {
-                        setButtonTintMode(immutableButtonTintMode)
+                        buttonTintMode = immutableButtonTintMode
                     }
                 }
             }
@@ -55,7 +54,7 @@ open class CompoundButtonFactory<TView : CompoundButton, TAttributes : CompoundB
                 attributes.button?.let {
                     val immutableButton = ContextCompat.getDrawable(context, it) as Drawable
                     if (buttonDrawable != immutableButton) {
-                        setButtonDrawable(immutableButton)
+                        buttonDrawable = immutableButton
                     }
                 }
             }

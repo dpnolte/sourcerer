@@ -60,9 +60,9 @@ enum class StyleableAttributeFormat(val value: kotlin.String, val requiresQualif
     }
 
     companion object {
-        val colorQualifierClassName = ClassName(TypePhilosopher.generatedPackageName, "ColorQualifier")
-        val referenceQualifierClassName = ClassName(TypePhilosopher.generatedPackageName, "ReferenceQualifier")
-        val dimensionQualifierClassName = ClassName(TypePhilosopher.generatedPackageName, "DimensionQualifier")
+        val colorQualifierClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "ColorQualifier")
+        val referenceQualifierClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "ReferenceQualifier")
+        val dimensionQualifierClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "DimensionQualifier")
 
         fun fromString(formatString: kotlin.String): List<StyleableAttributeFormat> {
             return formatString.split("|").map {

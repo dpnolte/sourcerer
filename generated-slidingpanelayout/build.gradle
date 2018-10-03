@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'kotlin-kapt'
 
 group='com.github.dpnolte.sourcerer'
 
@@ -25,6 +26,10 @@ android {
         main.java.srcDirs += 'src/main/kotlin/'
         test.java.srcDirs += 'src/test/kotlin/'
     }
+    compileOptions {
+        sourceCompatibility 1.7
+        targetCompatibility 1.7
+    }
 
 }
 
@@ -35,10 +40,12 @@ task sourceJar(type: Jar) {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:$androidX"
     implementation "com.squareup.moshi:moshi:$moshi"
+    kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
     api 'com.github.dpnolte.ts-rhymer:annotation:0.1'
 	implementation "androidx.slidingpanelayout:slidingpanelayout:$androidX"
+	implementation project(":service")
 	implementation project(":generated")
 }

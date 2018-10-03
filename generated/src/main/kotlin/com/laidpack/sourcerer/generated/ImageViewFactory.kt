@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
+import com.laidpack.sourcerer.service.api.init
+import com.laidpack.sourcerer.service.api.toPorterDuffMode
+import com.laidpack.sourcerer.service.api.toScaleType
 import kotlin.String
 
 open class ImageViewFactory<TView : ImageView, TAttributes : ImageViewAttributes> : ViewFactory<TView, TAttributes>() {
@@ -70,13 +70,13 @@ open class ImageViewFactory<TView : ImageView, TAttributes : ImageViewAttributes
                 attributes.tint?.let {
                     val immutableTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                     if (imageTintList != immutableTint) {
-                        setImageTintList(immutableTint)
+                        imageTintList = immutableTint
                     }
                 }
                 attributes.tintMode?.let {
                     val immutableTintMode = it.toPorterDuffMode()
                     if (imageTintMode != immutableTintMode) {
-                        setImageTintMode(immutableTintMode)
+                        imageTintMode = immutableTintMode
                     }
                 }
             }

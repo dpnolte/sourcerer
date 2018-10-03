@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ExpandableListView
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
 import kotlin.String
 
 open class ExpandableListViewFactory<TView : ExpandableListView, TAttributes : ExpandableListViewAttributes> : ListViewFactory<TView, TAttributes>() {
@@ -23,5 +20,6 @@ open class ExpandableListViewFactory<TView : ExpandableListView, TAttributes : E
         context: Context,
         attributes: TAttributes
     ) {
+        super.init(v, context, attributes)
     }
 }

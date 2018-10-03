@@ -5,10 +5,8 @@ import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
+import com.laidpack.sourcerer.service.api.init
 import kotlin.String
 
 open class SearchViewFactory<TView : SearchView, TAttributes : SearchViewAttributes> : LinearLayoutFactory<TView, TAttributes>() {
@@ -40,7 +38,7 @@ open class SearchViewFactory<TView : SearchView, TAttributes : SearchViewAttribu
                 }
                 attributes.queryHint?.let {
                     if (queryHint != it) {
-                        setQueryHint(it)
+                        queryHint = it
                     }
                 }
                 attributes.imeOptions?.let {

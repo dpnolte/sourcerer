@@ -1,6 +1,10 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.ColorQualifier
+import com.laidpack.sourcerer.service.api.DimensionQualifier
+import com.laidpack.sourcerer.service.api.IAttributes
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.Boolean
@@ -9,7 +13,7 @@ import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class ImageViewAttributes : ViewAttributes() {
+open class ImageViewAttributes : ViewAttributes(), IAttributes {
     var scaleType: ScaleTypeEnum? = null
 
     var adjustViewBounds: Boolean? = null
@@ -31,6 +35,12 @@ open class ImageViewAttributes : ViewAttributes() {
     var baseline: Int? = null
 
     var tintMode: Int? = null
+
+    companion object {
+        init {
+            SourcererService.registerAdapter(ImageViewAttributes::class, ImageViewAttributesJsonAdapter::class, "imageView")
+        }
+    }
 }
 
 enum class ScaleTypeEnum(val attributeName: String, val value: Int) {

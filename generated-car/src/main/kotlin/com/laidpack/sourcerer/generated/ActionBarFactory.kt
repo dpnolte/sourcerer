@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.car.widget.ActionBar
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
 import kotlin.String
 
 open class ActionBarFactory<TView : ActionBar, TAttributes : ActionBarAttributes> : RelativeLayoutFactory<TView, TAttributes>() {
@@ -23,5 +20,6 @@ open class ActionBarFactory<TView : ActionBar, TAttributes : ActionBarAttributes
         context: Context,
         attributes: TAttributes
     ) {
+        super.init(v, context, attributes)
     }
 }

@@ -1,6 +1,12 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.ColorQualifier
+import com.laidpack.sourcerer.service.api.DimensionQualifier
+import com.laidpack.sourcerer.service.api.IAttributes
+import com.laidpack.sourcerer.service.api.MultiFormatQualifier
+import com.laidpack.sourcerer.service.api.ReferenceQualifier
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.Boolean
@@ -10,7 +16,7 @@ import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class ViewAttributes {
+open class ViewAttributes : IAttributes {
     @field:ReferenceQualifier
     var id: Int? = null
 
@@ -205,6 +211,12 @@ open class ViewAttributes {
 
     @field:ColorQualifier
     var outlineAmbientShadowColor: Int? = null
+
+    companion object {
+        init {
+            SourcererService.registerAdapter(ViewAttributes::class, ViewAttributesJsonAdapter::class, "view")
+        }
+    }
 }
 
 enum class FocusableEnum(val attributeName: String, val value: Int) {

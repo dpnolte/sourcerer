@@ -8,10 +8,9 @@ import android.view.ViewGroup
 import android.widget.CheckedTextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
+import com.laidpack.sourcerer.service.api.init
+import com.laidpack.sourcerer.service.api.toPorterDuffMode
 import kotlin.String
 
 open class CheckedTextViewFactory<TView : CheckedTextView, TAttributes : CheckedTextViewAttributes> : TextViewFactory<TView, TAttributes>() {
@@ -42,13 +41,13 @@ open class CheckedTextViewFactory<TView : CheckedTextView, TAttributes : Checked
                 attributes.checkMarkTint?.let {
                     val immutableCheckMarkTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                     if (checkMarkTintList != immutableCheckMarkTint) {
-                        setCheckMarkTintList(immutableCheckMarkTint)
+                        checkMarkTintList = immutableCheckMarkTint
                     }
                 }
                 attributes.checkMarkTintMode?.let {
                     val immutableCheckMarkTintMode = it.value.toPorterDuffMode()
                     if (checkMarkTintMode != immutableCheckMarkTintMode) {
-                        setCheckMarkTintMode(immutableCheckMarkTintMode)
+                        checkMarkTintMode = immutableCheckMarkTintMode
                     }
                 }
             }

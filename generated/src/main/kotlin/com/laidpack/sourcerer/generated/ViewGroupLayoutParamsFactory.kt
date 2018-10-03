@@ -2,10 +2,7 @@ package com.laidpack.sourcerer.generated
 
 import android.content.Context
 import android.view.ViewGroup
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.BaseLayoutParamsFactory
 import kotlin.String
 
 open class ViewGroupLayoutParamsFactory<TLayoutParams : ViewGroup.LayoutParams, TAttributes : ViewGroupLayoutParamsAttributes> : BaseLayoutParamsFactory<TLayoutParams, TAttributes>() {

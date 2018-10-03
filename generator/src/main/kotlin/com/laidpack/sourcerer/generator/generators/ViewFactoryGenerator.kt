@@ -6,6 +6,7 @@ import com.laidpack.sourcerer.generator.*
 import com.laidpack.sourcerer.generator.peeker.ClassCategory
 import com.laidpack.sourcerer.generator.peeker.ConstructorExpression
 import com.laidpack.sourcerer.generator.peeker.ViewConstructorExpression
+import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.target.CodeBlock
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -23,7 +24,7 @@ class ViewFactoryGenerator(
     private val viewTypeName = View::class.asTypeName()
 
     override fun getFactoryClassName(originalClassName: ClassName): ClassName {
-        return ClassName(TypePhilosopher.generatedPackageName, "${originalClassName.simpleName}Factory")
+        return ClassName(SourcererEnvironment.generatedPackageName, "${originalClassName.simpleName}Factory")
     }
 
     override val rootFactoryClassName: ClassName = rootViewFactoryClassName
@@ -75,9 +76,9 @@ class ViewFactoryGenerator(
     }
 
     companion object {
-        val rootViewFactoryClassName = ClassName(TypePhilosopher.generatedPackageName, "BaseViewFactory")
+        val rootViewFactoryClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "BaseViewFactory")
         val layoutParamFactoryComponentClassName =
-                ClassName(TypePhilosopher.generatedPackageName, "LayoutParamsFactoryComponent")
+                ClassName(SourcererEnvironment.serviceApiPackageName, "LayoutParamsFactoryComponent")
                         .parameterizedBy(WildcardTypeName.STAR, WildcardTypeName.STAR)
         val viewGroupLpClassName = ViewGroup.LayoutParams::class.asClassName()
         val viewGroupLpFactoryClassName = LayoutParamsFactoryGenerator.getFactoryClassName(

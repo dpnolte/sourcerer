@@ -27,7 +27,7 @@ targetCompatibility = "8"
 evaluationDependsOn(':stub-app')
 def componentIds = project(":stub-app").configurations.debugCompileClasspath.incoming.resolutionResult.allDependencies
         .findAll {
-           it.selected.id.group == "com.google.android.material" || it.selected.id.group.startsWith("androidx.")
+           it.selected.id instanceof ModuleComponentIdentifier && (it.selected.id.group == "com.google.android.material" || it.selected.id.group.startsWith("androidx."))
         }
         .collect { it.selected.id}
 

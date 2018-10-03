@@ -2,6 +2,7 @@ package com.laidpack.sourcerer.generator.generators
 
 import com.laidpack.annotation.TypeScript
 import com.laidpack.sourcerer.generator.TypePhilosopher
+import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 import com.squareup.kotlinpoet.*
 import com.squareup.moshi.JsonClass
@@ -26,7 +27,12 @@ class MultiFormatGenerator {
                 .addAnnotation(TypeScript::class.java)
                 .primaryConstructor(
                         FunSpec.constructorBuilder()
-                                .addParameter("allowedFormats", formatSet)
+                                .addParameter(
+                                        ParameterSpec.builder("allowedFormats", formatSet)
+                                                .addAnnotation(Transient::class)
+                                                .defaultValue("setOf()")
+                                                .build()
+                                )
                                 .build()
                 )
                 .addProperty(
@@ -75,7 +81,7 @@ class MultiFormatGenerator {
     }
 
     companion object {
-        val multiFormatClassName = ClassName(TypePhilosopher.generatedPackageName, "MultiFormat")
-        val multiFormatQualifierClassName = ClassName(TypePhilosopher.generatedPackageName, "MultiFormatQualifier")
+        val multiFormatClassName = ClassName(SourcererEnvironment.generatedPackageName, "MultiFormat")
+        val multiFormatQualifierClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "MultiFormatQualifier")
     }
 }

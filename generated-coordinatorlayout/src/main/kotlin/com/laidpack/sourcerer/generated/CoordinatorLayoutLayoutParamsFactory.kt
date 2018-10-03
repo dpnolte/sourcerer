@@ -3,10 +3,6 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
 import kotlin.String
 
 open class CoordinatorLayoutLayoutParamsFactory<TLayoutParams : CoordinatorLayout.LayoutParams, TAttributes : CoordinatorLayoutLayoutParamsAttributes> : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>() {
@@ -19,5 +15,6 @@ open class CoordinatorLayoutLayoutParamsFactory<TLayoutParams : CoordinatorLayou
         context: Context,
         attributes: TAttributes
     ) {
+        super.init(lp, context, attributes)
     }
 }

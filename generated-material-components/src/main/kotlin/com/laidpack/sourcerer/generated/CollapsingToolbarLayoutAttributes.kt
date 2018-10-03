@@ -1,6 +1,10 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.ColorQualifier
+import com.laidpack.sourcerer.service.api.DimensionQualifier
+import com.laidpack.sourcerer.service.api.IAttributes
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.Boolean
@@ -9,7 +13,7 @@ import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class CollapsingToolbarLayoutAttributes : FrameLayoutAttributes() {
+open class CollapsingToolbarLayoutAttributes : FrameLayoutAttributes(), IAttributes {
     @field:DimensionQualifier
     var expandedTitleMarginStart: Int? = null
 
@@ -40,6 +44,12 @@ open class CollapsingToolbarLayoutAttributes : FrameLayoutAttributes() {
     var titleEnabled: Boolean? = null
 
     var title: String? = null
+
+    companion object {
+        init {
+            SourcererService.registerAdapter(CollapsingToolbarLayoutAttributes::class, CollapsingToolbarLayoutAttributesJsonAdapter::class, "collapsingToolbarLayout")
+        }
+    }
 }
 
 enum class CollapsedTitleGravityFlagsEnum(val attributeName: String, val value: Int) {

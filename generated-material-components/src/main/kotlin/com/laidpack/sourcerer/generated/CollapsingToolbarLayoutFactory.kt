@@ -5,10 +5,8 @@ import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
+import com.laidpack.sourcerer.service.api.init
 import kotlin.String
 
 open class CollapsingToolbarLayoutFactory<TView : CollapsingToolbarLayout, TAttributes : CollapsingToolbarLayoutAttributes> : FrameLayoutFactory<TView, TAttributes>() {
@@ -50,13 +48,13 @@ open class CollapsingToolbarLayoutFactory<TView : CollapsingToolbarLayout, TAttr
             attributes.contentScrim?.let {
                 val immutableContentScrim = ColorDrawable(it)
                 if (contentScrim != immutableContentScrim) {
-                    setContentScrim(immutableContentScrim)
+                    contentScrim = immutableContentScrim
                 }
             }
             attributes.statusBarScrim?.let {
                 val immutableStatusBarScrim = ColorDrawable(it)
                 if (statusBarScrim != immutableStatusBarScrim) {
-                    setStatusBarScrim(immutableStatusBarScrim)
+                    statusBarScrim = immutableStatusBarScrim
                 }
             }
             attributes.scrimVisibleHeightTrigger?.let {
@@ -87,7 +85,7 @@ open class CollapsingToolbarLayoutFactory<TView : CollapsingToolbarLayout, TAttr
             }
             attributes.title?.let {
                 if (title != it) {
-                    setTitle(it)
+                    title = it
                 }
             }
         }

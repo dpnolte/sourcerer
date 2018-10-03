@@ -3,10 +3,6 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.Toolbar
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
 import kotlin.String
 
 open class ToolbarLayoutParamsFactory<TLayoutParams : Toolbar.LayoutParams, TAttributes : ToolbarLayoutParamsAttributes> : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>() {
@@ -19,5 +15,6 @@ open class ToolbarLayoutParamsFactory<TLayoutParams : Toolbar.LayoutParams, TAtt
         context: Context,
         attributes: TAttributes
     ) {
+        super.init(lp, context, attributes)
     }
 }

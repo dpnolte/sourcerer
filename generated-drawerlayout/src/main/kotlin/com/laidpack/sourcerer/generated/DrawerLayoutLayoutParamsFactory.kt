@@ -3,10 +3,6 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.ViewGroup
 import androidx.drawerlayout.widget.DrawerLayout
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
 import kotlin.String
 
 open class DrawerLayoutLayoutParamsFactory<TLayoutParams : DrawerLayout.LayoutParams, TAttributes : DrawerLayoutLayoutParamsAttributes> : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>() {
@@ -19,5 +15,6 @@ open class DrawerLayoutLayoutParamsFactory<TLayoutParams : DrawerLayout.LayoutPa
         context: Context,
         attributes: TAttributes
     ) {
+        super.init(lp, context, attributes)
     }
 }

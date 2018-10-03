@@ -1,8 +1,16 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.IAttributes
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class FrameLayoutLayoutParamsAttributes : ViewGroupLayoutParamsAttributes()
+open class FrameLayoutLayoutParamsAttributes : ViewGroupLayoutParamsAttributes(), IAttributes {
+    companion object {
+        init {
+            SourcererService.registerAdapter(FrameLayoutLayoutParamsAttributes::class, FrameLayoutLayoutParamsAttributesJsonAdapter::class, "layoutParams")
+        }
+    }
+}

@@ -6,10 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
+import com.laidpack.sourcerer.service.api.init
+import com.laidpack.sourcerer.service.api.toPorterDuffMode
 import kotlin.String
 
 open class ProgressBarFactory<TView : ProgressBar, TAttributes : ProgressBarAttributes> : ViewFactory<TView, TAttributes>() {
@@ -32,49 +31,49 @@ open class ProgressBarFactory<TView : ProgressBar, TAttributes : ProgressBarAttr
                 attributes.progressTint?.let {
                     val immutableProgressTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                     if (progressTintList != immutableProgressTint) {
-                        setProgressTintList(immutableProgressTint)
+                        progressTintList = immutableProgressTint
                     }
                 }
                 attributes.progressTintMode?.let {
                     val immutableProgressTintMode = it.value.toPorterDuffMode()
                     if (progressTintMode != immutableProgressTintMode) {
-                        setProgressTintMode(immutableProgressTintMode)
+                        progressTintMode = immutableProgressTintMode
                     }
                 }
                 attributes.progressBackgroundTint?.let {
                     val immutableProgressBackgroundTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                     if (progressBackgroundTintList != immutableProgressBackgroundTint) {
-                        setProgressBackgroundTintList(immutableProgressBackgroundTint)
+                        progressBackgroundTintList = immutableProgressBackgroundTint
                     }
                 }
                 attributes.progressBackgroundTintMode?.let {
                     val immutableProgressBackgroundTintMode = it.value.toPorterDuffMode()
                     if (progressBackgroundTintMode != immutableProgressBackgroundTintMode) {
-                        setProgressBackgroundTintMode(immutableProgressBackgroundTintMode)
+                        progressBackgroundTintMode = immutableProgressBackgroundTintMode
                     }
                 }
                 attributes.secondaryProgressTint?.let {
                     val immutableSecondaryProgressTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                     if (secondaryProgressTintList != immutableSecondaryProgressTint) {
-                        setSecondaryProgressTintList(immutableSecondaryProgressTint)
+                        secondaryProgressTintList = immutableSecondaryProgressTint
                     }
                 }
                 attributes.secondaryProgressTintMode?.let {
                     val immutableSecondaryProgressTintMode = it.value.toPorterDuffMode()
                     if (secondaryProgressTintMode != immutableSecondaryProgressTintMode) {
-                        setSecondaryProgressTintMode(immutableSecondaryProgressTintMode)
+                        secondaryProgressTintMode = immutableSecondaryProgressTintMode
                     }
                 }
                 attributes.indeterminateTint?.let {
                     val immutableIndeterminateTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                     if (indeterminateTintList != immutableIndeterminateTint) {
-                        setIndeterminateTintList(immutableIndeterminateTint)
+                        indeterminateTintList = immutableIndeterminateTint
                     }
                 }
                 attributes.indeterminateTintMode?.let {
                     val immutableIndeterminateTintMode = it.value.toPorterDuffMode()
                     if (indeterminateTintMode != immutableIndeterminateTintMode) {
-                        setIndeterminateTintMode(immutableIndeterminateTintMode)
+                        indeterminateTintMode = immutableIndeterminateTintMode
                     }
                 }
             }

@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.leanback.widget.BaseGridView
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
 import kotlin.String
 
 open class BaseGridViewFactory<TView : BaseGridView, TAttributes : BaseGridViewAttributes> : RecyclerViewFactory<TView, TAttributes>() {
@@ -25,5 +22,6 @@ open class BaseGridViewFactory<TView : BaseGridView, TAttributes : BaseGridViewA
         context: Context,
         attributes: TAttributes
     ) {
+        super.init(v, context, attributes)
     }
 }

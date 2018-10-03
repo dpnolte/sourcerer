@@ -1,8 +1,16 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.IAttributes
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class EmojiAppCompatButtonAttributes : ButtonAttributes()
+open class EmojiAppCompatButtonAttributes : ButtonAttributes(), IAttributes {
+    companion object {
+        init {
+            SourcererService.registerAdapter(EmojiAppCompatButtonAttributes::class, EmojiAppCompatButtonAttributesJsonAdapter::class, "emojiAppCompatButton")
+        }
+    }
+}

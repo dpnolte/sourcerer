@@ -7,10 +7,8 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.navigation.NavigationView
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
+import com.laidpack.sourcerer.service.api.init
 import kotlin.String
 
 open class NavigationViewFactory<TView : NavigationView, TAttributes : NavigationViewAttributes> : FrameLayoutFactory<TView, TAttributes>() {
@@ -32,19 +30,19 @@ open class NavigationViewFactory<TView : NavigationView, TAttributes : Navigatio
             attributes.itemIconTint?.let {
                 val immutableItemIconTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                 if (itemIconTintList != immutableItemIconTint) {
-                    setItemIconTintList(immutableItemIconTint)
+                    itemIconTintList = immutableItemIconTint
                 }
             }
             attributes.itemTextColor?.let {
                 val immutableItemTextColor = ResourcesCompat.getColorStateList(context.resources, it, null)
                 if (itemTextColor != immutableItemTextColor) {
-                    setItemTextColor(immutableItemTextColor)
+                    itemTextColor = immutableItemTextColor
                 }
             }
             attributes.itemBackground?.let {
                 val immutableItemBackground = ContextCompat.getDrawable(context, it) as Drawable
                 if (itemBackground != immutableItemBackground) {
-                    setItemBackground(immutableItemBackground)
+                    itemBackground = immutableItemBackground
                 }
             }
             attributes.itemHorizontalPadding?.let {

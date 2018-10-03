@@ -66,10 +66,16 @@ fun generateFactoryFiles(targetDir: File, result: SourcererResult) {
 
 fun deleteOldGeneratedFiles(env: SourcererEnvironment) {
     println("=================================")
-    for (file in env.generatedPackageDir.listFiles()) {
-        file.deleteRecursively()
+    for (file in env.rootPath.toFile().listFiles()) {
+        if (file.isDirectory && file.name.startsWith("generated")) {
+            val sourcePath = file.toPath().resolve("src/main/kotlin")
+            for (generatedFile in sourcePath.toFile().listFiles()) {
+                println(generatedFile)
+                //file.deleteRecursively()
+            }
+        }
     }
-    println("Deleted old generated files @ ${env.generatedPackageDir}")
+    println("Deleted old generated files")
     println("=================================")
 }
 

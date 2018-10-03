@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.ActionMenuView
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
 import kotlin.String
 
 open class ActionMenuViewFactory<TView : ActionMenuView, TAttributes : ActionMenuViewAttributes> : ViewGroupFactory<TView, TAttributes>() {
@@ -23,5 +20,6 @@ open class ActionMenuViewFactory<TView : ActionMenuView, TAttributes : ActionMen
         context: Context,
         attributes: TAttributes
     ) {
+        super.init(v, context, attributes)
     }
 }

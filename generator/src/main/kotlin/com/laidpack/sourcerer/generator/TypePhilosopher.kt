@@ -4,6 +4,7 @@ import com.laidpack.sourcerer.generator.generators.MultiFormatGenerator
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 import com.laidpack.sourcerer.generator.generators.delegates.DelegateGeneratorBase
 import com.laidpack.sourcerer.generator.peeker.ClassInfo
+import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.target.*
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeName
@@ -191,7 +192,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
     ): AttributeTypeResult {
         return when {
             attribute.formats.size == 1 && attribute.enumValues.isNotEmpty() -> {
-                val className = ClassName(generatedPackageName, attribute.name.toCamelCase() + "Enum")
+                val className = ClassName(SourcererEnvironment.generatedPackageName, attribute.name.toCamelCase() + "Enum")
                 AttributeTypeResult(
                         className,
                         setOf(StyleableAttributeFormat.Enum),
@@ -200,7 +201,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
             }
             attribute.formats.size == 1 && attribute.flags.isNotEmpty() -> {
                 // TODO: make this multi format value (i.e., flags and random integer)?
-                val className = ClassName(generatedPackageName, attribute.name.toCamelCase() + "FlagsEnum")
+                val className = ClassName(SourcererEnvironment.generatedPackageName, attribute.name.toCamelCase() + "FlagsEnum")
                 AttributeTypeResult(
                         className,
                         setOf(StyleableAttributeFormat.Integer),
@@ -242,8 +243,8 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
         val parameter = setter.getParameterByAttribute(attribute)
         val setterType = typesForThisSetter.resolvedSetterType
         val enumClassName : TypeName? = when {
-            attribute.enumValues.isNotEmpty() ->  ClassName(generatedPackageName, attribute.name.toCamelCase() + "Enum")
-            attribute.flags.isNotEmpty() -> ClassName(generatedPackageName, attribute.name.toCamelCase() + "FlagsEnum")
+            attribute.enumValues.isNotEmpty() ->  ClassName(SourcererEnvironment.generatedPackageName, attribute.name.toCamelCase() + "Enum")
+            attribute.flags.isNotEmpty() -> ClassName(SourcererEnvironment.generatedPackageName, attribute.name.toCamelCase() + "FlagsEnum")
             else -> null
         }
         for (format in attribute.formats) {
@@ -363,11 +364,6 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
 
 
     companion object {
-        const val generatedPackageName = "com.laidpack.sourcerer.generated"
-        val booleanDescribedTypes = setOf(
-                "boolean",
-                "java.lang.Boolean"
-        )
         private val allowedConversions = DelegateGeneratorBase.transformingMethodTypes.keys
 
         fun isConversionAvailable(format: StyleableAttributeFormat, typeName: TypeName): Boolean {

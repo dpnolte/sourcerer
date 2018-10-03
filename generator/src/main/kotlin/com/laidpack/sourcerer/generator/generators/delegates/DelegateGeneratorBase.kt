@@ -14,6 +14,7 @@ import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.target.AttributeTypesForSetter
 import com.laidpack.sourcerer.generator.target.Getter
 import com.laidpack.sourcerer.generator.generators.FormatEnumGenerator
+import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ParameterSpec
@@ -219,27 +220,30 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
                 }
         )
 
+        private val toPorterDuffTypeName = ClassName(SourcererEnvironment.serviceApiPackageName, "toPorterDuffMode")
         private val enumToPorterDuffMode = TransformingMethod(
                 apply = { valueProvider, args, _na ->
                     val value = valueProvider(args)
-                    args.add("toPorterDuffMode")
-                    "$value.%N()"
+                    args.add(toPorterDuffTypeName)
+                    "$value.%T()"
 
                 }
         )
+        private val toScaleTypeName = ClassName(SourcererEnvironment.serviceApiPackageName, "toScaleType")
         private val enumToScaleType= TransformingMethod(
                 apply = { valueProvider, args, _na ->
                     val value = valueProvider(args)
-                    args.add("toScaleType")
-                    "$value.%N()"
+                    args.add(toScaleTypeName)
+                    "$value.%T()"
 
                 }
         )
+        private val toTruncateAtTypeName = ClassName(SourcererEnvironment.serviceApiPackageName, "toTruncateAt")
         private val enumToTruncateAt= TransformingMethod(
                 apply = { valueProvider, args, _na ->
                     val value = valueProvider(args)
-                    args.add("toTruncateAt")
-                    "$value.%N()"
+                    args.add(toTruncateAtTypeName)
+                    "$value.%T()"
 
                 }
         )

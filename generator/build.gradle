@@ -10,7 +10,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     // bug -> https://youtrack.jetbrains.com/issue/KT-23744
     implementation files("$sdkDir/platforms/android-$compileSdkVersion/android.jar")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.squareup:kotlinpoet:1.0.0-RC1'
     implementation "com.squareup.moshi:moshi:$moshi"
     implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.6.20'
@@ -21,15 +21,15 @@ dependencies {
     api 'com.github.dpnolte.ts-rhymer:annotation:0.1'
 }
 
-sourceCompatibility = "8"
-targetCompatibility = "8"
 
 evaluationDependsOn(':stub-app')
 def componentIds = project(":stub-app").configurations.debugCompileClasspath.incoming.resolutionResult.allDependencies
         .findAll {
-           it.selected.id.group == "com.google.android.material" || it.selected.id.group.startsWith("androidx.")
+           it.selected.id instanceof ModuleComponentIdentifier && (it.selected.id.group == "com.google.android.material" || it.selected.id.group.startsWith("androidx."))
         }
-        .collect { it.selected.id}
+        .collect {
+            it.selected.id
+        }
 
 def result = dependencies.createArtifactResolutionQuery()
         .forComponents(componentIds)
@@ -44,12 +44,21 @@ for (component in result.resolvedComponents) {
         i += 1
     }
 }
+def libFiles = project(":stub-app").configurations.debugCompileClasspath.filter {
+    if (it.name.startsWith("project ")) {
+        println "filtered ${it.name}"
+        return false
+    } else {
+        return true
+    }
+}.collect()
+
 
 def taskArgs = [
         rootDir.absolutePath,
         compileSdkVersion,
         sdkDir,
-        project(":stub-app").configurations.debugCompileClasspath.files,
+        libFiles,
         sourceArtifacts
 ]
 task analyzeSource(type: JavaExec) {
@@ -88,14 +97,15 @@ task printEnvArguments(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     args = taskArgs
     doFirst {
-        project(":stub-app").configurations.debugCompileClasspath.files.each {
+/*        taskArgs[3].each {
             println "file in stub-app classpath: $it"
-        }
+        }*/
         classpath.each {
             println "file in classpath: $it"
         }
-        project(":stub-app").configurations.debugCompileClasspath.dependencies.each {
-            println "dependency: $it"
+        project(":stub-app").configurations.debugCompileClasspath.incoming.resolutionResult.allDependencies.each {
+            println "dependency: $it, variant: ${it.selected.variant.displayName}"
+
         }
         sourceArtifacts.each {
             println "source artifact: $it"

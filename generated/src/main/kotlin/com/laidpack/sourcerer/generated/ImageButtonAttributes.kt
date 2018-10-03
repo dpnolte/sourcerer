@@ -1,8 +1,16 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.IAttributes
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class ImageButtonAttributes : ImageViewAttributes()
+open class ImageButtonAttributes : ImageViewAttributes(), IAttributes {
+    companion object {
+        init {
+            SourcererService.registerAdapter(ImageButtonAttributes::class, ImageButtonAttributesJsonAdapter::class, "imageButton")
+        }
+    }
+}

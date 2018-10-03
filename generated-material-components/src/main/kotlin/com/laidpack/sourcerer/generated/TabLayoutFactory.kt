@@ -5,10 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.tabs.TabLayout
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
+import com.laidpack.sourcerer.service.api.init
 import kotlin.String
 
 open class TabLayoutFactory<TView : TabLayout, TAttributes : TabLayoutAttributes> : HorizontalScrollViewFactory<TView, TAttributes>() {
@@ -60,7 +58,7 @@ open class TabLayoutFactory<TView : TabLayout, TAttributes : TabLayoutAttributes
             attributes.tabRippleColor?.let {
                 val immutableTabRippleColor = ResourcesCompat.getColorStateList(context.resources, it, null)
                 if (tabRippleColor != immutableTabRippleColor) {
-                    setTabRippleColor(immutableTabRippleColor)
+                    tabRippleColor = immutableTabRippleColor
                 }
             }
         }

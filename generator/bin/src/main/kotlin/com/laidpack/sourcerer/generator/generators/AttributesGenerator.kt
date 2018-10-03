@@ -25,6 +25,7 @@ class AttributesGenerator(
     private val propertySpecs = mutableListOf<PropertySpec>()
     private val formatsUsed = mutableSetOf<ClassName>()
     private val className = getAttributesClassName(targetClassName, classCategory)
+    private val adapterClassName = ClassName(className.packageName, className.simpleName + "JsonAdapter")
 
     fun generateFile(): FileSpec {
         for (attribute in attributes.values) {
@@ -66,6 +67,15 @@ class AttributesGenerator(
                                 .build()
                 )
                 .addAnnotation(TypeScript::class.java)
+                .primaryConstructor(FunSpec.constructorBuilder()
+                        .addStatement(
+                                    "%T.registerAdapter(%T::class, %T::class, %S)",
+                                    sourcererServiceClassName,
+                                    className, adapterClassName,
+                                    targetClassName.simpleName.decapitalize()
+                                )
+                        .build()
+                )
                 .addProperties(propertySpecs)
         if (superClassName != null) {
             classTypeSpec.superclass(getAttributesClassName(superClassName, classCategory))
@@ -193,7 +203,7 @@ class AttributesGenerator(
         }
 
         private val usedEnumClassNames = mutableSetOf<ClassName>()
-
+        private val sourcererServiceClassName = ClassName("com.laidpack.sourcerer.service" ,"SourcererService")
     }
 
 }

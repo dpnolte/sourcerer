@@ -4,8 +4,8 @@ import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 
 
 fun main(args: Array<String>) {
-    val env = SourcererEnvironment(args)
     println("Values in args: " + args.joinToString())
+    val env = SourcererEnvironment(args)
     println("=================")
     println("Working Directory: ${env.rootPath}")
     println("Compile sdk version: ${env.compileSdkVersion}")

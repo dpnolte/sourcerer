@@ -1,6 +1,11 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.ColorQualifier
+import com.laidpack.sourcerer.service.api.DimensionQualifier
+import com.laidpack.sourcerer.service.api.IAttributes
+import com.laidpack.sourcerer.service.api.ReferenceQualifier
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.Boolean
@@ -9,7 +14,7 @@ import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class SwitchAttributes : ButtonAttributes() {
+open class SwitchAttributes : ButtonAttributes(), IAttributes {
     var thumb: Int? = null
 
     var thumbTint: Int? = null
@@ -43,6 +48,12 @@ open class SwitchAttributes : ButtonAttributes() {
     var splitTrack: Boolean? = null
 
     var showText: Boolean? = null
+
+    companion object {
+        init {
+            SourcererService.registerAdapter(SwitchAttributes::class, SwitchAttributesJsonAdapter::class, "switch")
+        }
+    }
 }
 
 enum class TrackTintModeEnum(val attributeName: String, val value: Int) {

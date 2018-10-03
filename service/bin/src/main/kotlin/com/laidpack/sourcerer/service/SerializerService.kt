@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 
 interface SerializerComponent<TAdapter> {
     fun deserialize(type: KClass<*>, json: String): Any
-    fun registerAdapter(subjectType: KClass<*>, adapterType: KClass<*>): SerializerComponent<TAdapter>
+    fun registerAdapter(subjectType: KClass<*>, adapterType: KClass<*>, elementName: String? = null): SerializerComponent<TAdapter>
     fun addAdapter(adapter: Any): SerializerComponent<TAdapter>
     fun buildAdapters() : SerializerComponent<TAdapter>
     fun getAdapter(subjectType: KClass<*>): TAdapter
@@ -19,7 +19,7 @@ interface SerializerComponent<TAdapter> {
     companion object {
         val instance by lazy { serviceLocator().serializerService }
         inline fun <reified T : Any> deserialize(json: String): T {
-            return instance.deserialize(T::class, json)
+            return instance.deserialize(T::class, json) as T
         }
     }
 }
@@ -48,7 +48,11 @@ class SerializerModule : SerializerComponent<JsonAdapter<out Any>> {
         return this
     }
 
-    override fun registerAdapter(subjectType: KClass<*>, adapterType: KClass<*>): SerializerComponent<JsonAdapter<out Any>> {
+    override fun registerAdapter(
+            subjectType: KClass<*>,
+            adapterType: KClass<*>,
+            elementName: String?
+    ): SerializerComponent<JsonAdapter<out Any>> {
         // if it is derived from jsonadapter, then it is an auto generated adapter, add it to factory..
         val type = Types.getRawType(subjectType::class.javaObjectType)
         val annotation = type.getAnnotation(JsonClass::class.java)
@@ -67,6 +71,9 @@ class SerializerModule : SerializerComponent<JsonAdapter<out Any>> {
                 if (BuildConfig.DEBUG) throw InstantiationException(msg)
                 else Log.e(TAG, msg)
             }
+        }
+        if (elementName != null) {
+            elementNameToSubjectType[elementName] = subjectType
         }
         return this
     }

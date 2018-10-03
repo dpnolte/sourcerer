@@ -1,8 +1,16 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.IAttributes
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class HorizontalGridViewAttributes : ViewGroupAttributes()
+open class HorizontalGridViewAttributes : ViewGroupAttributes(), IAttributes {
+    companion object {
+        init {
+            SourcererService.registerAdapter(HorizontalGridViewAttributes::class, HorizontalGridViewAttributesJsonAdapter::class, "horizontalGridView")
+        }
+    }
+}

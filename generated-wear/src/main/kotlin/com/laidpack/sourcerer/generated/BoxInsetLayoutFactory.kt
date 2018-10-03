@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.wear.widget.BoxInsetLayout
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
 import kotlin.String
 
 open class BoxInsetLayoutFactory<TView : BoxInsetLayout, TAttributes : BoxInsetLayoutAttributes> : ViewGroupFactory<TView, TAttributes>() {
@@ -23,5 +20,6 @@ open class BoxInsetLayoutFactory<TView : BoxInsetLayout, TAttributes : BoxInsetL
         context: Context,
         attributes: TAttributes
     ) {
+        super.init(v, context, attributes)
     }
 }

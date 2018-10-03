@@ -1,6 +1,8 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.IAttributes
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.Boolean
@@ -9,7 +11,7 @@ import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class ViewGroupAttributes : ViewAttributes() {
+open class ViewGroupAttributes : ViewAttributes(), IAttributes {
     var animateLayoutChanges: Boolean? = null
 
     var clipChildren: Boolean? = null
@@ -31,6 +33,12 @@ open class ViewGroupAttributes : ViewAttributes() {
     var layoutMode: LayoutModeEnum? = null
 
     var transitionGroup: Boolean? = null
+
+    companion object {
+        init {
+            SourcererService.registerAdapter(ViewGroupAttributes::class, ViewGroupAttributesJsonAdapter::class, "viewGroup")
+        }
+    }
 }
 
 enum class PersistentDrawingCacheFlagsEnum(val attributeName: String, val value: Int) {

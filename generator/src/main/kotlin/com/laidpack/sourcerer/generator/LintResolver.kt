@@ -13,6 +13,7 @@ fun main(args: Array<String>) {
     Store.init(env)
     val lintResult = LintResultsParser(env.lintReportsFilePath).parse()
     var totalCounter = 0
+    deleteOldGeneratedFiles(env)
     for (sourcererResult in getSourcererResults()) {
         var counter = 0
         val issues = lintResult.issues[sourcererResult.targetClassName.simpleName]

@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
+import com.laidpack.sourcerer.service.api.init
+import com.laidpack.sourcerer.service.api.toPorterDuffMode
+import com.laidpack.sourcerer.service.api.toTruncateAt
 import kotlin.String
 
 open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes> : ViewFactory<TView, TAttributes>() {
@@ -227,7 +227,7 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes> :
                 }
                 attributes.fontFeatureSettings?.let {
                     if (fontFeatureSettings != it) {
-                        setFontFeatureSettings(it)
+                        fontFeatureSettings = it
                     }
                 }
             }

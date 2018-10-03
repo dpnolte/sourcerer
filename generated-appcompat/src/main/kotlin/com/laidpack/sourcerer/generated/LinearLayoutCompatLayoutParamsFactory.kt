@@ -3,10 +3,6 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.ViewGroup
 import androidx.appcompat.widget.LinearLayoutCompat
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
 import kotlin.String
 
 open class LinearLayoutCompatLayoutParamsFactory<TLayoutParams : LinearLayoutCompat.LayoutParams, TAttributes : LinearLayoutCompatLayoutParamsAttributes> : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>() {
@@ -19,5 +15,6 @@ open class LinearLayoutCompatLayoutParamsFactory<TLayoutParams : LinearLayoutCom
         context: Context,
         attributes: TAttributes
     ) {
+        super.init(lp, context, attributes)
     }
 }

@@ -6,10 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.google.android.material.textfield.TextInputLayout
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
+import com.laidpack.sourcerer.service.api.init
 import kotlin.String
 
 open class TextInputLayoutFactory<TView : TextInputLayout, TAttributes : TextInputLayoutAttributes> : LinearLayoutFactory<TView, TAttributes>() {
@@ -66,12 +64,12 @@ open class TextInputLayoutFactory<TView : TextInputLayout, TAttributes : TextInp
             attributes.passwordToggleDrawable?.let {
                 val immutablePasswordToggleDrawable = ContextCompat.getDrawable(context, it) as Drawable
                 if (passwordVisibilityToggleDrawable != immutablePasswordToggleDrawable) {
-                    setPasswordVisibilityToggleDrawable(immutablePasswordToggleDrawable)
+                    passwordVisibilityToggleDrawable = immutablePasswordToggleDrawable
                 }
             }
             attributes.passwordToggleContentDescription?.let {
                 if (passwordVisibilityToggleContentDescription != it) {
-                    setPasswordVisibilityToggleContentDescription(it)
+                    passwordVisibilityToggleContentDescription = it
                 }
             }
         }

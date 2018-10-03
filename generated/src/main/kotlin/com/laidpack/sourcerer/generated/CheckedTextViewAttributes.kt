@@ -1,6 +1,10 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.ColorQualifier
+import com.laidpack.sourcerer.service.api.IAttributes
+import com.laidpack.sourcerer.service.api.ReferenceQualifier
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.Int
@@ -8,7 +12,7 @@ import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class CheckedTextViewAttributes : TextViewAttributes() {
+open class CheckedTextViewAttributes : TextViewAttributes(), IAttributes {
     @field:ReferenceQualifier
     var checkMark: Int? = null
 
@@ -16,6 +20,12 @@ open class CheckedTextViewAttributes : TextViewAttributes() {
     var checkMarkTint: Int? = null
 
     var checkMarkTintMode: CheckMarkTintModeEnum? = null
+
+    companion object {
+        init {
+            SourcererService.registerAdapter(CheckedTextViewAttributes::class, CheckedTextViewAttributesJsonAdapter::class, "checkedTextView")
+        }
+    }
 }
 
 enum class CheckMarkTintModeEnum(val attributeName: String, val value: Int) {

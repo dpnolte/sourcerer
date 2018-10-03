@@ -30,6 +30,10 @@ android {
         main.java.srcDirs += 'src/main/kotlin/'
         test.java.srcDirs += 'src/test/kotlin/'
     }
+    compileOptions {
+        sourceCompatibility 1.7
+        targetCompatibility 1.7
+    }
 
 }
 
@@ -40,7 +44,7 @@ task sourceJar(type: Jar) {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${'$'}kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${'$'}kotlin_version"
     implementation "androidx.appcompat:appcompat:${'$'}androidX"
     implementation "com.squareup.moshi:moshi:${'$'}moshi"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:${'$'}moshi"

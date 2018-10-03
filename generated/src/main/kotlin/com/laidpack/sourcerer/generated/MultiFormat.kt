@@ -7,10 +7,11 @@ import kotlin.Float
 import kotlin.Int
 import kotlin.String
 import kotlin.collections.Set
+import kotlin.jvm.Transient
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-class MultiFormat(private val allowedFormats: Set<Format>) {
+class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) {
     val mutableBoolean: Boolean? = null
 
     val hasBoolean: Boolean

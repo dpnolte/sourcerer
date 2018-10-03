@@ -8,10 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.BaseViewFactory
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
+import com.laidpack.sourcerer.service.api.init
+import com.laidpack.sourcerer.service.api.toPorterDuffMode
 import kotlin.String
 
 open class ViewFactory<TView : View, TAttributes : ViewAttributes> : BaseViewFactory<TView, TAttributes>() {
@@ -320,13 +320,13 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes> : BaseViewFac
                 attributes.backgroundTint?.let {
                     val immutableBackgroundTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                     if (backgroundTintList != immutableBackgroundTint) {
-                        setBackgroundTintList(immutableBackgroundTint)
+                        backgroundTintList = immutableBackgroundTint
                     }
                 }
                 attributes.backgroundTintMode?.let {
                     val immutableBackgroundTintMode = it.value.toPorterDuffMode()
                     if (backgroundTintMode != immutableBackgroundTintMode) {
-                        setBackgroundTintMode(immutableBackgroundTintMode)
+                        backgroundTintMode = immutableBackgroundTintMode
                     }
                 }
             }
@@ -365,13 +365,13 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes> : BaseViewFac
                 attributes.foregroundTint?.let {
                     val immutableForegroundTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                     if (foregroundTintList != immutableForegroundTint) {
-                        setForegroundTintList(immutableForegroundTint)
+                        foregroundTintList = immutableForegroundTint
                     }
                 }
                 attributes.foregroundTintMode?.let {
                     val immutableForegroundTintMode = it.value.toPorterDuffMode()
                     if (foregroundTintMode != immutableForegroundTintMode) {
-                        setForegroundTintMode(immutableForegroundTintMode)
+                        foregroundTintMode = immutableForegroundTintMode
                     }
                 }
                 attributes.scrollIndicators?.let {
@@ -411,7 +411,7 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes> : BaseViewFac
                 }
                 attributes.tooltipText?.let {
                     if (tooltipText != it) {
-                        setTooltipText(it)
+                        tooltipText = it
                     }
                 }
                 attributes.keyboardNavigationCluster?.let {
@@ -443,7 +443,7 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes> : BaseViewFac
                 }
                 attributes.accessibilityPaneTitle?.let {
                     if (accessibilityPaneTitle != it) {
-                        setAccessibilityPaneTitle(it)
+                        accessibilityPaneTitle = it
                     }
                 }
                 attributes.accessibilityHeading?.let {

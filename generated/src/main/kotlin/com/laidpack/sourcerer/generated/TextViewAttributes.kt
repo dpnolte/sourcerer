@@ -1,6 +1,12 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.ColorQualifier
+import com.laidpack.sourcerer.service.api.DimensionQualifier
+import com.laidpack.sourcerer.service.api.IAttributes
+import com.laidpack.sourcerer.service.api.MultiFormatQualifier
+import com.laidpack.sourcerer.service.api.ReferenceQualifier
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.Boolean
@@ -10,7 +16,7 @@ import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class TextViewAttributes : ViewAttributes() {
+open class TextViewAttributes : ViewAttributes(), IAttributes {
     var text: String? = null
 
     var hint: String? = null
@@ -130,6 +136,12 @@ open class TextViewAttributes : ViewAttributes() {
     var hyphenationFrequency: HyphenationFrequencyEnum? = null
 
     var autoSizeTextType: AutoSizeTextTypeEnum? = null
+
+    companion object {
+        init {
+            SourcererService.registerAdapter(TextViewAttributes::class, TextViewAttributesJsonAdapter::class, "textView")
+        }
+    }
 }
 
 enum class DrawableTintModeEnum(val attributeName: String, val value: Int) {

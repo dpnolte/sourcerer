@@ -89,7 +89,9 @@ class AndroidWidgetParser : WidgetConnoisseur {
     }
 
     override fun getDependencies(widget: Widget): List<String> {
-        return listOf()
+        return listOf(
+                "project(\":service\")"
+        )
     }
 }
 
@@ -123,6 +125,7 @@ class MaterialDesignWidgetParser : WidgetConnoisseur {
     override fun getDependencies(widget: Widget): List<String> {
         return listOf(
                 "com.google.android.material:material:\$materialDesign",
+                "project(\":service\")",
                 "project(\":generated\")",
                 "project(\":generated-cardview\")"
         )
@@ -195,6 +198,7 @@ class SupportWidgetParser : WidgetConnoisseur {
         }
         val dependencies = mutableListOf(
                 "${libInfo.module}:${libInfo.name}:\$$version",
+                "project(\":service\")",
                 "project(\":generated\")"
         )
         if (libInfo.name == "leanback") {

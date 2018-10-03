@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
 import kotlin.String
 
 open class SeekBarFactory<TView : SeekBar, TAttributes : SeekBarAttributes> : AbsSeekBarFactory<TView, TAttributes>() {
@@ -23,5 +20,6 @@ open class SeekBarFactory<TView : SeekBar, TAttributes : SeekBarAttributes> : Ab
         context: Context,
         attributes: TAttributes
     ) {
+        super.init(v, context, attributes)
     }
 }

@@ -296,7 +296,7 @@ class AttributeManager(
                 matchingGetters.addAll(selectedClassInfo.methodDeclarations[matchingGetterNames[1]] as List<MethodInfo>)
             }
             for (matchingGetter in matchingGetters) {
-                if (!matchingGetter.methodDeclaration.isStatic && checkNullability(methodInfo)) {
+                if (!matchingGetter.methodDeclaration.isStatic && checkNullability(matchingGetter)) {
                     val methodName = matchingGetter.methodDeclaration.nameAsString
                     if (methodName.startsWith("is") && isBooleanRequired) {
                         return "is$setterMethodNameBase"

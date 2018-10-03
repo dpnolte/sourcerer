@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generator.generators
 
 import com.laidpack.sourcerer.generator.TypePhilosopher
+import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import java.io.File
 import java.lang.IllegalStateException
 import java.nio.file.Path
@@ -25,7 +26,7 @@ class ApiGenerator(targetSourcePath: Path, sourcePath: Path) {
 
     companion object {
         private val packageRegex = Regex("package\\s+(.+\\..+)")
-        private const val packageName = TypePhilosopher.generatedPackageName
+        private const val packageName = SourcererEnvironment.generatedPackageName
         private val packagePathString = packageName.replace(".", File.separator)
     }
 }

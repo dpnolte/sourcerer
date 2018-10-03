@@ -1,13 +1,17 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.ColorQualifier
+import com.laidpack.sourcerer.service.api.DimensionQualifier
+import com.laidpack.sourcerer.service.api.IAttributes
 import com.squareup.moshi.JsonClass
 import kotlin.Boolean
 import kotlin.Int
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class CardViewAttributes : FrameLayoutAttributes() {
+open class CardViewAttributes : FrameLayoutAttributes(), IAttributes {
     @field:ColorQualifier
     var cardBackgroundColor: Int? = null
 
@@ -35,4 +39,10 @@ open class CardViewAttributes : FrameLayoutAttributes() {
 
     @field:DimensionQualifier
     var contentPaddingBottom: Int? = null
+
+    companion object {
+        init {
+            SourcererService.registerAdapter(CardViewAttributes::class, CardViewAttributesJsonAdapter::class, "cardView")
+        }
+    }
 }

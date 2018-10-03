@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.tabs.TabItem
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
 import kotlin.String
 
 open class TabItemFactory<TView : TabItem, TAttributes : TabItemAttributes> : ViewFactory<TView, TAttributes>() {
@@ -23,5 +20,6 @@ open class TabItemFactory<TView : TabItem, TAttributes : TabItemAttributes> : Vi
         context: Context,
         attributes: TAttributes
     ) {
+        super.init(v, context, attributes)
     }
 }

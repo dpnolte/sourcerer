@@ -1,6 +1,10 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.service.SourcererService
+import com.laidpack.sourcerer.service.api.ColorQualifier
+import com.laidpack.sourcerer.service.api.DimensionQualifier
+import com.laidpack.sourcerer.service.api.IAttributes
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.Boolean
@@ -9,7 +13,7 @@ import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class TabLayoutAttributes : HorizontalScrollViewAttributes() {
+open class TabLayoutAttributes : HorizontalScrollViewAttributes(), IAttributes {
     @field:DimensionQualifier
     var tabIndicatorHeight: Int? = null
 
@@ -25,6 +29,12 @@ open class TabLayoutAttributes : HorizontalScrollViewAttributes() {
 
     @field:ColorQualifier
     var tabRippleColor: Int? = null
+
+    companion object {
+        init {
+            SourcererService.registerAdapter(TabLayoutAttributes::class, TabLayoutAttributesJsonAdapter::class, "tabLayout")
+        }
+    }
 }
 
 enum class TabIndicatorGravityEnum(val attributeName: String, val value: Int) {

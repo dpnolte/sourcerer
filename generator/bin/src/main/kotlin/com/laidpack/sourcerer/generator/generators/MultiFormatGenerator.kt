@@ -26,7 +26,12 @@ class MultiFormatGenerator {
                 .addAnnotation(TypeScript::class.java)
                 .primaryConstructor(
                         FunSpec.constructorBuilder()
-                                .addParameter("allowedFormats", formatSet)
+                                .addParameter(
+                                        ParameterSpec.builder("allowedFormats", formatSet)
+                                                .addAnnotation(Transient::class)
+                                                .defaultValue("setOf()")
+                                                .build()
+                                )
                                 .build()
                 )
                 .addProperty(

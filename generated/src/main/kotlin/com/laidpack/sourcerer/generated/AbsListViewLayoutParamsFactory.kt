@@ -3,10 +3,6 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.AbsListView
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
 import kotlin.String
 
 open class AbsListViewLayoutParamsFactory<TLayoutParams : AbsListView.LayoutParams, TAttributes : AbsListViewLayoutParamsAttributes> : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>() {
@@ -19,5 +15,6 @@ open class AbsListViewLayoutParamsFactory<TLayoutParams : AbsListView.LayoutPara
         context: Context,
         attributes: TAttributes
     ) {
+        super.init(lp, context, attributes)
     }
 }

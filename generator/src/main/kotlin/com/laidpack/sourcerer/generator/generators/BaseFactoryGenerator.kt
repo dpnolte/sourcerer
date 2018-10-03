@@ -4,11 +4,11 @@ import android.content.Context
 import android.os.Build
 import com.laidpack.sourcerer.generator.target.CodeBlock
 import com.laidpack.sourcerer.generator.peeker.ClassCategory
-import com.laidpack.sourcerer.generator.TypePhilosopher
 import com.laidpack.sourcerer.generator.generators.delegates.MultiAttributesAndMultiSettersGenerator
 import com.laidpack.sourcerer.generator.generators.delegates.MultiAttributesAndSingleSetterGenerator
 import com.laidpack.sourcerer.generator.generators.delegates.SingleAttributeAndMultiSettersGenerator
 import com.laidpack.sourcerer.generator.generators.delegates.SingleAttributeAndSingleSetterGenerator
+import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import kotlin.reflect.KClass
@@ -63,10 +63,6 @@ abstract class BaseFactoryGenerator(
     fun generateFile(): FileSpec {
 
         val file = FileSpec.builder(factoryClassName.packageName, factoryClassName.simpleName)
-        file.addImport(TypePhilosopher.generatedPackageName, "init")
-        file.addImport(TypePhilosopher.generatedPackageName, "toPorterDuffMode")
-        file.addImport(TypePhilosopher.generatedPackageName, "toScaleType")
-        file.addImport(TypePhilosopher.generatedPackageName, "toTruncateAt")
         file.addType(
                 getClassSpec()
                 .build()
@@ -88,27 +84,30 @@ abstract class BaseFactoryGenerator(
                                 .build()
                 )
                 .addFunction(generateCreateInstanceFunc())
-                .addFunction(generateInitFunc())
+                .addInitFuncIfRequired()
     }
 
     abstract fun generateCreateInstanceFunc(): FunSpec
 
-    private fun generateInitFunc() : FunSpec {
-        val funSpec = FunSpec.builder("init")
-                .addModifiers(KModifier.OVERRIDE)
-                .addParameter(layoutParam)
-                .addParameter(contextParam)
-                .addParameter(attributesParam)
+    private fun TypeSpec.Builder.addInitFuncIfRequired() : TypeSpec.Builder {
+        if (codeBlocks.isNotEmpty() || !hasSuperClass) {
+            val funSpec = FunSpec.builder("init")
+                    .addModifiers(KModifier.OVERRIDE)
+                    .addParameter(layoutParam)
+                    .addParameter(contextParam)
+                    .addParameter(attributesParam)
+                    .addSuperInitIfRequired()
 
-        if (codeBlocks.isNotEmpty()) {
-            funSpec.addSuperInitIfRequired()
-                    .addLocalVar()
-                    .beginControlFlow("%N.init", resolvedLayoutVariableName)
-                    .addInitializeAttributeCodeBlocks()
-                    .endControlFlow()
+            if (codeBlocks.isNotEmpty()) {
+                funSpec.addLocalVar()
+                        .beginControlFlow("%N.%T", resolvedLayoutVariableName, initTypeName)
+                        .addInitializeAttributeCodeBlocks()
+                        .endControlFlow()
+            }
+
+            this.addFunction(funSpec.build())
         }
-
-        return funSpec.build()
+        return this
     }
 
     private fun FunSpec.Builder.addLocalVar(): FunSpec.Builder {
@@ -161,6 +160,10 @@ abstract class BaseFactoryGenerator(
         }
 
         return this
+    }
+
+    companion object {
+        private val initTypeName = ClassName(SourcererEnvironment.serviceApiPackageName, "init")
     }
 
 }

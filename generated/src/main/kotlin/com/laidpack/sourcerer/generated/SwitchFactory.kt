@@ -8,10 +8,9 @@ import android.view.ViewGroup
 import android.widget.Switch
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.LayoutParamsFactoryComponent
+import com.laidpack.sourcerer.service.api.init
+import com.laidpack.sourcerer.service.api.toPorterDuffMode
 import kotlin.String
 
 open class SwitchFactory<TView : Switch, TAttributes : SwitchAttributes> : ButtonFactory<TView, TAttributes>() {
@@ -85,25 +84,25 @@ open class SwitchFactory<TView : Switch, TAttributes : SwitchAttributes> : Butto
                 attributes.thumbTint?.let {
                     val immutableThumbTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                     if (thumbTintList != immutableThumbTint) {
-                        setThumbTintList(immutableThumbTint)
+                        thumbTintList = immutableThumbTint
                     }
                 }
                 attributes.thumbTintMode?.let {
                     val immutableThumbTintMode = it.toPorterDuffMode()
                     if (thumbTintMode != immutableThumbTintMode) {
-                        setThumbTintMode(immutableThumbTintMode)
+                        thumbTintMode = immutableThumbTintMode
                     }
                 }
                 attributes.trackTint?.let {
                     val immutableTrackTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                     if (trackTintList != immutableTrackTint) {
-                        setTrackTintList(immutableTrackTint)
+                        trackTintList = immutableTrackTint
                     }
                 }
                 attributes.trackTintMode?.let {
                     val immutableTrackTintMode = it.value.toPorterDuffMode()
                     if (trackTintMode != immutableTrackTintMode) {
-                        setTrackTintMode(immutableTrackTintMode)
+                        trackTintMode = immutableTrackTintMode
                     }
                 }
             }

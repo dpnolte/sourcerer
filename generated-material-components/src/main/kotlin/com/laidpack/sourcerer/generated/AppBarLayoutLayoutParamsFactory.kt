@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import com.google.android.material.appbar.AppBarLayout
-import com.laidpack.sourcerer.generated.init
-import com.laidpack.sourcerer.generated.toPorterDuffMode
-import com.laidpack.sourcerer.generated.toScaleType
-import com.laidpack.sourcerer.generated.toTruncateAt
+import com.laidpack.sourcerer.service.api.init
 import kotlin.String
 
 open class AppBarLayoutLayoutParamsFactory<TLayoutParams : AppBarLayout.LayoutParams, TAttributes : AppBarLayoutLayoutParamsAttributes> : LinearLayoutLayoutParamsFactory<TLayoutParams, TAttributes>() {

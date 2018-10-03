@@ -5,6 +5,7 @@ import com.laidpack.sourcerer.generator.target.CodeBlock
 import com.laidpack.sourcerer.generator.peeker.ClassCategory
 import com.laidpack.sourcerer.generator.TypePhilosopher
 import com.laidpack.sourcerer.generator.peeker.LayoutParamsConstructorExpression
+import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.squareup.kotlinpoet.*
 
 class LayoutParamsFactoryGenerator(
@@ -48,13 +49,13 @@ class LayoutParamsFactoryGenerator(
     }
 
     companion object {
-        val rootFactoryClassName = ClassName(TypePhilosopher.generatedPackageName, "BaseLayoutParamsFactory")
+        val rootFactoryClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "BaseLayoutParamsFactory")
         val viewGroupLayoutParamsClassName = ViewGroup.LayoutParams::class.asClassName()
 
         fun getFactoryClassName(originalClassName: ClassName): ClassName {
             val splitClassNameString = originalClassName.canonicalName.split(".")
             val simpleName = splitClassNameString[splitClassNameString.lastIndex - 1] + splitClassNameString[splitClassNameString.lastIndex]
-            return ClassName(TypePhilosopher.generatedPackageName, simpleName + "Factory")
+            return ClassName(SourcererEnvironment.generatedPackageName, simpleName + "Factory")
         }
     }
 
