@@ -16,12 +16,4 @@ open class BaseGridViewFactory<TView : BaseGridView, TAttributes : BaseGridViewA
     override fun createInstance(context: Context): View {
         throw IllegalStateException("androidx.leanback.widget.BaseGridView is abstract and cannot be instantiated")
     }
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

@@ -110,12 +110,12 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes> :
                 }
             }
             if (attributes.drawableTop.hasColor || attributes.drawableTop.hasReference || attributes.drawableBottom.hasColor || attributes.drawableBottom.hasReference || attributes.drawableLeft.hasColor || attributes.drawableLeft.hasReference || attributes.drawableRight.hasColor || attributes.drawableRight.hasReference) {
-                val immutableDrawableLeftInt = if (attributes.drawableLeft.hasColor) attributes.drawableLeft.color else left
-                val immutableDrawableTopInt = if (attributes.drawableTop.hasColor) attributes.drawableTop.color else top
-                val immutableDrawableRightInt = if (attributes.drawableRight.hasColor) attributes.drawableRight.color else right
-                val immutableDrawableBottomInt = if (attributes.drawableBottom.hasColor) attributes.drawableBottom.color else bottom
-                if (left != immutableDrawableLeftInt || top != immutableDrawableTopInt || right != immutableDrawableRightInt || bottom != immutableDrawableBottomInt) {
-                    setCompoundDrawablesWithIntrinsicBounds(immutableDrawableLeftInt, immutableDrawableTopInt, immutableDrawableRightInt, immutableDrawableBottomInt)
+                val immutableDrawableLeftColor = if (attributes.drawableLeft.hasColor) attributes.drawableLeft.color else left
+                val immutableDrawableTopColor = if (attributes.drawableTop.hasColor) attributes.drawableTop.color else top
+                val immutableDrawableRightColor = if (attributes.drawableRight.hasColor) attributes.drawableRight.color else right
+                val immutableDrawableBottomColor = if (attributes.drawableBottom.hasColor) attributes.drawableBottom.color else bottom
+                if (left != immutableDrawableLeftColor || top != immutableDrawableTopColor || right != immutableDrawableRightColor || bottom != immutableDrawableBottomColor) {
+                    setCompoundDrawablesWithIntrinsicBounds(immutableDrawableLeftColor, immutableDrawableTopColor, immutableDrawableRightColor, immutableDrawableBottomColor)
                 }
             }
             attributes.drawablePadding?.let {

@@ -9,12 +9,4 @@ open class ViewPagerLayoutParamsFactory<TLayoutParams : ViewPager.LayoutParams, 
     override val elementName: String = "layoutParams"
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = ViewPager.LayoutParams()
-
-    override fun init(
-        lp: ViewGroup.LayoutParams,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(lp, context, attributes)
-    }
 }

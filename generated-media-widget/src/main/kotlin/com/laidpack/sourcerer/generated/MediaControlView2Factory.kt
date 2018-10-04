@@ -14,12 +14,4 @@ open class MediaControlView2Factory<TView : MediaControlView2, TAttributes : Med
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = MediaControlView2(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

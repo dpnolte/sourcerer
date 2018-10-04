@@ -9,12 +9,4 @@ open class FrameLayoutLayoutParamsFactory<TLayoutParams : FrameLayout.LayoutPara
     override val elementName: String = "layoutParams"
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
-
-    override fun init(
-        lp: ViewGroup.LayoutParams,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(lp, context, attributes)
-    }
 }

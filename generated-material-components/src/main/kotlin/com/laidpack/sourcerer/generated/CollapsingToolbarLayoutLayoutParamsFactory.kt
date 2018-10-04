@@ -9,12 +9,4 @@ open class CollapsingToolbarLayoutLayoutParamsFactory<TLayoutParams : Collapsing
     override val elementName: String = "layoutParams"
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = CollapsingToolbarLayout.LayoutParams(CollapsingToolbarLayout.LayoutParams.MATCH_PARENT, CollapsingToolbarLayout.LayoutParams.MATCH_PARENT)
-
-    override fun init(
-        lp: ViewGroup.LayoutParams,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(lp, context, attributes)
-    }
 }

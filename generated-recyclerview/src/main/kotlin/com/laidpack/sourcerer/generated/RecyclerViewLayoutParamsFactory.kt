@@ -9,12 +9,4 @@ open class RecyclerViewLayoutParamsFactory<TLayoutParams : RecyclerView.LayoutPa
     override val elementName: String = "layoutParams"
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.MATCH_PARENT)
-
-    override fun init(
-        lp: ViewGroup.LayoutParams,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(lp, context, attributes)
-    }
 }

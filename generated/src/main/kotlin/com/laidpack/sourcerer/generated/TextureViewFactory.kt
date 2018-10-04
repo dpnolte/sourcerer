@@ -14,12 +14,4 @@ open class TextureViewFactory<TView : TextureView, TAttributes : TextureViewAttr
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = TextureView(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

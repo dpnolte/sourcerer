@@ -14,12 +14,4 @@ open class QuickContactBadgeFactory<TView : QuickContactBadge, TAttributes : Qui
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = QuickContactBadge(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

@@ -14,12 +14,4 @@ open class CircularRevealLinearLayoutFactory<TView : CircularRevealLinearLayout,
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = CircularRevealLinearLayout(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

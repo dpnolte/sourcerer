@@ -9,12 +9,4 @@ open class BaseCardViewLayoutParamsFactory<TLayoutParams : BaseCardView.LayoutPa
     override val elementName: String = "layoutParams"
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = BaseCardView.LayoutParams(BaseCardView.LayoutParams.MATCH_PARENT, BaseCardView.LayoutParams.MATCH_PARENT)
-
-    override fun init(
-        lp: ViewGroup.LayoutParams,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(lp, context, attributes)
-    }
 }

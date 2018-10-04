@@ -14,12 +14,4 @@ open class PagedListViewFactory<TView : PagedListView, TAttributes : PagedListVi
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = PagedListView(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

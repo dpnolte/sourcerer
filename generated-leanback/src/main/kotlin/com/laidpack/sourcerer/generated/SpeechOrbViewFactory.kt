@@ -14,12 +14,4 @@ open class SpeechOrbViewFactory<TView : SpeechOrbView, TAttributes : SpeechOrbVi
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = SpeechOrbView(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

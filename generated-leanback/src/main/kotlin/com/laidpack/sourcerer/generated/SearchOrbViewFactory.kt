@@ -14,12 +14,4 @@ open class SearchOrbViewFactory<TView : SearchOrbView, TAttributes : SearchOrbVi
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = SearchOrbView(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

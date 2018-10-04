@@ -11,7 +11,7 @@ class JavaDocInterpreter(
     override fun interpret(): InterpretationResult {
         val interpretations = mutableListOf<Interpretation>()
         classInfo.getMethodsWithAttributeTagInComments().forEach { relevantMethod ->
-            val interpreter = JavaDocForMethodInterpreter(relevantMethod, classInfo, attributeManager)
+            val interpreter = JavaDocForSetterInterpreter(relevantMethod, classInfo, attributeManager)
             val interpretation = interpreter.interpret()
             interpretations.add(interpretation)
         }

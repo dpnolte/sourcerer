@@ -1,4 +1,5 @@
-package com.laidpack.sourcerer.generated
+// do not edit, auto-generated
+package com.laidpack.sourcerer.service.api
 
 import kotlin.String
 

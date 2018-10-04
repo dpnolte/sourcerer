@@ -17,6 +17,12 @@ class AttributeManager(
         private val classRegistry: ClassRegistry
 ) {
 
+    private val potentialGetters = classInfo.potentialGetters
+    private val potentialGettersWithAttribute = potentialGetters.filter{
+        it.methodDeclaration.nameAsString.startsWith("get")
+        && it.javadoc.blockTags.any { it.tagName == "attr" }
+    }
+
     fun linkAttributeAndSetter(attribute: Attribute, setter: Setter, parameterIndex: Int) {
         val setterHashCode = setter.hashCode()
         attribute.setterHashCodes.add(setterHashCode)
@@ -190,6 +196,13 @@ class AttributeManager(
         }
 
         return MatchGetterResult(false)
+    }
+
+    private fun analyzeJavaDocToFindGetter(attribute: Attribute, setter: Setter): MatchGetterResult {
+        for (potentialGetter in potentialGettersWithAttribute) {
+            val attributeBlockTags = potentialGetter.javadoc.blockTags.filter { it.tagName == "attr" }
+
+        }
     }
 
     private fun isEligibleMethod(method: MethodInfo, getterTargetClassNames: List<String>): Boolean {

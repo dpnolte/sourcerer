@@ -253,17 +253,17 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes> : BaseViewFac
             }
             if (Build.VERSION.SDK_INT >= 17) {
                 if (attributes.paddingLeft != null || attributes.paddingTop != null || attributes.paddingRight != null || attributes.paddingBottom != null || attributes.paddingStart != null || attributes.paddingEnd != null) {
-                    val immutablePaddingBottomInt = attributes.paddingBottom ?: paddingBottom
-                    val immutablePaddingLeftInt = attributes.paddingLeft ?: paddingLeft
-                    val immutablePaddingRightInt = attributes.paddingRight ?: paddingRight
-                    val immutablePaddingTopInt = attributes.paddingTop ?: paddingTop
-                    if (paddingBottom != immutablePaddingBottomInt || paddingBottom != immutablePaddingBottomInt || paddingLeft != immutablePaddingLeftInt || paddingRight != immutablePaddingRightInt || paddingTop != immutablePaddingTopInt || paddingTop != immutablePaddingTopInt) {
-                        setPadding(immutablePaddingLeftInt, immutablePaddingTopInt, immutablePaddingRightInt, immutablePaddingBottomInt)
+                    val immutablePaddingBottomDimension = attributes.paddingBottom ?: paddingBottom
+                    val immutablePaddingLeftDimension = attributes.paddingLeft ?: paddingLeft
+                    val immutablePaddingRightDimension = attributes.paddingRight ?: paddingRight
+                    val immutablePaddingTopDimension = attributes.paddingTop ?: paddingTop
+                    if (paddingBottom != immutablePaddingBottomDimension || paddingBottom != immutablePaddingBottomDimension || paddingLeft != immutablePaddingLeftDimension || paddingRight != immutablePaddingRightDimension || paddingTop != immutablePaddingTopDimension || paddingTop != immutablePaddingTopDimension) {
+                        setPadding(immutablePaddingLeftDimension, immutablePaddingTopDimension, immutablePaddingRightDimension, immutablePaddingBottomDimension)
                     }
-                    val immutablePaddingStartInt = attributes.paddingStart ?: paddingStart
-                    val immutablePaddingEndInt = attributes.paddingEnd ?: paddingEnd
-                    if (paddingStart != immutablePaddingStartInt || paddingEnd != immutablePaddingEndInt) {
-                        setPaddingRelative(immutablePaddingStartInt, immutablePaddingTopInt, immutablePaddingEndInt, immutablePaddingBottomInt)
+                    val immutablePaddingStartDimension = attributes.paddingStart ?: paddingStart
+                    val immutablePaddingEndDimension = attributes.paddingEnd ?: paddingEnd
+                    if (paddingStart != immutablePaddingStartDimension || paddingEnd != immutablePaddingEndDimension) {
+                        setPaddingRelative(immutablePaddingStartDimension, immutablePaddingTopDimension, immutablePaddingEndDimension, immutablePaddingBottomDimension)
                     }
                 }
                 attributes.layoutDirection?.let {

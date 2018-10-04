@@ -9,6 +9,7 @@ import com.squareup.kotlinpoet.*
 class FormatEnumGenerator() {
     fun generateFile(): FileSpec {
         val file = FileSpec.builder(formatEnumClassName.packageName, formatEnumClassName.simpleName)
+        file.addComment("do not edit, auto-generated")
         file.addType(createEnumType())
         file.addTypeAlias(TypeAliasSpec.builder(stringAliasClassName.simpleName, String::class).build())
         return file.build()
@@ -40,7 +41,7 @@ class FormatEnumGenerator() {
     }
 
     companion object {
-        private val stringAliasClassName = ClassName(SourcererEnvironment.generatedPackageName, "StringAlias")
-        val formatEnumClassName = ClassName(SourcererEnvironment.generatedPackageName, "Format")
+        private val stringAliasClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "StringAlias")
+        val formatEnumClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "Format")
     }
 }

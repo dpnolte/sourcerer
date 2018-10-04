@@ -14,12 +14,4 @@ open class RowHeaderViewFactory<TView : RowHeaderView, TAttributes : RowHeaderVi
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = RowHeaderView(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

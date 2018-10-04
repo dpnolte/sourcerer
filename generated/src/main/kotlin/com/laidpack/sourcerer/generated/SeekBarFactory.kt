@@ -14,12 +14,4 @@ open class SeekBarFactory<TView : SeekBar, TAttributes : SeekBarAttributes> : Ab
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = SeekBar(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

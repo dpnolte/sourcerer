@@ -14,12 +14,4 @@ open class TimePickerFactory<TView : TimePicker, TAttributes : TimePickerAttribu
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = TimePicker(context, null)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

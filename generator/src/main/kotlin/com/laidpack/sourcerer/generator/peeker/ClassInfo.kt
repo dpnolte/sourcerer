@@ -75,7 +75,7 @@ data class ClassInfo(
         val getters = mutableListOf<MethodInfo>()
         for (methodDeclarationGroup in methodDeclarations) {
             for (methodInfo in methodDeclarationGroup.value) {
-                if (isEligibleMethod(methodInfo)) {
+                if (isEligibleMethod(methodInfo) && !methodInfo.resolvedMethodDeclaration.returnType.isVoid) {
                     getters.add(methodInfo)
                 }
             }

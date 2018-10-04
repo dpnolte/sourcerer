@@ -14,12 +14,4 @@ open class WearableNavigationDrawerViewFactory<TView : WearableNavigationDrawerV
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = WearableNavigationDrawerView(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

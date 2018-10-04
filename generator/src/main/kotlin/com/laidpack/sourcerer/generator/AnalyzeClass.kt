@@ -6,7 +6,7 @@ import com.github.javaparser.ast.Node as JavaNode
 
 
 fun main(args: Array<String>) {
-    val simpleName= "SwitchCompat"
+    val simpleName= "TextView"
 
     val env = SourcererEnvironment(args)
     initParserAndStore(env)

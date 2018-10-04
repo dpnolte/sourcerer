@@ -21,11 +21,12 @@ fun main(args: Array<String>) {
     val classRegistry = ClassRegistry(attrsXmlManager)
     classRegistry.resolveAnyNewIdentifiedWidgetClasses()
 
+    generateMultiFormatFiles(env.servicePath)
     deleteTempFiles(env)
 
     val sourcerer = Sourcerer(classRegistry, env)
     sourcerer.generateFactoriesForAllWidgets()
-    generateHelperFiles(env.stubAppPath, env)
+
 
 }
 

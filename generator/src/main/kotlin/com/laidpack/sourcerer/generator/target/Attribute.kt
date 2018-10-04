@@ -35,6 +35,19 @@ open class Attribute(
             return getters.first()
         }
 
+    val formatsUsedBySetters : Set<StyleableAttributeFormat>
+        get () {
+            val formats = mutableSetOf<StyleableAttributeFormat>()
+            for (typesForSetter in typesPerSetter.values) {
+                for(format in typesForSetter.formats) {
+                    if (!formats.contains(format)) {
+                        formats.add(format)
+                    }
+                }
+            }
+            return formats
+        }
+
     var mutableAttributeDeclaredInSuperClass : Attribute? = null
     var mutableDeclarationClassName: ClassName = className
     val attributeDeclaredInSuperClass : Attribute

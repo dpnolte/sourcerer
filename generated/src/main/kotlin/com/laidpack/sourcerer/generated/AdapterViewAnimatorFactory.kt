@@ -16,12 +16,4 @@ open class AdapterViewAnimatorFactory<TView : AdapterViewAnimator, TAttributes :
     override fun createInstance(context: Context): View {
         throw IllegalStateException("android.widget.AdapterViewAnimator is abstract and cannot be instantiated")
     }
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

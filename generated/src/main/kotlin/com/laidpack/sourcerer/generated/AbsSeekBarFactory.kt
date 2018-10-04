@@ -16,12 +16,4 @@ open class AbsSeekBarFactory<TView : AbsSeekBar, TAttributes : AbsSeekBarAttribu
     override fun createInstance(context: Context): View {
         throw IllegalStateException("android.widget.AbsSeekBar is abstract and cannot be instantiated")
     }
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

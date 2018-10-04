@@ -1,16 +1,28 @@
 package com.laidpack.sourcerer.service.adapters
 
+import android.util.Log
+import com.laidpack.sourcerer.service.BuildConfig
 import com.laidpack.sourcerer.service.LayoutElement
 import com.laidpack.sourcerer.service.api.IAttributes
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.JsonDataException
-import com.squareup.moshi.JsonReader
-import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
-import kotlin.String
-import kotlin.collections.List
+import com.squareup.moshi.*
+import java.lang.reflect.Type
 import kotlin.reflect.KClass
+
+internal class LayoutElementAdapterFactory(private val elementNameToTypeProvider: () -> Map<String, KClass<*>>) : JsonAdapter.Factory {
+    override fun create(type: Type?, annotations: MutableSet<out Annotation>?, moshi: Moshi?): JsonAdapter<*>? {
+        val rawType = Types.getRawType(type)
+        if (rawType != targetType) {
+            return null
+        }
+
+        return LayoutElementAdapter(moshi as Moshi, elementNameToTypeProvider())
+
+    }
+    companion object {
+        val targetType = LayoutElement::class.java
+    }
+}
+
 
 internal class LayoutElementAdapter(private val moshi: Moshi, private val elementNameToType: Map<String, KClass<*>>) : JsonAdapter<LayoutElement>() {
     private val options: JsonReader.Options =

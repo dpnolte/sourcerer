@@ -14,12 +14,4 @@ open class ImageSwitcherFactory<TView : ImageSwitcher, TAttributes : ImageSwitch
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = ImageSwitcher(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

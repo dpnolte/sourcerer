@@ -61,6 +61,8 @@ class SourcererEnvironment(args: Array<String>) {
     val indexedPath : Path = generatorPath.resolve("indexed")
     val indexedDir = indexedPath.toFile()
 
+    val servicePath = rootPath.resolve("service/src/main/kotlin")
+
     companion object {
         const val servicePackageName =  "com.laidpack.sourcerer.service"
         const val serviceApiPackageName = "$servicePackageName.api"

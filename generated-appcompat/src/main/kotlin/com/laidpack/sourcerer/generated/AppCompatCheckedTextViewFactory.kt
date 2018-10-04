@@ -14,12 +14,4 @@ open class AppCompatCheckedTextViewFactory<TView : AppCompatCheckedTextView, TAt
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = AppCompatCheckedTextView(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

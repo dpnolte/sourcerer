@@ -14,12 +14,4 @@ open class ViewFlipperFactory<TView : ViewFlipper, TAttributes : ViewFlipperAttr
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = ViewFlipper(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

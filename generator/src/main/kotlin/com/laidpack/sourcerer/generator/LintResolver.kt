@@ -43,7 +43,6 @@ fun main(args: Array<String>) {
         println("-- Updated ${sourcererResult.targetClassName.simpleName}Factory with $counter minimum api level checks")
     }
     println("Fixed $totalCounter minimum api level requirement issues")
-    generateHelperFiles(env.generatedPath, env)
     deleteTempFiles(env)
 }
 

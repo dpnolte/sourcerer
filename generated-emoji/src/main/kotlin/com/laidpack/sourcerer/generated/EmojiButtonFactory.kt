@@ -14,12 +14,4 @@ open class EmojiButtonFactory<TView : EmojiButton, TAttributes : EmojiButtonAttr
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = EmojiButton(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

@@ -14,12 +14,4 @@ open class BoxInsetLayoutFactory<TView : BoxInsetLayout, TAttributes : BoxInsetL
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = BoxInsetLayout(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

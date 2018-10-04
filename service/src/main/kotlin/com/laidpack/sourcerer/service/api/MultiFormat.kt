@@ -1,7 +1,11 @@
-package com.laidpack.sourcerer.generated
+// do not edit, auto-generated
+package com.laidpack.sourcerer.service.api
 
 import com.laidpack.annotation.TypeScript
-import com.squareup.moshi.JsonClass
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import java.util.SortedMap
+import kotlin.Any
 import kotlin.Boolean
 import kotlin.Float
 import kotlin.Int
@@ -9,10 +13,9 @@ import kotlin.String
 import kotlin.collections.Set
 import kotlin.jvm.Transient
 
-@JsonClass(generateAdapter = true)
 @TypeScript
 class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) {
-    val mutableBoolean: Boolean? = null
+    var mutableBoolean: Boolean? = null
 
     val hasBoolean: Boolean
         get() = mutableBoolean != null
@@ -23,7 +26,7 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
             return mutableBoolean ?: throw IllegalStateException("Boolean is null")
         }
 
-    val mutableColor: Int? = null
+    var mutableColor: Int? = null
 
     val hasColor: Boolean
         get() = mutableColor != null
@@ -34,7 +37,7 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
             return mutableColor ?: throw IllegalStateException("Color is null")
         }
 
-    val mutableReference: Int? = null
+    var mutableReference: Int? = null
 
     val hasReference: Boolean
         get() = mutableReference != null
@@ -45,7 +48,7 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
             return mutableReference ?: throw IllegalStateException("Reference is null")
         }
 
-    val mutableFloat: Float? = null
+    var mutableFloat: Float? = null
 
     val hasFloat: Boolean
         get() = mutableFloat != null
@@ -56,7 +59,7 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
             return mutableFloat ?: throw IllegalStateException("Float is null")
         }
 
-    val mutableDimension: Int? = null
+    var mutableDimension: Int? = null
 
     val hasDimension: Boolean
         get() = mutableDimension != null
@@ -67,7 +70,7 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
             return mutableDimension ?: throw IllegalStateException("Dimension is null")
         }
 
-    val mutableInteger: Int? = null
+    var mutableInteger: Int? = null
 
     val hasInteger: Boolean
         get() = mutableInteger != null
@@ -78,7 +81,7 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
             return mutableInteger ?: throw IllegalStateException("Integer is null")
         }
 
-    val mutableString: String? = null
+    var mutableString: String? = null
 
     val hasString: Boolean
         get() = mutableString != null
@@ -89,7 +92,7 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
             return mutableString ?: throw IllegalStateException("String is null")
         }
 
-    val mutableEnum: Int? = null
+    var mutableEnum: Int? = null
 
     val hasEnum: Boolean
         get() = mutableEnum != null
@@ -100,7 +103,7 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
             return mutableEnum ?: throw IllegalStateException("Enum is null")
         }
 
-    val mutableFraction: Float? = null
+    var mutableFraction: Float? = null
 
     val hasFraction: Boolean
         get() = mutableFraction != null
@@ -111,7 +114,7 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
             return mutableFraction ?: throw IllegalStateException("Fraction is null")
         }
 
-    val mutableUnspecified: Int? = null
+    var mutableUnspecified: Int? = null
 
     val hasUnspecified: Boolean
         get() = mutableUnspecified != null
@@ -121,4 +124,46 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
             if (!allowedFormats.contains(Format.Unspecified)) throw IllegalStateException("Format 'Unspecified' is not allowed as value")
             return mutableUnspecified ?: throw IllegalStateException("Unspecified is null")
         }
+
+    val hasAnyValue: Boolean
+        get() = mutableBoolean != null
+        			|| mutableColor != null
+        			|| mutableReference != null
+        			|| mutableFloat != null
+        			|| mutableDimension != null
+        			|| mutableInteger != null
+        			|| mutableString != null
+        			|| mutableEnum != null
+        			|| mutableFraction != null
+        			|| mutableUnspecified != null
+
+    fun setValue(format: Format, value: Any) {
+        when (format) {
+            Format.Boolean -> mutableBoolean = value as Boolean
+            Format.Color -> mutableColor = value as Int
+            Format.Reference -> mutableReference = value as Int
+            Format.Float -> mutableFloat = value as Float
+            Format.Dimension -> mutableDimension = value as Int
+            Format.Integer -> mutableInteger = value as Int
+            Format.String -> mutableString = value as String
+            Format.Enum -> mutableEnum = value as Int
+            Format.Fraction -> mutableFraction = value as Float
+            Format.Unspecified -> mutableUnspecified = value as Int
+        }
+    }
+
+    companion object {
+        fun getAdaptersMap(moshi: Moshi): SortedMap<Format, JsonAdapter<*>> = sortedMapOf(
+        			Format.Reference to moshi.adapter<Int>(Int::class.java, ReferenceQualifier::class.java) as JsonAdapter<*>,
+        			Format.Color to moshi.adapter<Int>(Int::class.java, ColorQualifier::class.java) as JsonAdapter<*>,
+        			Format.Dimension to moshi.adapter<Int>(Int::class.java, DimensionQualifier::class.java) as JsonAdapter<*>,
+        			Format.Boolean to moshi.adapter<Boolean>(Boolean::class.java) as JsonAdapter<*>,
+        			Format.Float to moshi.adapter<Float>(Float::class.java) as JsonAdapter<*>,
+        			Format.Integer to moshi.adapter<Int>(Int::class.java) as JsonAdapter<*>,
+        			Format.String to moshi.adapter<String>(String::class.java) as JsonAdapter<*>,
+        			Format.Enum to moshi.adapter<Int>(Int::class.java) as JsonAdapter<*>,
+        			Format.Fraction to moshi.adapter<Float>(Float::class.java) as JsonAdapter<*>,
+        			Format.Unspecified to moshi.adapter<Int>(Int::class.java) as JsonAdapter<*>
+        		)
+    }
 }

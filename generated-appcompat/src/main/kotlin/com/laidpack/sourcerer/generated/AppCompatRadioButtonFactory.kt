@@ -14,12 +14,4 @@ open class AppCompatRadioButtonFactory<TView : AppCompatRadioButton, TAttributes
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = AppCompatRadioButton(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

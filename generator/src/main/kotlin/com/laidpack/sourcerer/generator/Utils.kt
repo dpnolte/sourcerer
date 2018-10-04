@@ -15,7 +15,7 @@ fun initParserAndStore(env: SourcererEnvironment) {
     Store.init(env)
 }
 
-fun generateHelperFiles(targetPath: Path, env: SourcererEnvironment) {
+fun generateMultiFormatFiles(targetPath: Path) {
     val targetDir = targetPath.toFile()
 
     println("=================================")
@@ -26,7 +26,7 @@ fun generateHelperFiles(targetPath: Path, env: SourcererEnvironment) {
     file2.writeTo(targetDir)
 
     //ApiGenerator(targetPath, env.apiSourcePath).writeFiles()
-    println("Created helper classes...")
+    println("Created multi-format class and format enum...")
     println("=================================")
 }
 

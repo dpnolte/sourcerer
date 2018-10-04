@@ -72,8 +72,9 @@ task analyzeClass(type: JavaExec) {
     args = taskArgs
 }
 
-// add extra task in sourcerer.. otherwise app:lint gets executed before analyze sourceProvider
+// add extra task in sourcerer.. otherwise app:lint gets executed before analyze source
 task performLint() {
+    dependsOn(":stub-app:clean")
     dependsOn(":stub-app:lint")
 }
 

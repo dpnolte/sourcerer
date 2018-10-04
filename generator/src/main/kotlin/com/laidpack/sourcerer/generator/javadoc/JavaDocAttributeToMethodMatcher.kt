@@ -12,58 +12,54 @@ import com.laidpack.sourcerer.generator.target.AttributeTypesForSetter
 import com.laidpack.sourcerer.generator.target.Parameter
 import com.laidpack.sourcerer.generator.target.Setter
 
-class JavaDocForMethodInterpreter(
+open class JavaDocAttributeToMethodMatcher(
         private val methodInfo: MethodInfo,
         private val classInfo: ClassInfo,
+        private val isThisTheTargetingAttribute: (attributeName: String) -> Boolean,
         private val attrManager: AttributeManager
 ) {
     private val parameters = attrManager.getParameters(methodInfo.methodDeclaration)
     private val parameterNames = parameters.map { it.name }.toSet()
-    private val attributes = mutableMapOf<String, Attribute>()
-    private val setters = mutableMapOf<Int, Setter>()
     private val attributeBlockTags = methodInfo.javadoc.blockTags.filter { it.tagName == "attr" }
     private val hasOneAttributeBlockTag = attributeBlockTags.size == 1
     private val hasOneParameter = parameters.size == 1
 
-    fun interpret(): Interpretation {
+    data class JavaDocAttributeMatchResult (
+            val success: Boolean,
+            val attributeName: String?  = null,
+            val parameter: Parameter? = null
+    )
+    fun match(): JavaDocAttributeMatchResult {
         for (blockTag in attributeBlockTags) {
             if (blockTag.tagName == "attr") {
                 val attributeName = getAttributeName(blockTag)
                 // assume match if we only have one parameter and one attribute block tag and we can find a matching getter
                 if (hasOneAttributeBlockTag
                         && hasOneParameter
-                        && attrManager.isAttributeDefined(attributeName)
+                        && isThisTheTargetingAttribute(attributeName)
                         && canAttributeTypeBeConvertedToParameterType(attributeName)) {
-                    handleMatch(attributeName, parameters.first())
-                // otherwise match based on name
+                    return JavaDocAttributeMatchResult(
+                            true,
+                            attributeName,
+                            parameters.first()
+                    )
+                    // otherwise match based on name
                 } else {
                     val parameter = guessMatchingParameterByName(attributeName)
                     if (parameter != null) {
-                        handleMatch(attributeName, parameter)
+                        return JavaDocAttributeMatchResult(
+                                true,
+                                attributeName,
+                                parameter
+                        )
                     }
                 }
 
             }
         }
-        if (!isEachParameterMapped(setters)) {
-            setters.clear()
-            attributes.clear()
-        }
-        return Interpretation(attributes, setters)
+        return JavaDocAttributeMatchResult(false)
     }
 
-    private fun handleMatch(attributeName: String, parameter: Parameter) {
-        val attribute = Attribute(classInfo.targetClassName, attributeName)
-        val setter = attrManager.getSetter(setters, methodInfo)
-        attrManager.linkAttributeAndSetter(attribute, setter, parameter.index)
-        attribute.typesPerSetter[setter.hashCode()] = AttributeTypesForSetter(listOf(parameter.describedType))
-        if (ensureGetterCanBeResolved(attribute, setter)) {
-            attributes[attribute.name] = attribute
-            setters[setter.hashCode()] = setter
-        } else {
-            setter.attributeToParameter.remove(attributeName)
-        }
-    }
 
     private fun canAttributeTypeBeConvertedToParameterType(attributeName: String, providedParameter: Parameter? = null): Boolean {
         val parameter = providedParameter ?: if (hasOneParameter) parameters.first() else throw IllegalStateException("No parameter provided for multi parameter setter")
@@ -72,11 +68,6 @@ class JavaDocForMethodInterpreter(
             println("Skipping potential setter ${methodInfo.methodDeclaration.nameAsString}, because attribute $attributeName cannot be assigned to parameter ${parameter.name}. Parameter type: ${parameter.describedType} vs. Attribute format(s): ${attrManager.getAttributeFormats(attributeName).joinToString(", ")}")
         }
         return canBeAssigned
-    }
-
-
-    private fun ensureGetterCanBeResolved(attribute: Attribute, setter: Setter): Boolean {
-        return attrManager.canResolveGetter(attribute, setter)
     }
 
     private fun getAttributeName(blockTag: JavadocBlockTag): String {
@@ -116,16 +107,6 @@ class JavaDocForMethodInterpreter(
         }
         return null
     }
-
-    private fun isEachParameterMapped(setters: Map<Int, Setter>): Boolean {
-        setters.values.forEach {setter ->
-            if (setter.parameters.size != setter.attributeToParameter.size) {
-                return false
-            }
-        }
-        return true
-    }
-
 
     private fun String.containsAnyCapitalChar(): Boolean {
         return this.any { it.isUpperCase() }

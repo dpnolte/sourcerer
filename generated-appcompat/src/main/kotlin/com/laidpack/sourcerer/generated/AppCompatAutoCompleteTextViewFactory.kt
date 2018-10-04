@@ -14,12 +14,4 @@ open class AppCompatAutoCompleteTextViewFactory<TView : AppCompatAutoCompleteTex
         get() = ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>()
 
     override fun createInstance(context: Context): View = AppCompatAutoCompleteTextView(context)
-
-    override fun init(
-        v: View,
-        context: Context,
-        attributes: TAttributes
-    ) {
-        super.init(v, context, attributes)
-    }
 }

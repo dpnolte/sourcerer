@@ -5,7 +5,6 @@ import com.laidpack.sourcerer.generator.target.AttributeTypesForSetter
 import com.laidpack.sourcerer.generator.target.CodeBlock
 import com.laidpack.sourcerer.generator.target.Setter
 import com.laidpack.sourcerer.generator.generators.delegates.statements.*
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.ParameterSpec
 
@@ -13,7 +12,7 @@ class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, co
     private val attributes = codeBlock.attributes
     private val variableNames = mutableMapOf<Int /* setter hash code */, MutableMap<String /* attr name */, String /* variable name */>>()
     private val attrToVarNames = mutableMapOf<String /* attr name */, MutableSet<String> /* var name */>()
-    private val processedAttributes = mutableSetOf<String>()
+    private val processedVariables = mutableSetOf<String>()
     private val delegate = this
     private val selectedSetters = selectSetters()
 
@@ -43,23 +42,25 @@ class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, co
                     it.parameters.size*10 + if (requiresTransformingMethod) 1 else 0
                 }
                 .forEach { setter ->
-                    if (anyAttributeNotYetIdentified(setter, identifiedAttributes)) {
+                    var requiresSetter = false
+                    val setterHashCode = setter.hashCode()
+                    for (attribute in attributes.values) {
+                        if (attribute.setterHashCodes.contains(setterHashCode)) {
+                            val tps = attribute.typesPerSetter[setterHashCode] as AttributeTypesForSetter
+                            for (format in tps.formats) {
+                                val id = attribute.name + format.name
+                                if (!identifiedAttributes.contains(id)) {
+                                    identifiedAttributes.add(id)
+                                    requiresSetter = true
+                                }
+                            }
+                        }
+                    }
+                    if (requiresSetter) {
                         selectedSetters.add(setter)
-                        val setterHashCode = setter.hashCode()
-                        identifiedAttributes.addAll(
-                                attributes.values
-                                .filter { it.setterHashCodes.contains(setterHashCode) }
-                                .map {  it.name }
-                        )
                     }
                 }
         return selectedSetters
-    }
-
-    private fun anyAttributeNotYetIdentified(setter: Setter, identifiedAttributes: Set<String>): Boolean {
-        return setter.attributeToParameter.keys.any { attrName ->
-            !identifiedAttributes.contains(attrName)
-        }
     }
 
     private fun FunSpec.Builder.beginFlowIfAnyValueIsSet(): FunSpec.Builder {
@@ -89,38 +90,41 @@ class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, co
                 variableNames[setterHashCode] = mutableMapOf()
             }
             val typesPerSetter = attr.typesPerSetter[setterHashCode] as AttributeTypesForSetter
-            val suffix = (typesPerSetter.setterType as ClassName).simpleName
-            val variableName = attr.localVariableName + suffix
-            attrToVarNameForThisSetter[attr.name] = variableName
-            if (!attrToVarNames.containsKey(attrName)) {
-                attrToVarNames[attrName] = mutableSetOf()
-            }
-            val varNames = attrToVarNames[attrName] as MutableSet<String>
-            if (varNames.contains(variableName)) {
-                // don't declare the same var
-                continue
-            }
-            varNames.add(variableName)
+            for (format in typesPerSetter.formats) {
+                val suffix = format.name
+                val variableName = attr.localVariableName + suffix
+                attrToVarNameForThisSetter[attr.name] = variableName
+                if (!attrToVarNames.containsKey(attrName)) {
+                    attrToVarNames[attrName] = mutableSetOf()
+                }
+                val varNames = attrToVarNames[attrName] as MutableSet<String>
+                if (varNames.contains(variableName)) {
+                    // don't declare the same var
+                    continue
+                }
+                varNames.add(variableName)
 
-            if (attr.formats.size > 1) {
-                DeclareMultiFormatVariable(delegate, attributesParam)
-                        .addDeclaredVar(
-                                this,
-                                attr,
-                                typesPerSetter,
-                                defaultToGetterValue = true,
-                                variableName = variableName
-                        )
-            } else {
-                DeclareSingleFormatVariable(delegate, attributesParam)
-                        .addDeclaredVar(
-                                this,
-                                attr,
-                                typesPerSetter,
-                                defaultToGetterValue = true,
-                                variableName = variableName
-                        )
+                if (attr.formats.size > 1) {
+                    DeclareMultiFormatVariable(delegate, attributesParam)
+                            .addDeclaredVar(
+                                    this,
+                                    attr,
+                                    typesPerSetter,
+                                    defaultToGetterValue = !typesPerSetter.requiresTransformMethod,
+                                    variableName = variableName
+                            )
+                } else {
+                    DeclareSingleFormatVariable(delegate, attributesParam)
+                            .addDeclaredVar(
+                                    this,
+                                    attr,
+                                    typesPerSetter,
+                                    defaultToGetterValue = true,
+                                    variableName = variableName
+                            )
+                }
             }
+
         }
         variableNames[setterHashCode] = attrToVarNameForThisSetter
         return this
@@ -134,12 +138,12 @@ class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, co
         val selectedAttrs = mutableListOf<Attribute>()
         val valueLiterals = mutableListOf<String>()
         setter.attributeToParameter.keys.forEach { attrName ->
-            if (!processedAttributes.contains(attrName)) {
+            if (!processedVariables.contains(attrName)) {
                 val attr = attributes[attrName] as Attribute
                 selectedAttrs.add(attr)
                 val variableName = setterVariableNames[attrName] as String
                 valueLiterals.add(variableName)
-                processedAttributes.add(attrName)
+                processedVariables.add(variableName)
             }
         }
         BeginIfAnyValueIsDifferentThanCurrent(delegate, attributesParam)
