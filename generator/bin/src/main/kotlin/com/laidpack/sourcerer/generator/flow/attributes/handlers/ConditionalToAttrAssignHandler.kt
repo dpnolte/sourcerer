@@ -66,7 +66,7 @@ class ConditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHandle
                 }
             }
         }
-        // TODO.. add binary operations to variable (attribute impact..)
+        // TODO.. findOrCreate binary operations to variable (attribute impact..)
     }
 
     private fun handleMethodCallWithTypedArrayParameter(targetExpr: NameExpr, methodCallExpr: MethodCallExpr) {

@@ -5,7 +5,6 @@ import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
 
-
 inline fun <T: View> T.init (init: T.() -> Unit) {
     this.init()
 }
@@ -17,21 +16,48 @@ inline fun <reified TView: View> createInstance(context: Context, provider: (Con
     return provider(context) as TView
 }
 
-abstract class BaseViewFactory<TView : View, TAttributes> : ViewFactoryComponent<TView, TAttributes> {
-    override fun create(context: Context, attributes: TAttributes, theme: Int): View {
+abstract class BaseFactory<TInstance, TAttributes>(
+        private val instanceType: Class<TInstance>,
+        private val attributesType: Class<TAttributes>
+) : LayoutElement.Factory {
+    abstract override val elementName: String
+    abstract override val minimumApiLevel: Int
+    abstract override val fallBackElementName: String?
+
+    protected fun getTypedInstance(instance: Any): TInstance {
+        return instanceType.cast(instance)
+                ?: throw ClassCastException("Attributes could not be cast.\nExpected: $attributesType, actual: ${instance::class.java.canonicalName}")
+    }
+    protected fun getTypedAttributes(attrs: IAttributes): TAttributes {
+        return attributesType.cast(attrs)
+                ?: throw ClassCastException("Attributes could not be cast.\nExpected: $attributesType, actual: ${attrs::class.java.canonicalName}")
+    }
+}
+
+abstract class BaseViewFactory<TView : View, TAttributes: IAttributes>(
+        viewType: Class<TView>,
+        attributesType : Class<TAttributes>
+) : BaseFactory<TView, TAttributes>(viewType, attributesType), LayoutElement.ViewFactory {
+    override fun create(context: Context, attributes: IAttributes, theme: Int): View {
         val ctx = wrapThemeContextIfNeeded(context, theme)
-        val view = createInstance(ctx)
-        init(view, ctx, attributes)
+        val view = getTypedInstance(createInstance(ctx))
+        init(
+                view,
+                ctx,
+                getTypedAttributes(attributes)
+        )
         return view
     }
-
-    override fun update(view: TView, context: Context, attributes: TAttributes) {
-        init(view, context, attributes)
+    override fun update(view: View, context: Context, attributes: IAttributes) {
+        init(
+                getTypedInstance(view),
+                context,
+                getTypedAttributes(attributes)
+        )
     }
 
     protected abstract fun createInstance(context: Context): View
-    protected abstract fun init(view: View, context: Context, attributes: TAttributes)
-    abstract override val elementName: String
+    protected abstract fun init(view: TView, context: Context, attributes: TAttributes)
 
     private class ExtendedContextThemeWrapper(base: Context?, val theme: Int) : ContextThemeWrapper(base, theme)
     companion object {
@@ -48,18 +74,29 @@ abstract class BaseViewFactory<TView : View, TAttributes> : ViewFactoryComponent
 }
 
 
-abstract class BaseLayoutParamsFactory<TLayoutParams : ViewGroup.LayoutParams, TAttributes> : LayoutParamsFactoryComponent<TLayoutParams, TAttributes> {
-    override fun create(context: Context, attributes: TAttributes, theme: Int): ViewGroup.LayoutParams {
-        val layoutParams = createInstance(context)
-        init(layoutParams, context, attributes)
+abstract class BaseLayoutParamsFactory<TLayoutParams : ViewGroup.LayoutParams, TAttributes: IAttributes>(
+        layoutParamsType: Class<TLayoutParams>,
+        attributesType : Class<TAttributes>
+) : BaseFactory<TLayoutParams, TAttributes>(layoutParamsType, attributesType), LayoutElement.LayoutParamsFactory {
+
+    override fun create(context: Context, attributes: IAttributes, theme: Int): ViewGroup.LayoutParams {
+        val layoutParams = getTypedInstance(createInstance(context))
+        init(
+                layoutParams,
+                context,
+                getTypedAttributes(attributes)
+        )
         return layoutParams
     }
 
-    override fun update(layoutParams: TLayoutParams, context: Context, attributes: TAttributes) {
-        init(layoutParams, context, attributes)
+    override fun update(layoutParams: ViewGroup.LayoutParams, context: Context, attributes: IAttributes) {
+        init(
+                getTypedInstance(layoutParams),
+                context,
+                getTypedAttributes(attributes)
+        )
     }
 
     protected abstract fun createInstance(context: Context): ViewGroup.LayoutParams
-    protected abstract fun init(layoutParams: ViewGroup.LayoutParams, context: Context, attributes: TAttributes)
-    abstract override val elementName: String
+    protected abstract fun init(layoutParams: TLayoutParams, context: Context, attributes: TAttributes)
 }

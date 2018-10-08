@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
+//apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -15,6 +15,7 @@ android {
     }
     buildTypes {
         release {
+            matchingFallbacks = ['default']
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -38,7 +39,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.squareup.moshi:moshi:$moshi"
-    kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
+    //kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
     implementation 'com.github.dpnolte.ts-rhymer:annotation:0.1'
     implementation "com.google.android.material:material:$materialDesign"
     implementation "androidx.appcompat:appcompat:$androidX"
@@ -60,7 +61,8 @@ dependencies {
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$androidX"
     implementation "androidx.viewpager:viewpager:$androidX"
     implementation "androidx.wear:wear:$androidX"
-    api project(path: ":service", configuration: 'default')
+    //api project(path: ":service", configuration: 'default')
+    //releaseApi project(":service")
 
 }
 

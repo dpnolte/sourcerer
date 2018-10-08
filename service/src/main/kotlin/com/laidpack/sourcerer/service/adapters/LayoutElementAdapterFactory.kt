@@ -1,8 +1,6 @@
 package com.laidpack.sourcerer.service.adapters
 
-import android.util.Log
-import com.laidpack.sourcerer.service.BuildConfig
-import com.laidpack.sourcerer.service.LayoutElement
+import com.laidpack.sourcerer.service.LayoutProperties
 import com.laidpack.sourcerer.service.api.IAttributes
 import com.squareup.moshi.*
 import java.lang.reflect.Type
@@ -19,12 +17,12 @@ internal class LayoutElementAdapterFactory(private val elementNameToTypeProvider
 
     }
     companion object {
-        val targetType = LayoutElement::class.java
+        val targetType = LayoutProperties::class.java
     }
 }
 
 
-internal class LayoutElementAdapter(private val moshi: Moshi, private val elementNameToType: Map<String, KClass<*>>) : JsonAdapter<LayoutElement>() {
+internal class LayoutElementAdapter(private val moshi: Moshi, private val elementNameToType: Map<String, KClass<*>>) : JsonAdapter<LayoutProperties>() {
     private val options: JsonReader.Options =
             JsonReader.Options.of("id", "element", "attributes", "children")
 
@@ -34,7 +32,7 @@ internal class LayoutElementAdapter(private val moshi: Moshi, private val elemen
     private val listOfStringAdapter: JsonAdapter<List<String>> =
             moshi.adapter<List<String>>(Types.newParameterizedType(List::class.java, String::class.java), kotlin.collections.emptySet(), "children")
 
-    override fun fromJson(reader: JsonReader): LayoutElement {
+    override fun fromJson(reader: JsonReader): LayoutProperties {
         var id: String? = null
         var elementName: String? = null
         var attributesAsJson: Any? = null
@@ -59,14 +57,15 @@ internal class LayoutElementAdapter(private val moshi: Moshi, private val elemen
         elementName ?: throw JsonDataException("Required property 'elementName' missing at ${reader.path}")
         val subjectType = elementNameToType[elementName] ?: throw JsonDataException("Element name $elementName has no registered json adapter")
         val attributesDelegate = moshi.adapter(subjectType.java)
-        return LayoutElement(
+        return LayoutProperties(
                 id = id ?: throw JsonDataException("Required property 'id' missing at ${reader.path}"),
                 elementName = elementName,
                 attributes =  attributesDelegate.fromJsonValue(attributesAsJson) as IAttributes,
-                children = children ?: throw JsonDataException("Required property 'children' missing at ${reader.path}"))
+                children = children ?: throw JsonDataException("Required property 'children' missing at ${reader.path}")
+        )
     }
 
-    override fun toJson(writer: JsonWriter, value: LayoutElement?) {
+    override fun toJson(writer: JsonWriter, value: LayoutProperties?) {
         throw NotImplementedError("No layout element to json implementation")
     }
 }

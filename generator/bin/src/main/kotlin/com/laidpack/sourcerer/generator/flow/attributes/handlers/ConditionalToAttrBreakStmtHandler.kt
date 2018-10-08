@@ -9,7 +9,7 @@ class ConditionalToAttrBreakStmtHandler(flow: AttributeFlow): BaseAttributesHand
     override val handler: NodeHandler<BreakStmt> = ::onResourceIdEntryBreak
 
     private fun onResourceIdEntryBreak(node: BreakStmt): Boolean {
-        // TODO: add support for nested switch statements..?
+        // TODO: findOrCreate support for nested switch statements..?
         if (flow.isConditionalToAttributeViaSwitchStmt) {
             flow.unflagAttributeAsConditional()
         }

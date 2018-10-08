@@ -1,5 +1,5 @@
-include ':stub-app',
-        ':generator',
+include ':generator',
+		':stub-app',
         ':generated',
         ':generated-appcompat',
         ':generated-car',

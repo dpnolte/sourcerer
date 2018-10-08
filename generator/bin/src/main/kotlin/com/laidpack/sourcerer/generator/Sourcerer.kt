@@ -143,7 +143,7 @@ class Sourcerer(
                 println("Attribute ${attrInSource.name} does not exist in attrs.xml.. Skipping it")
                 continue
             }
-            // if (attrInSource.hasSetter && !processedSetters.contains(attrInSource.resolvedSetter.name)) processedSetters.add(attrInSource.resolvedSetter.name)
+            // if (attrInSource.hasSetter && !processedSetters.contains(attrInSource.resolvedSetter.name)) processedSetters.findOrCreate(attrInSource.resolvedSetter.name)
 
             val attribute = attributes[attrInSource.name] as Attribute
             when {
@@ -159,7 +159,7 @@ class Sourcerer(
                     interpretationResult.resolved += 1
                     interpretationResult.identifiedNew += 1
                 }
-                attrInSource.setterHashCodes.isNotEmpty() && attribute.resolvedStatus == ResolvedStatus.SETTER_DEFINED -> // only add new settersFoundInSource
+                attrInSource.setterHashCodes.isNotEmpty() && attribute.resolvedStatus == ResolvedStatus.SETTER_DEFINED -> // only findOrCreate new settersFoundInSource
                     for (setterHashCode in attrInSource.setterHashCodes) {
                         if (!attribute.setterHashCodes.contains(setterHashCode)) {
                             attribute.setterHashCodes.add(setterHashCode)

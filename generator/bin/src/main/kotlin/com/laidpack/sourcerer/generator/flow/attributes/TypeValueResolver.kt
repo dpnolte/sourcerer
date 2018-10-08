@@ -8,7 +8,7 @@ import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 
 class TypeValueResolver(private val ifStmt: IfStmt, private val flow: AttributeFlow) {
     fun resolveTypeValueConditions() {
-        //TODO: add support for switch statements and
+        //TODO: findOrCreate support for switch statements and
         if (ifStmt.hasElseBlock()) {
             val returnStmts = ifStmt.elseStmt.get().descendantsOfType(ReturnStmt::class.java)
             if (returnStmts.isNotEmpty() && returnStmts.size == 1) {

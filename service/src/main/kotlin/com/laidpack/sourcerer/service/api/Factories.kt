@@ -4,14 +4,19 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 
-interface ViewFactoryComponent<T : View, TAttributes> {
-    fun create(context: Context, attributes: TAttributes, theme: Int = 0): View
-    fun update(view: T, context: Context, attributes: TAttributes)
-    val elementName: String
-    val defaultLayoutParamsFactory : LayoutParamsFactoryComponent<*, *>
+object LayoutElement {
+    interface Factory {
+        val elementName: String
+        val minimumApiLevel: Int
+        val fallBackElementName: String?
+    }
+    interface ViewFactory : Factory {
+        fun create(context: Context, attributes: IAttributes, theme: Int = 0): View
+        fun update(view: View, context: Context, attributes: IAttributes)
+    }
+    interface LayoutParamsFactory : Factory {
+        fun create(context: Context, attributes: IAttributes, theme: Int = 0): ViewGroup.LayoutParams
+        fun update(layoutParams: ViewGroup.LayoutParams, context: Context, attributes: IAttributes)
+    }
 }
-interface LayoutParamsFactoryComponent<T : ViewGroup.LayoutParams, TAttributes> {
-    fun create(context: Context, attributes: TAttributes, theme: Int = 0): ViewGroup.LayoutParams
-    fun update(layoutParams: T, context: Context, attributes: TAttributes)
-    val elementName: String
-}
+

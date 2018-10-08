@@ -51,6 +51,7 @@ allprojects {
         androidXmediaWidget = "1.0.0-alpha5"
         materialDesign="1.0.0"
         moshi = "1.7.0"
+        lintVersion = '26.0.0-beta5'
     }
 }
 
@@ -58,6 +59,7 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-task generate(dependsOn: [':generator:generate']) {
-    description 'Generating view factories and attribute container classes..'
+task generate {
+    dependsOn(":generator:generate")
+    description 'Generating view factories attribute, and adapter classes..'
 }

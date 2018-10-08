@@ -19,6 +19,9 @@ dependencies {
     implementation 'org.jetbrains.xodus:dnq:1.1.325'
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
     api 'com.github.dpnolte.ts-rhymer:annotation:0.1'
+    // lint
+    implementation "com.android.tools.lint:lint:$lintVersion"
+
 }
 
 
@@ -59,7 +62,8 @@ def taskArgs = [
         compileSdkVersion,
         sdkDir,
         libFiles,
-        sourceArtifacts
+        sourceArtifacts,
+        minSdkVersion
 ]
 task analyzeSource(type: JavaExec) {
     main = 'com.laidpack.sourcerer.generator.AnalyzeSourceKt'
@@ -71,19 +75,33 @@ task analyzeClass(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     args = taskArgs
 }
+task generateFiles(type: JavaExec) {
+    main = 'com.laidpack.sourcerer.generator.GenerateFilesKt'
+    classpath = sourceSets.main.runtimeClasspath
+    args = taskArgs
+}
 
-// add extra task in sourcerer.. otherwise app:lint gets executed before analyze source
+// findOrCreate extra task in sourcerer.. otherwise app:lint gets executed before analyze source
 task performLint() {
-    dependsOn(":stub-app:clean")
+    //dependsOn(":stub-app:clean")
     dependsOn(":stub-app:lint")
 }
 
-task generate(type: JavaExec) {
+task generateWithPerformingGradleLint(type: JavaExec) {
     dependsOn analyzeSource
     dependsOn performLint
     main = 'com.laidpack.sourcerer.generator.LintResolverKt'
     classpath = sourceSets.main.runtimeClasspath
     args = taskArgs
+    finalizedBy(clean, build)
+}
+
+task generate(type: JavaExec) {
+    dependsOn analyzeSource
+    main = 'com.laidpack.sourcerer.generator.LintResolverKt'
+    classpath = sourceSets.main.runtimeClasspath
+    args = taskArgs
+    finalizedBy(clean, build)
 }
 
 

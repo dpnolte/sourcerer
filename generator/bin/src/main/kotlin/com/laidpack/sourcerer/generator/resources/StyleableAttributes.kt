@@ -65,7 +65,7 @@ class StyleableAttributeManager {
     }
 
     fun getAttributesFromXml(classInfo: ClassInfo): Map<String, Attribute> {
-        // add annotations from xml
+        // findOrCreate annotations from xml
         val styleableAttributes = getStylableAttributes(
                 getStyleableNameFromClassName(classInfo.targetClassName), classInfo.widget
         )
