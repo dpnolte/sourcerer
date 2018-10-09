@@ -173,7 +173,6 @@ class IndexedClass(
     companion object : XdNaturalEntityType<IndexedClass>()
     var canonicalName by xdRequiredStringProp(unique = true, trimmed = true)
     var simpleName by xdRequiredStringProp(trimmed = true)
-
     private var mutableTargetClass: ClassName? = null
     val targetClassName : ClassName
         get() {

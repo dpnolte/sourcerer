@@ -5,16 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class StaggeredGridLayoutManagerLayoutParamsFactory<TLayoutParams : StaggeredGridLayoutManager.LayoutParams, TAttributes : StaggeredGridLayoutManagerLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
     override val elementName: String =
             "androidx.recyclerview.widget.StaggeredGridLayoutManager.LayoutParams"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = StaggeredGridLayoutManager.LayoutParams(StaggeredGridLayoutManager.LayoutParams.MATCH_PARENT, StaggeredGridLayoutManager.LayoutParams.MATCH_PARENT)
 

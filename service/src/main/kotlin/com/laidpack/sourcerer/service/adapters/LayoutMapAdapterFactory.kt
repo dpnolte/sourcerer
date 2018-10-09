@@ -14,8 +14,9 @@ internal class LayoutMapAdapterFactory(
         private val elementToLayoutParamsDelegate: layoutAdapterRetriever,
         private val defaultLayoutParamsDelegate: () -> LayoutParamsDelegateWrapper
 ): JsonAdapter.Factory {
-    override fun create(type: Type?, annotations: MutableSet<out Annotation>?, moshi: Moshi?): JsonAdapter<*>? {
-        val rawType = Types.getRawType(type as Type)
+    override fun create(t: Type?, annotations: MutableSet<out Annotation>?, moshi: Moshi?): JsonAdapter<*>? {
+        val type = t ?: return null
+        val rawType = Types.getRawType(type)
         if (rawType != targetType) {
             return null
         }

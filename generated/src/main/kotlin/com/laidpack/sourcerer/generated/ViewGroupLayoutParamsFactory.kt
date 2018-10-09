@@ -6,20 +6,15 @@ import com.laidpack.sourcerer.service.InflaterComponent
 import com.laidpack.sourcerer.service.api.BaseLayoutParamsFactory
 import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class ViewGroupLayoutParamsFactory<TLayoutParams : ViewGroup.LayoutParams, TAttributes : ViewGroupLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : BaseLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "android.view.ViewGroup.LayoutParams"
 
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
-
     override fun createInstance(context: Context): ViewGroup.LayoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
 
     override fun init(
-        layoutParams: TLayoutParams,
+        layoutParams: ViewGroup.LayoutParams,
         context: Context,
         attributes: TAttributes
     ) {

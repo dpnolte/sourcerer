@@ -5,15 +5,10 @@ import android.view.View
 import androidx.appcompat.widget.AppCompatTextView
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class AppCompatTextViewFactory<TView : AppCompatTextView, TAttributes : AppCompatTextViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : TextViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "appCompatTextView"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = AppCompatTextView(context)
 

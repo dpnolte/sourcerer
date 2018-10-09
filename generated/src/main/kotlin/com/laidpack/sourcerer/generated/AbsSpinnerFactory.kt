@@ -5,18 +5,14 @@ import android.view.View
 import android.widget.AbsSpinner
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class AbsSpinnerFactory<TView : AbsSpinner, TAttributes : AbsSpinnerAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AdapterViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "absSpinner"
 
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
-
     override fun createInstance(context: Context): View {
-        throw IllegalStateException("android.widget.AbsSpinner is abstract and cannot be instantiated")
+        // // AbsSpinner is abstract
+        return super.createInstance(context)
     }
 
     companion object {

@@ -5,15 +5,10 @@ import android.view.View
 import com.google.android.material.textfield.TextInputEditText
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class TextInputEditTextFactory<TView : TextInputEditText, TAttributes : TextInputEditTextAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : EditTextFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "textInputEditText"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = TextInputEditText(context)
 

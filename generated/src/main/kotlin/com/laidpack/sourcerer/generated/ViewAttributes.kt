@@ -50,6 +50,7 @@ open class ViewAttributes : IAttributes {
     @field:DimensionQualifier
     var paddingEnd: Int? = null
 
+    @field:MultiFormatQualifier(formats = [Format.Boolean, Format.Enum])
     var focusable: MultiFormat = MultiFormat(setOf(Format.Boolean, Format.Enum))
 
     @field:MultiFormatQualifier(formats = [Format.Reference, Format.String])

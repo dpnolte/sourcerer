@@ -10,11 +10,11 @@ import com.laidpack.sourcerer.service.LayoutProperties
 import com.laidpack.sourcerer.service.api.BaseLayoutParamsFactory
 import com.laidpack.sourcerer.service.api.BaseViewFactory
 import com.laidpack.sourcerer.service.api.IAttributes
-import com.laidpack.sourcerer.service.api.LayoutElement
 import com.nhaarman.mockito_kotlin.eq
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito
 
 class InflaterServiceTest {
@@ -159,7 +159,7 @@ open class DummyElementFactory<TView: View, TAttributes: IAttributes>(
         return mockedView
     }
 
-    override fun init(view: TView, context: Context, attributes: TAttributes) {
+    override fun init(view: View, context: Context, attributes: TAttributes) {
         // do nothing
     }
     override val elementName: String = "dummyElement"
@@ -179,7 +179,7 @@ class DummyLayoutParamsFactory<TLayoutParams: ViewGroup.LayoutParams, TAttribute
         return mockedLayoutParams
     }
 
-    override fun init(view: TLayoutParams, context: Context, attributes: TAttributes) {
+    override fun init(view: ViewGroup.LayoutParams, context: Context, attributes: TAttributes) {
         // do nothing
     }
     override val elementName: String = "dummyLayoutParams"

@@ -1,27 +1,33 @@
 package com.laidpack.sourcerer.generator.generators
 
 import android.view.View
-import android.view.ViewGroup
-import com.laidpack.sourcerer.generator.*
 import com.laidpack.sourcerer.generator.peeker.ClassCategory
-import com.laidpack.sourcerer.generator.peeker.ConstructorExpression
 import com.laidpack.sourcerer.generator.peeker.ViewConstructorExpression
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.target.CodeBlock
 import com.squareup.kotlinpoet.*
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 
 
 class ViewFactoryGenerator(
         targetClassName: ClassName,
         superClassName: ClassName?,
-        fallbackClassName: ClassName?,
         private val constructorExpression: ViewConstructorExpression,
         numberOfTypeVariables: Int,
         codeBlocks: List<CodeBlock>,
         private val minimumApiLevel: Int,
-        minSdkVersion: Int
-) : BaseFactoryGenerator(targetClassName, superClassName, fallbackClassName, View::class, codeBlocks, ClassCategory.View, numberOfTypeVariables, minimumApiLevel, minSdkVersion) {
+        minSdkVersion: Int,
+        isFinal: Boolean
+) : BaseFactoryGenerator(
+        targetClassName,
+        superClassName,
+        View::class,
+        codeBlocks,
+        ClassCategory.View,
+        numberOfTypeVariables,
+        minimumApiLevel,
+        minSdkVersion,
+        isFinal
+) {
 
     private val viewTypeName = View::class.asTypeName()
 
@@ -30,12 +36,10 @@ class ViewFactoryGenerator(
     }
 
     override val rootFactoryClassName: ClassName = rootViewFactoryClassName
-    override val layoutTypeVariable: TypeVariableName
-        get() = TypeVariableName("TView", viewClassTypeName)
-    override val layoutParam: ParameterSpec
-        get() = ParameterSpec.builder("view", layoutTypeVariable).build()
-    override val layoutVariableName: String
-        get() = "view"
+    override val viewTypeVariable: TypeVariableName
+        get() = TypeVariableName("TView", viewClassName)
+    override val viewParam: ParameterSpec
+        get() = ParameterSpec.builder("view", viewTypeVariable).build()
 
     override fun generateCreateInstanceFunc(): FunSpec {
         val funSpec = FunSpec.builder("createInstance")
@@ -53,8 +57,10 @@ class ViewFactoryGenerator(
                             this.addStatement("return %T(%N, null)", targetClassName, contextParam)
                         ViewConstructorExpression.ContextAttrsAndDefStyleAttr ->
                             this.addStatement("return %T(%N, null, 0)", targetClassName, contextParam)
-                        ViewConstructorExpression.AbstractView ->
-                            this.addStatement("throw IllegalStateException(%S)", "$targetClassName is abstract and cannot be instantiated")
+                        ViewConstructorExpression.AbstractView -> {
+                            this.addComment("// ${targetClassName.simpleName} is abstract")
+                            this.addStatement("return super.createInstance(%N)", contextParam.name)
+                        }
                     }
                 },
                 elseStatements = {

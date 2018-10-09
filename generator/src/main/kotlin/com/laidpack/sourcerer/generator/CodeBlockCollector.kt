@@ -46,7 +46,7 @@ class CodeBlockCollector(private val classInfo: ClassInfo, private val attribute
                 }
             }
             val codeBlock = CodeBlock(
-                    codeBlockSetters.values.toList(),
+                    codeBlockSetters,
                     codeBlockAttributes
             )
 

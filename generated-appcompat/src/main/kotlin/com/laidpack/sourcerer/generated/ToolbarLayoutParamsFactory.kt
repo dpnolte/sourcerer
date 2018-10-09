@@ -5,15 +5,10 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class ToolbarLayoutParamsFactory<TLayoutParams : Toolbar.LayoutParams, TAttributes : ToolbarLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "androidx.appcompat.widget.Toolbar.LayoutParams"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = Toolbar.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.MATCH_PARENT)
 

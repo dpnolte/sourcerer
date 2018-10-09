@@ -18,7 +18,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
     fun contemplateOnTheMeaningOfTypes(codeBlocks: List<CodeBlock>): List<CodeBlock> {
         // assign setter types first before we can assign formats per setter (see assignAttributeType)
         codeBlocks.forEach { codeBlock ->
-            for (setter in codeBlock.setters) {
+            for (setter in codeBlock.setters.values) {
                 for (attrName in setter.attributeToParameter.keys) {
                     val attribute = codeBlock.attributes[attrName] as Attribute
                     val typesForThisSetter = attribute.resolvedTypesPerSetter(setter.hashCode())
@@ -31,7 +31,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
         val selectedCodeBlocks = mutableListOf<CodeBlock>()
         codeBlocks.forEach { codeBlock ->
             val toBeRemovedSetters = mutableSetOf<Int>()
-            for (setter in codeBlock.setters) {
+            for (setter in codeBlock.setters.values) {
                 for (attrName in setter.attributeToParameter.keys) {
                     val attribute = codeBlock.attributes[attrName] as Attribute
                     val typesForThisSetter = attribute.resolvedTypesPerSetter(setter.hashCode())
@@ -61,7 +61,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
                             attr.typesPerSetter.remove(hashCode)
                         }
                     }
-                    CodeBlock(setters, attributes, codeBlock.minimumApiLevel)
+                    CodeBlock(setters.toMutableMap(), attributes, codeBlock.minimumApiLevel)
                 } else codeBlock
                 selectedCodeBlocks.add(updatedCodeBlock)
             } else {
@@ -213,12 +213,12 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
             //if (formatAssignedToOtherSetter(otherSetters, attribute, format)) continue
             val formatTypeName = format.toClass().asTypeName()
             val parameterFormatTypeName = parameter.format.toClass().asTypeName()
-            val directMatchedFormat = getDirectMatchedFormatForThisSetter(setter, attribute, format)
+            val directlyMatchingFormat = getFormatThatMatchesDirectlyWithSetter(setter, attribute, format)
             val isFormatSpecified = parameter.format != StyleableAttributeFormat.Unspecified
             when {
                 !isFormatSpecified && formatTypeName.toString() == setterType.toString() -> formats.add(format)
                 !isFormatSpecified && allowedFormatToTypeTransformations.contains(Pair(format, setterType)) -> formats.add(format)
-                directMatchedFormat != null -> formats.add(format)
+                directlyMatchingFormat != null -> formats.add(format)
                 allowedFormatToTypeTransformations.contains(Pair(format, parameterFormatTypeName)) -> formats.add(format)
             }
         }
@@ -227,16 +227,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
         return AttributeTypeResult(MultiFormatGenerator.multiFormatClassName, formats, enumClassName)
     }
 
-    private fun getDirectMatchedFormatForThisSetter(setter: Setter, attribute: Attribute, providedFormat: StyleableAttributeFormat? = null): StyleableAttributeFormat? {
-        val hashCode = setter.hashCode()
-        if (cachedFormatsReservedForSetters.containsKey(hashCode)) {
-            val cachedFormat = cachedFormatsReservedForSetters[hashCode]
-            return when (providedFormat) {
-                null -> cachedFormat
-                cachedFormat -> cachedFormat
-                else -> null
-            }
-        }
+    private fun getFormatThatMatchesDirectlyWithSetter(setter: Setter, attribute: Attribute, providedFormat: StyleableAttributeFormat? = null): StyleableAttributeFormat? {
         val parameter = setter.getParameterByAttribute(attribute)
         val typesForThisSetter = attribute.typesPerSetter[setter.hashCode()] as AttributeTypesForSetter
         val setterType = typesForThisSetter.resolvedSetterType
@@ -256,7 +247,6 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
                 selectedFormat = format
             }
         }
-        cachedFormatsReservedForSetters[hashCode] = selectedFormat
         return selectedFormat
     }
 
@@ -314,76 +304,68 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
     private fun handleMultiFormatAttributesWithMultipleSetters(codeBlock: CodeBlock) {
         // only focus on attributes with multiple setters
 
-        val setters = codeBlock.setters.associateBy { it.hashCode() }
         for (attribute in codeBlock.attributes.values) {
             // secondly, build a format to setter map to identify formats being used for multiple setters
             if (attribute.formats.size > 1 && attribute.setterHashCodes.size > 1) {
-                val formatToSetterHashCodesMap = mutableMapOf<StyleableAttributeFormat, MutableList<Int>>()
+                val formatToSetterHashCodesMap = mutableMapOf<StyleableAttributeFormat, MutableSet<Int>>()
                 for (typesForSetterPair in attribute.typesPerSetter) {
                     val typesForSetter = typesForSetterPair.value
                     for (format in typesForSetter.formats) {
                         if (!formatToSetterHashCodesMap.containsKey(format)) {
-                            formatToSetterHashCodesMap[format] = mutableListOf(typesForSetterPair.key)
+                            formatToSetterHashCodesMap[format] = mutableSetOf(typesForSetterPair.key)
                         } else {
                             formatToSetterHashCodesMap[format]?.add(typesForSetterPair.key)
                         }
                     }
                 }
-                for (formatToSetterHashCodes in formatToSetterHashCodesMap) {
-                    if (formatToSetterHashCodes.value.size > 1) {
+                for ((format, setterHashCodes) in formatToSetterHashCodesMap) {
+                    if (setterHashCodes.size > 1) {
                         // make selection based on:
                         // -- a) is there another attribute that requires this setter?
                         // -- b) is there a setter with equal getter type (no transform)
                         // -- c) is there a setter with no transform type needed
-                        // is there a setter with single format? (which makes it fixed)
-                        val settersWithOneFormatAssigned = formatToSetterHashCodes.value
-                                .filter {
-                                    val typesForSetter = attribute.typesPerSetter[it] as AttributeTypesForSetter
-                                    typesForSetter.formats.size == 1
-                                }
-                        val settersWithMultipleFormatsAssigned = formatToSetterHashCodes.value
-                                .filter {
-                                    val typesForSetter = attribute.typesPerSetter[it] as AttributeTypesForSetter
-                                    typesForSetter.formats.size > 1
-                                }
-                        when {
-                            settersWithOneFormatAssigned.size == 1 && settersWithMultipleFormatsAssigned.isNotEmpty() -> {
-                                settersWithMultipleFormatsAssigned.forEach { setterHashCode ->
-                                    val typesPerSetter = attribute.typesPerSetter[setterHashCode] as AttributeTypesForSetter
-                                    typesPerSetter.formats.remove(formatToSetterHashCodes.key)
-                                }
-                            }
-                            settersWithOneFormatAssigned.size > 1 -> {
-                                settersWithMultipleFormatsAssigned.forEach { setterHashCode ->
-                                    val typesPerSetter = attribute.typesPerSetter[setterHashCode] as AttributeTypesForSetter
-                                    typesPerSetter.formats.remove(formatToSetterHashCodes.key)
-                                }
-                                // TODO: SELECT THE SETTER THAT HAS SAME TYPE AS GETTER
-                                /*// sort by number of params, and then name length of setter
-                                settersWithOneFormatAssigned.sortedWith(compareBy(
-                                        { (setters[it] as Setter).parameters.size },
-                                        { (setters[it] as Setter).name.length }
-                                )).forEachIndexed { index, hashCode ->
-                                    if (index != 0) { // keep first assignment
-                                        val typesPerSetter = attribute.typesPerSetter[hashCode] as AttributeTypesForSetter
-                                        typesPerSetter.formats.remove(formatToSetterHashCodes.key)
-                                    }
-                                }*/
 
+                        val keepSettersWithAnyOtherAttribute = mutableSetOf<Int>()
+                        val settersWithEqualGetterType = mutableSetOf<Int>()
+                        val settersWithoutTransform = mutableSetOf<Int>()
+                        val settersWithEqualGetterTypeAndWithoutTransform = mutableSetOf<Int>()
+                        val isFormatSpecified = format != StyleableAttributeFormat.Unspecified
+                        setterHashCodes.forEach { hashCode ->
+                            val setter = codeBlock.setters[hashCode] as Setter
+                            val typesForSetter = attribute.typesPerSetter[hashCode] as AttributeTypesForSetter
+                            // a)
+                            if (setter.attributeToParameter.size > 1) {
+                                keepSettersWithAnyOtherAttribute.add(hashCode)
                             }
-                            settersWithOneFormatAssigned.isEmpty() && settersWithMultipleFormatsAssigned.isNotEmpty() -> {
-                                // sort by number of params, and then name length of setter
-                                settersWithMultipleFormatsAssigned.sortedWith(compareBy(
-                                        { (setters[it] as Setter).parameters.size },
-                                        { (setters[it] as Setter).name.length }
-                                )).forEachIndexed { index, hashCode ->
-                                    if (index != 0) { // keep first assignment
-                                        val typesPerSetter = attribute.typesPerSetter[hashCode] as AttributeTypesForSetter
-                                        typesPerSetter.formats.remove(formatToSetterHashCodes.key)
-                                    }
+                            // b)
+                            if (isFormatSpecified && attribute.getters.any {it.resolvedType == typesForSetter.resolvedSetterType}) {
+                                settersWithEqualGetterType.add(hashCode)
+                            }
+                            // c)
+                            if (isFormatSpecified && !typesForSetter.requiresTransformMethod) {
+                                settersWithoutTransform.add(hashCode)
+                                if (settersWithEqualGetterType.contains(hashCode)) {
+                                    settersWithEqualGetterTypeAndWithoutTransform.add(hashCode)
                                 }
                             }
-                            else -> throw TODO("Not yet implement case of attribute having multiple setters with same format type assigned and that format is the allowed one")
+
+                        }
+                        val selectedHashCodes = when {
+                            keepSettersWithAnyOtherAttribute.isNotEmpty() -> keepSettersWithAnyOtherAttribute
+                            settersWithEqualGetterTypeAndWithoutTransform.isNotEmpty() -> setOf(settersWithEqualGetterTypeAndWithoutTransform.first())
+                            settersWithEqualGetterType.isNotEmpty() -> setOf(settersWithEqualGetterType.first())
+                            settersWithoutTransform.isNotEmpty() -> setOf(settersWithoutTransform.first())
+                            else -> setOf(setterHashCodes.first()) // if nothing else, just keep first setter
+                        }
+                        setterHashCodes.forEach { hashCode ->
+                            if (!selectedHashCodes.contains(hashCode)) {
+                                attribute.resolvedTypesPerSetter(hashCode).formats.remove(format)
+                                if (attribute.resolvedTypesPerSetter(hashCode).formats.isEmpty()) {
+                                    codeBlock.setters.remove(hashCode)
+                                    attribute.typesPerSetter.remove(hashCode)
+                                    attribute.setterHashCodes.remove(hashCode)
+                                }
+                            }
                         }
                     }
                 }
@@ -391,6 +373,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
             }
         }
     }
+
 
     private fun getResolvedGetterType(attribute: Attribute, getter: Getter, typesForThisSetter: AttributeTypesForSetter): TypeName {
         val getterCanonicalName = getter.typeName.toString()

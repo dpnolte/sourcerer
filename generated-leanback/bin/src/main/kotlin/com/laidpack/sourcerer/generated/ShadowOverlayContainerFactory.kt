@@ -5,15 +5,10 @@ import android.view.View
 import androidx.leanback.widget.ShadowOverlayContainer
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class ShadowOverlayContainerFactory<TView : ShadowOverlayContainer, TAttributes : ShadowOverlayContainerAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "shadowOverlayContainer"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = ShadowOverlayContainer(context)
 

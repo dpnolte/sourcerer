@@ -6,10 +6,12 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.FieldDeclaration
 import com.laidpack.sourcerer.generator.Store
 import com.laidpack.sourcerer.generator.resources.*
+import com.laidpack.sourcerer.generator.target.Getter
+import com.laidpack.sourcerer.generator.target.Setter
 import com.squareup.kotlinpoet.ClassName
 import kotlinx.dnq.query.*
-import java.lang.IllegalArgumentException
 import java.util.*
+import kotlin.IllegalArgumentException
 
 class ClassRegistry(
         private val attrsXmlManager: StyleableAttributeManager = StyleableAttributeManager(),
@@ -127,8 +129,50 @@ class ClassRegistry(
         return null
     }
 
+    fun getResolvedFieldFromThisClassOrSuperClass(variableName: String, classInfo: ClassInfo): FieldDeclaration {
+        return getFieldFromThisClassOrSuperClass(variableName, classInfo)
+            ?: throw IllegalArgumentException("No field declaration with name '$variableName' in class '${classInfo.targetClassName}' or super classes '${classInfo.superClassNames.joinToString()}'")
+    }
+
+    fun getGetterFromThisClassOrSuperClass(getter: Getter, classInfo: ClassInfo): MethodInfo {
+        try {
+            return classInfo.getGetterMethodInfo(getter)
+        } catch (e: IllegalArgumentException) {
+            val superClasses = getSuperClasses(classInfo)
+            for (superClass in superClasses) {
+                try {
+                    return superClass.getGetterMethodInfo(getter)
+                } catch (e: IllegalArgumentException) {
+                    continue
+                }
+            }
+        }
+        throw IllegalArgumentException("No method info for getter '${getter.name}' in class '${classInfo.targetClassName}' or super classes '${classInfo.superClassNames.joinToString()}'")
+    }
+
+    fun getSetterFromThisClassOrSuperClass(setter: Setter, classInfo: ClassInfo): MethodInfo {
+        try {
+            return classInfo.getSetterMethodInfo(setter)
+        } catch (e: IllegalArgumentException) {
+            val superClasses = getSuperClasses(classInfo)
+            for (superClass in superClasses) {
+                try {
+                    return superClass.getSetterMethodInfo(setter)
+                } catch (e: IllegalArgumentException) {
+                    continue
+                }
+            }
+        }
+        throw IllegalArgumentException("No method info for setter '${setter.name}' in class '${classInfo.targetClassName}' or super classes '${classInfo.superClassNames.joinToString()}'")
+    }
+
     companion object {
-        fun add(className: ClassName, nodeHashCode: Int, indexedFile: IndexedFile, providedPackage: IndexedPackage): IndexedClass {
+        fun add(
+                className: ClassName,
+                nodeHashCode: Int,
+                indexedFile: IndexedFile,
+                providedPackage: IndexedPackage
+        ): IndexedClass {
             return Store.transactional {
                 val indexedClass= IndexedClass.new()
                 indexedClass.canonicalName = className.canonicalName

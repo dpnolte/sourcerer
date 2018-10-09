@@ -7,7 +7,8 @@ import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
 internal class LayoutElementAdapterFactory(private val elementNameToTypeProvider: () -> Map<String, KClass<*>>) : JsonAdapter.Factory {
-    override fun create(type: Type?, annotations: MutableSet<out Annotation>?, moshi: Moshi?): JsonAdapter<*>? {
+    override fun create(t: Type?, annotations: MutableSet<out Annotation>?, moshi: Moshi?): JsonAdapter<*>? {
+        val type = t ?: return null
         val rawType = Types.getRawType(type)
         if (rawType != targetType) {
             return null

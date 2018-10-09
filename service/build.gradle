@@ -29,6 +29,7 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin/'
         test.java.srcDirs += 'src/test/kotlin/'
+        androidTest.java.srcDirs += 'src/androidTest/kotlin'
     }
 
     compileOptions {
@@ -50,5 +51,11 @@ dependencies {
     testImplementation "com.nhaarman:mockito-kotlin:1.6.0"
     testImplementation 'org.amshove.kluent:kluent:1.37'
     testImplementation 'org.amshove.kluent:kluent-android:1.37'
+    testImplementation 'junit:junit:4.12'
+    /*
+    androidTestImplementation 'com.android.support:support-annotations:28.0.0'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    */
 
 }

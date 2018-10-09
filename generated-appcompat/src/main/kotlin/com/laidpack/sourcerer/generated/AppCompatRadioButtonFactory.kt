@@ -5,15 +5,10 @@ import android.view.View
 import androidx.appcompat.widget.AppCompatRadioButton
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class AppCompatRadioButtonFactory<TView : AppCompatRadioButton, TAttributes : AppCompatRadioButtonAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ButtonFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "appCompatRadioButton"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = AppCompatRadioButton(context)
 

@@ -23,7 +23,7 @@ class SingleAttributeAndMultiSettersGenerator(attributesParam: ParameterSpec, co
         builder.beginControlFlow("when")
         for(setterHashCode in attribute.setterHashCodes) {
             val typesForThisSetter = attribute.typesPerSetter[setterHashCode] as AttributeTypesForSetter
-            val setter = codeBlock.setters.first { it.hashCode() == setterHashCode }
+            val setter = codeBlock.setters[setterHashCode] as Setter
             builder.addWhenEntry(setter, typesForThisSetter)
 
         }

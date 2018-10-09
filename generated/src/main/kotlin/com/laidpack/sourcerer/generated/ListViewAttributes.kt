@@ -13,7 +13,7 @@ import kotlin.Int
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class ListViewAttributes : AbsListViewAttributes(), IAttributes {
+open class ListViewAttributes : AdapterViewAttributes(), IAttributes {
     @field:MultiFormatQualifier(formats = [Format.Color, Format.Reference])
     var divider: MultiFormat = MultiFormat(setOf(Format.Color, Format.Reference))
 

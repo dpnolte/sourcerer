@@ -5,15 +5,10 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class RecyclerViewFactory<TView : RecyclerView, TAttributes : RecyclerViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "recyclerView"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = RecyclerView(context)
 

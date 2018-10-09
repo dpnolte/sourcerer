@@ -5,23 +5,18 @@ import android.view.View
 import androidx.leanback.widget.RowHeaderView
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
-open class RowHeaderViewFactory<TView : RowHeaderView, TAttributes : RowHeaderViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : TextViewFactory<TView, TAttributes>(instanceType, attributesType) {
+open class RowHeaderViewFactory<TAttributes : RowHeaderViewAttributes>(attributesType: Class<TAttributes>) : TextViewFactory<RowHeaderView, TAttributes>(RowHeaderView::class.java, attributesType) {
     override val elementName: String = "rowHeaderView"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = RowHeaderView(context)
 
     companion object {
         init {
-            InflaterComponent.addFactory(RowHeaderViewFactory<RowHeaderView, RowHeaderViewAttributes>())
+            InflaterComponent.addFactory(RowHeaderViewFactory<RowHeaderViewAttributes>())
         }
 
-        inline operator fun <reified TView : RowHeaderView, reified TAttributes : RowHeaderViewAttributes> invoke() = RowHeaderViewFactory(TView::class.java, TAttributes::class.java)
+        inline operator fun <reified TAttributes : RowHeaderViewAttributes> invoke() = RowHeaderViewFactory(TAttributes::class.java)
     }
 }

@@ -1,5 +1,6 @@
 include ':generator',
 		':stub-app',
+		':service',
         ':generated',
         ':generated-appcompat',
         ':generated-car',
@@ -18,5 +19,5 @@ include ':generator',
         ':generated-slidingpanelayout',
         ':generated-swiperefreshlayout',
         ':generated-viewpager',
-        ':generated-wear',
-        ':service'
+        ':generated-wear'
+

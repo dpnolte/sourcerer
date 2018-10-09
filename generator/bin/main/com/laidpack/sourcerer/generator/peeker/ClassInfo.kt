@@ -2,6 +2,7 @@ package com.laidpack.sourcerer.generator.peeker
 
 import android.view.ViewGroup
 import com.github.javaparser.ast.body.*
+import com.github.javaparser.ast.expr.AnnotationExpr
 import com.github.javaparser.ast.expr.MethodCallExpr
 import com.github.javaparser.javadoc.Javadoc
 import com.github.javaparser.resolution.UnsolvedSymbolException
@@ -64,7 +65,8 @@ data class ClassInfo(
         val methodDeclarations: Map<String, List<MethodInfo>>,
         val fieldDeclarations: Map<String, FieldDeclaration>,
         val constructorExpression: ConstructorExpression,
-        val indexedClass: IndexedClass
+        val indexedClass: IndexedClass,
+        val annotations: List<AnnotationExpr>
 ) {
     var hasResolvedAttributes: Boolean = false
     val specifiedAttributes = mutableMapOf<String, Attribute>()
@@ -169,13 +171,23 @@ data class ClassInfo(
         return this.fieldDeclarations[variableName] as FieldDeclaration
     }
 
-    fun getSetterInfo(setter: Setter): MethodInfo {
+    fun getSetterMethodInfo(setter: Setter): MethodInfo {
         val methodInfos = methodDeclarations[setter.name] ?: throw IllegalArgumentException("No method info for setter ${setter.name}, no match based on name")
         if (methodInfos.size == 1) return methodInfos.first()
 
         val hashCode = setter.hashCode()
         return methodInfos.first {
             Setter.getHashCodeFromMethodInfo(it) == hashCode
+        }
+    }
+
+    fun getGetterMethodInfo(getter: Getter): MethodInfo {
+        val methodInfos = methodDeclarations[getter.name] ?: throw IllegalArgumentException("No method info for getter ${getter.name}, no match based on name")
+        if (methodInfos.size == 1) return methodInfos.first()
+
+        val hashCode = getter.hashCode()
+        return methodInfos.first {
+            Getter.getHashCodeFromMethodInfo(it) == hashCode
         }
     }
 

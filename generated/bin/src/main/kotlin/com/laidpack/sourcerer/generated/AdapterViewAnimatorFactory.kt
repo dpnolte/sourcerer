@@ -5,18 +5,14 @@ import android.view.View
 import android.widget.AdapterViewAnimator
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class AdapterViewAnimatorFactory<TView : AdapterViewAnimator, TAttributes : AdapterViewAnimatorAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AdapterViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "adapterViewAnimator"
 
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
-
     override fun createInstance(context: Context): View {
-        throw IllegalStateException("android.widget.AdapterViewAnimator is abstract and cannot be instantiated")
+        // // AdapterViewAnimator is abstract
+        return super.createInstance(context)
     }
 
     companion object {

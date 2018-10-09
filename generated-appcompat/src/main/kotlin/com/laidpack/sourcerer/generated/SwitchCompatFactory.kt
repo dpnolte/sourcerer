@@ -10,78 +10,75 @@ import com.laidpack.sourcerer.service.InflaterComponent
 import com.laidpack.sourcerer.service.api.init
 import com.laidpack.sourcerer.service.api.toPorterDuffMode
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class SwitchCompatFactory<TView : SwitchCompat, TAttributes : SwitchCompatAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ButtonFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "switchCompat"
 
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
-
     override fun createInstance(context: Context): View = SwitchCompat(context)
 
     override fun init(
-        view: TView,
+        view: View,
         context: Context,
         attributes: TAttributes
     ) {
         super.init(view, context, attributes)
-        view.init {
-            attributes.thumbTint?.let {
-                val immutableThumbTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                if (thumbTintList != immutableThumbTint) {
-                    thumbTintList = immutableThumbTint
+        if (view is SwitchCompat) {
+            view.init {
+                attributes.thumbTint?.let {
+                    val immutableThumbTint = ResourcesCompat.getColorStateList(context.resources, it, null)
+                    if (thumbTintList != immutableThumbTint) {
+                        thumbTintList = immutableThumbTint
+                    }
                 }
-            }
-            attributes.thumbTintMode?.let {
-                val immutableThumbTintMode = it.value.toPorterDuffMode()
-                if (thumbTintMode != immutableThumbTintMode) {
-                    thumbTintMode = immutableThumbTintMode
+                attributes.thumbTintMode?.let {
+                    val immutableThumbTintMode = it.value.toPorterDuffMode()
+                    if (thumbTintMode != immutableThumbTintMode) {
+                        thumbTintMode = immutableThumbTintMode
+                    }
                 }
-            }
-            attributes.track?.let {
-                val immutableTrack = ContextCompat.getDrawable(context, it) as Drawable
-                if (trackDrawable != immutableTrack) {
-                    trackDrawable = immutableTrack
+                attributes.track?.let {
+                    val immutableTrack = ContextCompat.getDrawable(context, it) as Drawable
+                    if (trackDrawable != immutableTrack) {
+                        trackDrawable = immutableTrack
+                    }
                 }
-            }
-            attributes.trackTint?.let {
-                val immutableTrackTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                if (trackTintList != immutableTrackTint) {
-                    trackTintList = immutableTrackTint
+                attributes.trackTint?.let {
+                    val immutableTrackTint = ResourcesCompat.getColorStateList(context.resources, it, null)
+                    if (trackTintList != immutableTrackTint) {
+                        trackTintList = immutableTrackTint
+                    }
                 }
-            }
-            attributes.trackTintMode?.let {
-                val immutableTrackTintMode = it.value.toPorterDuffMode()
-                if (trackTintMode != immutableTrackTintMode) {
-                    trackTintMode = immutableTrackTintMode
+                attributes.trackTintMode?.let {
+                    val immutableTrackTintMode = it.value.toPorterDuffMode()
+                    if (trackTintMode != immutableTrackTintMode) {
+                        trackTintMode = immutableTrackTintMode
+                    }
                 }
-            }
-            attributes.thumbTextPadding?.let {
-                if (thumbTextPadding != it) {
-                    thumbTextPadding = it
+                attributes.thumbTextPadding?.let {
+                    if (thumbTextPadding != it) {
+                        thumbTextPadding = it
+                    }
                 }
-            }
-            attributes.switchMinWidth?.let {
-                if (switchMinWidth != it) {
-                    switchMinWidth = it
+                attributes.switchMinWidth?.let {
+                    if (switchMinWidth != it) {
+                        switchMinWidth = it
+                    }
                 }
-            }
-            attributes.switchPadding?.let {
-                if (switchPadding != it) {
-                    switchPadding = it
+                attributes.switchPadding?.let {
+                    if (switchPadding != it) {
+                        switchPadding = it
+                    }
                 }
-            }
-            attributes.splitTrack?.let {
-                if (splitTrack != it) {
-                    splitTrack = it
+                attributes.splitTrack?.let {
+                    if (splitTrack != it) {
+                        splitTrack = it
+                    }
                 }
-            }
-            attributes.showText?.let {
-                if (showText != it) {
-                    showText = it
+                attributes.showText?.let {
+                    if (showText != it) {
+                        showText = it
+                    }
                 }
             }
         }

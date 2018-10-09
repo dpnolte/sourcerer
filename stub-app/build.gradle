@@ -62,7 +62,7 @@ dependencies {
     implementation "androidx.viewpager:viewpager:$androidX"
     implementation "androidx.wear:wear:$androidX"
     //api project(path: ":service", configuration: 'default')
-    //releaseApi project(":service")
+    releaseImplementation project(":service")
 
 }
 

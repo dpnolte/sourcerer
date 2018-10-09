@@ -5,18 +5,14 @@ import android.view.View
 import androidx.leanback.widget.BaseGridView
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
-open class BaseGridViewFactory<TView : BaseGridView, TAttributes : BaseGridViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : RecyclerViewFactory<TView, TAttributes>(instanceType, attributesType) {
+open class BaseGridViewFactory<TView : BaseGridView, TAttributes : BaseGridViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "baseGridView"
 
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
-
     override fun createInstance(context: Context): View {
-        throw IllegalStateException("androidx.leanback.widget.BaseGridView is abstract and cannot be instantiated")
+        // // BaseGridView is abstract
+        return super.createInstance(context)
     }
 
     companion object {

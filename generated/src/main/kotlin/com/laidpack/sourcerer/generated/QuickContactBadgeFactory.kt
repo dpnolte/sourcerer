@@ -5,15 +5,10 @@ import android.view.View
 import android.widget.QuickContactBadge
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class QuickContactBadgeFactory<TView : QuickContactBadge, TAttributes : QuickContactBadgeAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ImageViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "quickContactBadge"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = QuickContactBadge(context)
 

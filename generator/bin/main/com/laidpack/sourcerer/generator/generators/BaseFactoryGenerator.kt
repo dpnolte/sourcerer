@@ -8,6 +8,7 @@ import com.laidpack.sourcerer.generator.generators.delegates.MultiAttributesAndM
 import com.laidpack.sourcerer.generator.generators.delegates.MultiAttributesAndSingleSetterGenerator
 import com.laidpack.sourcerer.generator.generators.delegates.SingleAttributeAndMultiSettersGenerator
 import com.laidpack.sourcerer.generator.generators.delegates.SingleAttributeAndSingleSetterGenerator
+import com.laidpack.sourcerer.generator.lint.ApiDetector
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -16,37 +17,32 @@ import kotlin.reflect.KClass
 abstract class BaseFactoryGenerator(
         protected val targetClassName: ClassName,
         protected val superClassName: ClassName?,
-        fallbackClassName: ClassName?,
         private val baseClassType: KClass<*>,
         private val codeBlocks: List<CodeBlock>,
         classCategory: ClassCategory,
         numberOfTypeVariables: Int,
         private val minimumApiLevel: Int,
-        private val minSdkVersion: Int
+        private val minSdkVersion: Int,
+        private val isFinal: Boolean
 ) {
     private val hasSuperClass = superClassName != null
     private val attributesClassName = AttributesGenerator.getAttributesClassName(targetClassName, classCategory)
     private val attributesTypeVariable = TypeVariableName("TAttributes", attributesClassName)
-    protected val viewClassTypeName = if (numberOfTypeVariables > 0) {
-        var stars = mutableListOf<TypeName>()
+    protected val viewClassName = if (numberOfTypeVariables > 0) {
+        val stars = mutableListOf<TypeName>()
         for(i in 1..numberOfTypeVariables) {
             stars.add(WildcardTypeName.STAR)
         }
         targetClassName.parameterizedBy(*stars.toTypedArray())
     } else targetClassName
-    private val layoutTypeClassName
+    private val viewClazzClassName
         get() = ClassName("java.lang", "Class")
-            .parameterizedBy(layoutTypeVariable)
-    private val attributesTypeClassName = ClassName("java.lang", "Class")
+            .parameterizedBy(viewTypeVariable)
+    private val attributesClazzClassName = ClassName("java.lang", "Class")
             .parameterizedBy(attributesTypeVariable)
     private val elementName = if (classCategory == ClassCategory.View) {
         targetClassName.simpleName.decapitalize()
     } else targetClassName.canonicalName
-    private val fallBackElementName = when {
-        fallbackClassName != null && classCategory == ClassCategory.View -> "\"${fallbackClassName.simpleName}\""
-        fallbackClassName != null -> "\"${fallbackClassName.canonicalName}\""
-        else -> "null"
-    }
 
 
 
@@ -56,12 +52,12 @@ abstract class BaseFactoryGenerator(
         get() {
             return if (superClassName != null) {
                 getFactoryClassName(superClassName).parameterizedBy(
-                        layoutTypeVariable,
+                        if (isFinal) viewClassName else viewTypeVariable,
                         attributesTypeVariable
                 )
             } else {
                 rootFactoryClassName.parameterizedBy(
-                        layoutTypeVariable,
+                        if (isFinal) viewClassName else viewTypeVariable,
                         attributesTypeVariable
                 )
             }
@@ -69,14 +65,11 @@ abstract class BaseFactoryGenerator(
 
     abstract fun getFactoryClassName(originalClassName: ClassName): ClassName
     abstract val rootFactoryClassName: ClassName
-    abstract val layoutTypeVariable: TypeVariableName
-    abstract val layoutParam : ParameterSpec
-    abstract val layoutVariableName: String
+    abstract val viewTypeVariable: TypeVariableName
+    abstract val viewParam : ParameterSpec
 
     protected val attributesParam = ParameterSpec.builder("attributes", attributesTypeVariable).build()
     protected val contextParam = ParameterSpec.builder("context", Context::class).build()
-    private val resolvedLayoutVariableName : String
-        get() = if (targetClassName.canonicalName != baseClassType.java.canonicalName) layoutVariableName else layoutParam.name
 
     fun generateFile(): FileSpec {
 
@@ -92,10 +85,9 @@ abstract class BaseFactoryGenerator(
         return TypeSpec.classBuilder(factoryClassName)
                 .addModifiers(KModifier.OPEN)
                 .primaryConstructor(getPrimaryConstructor())
-                .addSuperclassConstructorParameter("%N", "instanceType")
-                .addSuperclassConstructorParameter("%N", "attributesType")
+                .addSuperClassParameters()
                 .superclass(this.baseFactoryClassName)
-                .addTypeVariables(listOf(layoutTypeVariable, attributesTypeVariable))
+                .addTypeVariables(getClassTypeVariables())
                 .addProperty(
                         PropertySpec.builder(
                                 "elementName",
@@ -104,49 +96,45 @@ abstract class BaseFactoryGenerator(
                         ).initializer("%S", elementName)
                                 .build()
                 )
-                .addProperty(
-                        PropertySpec.builder(
-                                "fallBackElementName",
-                                String::class.asTypeName().asNullable(),
-                                KModifier.OVERRIDE
-                        ).initializer("%L", fallBackElementName)
-                                .build()
-                )
-                .addProperty(
-                        PropertySpec.builder(
-                                "minimumApiLevel",
-                                Int::class.asTypeName(),
-                                KModifier.OVERRIDE
-                        ).initializer("%L", minimumApiLevel)
-                                .build()
-                )
                 .addFunction(generateCreateInstanceFunc())
                 .addInitFuncIfRequired()
                 .addType(getCompanionSpec())
     }
 
     open fun getCompanionSpec(): TypeSpec {
+        val invokeFuncStmtArgs = mutableListOf<Any>()
+        val invokeFunStmtExpression = if (isFinal) {
+            invokeFuncStmtArgs.add(factoryClassName)
+            invokeFuncStmtArgs.add(attributesTypeVariable)
+            "return %T(%T::class.java)"
+        } else {
+            invokeFuncStmtArgs.add(factoryClassName)
+            invokeFuncStmtArgs.add(viewTypeVariable)
+            invokeFuncStmtArgs.add(attributesTypeVariable)
+            "return %T(%T::class.java, %T::class.java)"
+        }
+
         val invokeFunc = FunSpec.builder("invoke")
                 .addModifiers(KModifier.INLINE, KModifier.OPERATOR)
-                .addTypeVariables(listOf(
-                        layoutTypeVariable.reified(true),
-                        attributesTypeVariable.reified(true)
-                ))
-                .addStatement(
-                        "return %T(%T::class.java, %T::class.java)",
-                        factoryClassName,
-                        layoutTypeVariable,
-                        attributesTypeVariable
-                )
+                .addTypeVariables(getClassTypeVariables(true))
+                .addStatement(invokeFunStmtExpression, *invokeFuncStmtArgs.toTypedArray())
                 .build()
+
+        val initBlockStmtArgs = mutableListOf<Any>()
+        val initBlockStmtExpression = if (isFinal) {
+            initBlockStmtArgs.add(inflaterComponentClassName)
+            initBlockStmtArgs.add(factoryClassName)
+            initBlockStmtArgs.add(attributesClassName)
+            "%T.addFactory(%T<%T>())"
+        } else {
+            initBlockStmtArgs.add(inflaterComponentClassName)
+            initBlockStmtArgs.add(factoryClassName)
+            initBlockStmtArgs.add(viewClassName)
+            initBlockStmtArgs.add(attributesClassName)
+            "%T.addFactory(%T<%T, %T>())"
+        }
         val initBlock = com.squareup.kotlinpoet.CodeBlock.Builder()
-                .addStatement(
-                        "%T.addFactory(%T<%T, %T>())",
-                        inflaterComponentClassName,
-                        factoryClassName,
-                        viewClassTypeName,
-                        attributesClassName
-                )
+                .addStatement(initBlockStmtExpression, *initBlockStmtArgs.toTypedArray())
 
         return TypeSpec.companionObjectBuilder()
                 .addFunction(invokeFunc)
@@ -155,10 +143,31 @@ abstract class BaseFactoryGenerator(
     }
 
     open fun getPrimaryConstructor(): FunSpec {
-        return FunSpec.constructorBuilder()
-                .addParameter("instanceType", layoutTypeClassName)
-                .addParameter("attributesType", attributesTypeClassName)
+        val funSpec =FunSpec.constructorBuilder()
+        if (!isFinal) {
+            funSpec.addParameter("instanceType", viewClazzClassName)
+        }
+        return funSpec.addParameter("attributesType", attributesClazzClassName)
                 .build()
+    }
+
+    private fun getClassTypeVariables(reified: Boolean = false): Iterable<TypeVariableName> {
+        val typeVariables = mutableListOf<TypeVariableName>()
+        if (!isFinal) {
+            typeVariables.add(viewTypeVariable.reified(reified))
+        }
+        typeVariables.add(attributesTypeVariable.reified(reified))
+        return typeVariables.asIterable()
+    }
+
+    private fun TypeSpec.Builder.addSuperClassParameters(): TypeSpec.Builder {
+        if (isFinal) {
+            this.addSuperclassConstructorParameter("%T::class.java", viewClassName)
+        } else {
+            this.addSuperclassConstructorParameter("%N", "instanceType")
+        }
+        this.addSuperclassConstructorParameter("%N", "attributesType")
+        return this
     }
 
     abstract fun generateCreateInstanceFunc(): FunSpec
@@ -166,10 +175,11 @@ abstract class BaseFactoryGenerator(
     protected fun FunSpec.Builder.wrapInMininumApiLevelCheckIfNeeded(
             minApiLevel: Int,
             ifStatements: FunSpec.Builder.() -> Unit,
-            elseStatements: (FunSpec.Builder.() -> Unit)? = null
+            elseStatements: (FunSpec.Builder.() -> Unit)? = null,
+            operator: String = ">="
     ) : FunSpec.Builder {
         if (minApiLevel > minSdkVersion) {
-            this.beginControlFlow("if (%T.VERSION.SDK_INT >= %L)", Build::class.asTypeName(), minApiLevel)
+            this.beginControlFlow("if (%T.VERSION.SDK_INT $operator %L)", Build::class.asTypeName(), minApiLevel)
         }
         this.ifStatements()
         if (minApiLevel > minSdkVersion) {
@@ -186,15 +196,19 @@ abstract class BaseFactoryGenerator(
         if (codeBlocks.isNotEmpty() || !hasSuperClass) {
             val funSpec = FunSpec.builder("init")
                     .addModifiers(KModifier.OVERRIDE)
-                    .addParameter(layoutParam)
+                    .addParameter(viewParam.name, baseClassType.asTypeName())
                     .addParameter(contextParam)
                     .addParameter(attributesParam)
                     .addSuperInitIfRequired()
 
             if (codeBlocks.isNotEmpty()) {
-                funSpec.beginControlFlow("%N.%T", layoutParam.name, initTypeName)
-                        .addInitializeAttributeCodeBlocks()
-                        .endControlFlow()
+                funSpec.wrapInMininumApiLevelCheckIfNeeded(minimumApiLevel, ifStatements = {
+                    this.wrapInViewIsTypeCheckIfRequired {
+                        this.beginControlFlow("%N.%T", viewParam, initTypeName)
+                            .addInitializeAttributeCodeBlocks()
+                            .endControlFlow()
+                    }
+                })
             }
 
             this.addFunction(funSpec.build())
@@ -202,16 +216,21 @@ abstract class BaseFactoryGenerator(
         return this
     }
 
-    private fun FunSpec.Builder.addLocalVar(): FunSpec.Builder {
-        if (targetClassName.canonicalName != baseClassType.java.canonicalName) {
-            this.addStatement("val %N = %N as %T", layoutVariableName, layoutParam, viewClassTypeName)
+    private fun FunSpec.Builder.wrapInViewIsTypeCheckIfRequired(ifStatements: FunSpec.Builder.() -> Unit): FunSpec.Builder {
+        if (targetClassName != baseClassType.asClassName()) {
+            this.beginControlFlow("if (%N is %T)", viewParam, viewClassName)
+        }
+        this.ifStatements()
+        if (targetClassName != baseClassType.asClassName()) {
+            this.endControlFlow()
         }
         return this
     }
 
+
     private fun FunSpec.Builder.addSuperInitIfRequired(): FunSpec.Builder {
         if (hasSuperClass) {
-            this.addStatement("super.init(%N, %N, %N)", layoutParam, contextParam, attributesParam)
+            this.addStatement("super.init(%N, %N, %N)", viewParam, contextParam, attributesParam)
         }
         return this
     }
@@ -221,7 +240,9 @@ abstract class BaseFactoryGenerator(
             it.minimumApiLevel
         }.toSortedMap()
         codeBlocksPerMinimumApiLevel.forEach {
-            val codeBlockMinimumApiLevel = it.key
+            val codeBlockMinimumApiLevel = if (it.key <= minimumApiLevel) {
+                ApiDetector.UNKNOWN_OR_VERSION_1 // only add check if code block's minimum api level is higher the class's
+            } else it.key
             val codeBlocks = it.value
             this.wrapInMininumApiLevelCheckIfNeeded(codeBlockMinimumApiLevel, {
                 codeBlocks.forEach { codeBlock ->

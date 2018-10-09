@@ -8,8 +8,8 @@ import com.github.javaparser.ast.Node as JavaNode
 
 
 fun main(args: Array<String>) {
-    //val input = "Chronometer" // canonical name or simple name like 'TextView'
-    val input = "android.widget.ActionMenuView"
+    val input = "ViewStub" // canonical name or simple name like 'TextView'
+    //val input = "androidx.media.widget.VideoView2"
     SourcererEnvironment.printSourceTreeVisitOutput = true
     val env = SourcererEnvironment(args)
     initParserAndStore(env)
@@ -25,7 +25,12 @@ fun main(args: Array<String>) {
         else -> ClassRegistry.findBySimpleName(input)
     }
     when {
-        indexedClasses.size > 1 -> throw IllegalArgumentException("Multiple classes with simple name '$input' indexed")
+        indexedClasses.size > 1 -> {
+            val classNames = Store.transactional {
+                indexedClasses.joinToString("\n") { "- ${it.canonicalName}" }
+            }
+            throw IllegalArgumentException("Multiple classes with simple name '$input' indexed.\nClasses:\n$classNames")
+        }
         indexedClasses.size == 1 -> {
             val indexedClass = indexedClasses.first()
 

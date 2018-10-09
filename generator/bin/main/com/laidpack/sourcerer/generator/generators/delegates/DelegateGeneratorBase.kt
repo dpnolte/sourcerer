@@ -294,7 +294,7 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
                 Pair(StyleableAttributeFormat.Integer, TextUtils.TruncateAt::class.asTypeName()) to enumToTruncateAt,
                 Pair(StyleableAttributeFormat.Enum, TextUtils.TruncateAt::class.asTypeName()) to enumToTruncateAt,
                 Pair(StyleableAttributeFormat.Boolean, layoutTransitionTypeName) to booleanToLayoutTransition,
-                Pair(StyleableAttributeFormat.Boolean, intTypeName) to boolToInt,
+                //Pair(StyleableAttributeFormat.Boolean, intTypeName) to boolToInt,
                 Pair(StyleableAttributeFormat.Integer, InputFilter::class.asTypeName()) to intToInputFilter,
                 Pair(StyleableAttributeFormat.Reference, Interpolator::class.asTypeName()) to referenceToInterpolator,
                 Pair(StyleableAttributeFormat.Unspecified, Interpolator::class.asTypeName()) to referenceToInterpolator,

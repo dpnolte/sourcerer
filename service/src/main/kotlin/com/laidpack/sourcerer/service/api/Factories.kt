@@ -7,8 +7,6 @@ import android.view.ViewGroup
 object LayoutElement {
     interface Factory {
         val elementName: String
-        val minimumApiLevel: Int
-        val fallBackElementName: String?
     }
     interface ViewFactory : Factory {
         fun create(context: Context, attributes: IAttributes, theme: Int = 0): View

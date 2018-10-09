@@ -38,12 +38,12 @@ abstract class BaseFactoryGenerator(
         get() {
             return if (superClassName != null) {
                 getFactoryClassName(superClassName).parameterizedBy(
-                        layoutTypeVariable,
+                        viewTypeVariable,
                         attributesTypeVariable
                 )
             } else {
                 rootFactoryClassName.parameterizedBy(
-                        layoutTypeVariable,
+                        viewTypeVariable,
                         attributesTypeVariable
                 )
             }
@@ -58,7 +58,7 @@ abstract class BaseFactoryGenerator(
     protected val attributesParam = ParameterSpec.builder("attributes", attributesTypeVariable).build()
     protected val contextParam = ParameterSpec.builder("context", Context::class).build()
     private val resolvedLayoutVariableName : String
-        get() = if (targetClassName.canonicalName != baseClassType.java.canonicalName) layoutVariableName else layoutParam.name
+        get() = if (targetClassName.canonicalName != baseClassType.java.canonicalName) layoutVariableName else viewParam.name
 
     fun generateFile(): FileSpec {
 
@@ -78,7 +78,7 @@ abstract class BaseFactoryGenerator(
         return TypeSpec.classBuilder(factoryClassName)
                 .addModifiers(KModifier.OPEN)
                 .superclass(this.baseFactoryClassName)
-                .addTypeVariables(listOf(layoutTypeVariable, attributesTypeVariable))
+                .addTypeVariables(listOf(viewTypeVariable, attributesTypeVariable))
                 .addProperty(
                         PropertySpec.builder(
                                 "elementName",
@@ -96,7 +96,7 @@ abstract class BaseFactoryGenerator(
     private fun generateInitFunc() : FunSpec {
         val funSpec = FunSpec.builder("init")
                 .addModifiers(KModifier.OVERRIDE)
-                .addParameter(layoutParam)
+                .addParameter(viewParam)
                 .addParameter(contextParam)
                 .addParameter(attributesParam)
 

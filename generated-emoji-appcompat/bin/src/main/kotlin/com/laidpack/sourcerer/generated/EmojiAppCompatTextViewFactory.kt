@@ -5,15 +5,10 @@ import android.view.View
 import androidx.emoji.widget.EmojiAppCompatTextView
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class EmojiAppCompatTextViewFactory<TView : EmojiAppCompatTextView, TAttributes : EmojiAppCompatTextViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : TextViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "emojiAppCompatTextView"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = EmojiAppCompatTextView(context)
 

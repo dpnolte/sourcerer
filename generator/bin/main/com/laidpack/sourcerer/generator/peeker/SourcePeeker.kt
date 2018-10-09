@@ -61,17 +61,15 @@ class SourcePeeker(
                     resolvedClass.superClassNames.filter {
                         val indexedClass = ClassRegistry[it] as IndexedClass
                         indexedClass.widget != null
-                    }
-                    /*  .filter { superClassName ->
-                                attrsXmlManager.hasAttributesDefined(superClassName, widgetRegistry[superClassName])
-                            }*/,
+                    },
                     methodLikeWithAttributeSetParamKeys,
                     methodsWithAttributeBlockTagKeys,
                     constructorDeclarations,
                     methodDeclarations,
                     fieldDeclarations,
                     getConstructorExpression(resolvedClass.classCategory, classDeclaration, constructorDeclarations),
-                    resolvedClass.indexedClass
+                    resolvedClass.indexedClass,
+                    classDeclaration.annotations.toList()
             )
         }
 

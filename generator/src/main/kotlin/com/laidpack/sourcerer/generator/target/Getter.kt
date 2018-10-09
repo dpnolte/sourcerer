@@ -1,12 +1,16 @@
 package com.laidpack.sourcerer.generator.target
 
+import com.github.javaparser.ast.body.FieldDeclaration
 import com.laidpack.sourcerer.generator.Store
+import com.laidpack.sourcerer.generator.peeker.MethodInfo
+import com.laidpack.sourcerer.generator.peeker.describeType
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeName
 import jetbrains.exodus.entitystore.Entity
 import kotlinx.dnq.*
 import kotlinx.dnq.query.addAll
 import kotlinx.dnq.query.toList
+import java.util.*
 
 data class Getter(
         val name: String,
@@ -35,6 +39,15 @@ data class Getter(
     val hasResolvedType: Boolean
         get() = mutableResolvedType != null
 
+    override fun hashCode(): Int {
+        return Objects.hash(
+                name,
+                line,
+                isField,
+                *parameters.map { it.describedType }.toTypedArray()
+        )
+    }
+
     fun toEntity(xdAttribute: XdAttribute): XdGetter {
         val xdGetter = XdGetter.new()
         xdGetter.name = this.name
@@ -50,6 +63,27 @@ data class Getter(
                 }
         )
         return xdGetter
+    }
+
+    companion object {
+        fun getHashCodeFromMethodInfo(method: MethodInfo): Int {
+            return Objects.hash(
+                    method.methodDeclaration.nameAsString,
+                    method.methodDeclaration.begin.get().line,
+                    /*isField*/ false,
+                    *method.methodDeclaration.parameters.map {
+                        it.describeType()
+                    }.toTypedArray()
+            )
+        }
+        fun getHashCodeFromField(field: FieldDeclaration): Int {
+            return Objects.hash(
+                    field.variables.first().nameAsString,
+                    field.begin.get().line,
+                    /*isField*/ true,
+                    *listOf<String>().toTypedArray()
+            )
+        }
     }
 
 }

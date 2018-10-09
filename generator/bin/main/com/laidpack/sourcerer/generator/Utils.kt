@@ -48,24 +48,24 @@ fun generateFactoryFiles(targetDir: File, result: SourcererResult, minSdkVersion
         val fileSpec = ViewFactoryGenerator(
                 result.targetClassName,
                 result.superClassName,
-                result.fallbackClassName,
                 result.constructorExpression as ViewConstructorExpression,
                 result.numberOfTypeVariables,
                 result.codeBlocks,
                 result.minimumApiLevel,
-                minSdkVersion
+                minSdkVersion,
+                result.isFinal
         ).generateFile()
         fileSpec.writeTo(targetDir)
     } else {
         val fileSpec = LayoutParamsFactoryGenerator(
                 result.targetClassName,
                 result.superClassName,
-                result.fallbackClassName,
                 result.constructorExpression as LayoutParamsConstructorExpression,
                 result.numberOfTypeVariables,
                 result.codeBlocks,
                 result.minimumApiLevel,
-                minSdkVersion
+                minSdkVersion,
+                result.isFinal
         ).generateFile()
         fileSpec.writeTo(targetDir)
     }

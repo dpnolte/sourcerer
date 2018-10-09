@@ -5,15 +5,10 @@ import android.view.View
 import android.widget.MediaController
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class MediaControllerFactory<TView : MediaController, TAttributes : MediaControllerAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "mediaController"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = MediaController(context)
 

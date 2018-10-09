@@ -5,15 +5,10 @@ import android.view.View
 import androidx.core.widget.ContentLoadingProgressBar
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class ContentLoadingProgressBarFactory<TView : ContentLoadingProgressBar, TAttributes : ContentLoadingProgressBarAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ProgressBarFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "contentLoadingProgressBar"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = ContentLoadingProgressBar(context)
 

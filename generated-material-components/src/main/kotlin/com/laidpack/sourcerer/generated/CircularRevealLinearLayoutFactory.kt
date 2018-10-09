@@ -5,15 +5,10 @@ import android.view.View
 import com.google.android.material.circularreveal.CircularRevealLinearLayout
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class CircularRevealLinearLayoutFactory<TView : CircularRevealLinearLayout, TAttributes : CircularRevealLinearLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : LinearLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "circularRevealLinearLayout"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = CircularRevealLinearLayout(context)
 

@@ -81,29 +81,19 @@ task generateFiles(type: JavaExec) {
     args = taskArgs
 }
 
-// findOrCreate extra task in sourcerer.. otherwise app:lint gets executed before analyze source
+// extra task in sourcerer.. otherwise app:lint gets executed before analyze source
 task performLint() {
     //dependsOn(":stub-app:clean")
     dependsOn(":stub-app:lint")
 }
 
-task generateWithPerformingGradleLint(type: JavaExec) {
-    dependsOn analyzeSource
-    dependsOn performLint
-    main = 'com.laidpack.sourcerer.generator.LintResolverKt'
-    classpath = sourceSets.main.runtimeClasspath
-    args = taskArgs
-    finalizedBy(clean, build)
-}
-
 task generate(type: JavaExec) {
     dependsOn analyzeSource
-    main = 'com.laidpack.sourcerer.generator.LintResolverKt'
+    main = 'com.laidpack.sourcerer.generator.ModuleDistributorKt'
     classpath = sourceSets.main.runtimeClasspath
     args = taskArgs
-    finalizedBy(clean, build)
+    finalizedBy(rootProject.tasks.clean)
 }
-
 
 task printAllFormats(type: JavaExec) {
     main = 'com.laidpack.sourcerer.generator.PrintAllFormatsKt'
@@ -138,8 +128,8 @@ task printUsedAndroidXLibs(type: JavaExec) {
     args = taskArgs
 }
 
-task resolveLint(type: JavaExec) {
-    main = 'com.laidpack.sourcerer.generator.LintResolverKt'
+task moduleDistributor(type: JavaExec) {
+    main = 'com.laidpack.sourcerer.generator.ModuleDistributorKt'
     classpath = sourceSets.main.runtimeClasspath
     args = taskArgs
 }

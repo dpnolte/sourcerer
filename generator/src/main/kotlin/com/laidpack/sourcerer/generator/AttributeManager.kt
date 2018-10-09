@@ -107,7 +107,7 @@ class AttributeManager(
     }
 
     private fun analyzeSetterFlowToFindGetter(attribute: Attribute, setter: Setter): MatchGetterResult {
-        val setterInfo = classInfo.getSetterInfo(setter)
+        val setterInfo = classInfo.getSetterMethodInfo(setter)
         val setterInterpreter = SetterFlowInterpreter(setterInfo, setter, attribute, classInfo)
         val getterRequirements = setterInterpreter.resolveGetterRequirements()
         if (getterRequirements.fields.isEmpty()) {
@@ -302,7 +302,7 @@ class AttributeManager(
         ) {
             return null
         }
-        val methodInfo = classInfo.getSetterInfo(setter)
+        val methodInfo = classInfo.getSetterMethodInfo(setter)
         val parameter = methodInfo.methodDeclaration.parameters.first()
         val requiresNullableGetter = parameter.annotations.any { it.nameAsString == "Nullable" }
 

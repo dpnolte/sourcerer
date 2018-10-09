@@ -2,6 +2,7 @@ package com.laidpack.sourcerer.generator
 
 import com.laidpack.sourcerer.generator.flow.attributes.FlowInterpreter
 import com.laidpack.sourcerer.generator.javadoc.JavaDocInterpreter
+import com.laidpack.sourcerer.generator.lint.ApiDetector
 import com.laidpack.sourcerer.generator.lint.ApiRequirementsChecker
 import com.laidpack.sourcerer.generator.peeker.*
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
@@ -15,7 +16,7 @@ import java.io.File
 class Sourcerer(
         private val env: SourcererEnvironment,
         private val classRegistry: ClassRegistry = ClassRegistry(),
-        private val apiRequirementsChecker: ApiRequirementsChecker = ApiRequirementsChecker(env)
+        private val apiRequirementsChecker: ApiRequirementsChecker = ApiRequirementsChecker(env, classRegistry)
 ) {
     private val setters = mutableMapOf<Int, Setter>()
     private val typedArrayInfo = ClassRegistry.getTypedArrayInfo(env.sdkStructure)
@@ -101,26 +102,33 @@ class Sourcerer(
             classInfo.setResolvedAttributes(resolvedAttributes)
             println("\t\tNo attributes specified, skipping source interpretation")
         }
-        println("\t--checking minimum api level requirements")
-        val apiRequirements = apiRequirementsChecker.checkMinApiRequirements(classInfo, codeBlocks)
-        println("\t\t------------")
-        println("\t\t${classInfo.targetClassName.simpleName} min api level: ${if (apiRequirements.classMinApiLevel == -1) "unknown or version 1" else apiRequirements.classMinApiLevel.toString()}")
-        println("\t\tFallback class if any?: ${apiRequirements.fallbackClassName ?: "None"}")
-        println("\t\t${apiRequirements.codeBlockMinApiLevelList.count { it > env.minSdkVersion }}/${apiRequirements.codeBlockMinApiLevelList.size} code blocks have min api level requirements (min sdk: ${env.minSdkVersion})")
-        println("\t\t------------")
-        apiRequirements.assignMinApiLevelRequirementsToCodeBlocks(codeBlocks)
+        var fallbackClassName: ClassName? = null
+        var classMiniApiLevel = ApiDetector.UNKNOWN_OR_VERSION_1
+        if (apiRequirementsChecker.canCheckRequirements(classInfo)) {
+            println("\t--checking minimum api level requirements")
+            val apiRequirements = apiRequirementsChecker.checkMinApiRequirements(classInfo, codeBlocks)
+            println("\t\t------------")
+            println("\t\t${classInfo.targetClassName.simpleName} min api level: ${if (apiRequirements.classMinApiLevel == -1) "unknown or version 1" else apiRequirements.classMinApiLevel.toString()}")
+            println("\t\tFallback class if any?: ${apiRequirements.fallbackClassName ?: "None"}")
+            println("\t\t${apiRequirements.codeBlockMinApiLevelList.count { it > env.minSdkVersion }}/${apiRequirements.codeBlockMinApiLevelList.size} code blocks have min api level requirements (min sdk: ${env.minSdkVersion})")
+            println("\t\t------------")
+            apiRequirements.assignMinApiLevelRequirementsToCodeBlocks(codeBlocks)
+            fallbackClassName = apiRequirements.fallbackClassName
+            classMiniApiLevel = apiRequirements.classMinApiLevel
+        }
 
         val result = SourcererResult(
                 classInfo.targetClassName,
                 if(classInfo.hasSuperClass) classInfo.superClassNames.first() else null,
-                apiRequirements.fallbackClassName,
+                fallbackClassName,
                 getDefaultLayoutParamClass(classInfo),
                 classInfo.classDeclaration.isAbstract,
+                classInfo.classDeclaration.isFinal,
                 classInfo.constructorExpression,
                 classInfo.classDeclaration.typeParameters.size,
                 classInfo.classCategory,
                 classInfo.isViewGroup,
-                apiRequirements.classMinApiLevel,
+                classMiniApiLevel,
                 resolvedAttributes,
                 setters,
                 codeBlocks,
@@ -257,6 +265,7 @@ data class SourcererResult(
         val fallbackClassName: ClassName?,
         val defaultLayoutParamsClassName: ClassName?,
         val isAbstract: Boolean,
+        val isFinal: Boolean,
         val constructorExpression: ConstructorExpression,
         val numberOfTypeVariables: Int,
         val classCategory: ClassCategory,
@@ -275,27 +284,28 @@ data class SourcererResult(
         if (this.fallbackClassName != null) xdResult.fallbackClassCanonicalName = this.fallbackClassName.canonicalName
         if (this.defaultLayoutParamsClassName != null) xdResult.defaultLayoutParamsClassName = this.defaultLayoutParamsClassName.canonicalName
         xdResult.isAbstract = this.isAbstract
+        xdResult.isFinal = this.isFinal
         xdResult.constructorExpression = this.constructorExpression.toEntity()
         xdResult.numberOfTypeVariables = this.numberOfTypeVariables
         xdResult.classCategory = this.classCategory.toEntity()
         xdResult.isViewGroup = this.isViewGroup
         xdResult.minimumApiLevel = this.minimumApiLevel
 
-        val setters = mutableMapOf<Int, XdSetter>()
+        val xdSetters = mutableMapOf<Int, XdSetter>()
         for (setter in this.setters) {
             val xdSetter = setter.value.toEntity(xdResult)
-            setters[setter.key] = xdSetter
+            xdSetters[setter.key] = xdSetter
             xdResult.setters.add(xdSetter)
         }
-        val attributes = mutableMapOf<String, XdAttribute>()
+        val xdAttributes = mutableMapOf<String, XdAttribute>()
         for (attribute in this.attributes) {
-            val xdAttribute = attribute.value.toEntity(setters, xdResult)
-            attributes[attribute.key] = xdAttribute
+            val xdAttribute = attribute.value.toEntity(xdSetters, xdResult)
+            xdAttributes[attribute.key] = xdAttribute
             xdResult.attributes.add(xdAttribute)
         }
         for (codeBlock in this.codeBlocks) {
             xdResult.codeBlocks.add(
-                    codeBlock.toEntity(xdResult, setters, attributes)
+                    codeBlock.toEntity(xdResult, xdSetters, xdAttributes)
             )
         }
         return xdResult
@@ -312,6 +322,7 @@ class XdSourcererResult(entity: Entity) : XdEntity(entity) {
     var fallbackClassCanonicalName by xdStringProp()
     var defaultLayoutParamsClassName by xdStringProp()
     var isAbstract by xdBooleanProp()
+    var isFinal by xdBooleanProp()
     var constructorExpression by xdLink1(XdConstructorExpression)
     var numberOfTypeVariables by xdRequiredIntProp()
     var classCategory by xdLink1(XdClassCategory)
@@ -336,6 +347,7 @@ class XdSourcererResult(entity: Entity) : XdEntity(entity) {
                     if (this.fallbackClassCanonicalName != null) ClassName.bestGuess(this.fallbackClassCanonicalName as String) else null,
                     if (this.defaultLayoutParamsClassName != null) ClassName.bestGuess(this.defaultLayoutParamsClassName as String) else null,
                     this.isAbstract,
+                    this.isFinal,
                     this.constructorExpression.toEnum(false),
                     this.numberOfTypeVariables,
                     this.classCategory.toEnum(false),

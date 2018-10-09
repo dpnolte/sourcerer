@@ -5,15 +5,10 @@ import android.view.View
 import androidx.leanback.widget.SearchEditText
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class SearchEditTextFactory<TView : SearchEditText, TAttributes : SearchEditTextAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : EditTextFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "searchEditText"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = SearchEditText(context)
 

@@ -5,15 +5,10 @@ import android.view.View
 import androidx.appcompat.widget.AppCompatSeekBar
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class AppCompatSeekBarFactory<TView : AppCompatSeekBar, TAttributes : AppCompatSeekBarAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : SeekBarFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "appCompatSeekBar"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = AppCompatSeekBar(context)
 

@@ -9,31 +9,28 @@ import kotlinx.dnq.query.addAll
 import kotlinx.dnq.query.toList
 
 data class CodeBlock (
-        val setters: List<Setter>,
+        val setters: MutableMap<Int /* hash code */, Setter>,
         val attributes: Map<String, Attribute>,
         var minimumApiLevel: Int = 0
 ) {
-    val setter = setters.first()
+    val setter
+        get() = setters.values.first()
     val hasOnlyOneSetter = setters.size == 1
 
     fun toEntity(
-            sourcererResult: XdSourcererResult,
-            setters: Map<Int /* hash code */, XdSetter>,
-            attributes: Map<String /* name */, XdAttribute>
+            xdResult: XdSourcererResult,
+            xdSetters: Map<Int /* hash code */, XdSetter>,
+            xdAttributes: Map<String /* name */, XdAttribute>
             ): XdCodeBlock {
         val xdCodeBlock = XdCodeBlock.new()
         xdCodeBlock.attributes.addAll(
-                this.attributes.map { pair ->
-                    attributes[pair.key] as XdAttribute
-                }
+            xdAttributes.filter { this.attributes.containsKey(it.key) }.values
         )
         xdCodeBlock.setters.addAll(
-                this.setters.map {setter ->
-                    setters[setter.hashCode()] as XdSetter
-                }
+            xdSetters.filter { this.setters.containsKey(it.key) }.values
         )
         xdCodeBlock.minimumApiLevel = this.minimumApiLevel
-        xdCodeBlock.sourcererResult = sourcererResult
+        xdCodeBlock.sourcererResult = xdResult
         return xdCodeBlock
     }
 }
@@ -68,7 +65,7 @@ class XdCodeBlock(entity: Entity) : XdEntity(entity) {
                 }
             }
             CodeBlock(
-                    setters,
+                    setters.associateBy { it.hashCode() }.toMutableMap(),
                     attributes,
                     this.minimumApiLevel ?: 0
             )

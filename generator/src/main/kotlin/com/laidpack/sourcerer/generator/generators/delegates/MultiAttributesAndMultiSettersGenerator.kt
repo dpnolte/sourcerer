@@ -33,7 +33,7 @@ class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, co
     private fun selectSetters(): List<Setter> {
         val selectedSetters = mutableListOf<Setter>()
         val identifiedAttributes = mutableSetOf<String>()
-        val sortedSetters = codeBlock.setters.sortedWith(compareBy(
+        val sortedSetters = codeBlock.setters.values.sortedWith(compareBy(
                 { it.parameters.size },
                 { // is transforming method required?
                     attributes.values.any { attr ->

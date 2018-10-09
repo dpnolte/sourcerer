@@ -5,15 +5,10 @@ import android.view.View
 import androidx.leanback.widget.VerticalGridView
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class VerticalGridViewFactory<TView : VerticalGridView, TAttributes : VerticalGridViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "verticalGridView"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = VerticalGridView(context)
 

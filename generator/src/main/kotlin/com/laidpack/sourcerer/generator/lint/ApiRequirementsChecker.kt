@@ -11,28 +11,36 @@ import kotlinx.dnq.query.eq
 import kotlinx.dnq.query.firstOrNull
 import kotlinx.dnq.query.query
 
-class ApiRequirementsChecker(env: SourcererEnvironment) {
-    private val apiDetector = ApiDetector(env.stubAppProjectDir)
+class ApiRequirementsChecker(env: SourcererEnvironment, private val classRegistry: ClassRegistry) {
+    private val apiDetector = ApiDetector(env.stubAppProjectDir, classRegistry)
     private val minSdkVersion = env.minSdkVersion
 
+    fun canCheckRequirements(classInfo: ClassInfo): Boolean {
+        return try {
+            apiDetector.getClassVersion(classInfo)
+            true
+        } catch (e: IllegalArgumentException) {
+            false
+        }
+    }
     fun checkMinApiRequirements(classInfo: ClassInfo, codeBlocks : List<CodeBlock>): ClassApiRequirements {
         if (!classInfo.hasResolvedAttributes) throw IllegalArgumentException("Class ${classInfo.targetClassName} has not yet resolved attributes")
 
-        val classMinApiLevel = apiDetector.getClassVersion(classInfo.targetClassName)
+        val classMinApiLevel = apiDetector.getClassVersion(classInfo)
         val fallbackClassName = getFallbackClassNameIfNeeded(classInfo, classMinApiLevel)
         val codeBlockMinApiLevelList = mutableListOf<Int>()
         for (codeBlock in codeBlocks) {
             var minApiLevelForCodeBlock = ApiDetector.UNKNOWN_OR_VERSION_1
             for (attribute in codeBlock.attributes.values) {
                 for (getter in attribute.getters) {
-                    val getterMinApiLevel = apiDetector.getGetterVersion(classInfo.targetClassName, getter)
+                    val getterMinApiLevel = apiDetector.getGetterVersion(classInfo, getter)
                     if (getterMinApiLevel > minApiLevelForCodeBlock) {
                         minApiLevelForCodeBlock = getterMinApiLevel
                     }
                 }
             }
-            for (setter in codeBlock.setters) {
-                val setterMinApiLevel = apiDetector.getSetterVersion(classInfo.targetClassName, setter)
+            for (setter in codeBlock.setters.values) {
+                val setterMinApiLevel = apiDetector.getSetterVersion(classInfo, setter)
                 if (setterMinApiLevel > minApiLevelForCodeBlock) {
                     minApiLevelForCodeBlock = setterMinApiLevel
                 }
@@ -68,7 +76,8 @@ class ApiRequirementsChecker(env: SourcererEnvironment) {
     private fun getFallbackClassNameIfNeeded(classInfo: ClassInfo, classMinApiLevel: Int): ClassName? {
         if (classMinApiLevel > minSdkVersion) {
             for (superClassName in classInfo.superClassNames) {
-                val superClassMinApiLevel = getSavedMinApiLevelIfAvailable(superClassName) ?: apiDetector.getClassVersion(superClassName)
+                val superClassMinApiLevel = getSavedMinApiLevelIfAvailable(superClassName)
+                        ?: apiDetector.getClassVersion(classRegistry[superClassName] as ClassInfo)
                 if (superClassMinApiLevel <= minSdkVersion) {
                     return superClassName
                 }

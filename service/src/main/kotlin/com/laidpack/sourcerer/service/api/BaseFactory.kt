@@ -21,8 +21,6 @@ abstract class BaseFactory<TInstance, TAttributes>(
         private val attributesType: Class<TAttributes>
 ) : LayoutElement.Factory {
     abstract override val elementName: String
-    abstract override val minimumApiLevel: Int
-    abstract override val fallBackElementName: String?
 
     protected fun getTypedInstance(instance: Any): TInstance {
         return instanceType.cast(instance)
@@ -40,7 +38,7 @@ abstract class BaseViewFactory<TView : View, TAttributes: IAttributes>(
 ) : BaseFactory<TView, TAttributes>(viewType, attributesType), LayoutElement.ViewFactory {
     override fun create(context: Context, attributes: IAttributes, theme: Int): View {
         val ctx = wrapThemeContextIfNeeded(context, theme)
-        val view = getTypedInstance(createInstance(ctx))
+        val view = createInstance(ctx)
         init(
                 view,
                 ctx,
@@ -50,14 +48,14 @@ abstract class BaseViewFactory<TView : View, TAttributes: IAttributes>(
     }
     override fun update(view: View, context: Context, attributes: IAttributes) {
         init(
-                getTypedInstance(view),
+                view,
                 context,
                 getTypedAttributes(attributes)
         )
     }
 
     protected abstract fun createInstance(context: Context): View
-    protected abstract fun init(view: TView, context: Context, attributes: TAttributes)
+    protected abstract fun init(view: View, context: Context, attributes: TAttributes)
 
     private class ExtendedContextThemeWrapper(base: Context?, val theme: Int) : ContextThemeWrapper(base, theme)
     companion object {
@@ -80,7 +78,7 @@ abstract class BaseLayoutParamsFactory<TLayoutParams : ViewGroup.LayoutParams, T
 ) : BaseFactory<TLayoutParams, TAttributes>(layoutParamsType, attributesType), LayoutElement.LayoutParamsFactory {
 
     override fun create(context: Context, attributes: IAttributes, theme: Int): ViewGroup.LayoutParams {
-        val layoutParams = getTypedInstance(createInstance(context))
+        val layoutParams = createInstance(context)
         init(
                 layoutParams,
                 context,
@@ -91,12 +89,12 @@ abstract class BaseLayoutParamsFactory<TLayoutParams : ViewGroup.LayoutParams, T
 
     override fun update(layoutParams: ViewGroup.LayoutParams, context: Context, attributes: IAttributes) {
         init(
-                getTypedInstance(layoutParams),
+                layoutParams,
                 context,
                 getTypedAttributes(attributes)
         )
     }
 
     protected abstract fun createInstance(context: Context): ViewGroup.LayoutParams
-    protected abstract fun init(layoutParams: TLayoutParams, context: Context, attributes: TAttributes)
+    protected abstract fun init(layoutParams: ViewGroup.LayoutParams, context: Context, attributes: TAttributes)
 }

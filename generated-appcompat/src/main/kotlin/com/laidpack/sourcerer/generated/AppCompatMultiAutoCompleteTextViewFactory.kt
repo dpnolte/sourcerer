@@ -5,15 +5,10 @@ import android.view.View
 import androidx.appcompat.widget.AppCompatMultiAutoCompleteTextView
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class AppCompatMultiAutoCompleteTextViewFactory<TView : AppCompatMultiAutoCompleteTextView, TAttributes : AppCompatMultiAutoCompleteTextViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : MultiAutoCompleteTextViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "appCompatMultiAutoCompleteTextView"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = AppCompatMultiAutoCompleteTextView(context)
 

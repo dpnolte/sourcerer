@@ -59,6 +59,7 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
+
 task generate {
     dependsOn(":generator:generate")
     description 'Generating view factories attribute, and adapter classes..'

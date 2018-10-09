@@ -5,15 +5,10 @@ import android.view.View
 import androidx.drawerlayout.widget.DrawerLayout
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
 open class DrawerLayoutFactory<TView : DrawerLayout, TAttributes : DrawerLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementName: String = "drawerLayout"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = DrawerLayout(context)
 

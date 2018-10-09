@@ -5,23 +5,18 @@ import android.view.View
 import androidx.car.widget.ColumnCardView
 import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
-import kotlin.Int
 import kotlin.String
 
-open class ColumnCardViewFactory<TView : ColumnCardView, TAttributes : ColumnCardViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
+open class ColumnCardViewFactory<TAttributes : ColumnCardViewAttributes>(attributesType: Class<TAttributes>) : FrameLayoutFactory<ColumnCardView, TAttributes>(ColumnCardView::class.java, attributesType) {
     override val elementName: String = "columnCardView"
-
-    override val fallBackElementName: String? = null
-
-    override val minimumApiLevel: Int = 0
 
     override fun createInstance(context: Context): View = ColumnCardView(context)
 
     companion object {
         init {
-            InflaterComponent.addFactory(ColumnCardViewFactory<ColumnCardView, ColumnCardViewAttributes>())
+            InflaterComponent.addFactory(ColumnCardViewFactory<ColumnCardViewAttributes>())
         }
 
-        inline operator fun <reified TView : ColumnCardView, reified TAttributes : ColumnCardViewAttributes> invoke() = ColumnCardViewFactory(TView::class.java, TAttributes::class.java)
+        inline operator fun <reified TAttributes : ColumnCardViewAttributes> invoke() = ColumnCardViewFactory(TAttributes::class.java)
     }
 }
