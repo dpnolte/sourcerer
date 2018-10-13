@@ -5,6 +5,7 @@ import com.laidpack.sourcerer.generator.peeker.ClassCategory
 import com.laidpack.sourcerer.generator.peeker.ClassInfo
 import com.laidpack.sourcerer.generator.peeker.ClassRegistry
 import com.laidpack.sourcerer.generator.peeker.TypedArrayInfo
+import com.laidpack.sourcerer.generator.target.Setter
 
 
 class FlowInterpreter (
@@ -15,7 +16,7 @@ class FlowInterpreter (
 ) : Interpreter {
     private val interpretations = mutableListOf<Interpretation>()
 
-    override fun interpret(): InterpretationResult {
+    override fun interpret(earlierIdentifiedSetters: Map<Int, Setter>): InterpretationResult {
         classInfo.getMethodLikeWithAttributeSetAsParam().forEach { relevantConstructorOrMethod ->
             val methodFlowInterpreter = FlowInMethodInterpreter(
                     relevantConstructorOrMethod,

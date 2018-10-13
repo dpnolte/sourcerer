@@ -6,13 +6,11 @@ import android.os.Build
 import android.view.View
 import android.widget.CalendarView
 import androidx.core.content.ContextCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class CalendarViewFactory<TView : CalendarView, TAttributes : CalendarViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "calendarView"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = CalendarView(context)
 
@@ -23,7 +21,7 @@ open class CalendarViewFactory<TView : CalendarView, TAttributes : CalendarViewA
     ) {
         super.init(view, context, attributes)
         if (view is CalendarView) {
-            view.init {
+            view.apply {
                 attributes.firstDayOfWeek?.let {
                     if (firstDayOfWeek != it) {
                         firstDayOfWeek = it
@@ -104,9 +102,7 @@ open class CalendarViewFactory<TView : CalendarView, TAttributes : CalendarViewA
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(CalendarViewFactory<CalendarView, CalendarViewAttributes>())
-        }
+        const val elementType: String = "calendarView"
 
         inline operator fun <reified TView : CalendarView, reified TAttributes : CalendarViewAttributes> invoke() = CalendarViewFactory(TView::class.java, TAttributes::class.java)
     }

@@ -7,19 +7,11 @@ import android.view.View
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
-import com.laidpack.sourcerer.service.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
 open class CompoundButtonFactory<TView : CompoundButton, TAttributes : CompoundButtonAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ButtonFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "compoundButton"
-
-    override fun createInstance(context: Context): View {
-        // // CompoundButton is abstract
-        return super.createInstance(context)
-    }
+    override val elementType: String = Companion.elementType
 
     override fun init(
         view: View,
@@ -28,7 +20,7 @@ open class CompoundButtonFactory<TView : CompoundButton, TAttributes : CompoundB
     ) {
         super.init(view, context, attributes)
         if (view is CompoundButton) {
-            view.init {
+            view.apply {
                 attributes.checked?.let {
                     if (isChecked != it) {
                         isChecked = it
@@ -39,12 +31,6 @@ open class CompoundButtonFactory<TView : CompoundButton, TAttributes : CompoundB
                         val immutableButtonTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                         if (buttonTintList != immutableButtonTint) {
                             buttonTintList = immutableButtonTint
-                        }
-                    }
-                    attributes.buttonTintMode?.let {
-                        val immutableButtonTintMode = it.value.toPorterDuffMode()
-                        if (buttonTintMode != immutableButtonTintMode) {
-                            buttonTintMode = immutableButtonTintMode
                         }
                     }
                 }
@@ -61,9 +47,7 @@ open class CompoundButtonFactory<TView : CompoundButton, TAttributes : CompoundB
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(CompoundButtonFactory<CompoundButton, CompoundButtonAttributes>())
-        }
+        const val elementType: String = "compoundButton"
 
         inline operator fun <reified TView : CompoundButton, reified TAttributes : CompoundButtonAttributes> invoke() = CompoundButtonFactory(TView::class.java, TAttributes::class.java)
     }

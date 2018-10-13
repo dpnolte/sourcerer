@@ -63,7 +63,7 @@ class AttributeFlow (
         val typedArrayInfo: TypedArrayInfo
 ) {
     // API:
-    val memberFieldsToAttributes = mutableMapOf<FieldDeclaration, String>()
+    val variableNamesToAttributes = mutableMapOf<String, String>()
     val typedArrayVariableNames = mutableSetOf<SimpleName>()
     var typedValueVariableName: SimpleName? = null
     private set
@@ -311,7 +311,7 @@ class AttributeFlow (
         }
 
         if (classInfo.isFieldFromThisClass(variableName)) {
-            memberFieldsToAttributes[classInfo.getFieldFromThisClass(variableName)] = attribute.name
+            variableNamesToAttributes[variableName] = attribute.name
         } else {
             attribute.derivedVariables[variableName] = VariableImpact.ASSIGNED
 
@@ -529,7 +529,7 @@ class AttributeFlow (
     }
 
     private fun ensureListIsNotEmpty(list: List<String>) {
-        if (list.isEmpty()) throw IllegalStateException("At least one list item is required")
+        if (list.isEmpty()) throw IllegalStateException("At least one attributesToParameters item is required")
     }
     companion object {
         private val typedArrayCanonicalName = TypedArray::class.java.canonicalName

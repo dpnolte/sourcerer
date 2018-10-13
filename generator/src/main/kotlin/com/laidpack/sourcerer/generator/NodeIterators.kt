@@ -31,7 +31,7 @@ class SimpleNodeIterator(private val nodeHandler: (node: Node) -> Boolean) {
 }
 
 // this is a method extension: we had this method to the existing class "Node"
-fun <T> Node.descendantsOfType(type: Class<T>) : List<T> {
+fun <T> Node.descendantsOfType(type: Class<T>, predicate: (T) -> Boolean = {true}) : List<T> {
     val descendants = mutableListOf<T>()
     SpecificNodeIterator(type, fun(node: T): Boolean {
             descendants.add(node)

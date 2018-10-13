@@ -3,19 +3,38 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
 import kotlin.String
 
 open class LinearLayoutLayoutParamsFactory<TLayoutParams : LinearLayout.LayoutParams, TAttributes : LinearLayoutLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "android.widget.LinearLayout.LayoutParams"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
 
-    companion object {
-        init {
-            InflaterComponent.addFactory(LinearLayoutLayoutParamsFactory<LinearLayout.LayoutParams, LinearLayoutLayoutParamsAttributes>())
+    override fun init(
+        layoutParams: ViewGroup.LayoutParams,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(layoutParams, context, attributes)
+        if (layoutParams is LinearLayout.LayoutParams) {
+            layoutParams.apply {
+                attributes.layout_weight?.let {
+                    if (it != weight) {
+                        weight = it
+                    }
+                }
+                attributes.layout_gravity?.let {
+                    if (it != gravity) {
+                        gravity = it
+                    }
+                }
+            }
         }
+    }
+
+    companion object {
+        const val elementType: String = "android.widget.LinearLayout.LayoutParams"
 
         inline operator fun <reified TLayoutParams : LinearLayout.LayoutParams, reified TAttributes : LinearLayoutLayoutParamsAttributes> invoke() = LinearLayoutLayoutParamsFactory(TLayoutParams::class.java, TAttributes::class.java)
     }

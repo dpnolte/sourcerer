@@ -4,12 +4,11 @@ import android.content.Context
 import android.os.Build
 import android.view.ViewGroup
 import android.widget.ActionMenuView
-import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
 import kotlin.String
 
 open class ActionMenuViewLayoutParamsFactory<TLayoutParams : ActionMenuView.LayoutParams, TAttributes : ActionMenuViewLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : LinearLayoutLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "android.widget.ActionMenuView.LayoutParams"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams {
         if (Build.VERSION.SDK_INT >= 21) {
@@ -21,9 +20,7 @@ open class ActionMenuViewLayoutParamsFactory<TLayoutParams : ActionMenuView.Layo
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(ActionMenuViewLayoutParamsFactory<ActionMenuView.LayoutParams, ActionMenuViewLayoutParamsAttributes>())
-        }
+        const val elementType: String = "android.widget.ActionMenuView.LayoutParams"
 
         inline operator fun <reified TLayoutParams : ActionMenuView.LayoutParams, reified TAttributes : ActionMenuViewLayoutParamsAttributes> invoke() = ActionMenuViewLayoutParamsFactory(TLayoutParams::class.java, TAttributes::class.java)
     }

@@ -3,13 +3,11 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.View
 import android.widget.RatingBar
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class RatingBarFactory<TView : RatingBar, TAttributes : RatingBarAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AbsSeekBarFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "ratingBar"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = RatingBar(context)
 
@@ -20,7 +18,7 @@ open class RatingBarFactory<TView : RatingBar, TAttributes : RatingBarAttributes
     ) {
         super.init(view, context, attributes)
         if (view is RatingBar) {
-            view.init {
+            view.apply {
                 attributes.numStars?.let {
                     if (numStars != it) {
                         numStars = it
@@ -46,9 +44,7 @@ open class RatingBarFactory<TView : RatingBar, TAttributes : RatingBarAttributes
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(RatingBarFactory<RatingBar, RatingBarAttributes>())
-        }
+        const val elementType: String = "ratingBar"
 
         inline operator fun <reified TView : RatingBar, reified TAttributes : RatingBarAttributes> invoke() = RatingBarFactory(TView::class.java, TAttributes::class.java)
     }

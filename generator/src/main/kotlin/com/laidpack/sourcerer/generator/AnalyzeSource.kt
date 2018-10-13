@@ -1,5 +1,6 @@
 package com.laidpack.sourcerer.generator
 
+import com.laidpack.sourcerer.generator.generators.ProjectGeneratorManager
 import com.laidpack.sourcerer.generator.peeker.ClassIndexer
 import com.laidpack.sourcerer.generator.peeker.ClassRegistry
 import com.laidpack.sourcerer.generator.resources.*
@@ -16,8 +17,8 @@ fun main(args: Array<String>) {
     val classRegistry = ClassRegistry()
     classRegistry.resolveAnyNewIdentifiedWidgetClasses()
 
-    generateMultiFormatFiles(env.servicePath)
-    deleteTempFiles(env)
+    ProjectGeneratorManager.generateMultiFormatFiles(env.servicesDir)
+    ProjectGeneratorManager.deleteTempFiles(env)
 
     val sourcerer = Sourcerer(env, classRegistry)
     sourcerer.generateFactoriesForAllWidgets()

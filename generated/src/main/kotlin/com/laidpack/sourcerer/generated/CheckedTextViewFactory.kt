@@ -7,14 +7,11 @@ import android.view.View
 import android.widget.CheckedTextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
-import com.laidpack.sourcerer.service.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
 open class CheckedTextViewFactory<TView : CheckedTextView, TAttributes : CheckedTextViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : TextViewFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "checkedTextView"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = CheckedTextView(context)
 
@@ -25,7 +22,7 @@ open class CheckedTextViewFactory<TView : CheckedTextView, TAttributes : Checked
     ) {
         super.init(view, context, attributes)
         if (view is CheckedTextView) {
-            view.init {
+            view.apply {
                 attributes.checked?.let {
                     if (isChecked != it) {
                         isChecked = it
@@ -46,21 +43,13 @@ open class CheckedTextViewFactory<TView : CheckedTextView, TAttributes : Checked
                             checkMarkTintList = immutableCheckMarkTint
                         }
                     }
-                    attributes.checkMarkTintMode?.let {
-                        val immutableCheckMarkTintMode = it.value.toPorterDuffMode()
-                        if (checkMarkTintMode != immutableCheckMarkTintMode) {
-                            checkMarkTintMode = immutableCheckMarkTintMode
-                        }
-                    }
                 }
             }
         }
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(CheckedTextViewFactory<CheckedTextView, CheckedTextViewAttributes>())
-        }
+        const val elementType: String = "checkedTextView"
 
         inline operator fun <reified TView : CheckedTextView, reified TAttributes : CheckedTextViewAttributes> invoke() = CheckedTextViewFactory(TView::class.java, TAttributes::class.java)
     }

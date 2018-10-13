@@ -4,13 +4,11 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.widget.Chronometer
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class ChronometerFactory<TView : Chronometer, TAttributes : ChronometerAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : TextViewFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "chronometer"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = Chronometer(context)
 
@@ -21,7 +19,7 @@ open class ChronometerFactory<TView : Chronometer, TAttributes : ChronometerAttr
     ) {
         super.init(view, context, attributes)
         if (view is Chronometer) {
-            view.init {
+            view.apply {
                 attributes.format?.let {
                     if (format != it) {
                         format = it
@@ -39,9 +37,7 @@ open class ChronometerFactory<TView : Chronometer, TAttributes : ChronometerAttr
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(ChronometerFactory<Chronometer, ChronometerAttributes>())
-        }
+        const val elementType: String = "chronometer"
 
         inline operator fun <reified TView : Chronometer, reified TAttributes : ChronometerAttributes> invoke() = ChronometerFactory(TView::class.java, TAttributes::class.java)
     }

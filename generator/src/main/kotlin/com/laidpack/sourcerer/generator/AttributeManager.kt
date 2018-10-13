@@ -2,6 +2,7 @@ package com.laidpack.sourcerer.generator
 
 import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.MethodDeclaration
+import com.github.javaparser.ast.body.VariableDeclarator
 import com.github.javaparser.ast.expr.MethodCallExpr
 import com.laidpack.sourcerer.generator.flow.getter.GetterFlowInterpreter
 import com.laidpack.sourcerer.generator.flow.setter.SetterFlowInterpreter
@@ -19,10 +20,10 @@ class AttributeManager(
 ) {
 
     private val potentialGetters = classInfo.potentialGetters
-    private val potentialGettersForJavaDocAnalysis = potentialGetters.filter{
+    private val potentialGettersForJavaDocAnalysis = potentialGetters.asSequence().filter{
         it.methodDeclaration.nameAsString.startsWith("get")
-        && it.methodDeclaration.parameters.isEmpty()
-        && it.javadoc.blockTags.any { it.tagName == "attr" }
+                && it.methodDeclaration.parameters.isEmpty()
+                && it.javadoc.blockTags.any { tag -> tag.tagName == "attr" }
     }.associateBy { it.methodDeclaration.nameAsString }
     private val javaDocAttributeNamesPerPotentialGetter = potentialGettersForJavaDocAnalysis.values.associate {
         Pair(
@@ -34,20 +35,39 @@ class AttributeManager(
         )
     }
 
-    fun linkAttributeAndSetter(attribute: Attribute, setter: Setter, parameterIndex: Int) {
+    fun linkAttributeAndSetter(
+            attribute: Attribute,
+            setter: Setter,
+            parameterIndex: Int,
+            otherAttributeNames: List<String>
+    ) {
         val setterHashCode = setter.hashCode()
         attribute.setterHashCodes.add(setterHashCode)
-        setter.attributeToParameter[attribute.name] = parameterIndex
+        setter.addCallSignatureMap(attribute, parameterIndex, otherAttributeNames)
+    }
+    fun linkAttributesAndSetter(
+            attributesToParameters: Map<Attribute, Int /* parameter index */>,
+            setter: Setter
+    ) {
+        val setterHashCode = setter.hashCode()
+        for (attribute in attributesToParameters.keys) {
+            attribute.setterHashCodes.add(setterHashCode)
+        }
+        val map = attributesToParameters.mapKeys { it.key.name }.toMutableMap()
+        if (!setter.callSignatureMaps.hasCallSignatureMap(map)) {
+            setter.addCallSignatureMap(map)
+        }
     }
 
     fun canResolveGetter(
             attribute: Attribute,
-            setter: Setter
+            setter: Setter,
+            providedParameterIndex: Int? = null
     ): Boolean {
         return setter.isField
                 || analyzeJavaDocToFindGetter(attribute, setter).success
-                || bestGuessMatchingGetterByName(attribute, setter).success
-                || analyzeSetterFlowToFindGetter(attribute, setter).success
+                || bestGuessMatchingGetterByName(attribute, setter, providedParameterIndex).success
+                || analyzeSetterFlowToFindGetter(attribute, setter, providedParameterIndex).success
     }
 
     fun getResolvedGetters(
@@ -66,7 +86,7 @@ class AttributeManager(
         val field = classInfo.fieldDeclarations[setter.name] ?: throw IllegalStateException("Field '${setter.name}' not found in class ${classInfo.targetClassName}")
         return Getter(
                 setter.name,
-                field.describeType(),
+                field.describeType(setter.name),
                 listOf(),
                 field.begin.get().line,
                 isField = true
@@ -94,21 +114,25 @@ class AttributeManager(
                 getters
             }
             else /*result.type == GetterType.FIELD*/ -> {
-                val field = result.field as FieldDeclaration
+                val variable = result.variable as VariableDeclarator
                 listOf(Getter(
-                        field.variables.first().nameAsString,
-                        field.describeType(),
+                        variable.nameAsString,
+                        variable.describeType(),
                         listOf(),
-                        field.begin.get().line,
+                        variable.begin.get().line,
                         isField = true
                 ))
             }
         }
     }
 
-    private fun analyzeSetterFlowToFindGetter(attribute: Attribute, setter: Setter): MatchGetterResult {
+    private fun analyzeSetterFlowToFindGetter(
+            attribute: Attribute,
+            setter: Setter,
+            providedParameterIndex: Int? = null
+    ): MatchGetterResult {
         val setterInfo = classInfo.getSetterMethodInfo(setter)
-        val setterInterpreter = SetterFlowInterpreter(setterInfo, setter, attribute, classInfo)
+        val setterInterpreter = SetterFlowInterpreter(setterInfo, setter, attribute, classInfo, providedParameterIndex)
         val getterRequirements = setterInterpreter.resolveGetterRequirements()
         if (getterRequirements.fields.isEmpty()) {
             return MatchGetterResult(false)
@@ -116,17 +140,18 @@ class AttributeManager(
         val eligibleGetters = mutableMapOf<FieldDeclaration, MethodInfo>()
         val eligibilityResults = mutableMapOf<FieldDeclaration, GetterFlowInterpreter.EligibilityResult>()
         if (getterRequirements.fields.isNotEmpty()) {
-            for(field in getterRequirements.fields) {
-                val potentialGetters = classInfo.getPotentialGettersForField(field)
+            for((variableName, field) in getterRequirements.fields) {
+                val potentialGetters = classInfo.getPotentialGettersForField(field, variableName)
                 for(potentialGetter in potentialGetters) {
                     val getterInterpreter = GetterFlowInterpreter(
                             potentialGetter,
                             field,
+                            variableName,
                             getterRequirements.conditions,
                             attribute,
                             classInfo
                     )
-                    val result =getterInterpreter.checkEligibility()
+                    val result = getterInterpreter.checkEligibility()
                     if (result.eligible) {
                         // replace if more conditions are met
                         when {
@@ -161,11 +186,12 @@ class AttributeManager(
             val success : Boolean,
             val type: GetterType? = null,
             val methods: List<MethodInfo> = listOf(),
-            val field: FieldDeclaration? = null
+            val variable: VariableDeclarator? = null
     )
     private fun bestGuessMatchingGetterByName(
             attribute: Attribute,
-            setter: Setter
+            setter: Setter,
+            providedParameterIndex: Int? = null
     ): MatchGetterResult {
         val typesForThisSetter = attribute.typesPerSetter[setter.hashCode()] as AttributeTypesForSetter
 
@@ -183,7 +209,8 @@ class AttributeManager(
         } else attribute.name.capitalize()
         guesses.addAll(getGuessesForBase(attrNameBase, targetsBoolean))
         if (!typesForThisSetter.unassociatedToParameter) {
-            val parameter = setter.parameters[setter.attributeToParameter[attribute.name] as Int]
+            val parameterIndex = providedParameterIndex ?: setter.callSignatureMaps[attribute.name]
+            val parameter = setter.parameters[parameterIndex]
             val parameterNameBase = parameter.name.capitalize()
             guesses.addAll(getGuessesForBase(parameterNameBase, targetsBoolean))
         }
@@ -200,8 +227,9 @@ class AttributeManager(
                     }
                     classInfo.fieldDeclarations.containsKey(getterNameGuess) -> {
                         val field = classInfo.fieldDeclarations[getterNameGuess] as FieldDeclaration
-                        if (isEligibleField(field, getterTargetClassNames)) {
-                            return MatchGetterResult(true, GetterType.FIELD, listOf(), field)
+                        val variable = field.variables.first { it.nameAsString == getterNameGuess }
+                        if (isEligibleField(field, variable.nameAsString, getterTargetClassNames)) {
+                            return MatchGetterResult(true, GetterType.FIELD, listOf(), variable)
                         }
                     }
                 }
@@ -211,9 +239,17 @@ class AttributeManager(
         return MatchGetterResult(false)
     }
 
-    private fun analyzeJavaDocToFindGetter(attribute: Attribute, setter: Setter): MatchGetterResult {
+    private fun analyzeJavaDocToFindGetter(
+            attribute: Attribute,
+            setter: Setter
+    ): MatchGetterResult {
         var selectedGetter : MethodInfo? = null
-        val numberOfDesiredAttributes = setOf(1, setter.attributeToParameter.size)
+        val numberOfDesiredAttributes = setOf(
+                1,
+                if (setter.callSignatureMaps.containsAttribute(attribute.name)) {
+                    setter.callSignatureMaps.size(attribute)
+                } else 1
+        )
         for (potentialGetterName in javaDocAttributeNamesPerPotentialGetter.keys) {
             val attributeNames = javaDocAttributeNamesPerPotentialGetter[potentialGetterName] as List<String>
             if (numberOfDesiredAttributes.contains(attributeNames.size)
@@ -227,16 +263,16 @@ class AttributeManager(
     }
 
     private fun isEligibleMethod(method: MethodInfo, getterTargetClassNames: List<String>): Boolean {
-        if (ClassInfo.isEligibleMethod(method)) {
+        if (ClassInfo.isEligibleGetter(method)) {
             val returnTypeString = method.describeReturnType()
             return getterTargetClassNames.any { isAttributeAssignableToGetter(it, returnTypeString) }
         }
         return false
     }
 
-    private fun isEligibleField(field: FieldDeclaration, getterTargetClassNames: List<String>): Boolean {
+    private fun isEligibleField(field: FieldDeclaration, variableName: String, getterTargetClassNames: List<String>): Boolean {
         if (ClassInfo.isEligibleField(field)) {
-            return getterTargetClassNames.any { isAttributeAssignableToGetter(it, field.describeType()) }
+            return getterTargetClassNames.any { isAttributeAssignableToGetter(it, field.describeType(variableName)) }
         }
         return false
     }

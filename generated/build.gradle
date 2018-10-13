@@ -45,5 +45,5 @@ dependencies {
     implementation "com.squareup.moshi:moshi:$moshi"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
     api 'com.github.dpnolte.ts-rhymer:annotation:0.1'
-	implementation project(":service")
+	implementation project(":services")
 }

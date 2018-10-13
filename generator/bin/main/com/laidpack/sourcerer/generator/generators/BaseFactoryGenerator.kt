@@ -40,7 +40,7 @@ abstract class BaseFactoryGenerator(
             .parameterizedBy(viewTypeVariable)
     private val attributesClazzClassName = ClassName("java.lang", "Class")
             .parameterizedBy(attributesTypeVariable)
-    private val elementName = if (classCategory == ClassCategory.View) {
+    private val elementType = if (classCategory == ClassCategory.View) {
         targetClassName.simpleName.decapitalize()
     } else targetClassName.canonicalName
 
@@ -90,10 +90,10 @@ abstract class BaseFactoryGenerator(
                 .addTypeVariables(getClassTypeVariables())
                 .addProperty(
                         PropertySpec.builder(
-                                "elementName",
+                                "elementType",
                                 String::class.asTypeName(),
                                 KModifier.OVERRIDE
-                        ).initializer("%S", elementName)
+                        ).initializer("%S", elementType)
                                 .build()
                 )
                 .addFunction(generateCreateInstanceFunc())

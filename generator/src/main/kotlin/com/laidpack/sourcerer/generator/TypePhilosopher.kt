@@ -1,5 +1,6 @@
 package com.laidpack.sourcerer.generator
 
+import com.github.javaparser.ast.expr.AnnotationExpr
 import com.laidpack.sourcerer.generator.generators.MultiFormatGenerator
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 import com.laidpack.sourcerer.generator.generators.delegates.DelegateGeneratorBase
@@ -12,14 +13,17 @@ import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import kotlin.reflect.KClass
 
-class TypePhilosopher(private val attrManager: AttributeManager, private val classInfo: ClassInfo) {
-    private val cachedFormatsReservedForSetters = mutableMapOf<Int /*setter hash code */,  StyleableAttributeFormat?>()
+// TODO: refactor our poor overloaded philosopher
+class TypePhilosopher(
+        private val attrManager: AttributeManager,
+        private val classInfo: ClassInfo
+) {
 
     fun contemplateOnTheMeaningOfTypes(codeBlocks: List<CodeBlock>): List<CodeBlock> {
         // assign setter types first before we can assign formats per setter (see assignAttributeType)
         codeBlocks.forEach { codeBlock ->
             for (setter in codeBlock.setters.values) {
-                for (attrName in setter.attributeToParameter.keys) {
+                for (attrName in setter.callSignatureMaps.getCallSignatureMap(codeBlock).keys) {
                     val attribute = codeBlock.attributes[attrName] as Attribute
                     val typesForThisSetter = attribute.resolvedTypesPerSetter(setter.hashCode())
                     assignFormatToAttributeParameter(attribute, setter, typesForThisSetter)
@@ -32,7 +36,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
         codeBlocks.forEach { codeBlock ->
             val toBeRemovedSetters = mutableSetOf<Int>()
             for (setter in codeBlock.setters.values) {
-                for (attrName in setter.attributeToParameter.keys) {
+                for (attrName in setter.callSignatureMaps.getCallSignatureMap(codeBlock).keys) {
                     val attribute = codeBlock.attributes[attrName] as Attribute
                     val typesForThisSetter = attribute.resolvedTypesPerSetter(setter.hashCode())
                     assignAttributeType(attribute, setter, typesForThisSetter, codeBlock)
@@ -66,6 +70,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
                 selectedCodeBlocks.add(updatedCodeBlock)
             } else {
                 println("\t\t\t! - Skipping code block (no setter remaining after getter matching). Attribute name(s): '${codeBlock.attributes.values.joinToString(", "){ it.name }}'")
+
             }
         }
         // we need post-process multi-formatted attrs -- only with all processed setters, we can establish 1-by-1 format/setter links
@@ -113,6 +118,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
                 attribute,
                 setter
         )
+        val setterHashCode = setter.hashCode()
         // assign formats to getters
         for (getter in getters) {
             val typeName = considerWhatTypeReallyIsAtTheRudimentaryLevel(getter.describedReturnType)
@@ -130,6 +136,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
             if (attribute.getters.all { it.name != getter.name }) {
                 attribute.getters.add(getter)
             }
+            getter.setterHashCodes.add(setterHashCode)
         }
         setter.mutablePropertyName = attrManager.getResolvedSetterPropertyName(setter)
     }
@@ -140,10 +147,6 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
             val format = getParameterFormat(attribute, parameter)
             parameter.format = format
         }
-    }
-
-    private fun String.toCamelCase(): String {
-        return this.split('_').joinToString("") { it.capitalize() }
     }
 
     private data class AttributeTypeResult(val typeName: TypeName, val formats: Set<StyleableAttributeFormat>, val enumClassName : TypeName? = null ) {
@@ -183,8 +186,18 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
                 } else {
                     // try to specify format by setter parameter type
                     val setterType = considerWhatTypeReallyIsAtTheRudimentaryLevel(typesForThisSetter.setterClassName)
-                    val matchedFormat = StyleableAttributeFormat.fromTypeName(setterType)
-                    AttributeTypeResult(matchedFormat.toClass().asTypeName(), setOf(matchedFormat))
+                    var result : AttributeTypeResult? = null
+                    if (!setter.isField) {
+                        val parameter = setter.getParameterByAttribute(attribute)
+                        if (parameter.format != StyleableAttributeFormat.Unspecified) {
+                            result = AttributeTypeResult(parameter.format.toClass().asTypeName(), setOf(parameter.format))
+                        }
+                    }
+                    if(result == null) {
+                        val setterFormat = StyleableAttributeFormat.fromTypeName(setterType)
+                        result = AttributeTypeResult(setterFormat.toClass().asTypeName(), setOf(setterFormat))
+                    }
+                    result
                 }
             }
             attribute.formats.size > 1 -> {
@@ -295,6 +308,13 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
                     "InterpolatorRes" -> return StyleableAttributeFormat.Reference
                     "AnyRes" -> return StyleableAttributeFormat.Reference
                 }
+                if (classInfo.intDefinedAnnotations.containsKey(annotation)) {
+                    val annotationExpr = classInfo.intDefinedAnnotations[annotation] as AnnotationExpr
+                    attr.enumValues.addAll(classInfo.convertIntDefinedAnnotationToEnum(annotationExpr))
+                    return StyleableAttributeFormat.Enum
+                }
+                // check if annotation defines int
+
             }
         }
         val typeName = considerWhatTypeReallyIsAtTheRudimentaryLevel(parameter.describedType)
@@ -334,7 +354,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
                             val setter = codeBlock.setters[hashCode] as Setter
                             val typesForSetter = attribute.typesPerSetter[hashCode] as AttributeTypesForSetter
                             // a)
-                            if (setter.attributeToParameter.size > 1) {
+                            if (setter.callSignatureMaps.size(attribute) > 1) {
                                 keepSettersWithAnyOtherAttribute.add(hashCode)
                             }
                             // b)
@@ -397,7 +417,6 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
         private val allowedFormatToTypeTransformations = DelegateGeneratorBase.transformFormatToTypeMap.keys
         private val allowedTypeToFormatTransformations = DelegateGeneratorBase.transformTypeToFormatMap.keys
         private val allowedArrayAccessorTransformations = DelegateGeneratorBase.transformArrayAccessorMap.keys
-        private val intTypeName = Int::class.asTypeName()
 
         fun isFormatToTypeConversionAvailable(format: StyleableAttributeFormat, typeName: TypeName): Boolean {
             return allowedFormatToTypeTransformations.contains(Pair(format,typeName))

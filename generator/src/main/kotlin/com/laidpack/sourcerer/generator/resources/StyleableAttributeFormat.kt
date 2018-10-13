@@ -1,12 +1,10 @@
 package com.laidpack.sourcerer.generator.resources
 
 import com.laidpack.sourcerer.generator.Store
-import com.laidpack.sourcerer.generator.TypePhilosopher
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asTypeName
 import jetbrains.exodus.entitystore.Entity
-import kotlinx.dnq.XdEntity
 import kotlinx.dnq.XdEnumEntity
 import kotlinx.dnq.enum.XdEnumEntityType
 import kotlinx.dnq.query.eq
@@ -60,9 +58,9 @@ enum class StyleableAttributeFormat(val value: kotlin.String, val requiresQualif
     }
 
     companion object {
-        val colorQualifierClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "ColorQualifier")
-        val referenceQualifierClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "ReferenceQualifier")
-        val dimensionQualifierClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "DimensionQualifier")
+        val colorQualifierClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "ColorQualifier")
+        val referenceQualifierClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "ReferenceQualifier")
+        val dimensionQualifierClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "DimensionQualifier")
 
         fun fromString(formatString: kotlin.String): List<StyleableAttributeFormat> {
             return formatString.split("|").map {

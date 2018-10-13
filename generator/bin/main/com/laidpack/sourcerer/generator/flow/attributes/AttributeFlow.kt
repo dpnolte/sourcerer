@@ -534,7 +534,7 @@ class AttributeFlow (
     }
 
     private fun ensureListIsNotEmpty(list: List<String>) {
-        if (list.isEmpty()) throw IllegalStateException("At least one list item is required")
+        if (list.isEmpty()) throw IllegalStateException("At least one attributesToParameters item is required")
     }
     companion object {
         private val typedArrayCanonicalName = TypedArray::class.java.canonicalName

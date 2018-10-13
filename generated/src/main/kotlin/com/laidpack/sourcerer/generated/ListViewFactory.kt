@@ -3,16 +3,15 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.View
 import android.widget.ListView
 import androidx.core.content.ContextCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class ListViewFactory<TView : ListView, TAttributes : ListViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AdapterViewFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "listView"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = ListView(context)
 
@@ -23,7 +22,7 @@ open class ListViewFactory<TView : ListView, TAttributes : ListViewAttributes>(i
     ) {
         super.init(view, context, attributes)
         if (view is ListView) {
-            view.init {
+            view.apply {
                 if (attributes.divider.hasColor || attributes.divider.hasReference) {
                     val immutableDivider = when {
                         attributes.divider.hasColor -> ColorDrawable(attributes.divider.color)
@@ -56,14 +55,24 @@ open class ListViewFactory<TView : ListView, TAttributes : ListViewAttributes>(i
                         overscrollFooter = immutableOverScrollFooter
                     }
                 }
+                if (Build.VERSION.SDK_INT >= 19) {
+                    attributes.headerDividersEnabled?.let {
+                        if (areHeaderDividersEnabled() != it) {
+                            setHeaderDividersEnabled(it)
+                        }
+                    }
+                    attributes.footerDividersEnabled?.let {
+                        if (areFooterDividersEnabled() != it) {
+                            setFooterDividersEnabled(it)
+                        }
+                    }
+                }
             }
         }
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(ListViewFactory<ListView, ListViewAttributes>())
-        }
+        const val elementType: String = "listView"
 
         inline operator fun <reified TView : ListView, reified TAttributes : ListViewAttributes> invoke() = ListViewFactory(TView::class.java, TAttributes::class.java)
     }

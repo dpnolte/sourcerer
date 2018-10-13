@@ -1,6 +1,7 @@
-include ':generator',
+include ':generator', ':sample-server',
+		':sample-app',
 		':stub-app',
-		':service',
+		':services',
         ':generated',
         ':generated-appcompat',
         ':generated-car',
@@ -20,4 +21,3 @@ include ':generator',
         ':generated-swiperefreshlayout',
         ':generated-viewpager',
         ':generated-wear'
-

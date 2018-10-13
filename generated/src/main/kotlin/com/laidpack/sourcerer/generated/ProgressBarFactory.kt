@@ -7,14 +7,12 @@ import android.view.View
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
-import com.laidpack.sourcerer.service.api.toPorterDuffMode
+import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
 open class ProgressBarFactory<TView : ProgressBar, TAttributes : ProgressBarAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "progressBar"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = ProgressBar(context)
 
@@ -25,7 +23,7 @@ open class ProgressBarFactory<TView : ProgressBar, TAttributes : ProgressBarAttr
     ) {
         super.init(view, context, attributes)
         if (view is ProgressBar) {
-            view.init {
+            view.apply {
                 attributes.max?.let {
                     if (max != it) {
                         max = it
@@ -115,9 +113,7 @@ open class ProgressBarFactory<TView : ProgressBar, TAttributes : ProgressBarAttr
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(ProgressBarFactory<ProgressBar, ProgressBarAttributes>())
-        }
+        const val elementType: String = "progressBar"
 
         inline operator fun <reified TView : ProgressBar, reified TAttributes : ProgressBarAttributes> invoke() = ProgressBarFactory(TView::class.java, TAttributes::class.java)
     }

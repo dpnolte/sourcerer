@@ -189,19 +189,19 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
             "if (${valueProvider(args)}) 1 else 0"
         }
 
-        private val toPorterDuffTypeName = ClassName(SourcererEnvironment.serviceApiPackageName, "toPorterDuffMode")
+        private val toPorterDuffTypeName = ClassName(SourcererEnvironment.servicesApiPackageName, "toPorterDuffMode")
         private val enumToPorterDuffMode: transformingMethod = { valueProvider, args, _na, attribute ->
             val value = valueProvider(args)
             args.add(toPorterDuffTypeName)
             "$value.%T()"
         }
-        private val toScaleTypeName = ClassName(SourcererEnvironment.serviceApiPackageName, "toScaleType")
+        private val toScaleTypeName = ClassName(SourcererEnvironment.servicesApiPackageName, "toScaleType")
         private val enumToScaleType: transformingMethod = { valueProvider, args, _na, attribute ->
             val value = valueProvider(args)
             args.add(toScaleTypeName)
             "$value.%T()"
         }
-        private val toTruncateAtTypeName = ClassName(SourcererEnvironment.serviceApiPackageName, "toTruncateAt")
+        private val toTruncateAtTypeName = ClassName(SourcererEnvironment.servicesApiPackageName, "toTruncateAt")
         private val enumToTruncateAt: transformingMethod = { valueProvider, args, _na, attribute ->
             val value = valueProvider(args)
             args.add(toTruncateAtTypeName)

@@ -1,25 +1,24 @@
 package com.laidpack.sourcerer.generator.peeker
 
-import android.view.ViewGroup
+import com.github.javaparser.ast.Node
 import com.github.javaparser.ast.body.*
-import com.github.javaparser.ast.expr.AnnotationExpr
-import com.github.javaparser.ast.expr.MethodCallExpr
+import com.github.javaparser.ast.expr.*
 import com.github.javaparser.javadoc.Javadoc
 import com.github.javaparser.resolution.UnsolvedSymbolException
 import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration
 import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclaration
 import com.laidpack.sourcerer.generator.Store
+import com.laidpack.sourcerer.generator.firstAncestorOfType
+import com.laidpack.sourcerer.generator.firstDescendantOfType
+import com.laidpack.sourcerer.generator.resources.StyleableAttributeEnumValue
 import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.target.Setter
 import com.laidpack.sourcerer.generator.resources.Widget
 import com.laidpack.sourcerer.generator.target.Getter
-import com.laidpack.sourcerer.generator.target.XdResolvedStatus
 import com.squareup.kotlinpoet.ClassName
 import jetbrains.exodus.entitystore.Entity
-import kotlinx.dnq.XdEntity
 import kotlinx.dnq.XdEnumEntity
-import kotlinx.dnq.XdNaturalEntityType
 import kotlinx.dnq.enum.XdEnumEntityType
 import kotlinx.dnq.query.eq
 import kotlinx.dnq.query.first
@@ -36,7 +35,7 @@ data class MethodInfo(
     fun describeReturnType(): String {
         return try {
             resolvedMethodDeclaration.returnType.describe()
-        } catch (e: UnsolvedSymbolException) {
+        } catch (e: Exception) {
             val returnType = methodDeclaration.type
             if (returnType.isClassOrInterfaceType) {
                 val indexedClass = ClassSymbolResolver.resolveClassOrInterfaceType(returnType.asClassOrInterfaceType())
@@ -66,7 +65,8 @@ data class ClassInfo(
         val fieldDeclarations: Map<String, FieldDeclaration>,
         val constructorExpression: ConstructorExpression,
         val indexedClass: IndexedClass,
-        val annotations: List<AnnotationExpr>
+        val annotations: List<AnnotationExpr>,
+        val intDefinedAnnotations: Map<String, AnnotationExpr>
 ) {
     var hasResolvedAttributes: Boolean = false
     val specifiedAttributes = mutableMapOf<String, Attribute>()
@@ -82,7 +82,7 @@ data class ClassInfo(
                 val isVoid = try {
                     methodInfo.resolvedMethodDeclaration.returnType.isVoid
                 } catch (e: Exception) { false }
-                if (isEligibleMethod(methodInfo) && !isVoid) {
+                if (isEligibleGetter(methodInfo) && !isVoid) {
                     getters.add(methodInfo)
                 }
             }
@@ -90,8 +90,8 @@ data class ClassInfo(
         getters
     }
 
-    fun getPotentialGettersForField(field: FieldDeclaration): List<MethodInfo> {
-        val fieldTypeAsString = field.describeType()
+    fun getPotentialGettersForField(field: FieldDeclaration, variableName: String): List<MethodInfo> {
+        val fieldTypeAsString = field.describeType(variableName)
         return potentialGetters.filter {
             fieldTypeAsString == it.describeReturnType()
         }
@@ -196,11 +196,126 @@ data class ClassInfo(
         hasResolvedAttributes = true
     }
 
+    fun convertIntDefinedAnnotationToEnum(
+            intDefinedAnnotation: AnnotationExpr
+    ): List<StyleableAttributeEnumValue> {
+        val enumValues = mutableListOf<StyleableAttributeEnumValue>()
+        val arrayInitializerExpr =
+                intDefinedAnnotation.firstDescendantOfType(ArrayInitializerExpr::class.java) as ArrayInitializerExpr
+        val variables = arrayInitializerExpr.values.map {
+            when (it) {
+                is NameExpr -> {
+                    val name = it.nameAsString
+                    val field = fieldDeclarations[name] as FieldDeclaration
+                    field.variables.first { it.nameAsString == name }
+                }
+                is FieldAccessExpr -> {
+                    val variable = findVariable(it) ?: throw IllegalStateException("Cannot find field '$it' in @IntDef annotation $intDefinedAnnotation")
+                    variable
+                }
+                else -> throw IllegalStateException("Cannot convert '$it' to a variable")
+            }
+        }
+        for (variable in variables) {
+            enumValues.add(StyleableAttributeEnumValue(
+                    variable.nameAsString.toLowerCase(),
+                    resolveIntValueFromNode(variable))
+            )
+        }
+        return enumValues
+    }
+
+    private fun resolveIntValueFromNode(node: Node): Int {
+        val initializerExpr = node.firstDescendantOfType(IntegerLiteralExpr::class.java)
+        if (initializerExpr != null) {
+            return initializerExpr.asInt()
+        } else {
+            val fieldAccessExpr = node.firstDescendantOfType(FieldAccessExpr::class.java)
+            if (fieldAccessExpr != null) {
+                return resolveFieldAccessExpr(fieldAccessExpr)
+                    ?: throw IllegalStateException("Could not resolve int value for node $node with field access expression $fieldAccessExpr")
+            }
+            val binaryExpr = node.firstDescendantOfType(BinaryExpr::class.java)
+            if (binaryExpr != null) {
+                return resolveBinaryExpr(binaryExpr)
+                        ?: throw IllegalStateException("Could not resolve int value for node $node with binary expression $binaryExpr")
+            }
+            val nameExpr = node.firstDescendantOfType(NameExpr::class.java)
+                    ?: throw IllegalArgumentException("Cannot resolve node to Int. No integer literal expression, field access expression, binary expression, or name expression found for node '$node'")
+
+            return resolveNameExpr(nameExpr)
+        }
+
+    }
+
+    private fun resolveFieldAccessExpr(fieldAccessExpr: FieldAccessExpr): Int? {
+        return resolveIntValueFromNode(findVariable(fieldAccessExpr)
+            ?: return null)
+    }
+
+    private fun resolveBinaryExpr(binaryExpr: BinaryExpr): Int? {
+        val leftHandSide = resolveIntValueFromNode(binaryExpr.left)
+        val rightHandSide = resolveIntValueFromNode(binaryExpr.right)
+
+        return when (binaryExpr.operator) {
+            BinaryExpr.Operator.BINARY_OR -> leftHandSide.or(rightHandSide)
+            BinaryExpr.Operator.BINARY_AND -> leftHandSide.and(rightHandSide)
+            BinaryExpr.Operator.XOR -> leftHandSide.xor(rightHandSide)
+            BinaryExpr.Operator.LEFT_SHIFT -> leftHandSide.shl(rightHandSide)
+            BinaryExpr.Operator.SIGNED_RIGHT_SHIFT -> leftHandSide.shr(rightHandSide)
+            BinaryExpr.Operator.UNSIGNED_RIGHT_SHIFT -> leftHandSide.ushr(rightHandSide)
+            BinaryExpr.Operator.PLUS -> leftHandSide + rightHandSide
+            BinaryExpr.Operator.MINUS -> leftHandSide - rightHandSide
+            BinaryExpr.Operator.MULTIPLY -> leftHandSide * rightHandSide
+            BinaryExpr.Operator.DIVIDE -> leftHandSide / rightHandSide
+            BinaryExpr.Operator.REMAINDER -> leftHandSide % rightHandSide
+            else -> null
+        }
+    }
+
+    private fun resolveNameExpr(nameExpr: NameExpr): Int {
+        val classDeclaration = nameExpr.firstAncestorOfType(ClassOrInterfaceDeclaration::class.java)
+        val variableDeclarator = classDeclaration?.firstDescendantOfType(
+                VariableDeclarator::class.java
+        ) { n -> n.nameAsString == nameExpr.nameAsString}
+            ?: throw java.lang.IllegalArgumentException("No variable found with name $nameExpr")
+        return resolveIntValueFromNode(variableDeclarator)
+    }
+
+    private fun findVariable(fieldAccessExpr: FieldAccessExpr): VariableDeclarator? {
+        val simpleName = fieldAccessExpr.scope.asNameExpr().nameAsString
+        val fieldName = fieldAccessExpr.name.asString()
+        val foundClasses = ClassRegistry.findBySimpleName(simpleName)
+        if (foundClasses.isNotEmpty()) {
+            for (foundClass in foundClasses) {
+                val classDeclaration = foundClass.node
+                return classDeclaration.firstDescendantOfType(
+                        VariableDeclarator::class.java
+                ) { v -> v.nameAsString == fieldName } ?: continue
+            }
+        } else {
+            // check if it is defined with an annotation declaratino
+            // example: @interface Gutter { int NONE = 0; }
+            val rootNode = fieldAccessExpr.findRootNode()
+            val annotationDeclaration = rootNode.firstDescendantOfType(
+                    AnnotationDeclaration::class.java
+            ) { n -> n.nameAsString == simpleName}
+                    ?: throw IllegalStateException("Ambiguous field access expression '$fieldAccessExpr'. No classes found in index with that name")
+
+            return annotationDeclaration.firstDescendantOfType(
+                    VariableDeclarator::class.java
+            ) { v -> v.nameAsString == fieldName }
+        }
+        return null
+    }
+
     companion object {
-        val layoutParamsClassType = ViewGroup.LayoutParams::class
-        fun isEligibleMethod(method: MethodInfo): Boolean {
+        fun isEligibleGetter(method: MethodInfo): Boolean {
             return method.methodDeclaration.parameters.isEmpty()
-                    && method.methodDeclaration.isPublic
+                    && isEligibleMethod(method)
+        }
+        fun isEligibleMethod(method: MethodInfo): Boolean {
+            return method.methodDeclaration.isPublic
                     && !method.javadoc.blockTags.any { it.tagName == "hide" || it.tagName == "removed" }
         }
 
@@ -210,13 +325,18 @@ data class ClassInfo(
     }
 }
 
-fun FieldDeclaration.describeType(): String {
-    val variable = this.variables.first()
+fun FieldDeclaration.describeType(variableName: String): String {
+    val variable = this.variables.find { it.nameAsString == variableName }
+        ?: throw java.lang.IllegalArgumentException("Field $this contains no variable '$variableName'")
+    return variable.describeType()
+}
+
+fun VariableDeclarator.describeType(): String {
     return try {
-        variable.type.resolve().describe()
-    } catch (e: UnsolvedSymbolException) {
-        if (variable.type.isClassOrInterfaceType) {
-            val indexedClass = ClassSymbolResolver.resolveClassOrInterfaceType(variable.type.asClassOrInterfaceType())
+        this.type.resolve().describe()
+    } catch (e: Exception) {
+        if (this.type.isClassOrInterfaceType) {
+            val indexedClass = ClassSymbolResolver.resolveClassOrInterfaceType(this.type.asClassOrInterfaceType())
             indexedClass.targetClassName.canonicalName
         } else throw e
     }
@@ -228,7 +348,7 @@ fun com.github.javaparser.ast.body.Parameter.describeType(): String {
             this.isVarArgs -> this.resolve().describeType().replace("...", "[]")
             else -> this.resolve().describeType()
         }
-    } catch (e: UnsolvedSymbolException) {
+    } catch (e: Exception) {
         if (this.type.isClassOrInterfaceType) {
             val indexedClass = ClassSymbolResolver.resolveClassOrInterfaceType(this.type.asClassOrInterfaceType())
             indexedClass.targetClassName.canonicalName

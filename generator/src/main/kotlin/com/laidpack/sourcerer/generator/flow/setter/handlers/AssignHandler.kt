@@ -24,7 +24,7 @@ class AssignHandler(flow: SetterFlow) : BaseSetterHandler<AssignExpr>(flow, Assi
             if (assignExpression.target is NameExpr) {
                 val name = assignExpression.target.asNameExpr().nameAsString
                 if (flow.classInfo.isFieldFromThisClass(name)) {
-                    flow.addFieldIfNew(flow.classInfo.getFieldFromThisClass(name))
+                    flow.addFieldIfNew(name, flow.classInfo.getFieldFromThisClass(name))
                 }
             }
         }

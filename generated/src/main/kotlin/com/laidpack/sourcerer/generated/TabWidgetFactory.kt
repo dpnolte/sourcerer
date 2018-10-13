@@ -6,13 +6,11 @@ import android.os.Build
 import android.view.View
 import android.widget.TabWidget
 import androidx.core.content.ContextCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class TabWidgetFactory<TView : TabWidget, TAttributes : TabWidgetAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : LinearLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "tabWidget"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = TabWidget(context)
 
@@ -23,7 +21,12 @@ open class TabWidgetFactory<TView : TabWidget, TAttributes : TabWidgetAttributes
     ) {
         super.init(view, context, attributes)
         if (view is TabWidget) {
-            view.init {
+            view.apply {
+                attributes.tabStripEnabled?.let {
+                    if (isStripEnabled != it) {
+                        isStripEnabled = it
+                    }
+                }
                 if (Build.VERSION.SDK_INT >= 16) {
                     attributes.divider?.let {
                         val immutableDivider = ContextCompat.getDrawable(context, it) as Drawable
@@ -51,9 +54,7 @@ open class TabWidgetFactory<TView : TabWidget, TAttributes : TabWidgetAttributes
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(TabWidgetFactory<TabWidget, TabWidgetAttributes>())
-        }
+        const val elementType: String = "tabWidget"
 
         inline operator fun <reified TView : TabWidget, reified TAttributes : TabWidgetAttributes> invoke() = TabWidgetFactory(TView::class.java, TAttributes::class.java)
     }

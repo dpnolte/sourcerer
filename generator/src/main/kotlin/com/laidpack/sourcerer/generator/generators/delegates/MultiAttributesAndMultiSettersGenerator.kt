@@ -5,7 +5,6 @@ import com.laidpack.sourcerer.generator.target.AttributeTypesForSetter
 import com.laidpack.sourcerer.generator.target.CodeBlock
 import com.laidpack.sourcerer.generator.target.Setter
 import com.laidpack.sourcerer.generator.generators.delegates.statements.*
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.ParameterSpec
 
@@ -85,7 +84,8 @@ class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, co
     private fun FunSpec.Builder.addLocalVars(setter: Setter): FunSpec.Builder {
         val setterHashCode = setter.hashCode()
         val attrToVarNameForThisSetter = mutableMapOf<String, String>()
-        for(attrName in setter.attributeToParameter.keys) {
+
+        for(attrName in getAttributesToParameters(setter).keys) {
             val attr = attributes[attrName] as Attribute
             if (variableNames[setterHashCode] == null) {
                 variableNames[setterHashCode] = mutableMapOf()
@@ -138,7 +138,7 @@ class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, co
         val setterVariableNames = variableNames[setterHashCode] as MutableMap<String, String>
         val selectedAttrs = mutableListOf<Attribute>()
         val valueLiterals = mutableListOf<String>()
-        setter.attributeToParameter.keys.forEach { attrName ->
+        getAttributesToParameters(setter).keys.forEach { attrName ->
             if (!processedVariables.contains(attrName)) {
                 val attr = attributes[attrName] as Attribute
                 selectedAttrs.add(attr)
@@ -158,7 +158,8 @@ class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, co
         val setterVariableNames = variableNames[setterHashCode] as MutableMap<String, String>
         var index = 0
         val parameters = setter.parameters.joinToString(", ") { parameter ->
-            val attributeToParameters =  setter.attributeToParameter.filter { it.value == index } //codeBlock.attributes.values.find { it.hasParameterIndex && it.resolvedParameterIndex == index}
+            val attributeToParameters =  getAttributesToParameters(setter)
+                    .filter { it.value == index }
             val attribute = if (attributeToParameters.isNotEmpty()) {
                 codeBlock.attributes[attributeToParameters.keys.first()] as Attribute
             } else null
@@ -172,5 +173,9 @@ class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, co
             result
         }
         return this.addStatement("${setter.name}($parameters)")
+    }
+
+    private fun getAttributesToParameters(setter: Setter): Map<String, Int> {
+        return setter.callSignatureMaps.getCallSignatureMapUsedByAnOfTheseAttributes(attributes.values)
     }
 }

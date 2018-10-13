@@ -3,19 +3,16 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.View
 import android.widget.EditText
-import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
 import kotlin.String
 
 open class EditTextFactory<TView : EditText, TAttributes : EditTextAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : TextViewFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "editText"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = EditText(context)
 
     companion object {
-        init {
-            InflaterComponent.addFactory(EditTextFactory<EditText, EditTextAttributes>())
-        }
+        const val elementType: String = "editText"
 
         inline operator fun <reified TView : EditText, reified TAttributes : EditTextAttributes> invoke() = EditTextFactory(TView::class.java, TAttributes::class.java)
     }

@@ -6,13 +6,11 @@ import android.os.Build
 import android.view.View
 import android.widget.Spinner
 import androidx.core.content.ContextCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class SpinnerFactory<TView : Spinner, TAttributes : SpinnerAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AdapterViewFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "spinner"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = Spinner(context)
 
@@ -23,7 +21,7 @@ open class SpinnerFactory<TView : Spinner, TAttributes : SpinnerAttributes>(inst
     ) {
         super.init(view, context, attributes)
         if (view is Spinner) {
-            view.init {
+            view.apply {
                 if (Build.VERSION.SDK_INT >= 16) {
                     attributes.popupBackground?.let {
                         val immutablePopupBackground = ContextCompat.getDrawable(context, it) as Drawable
@@ -47,9 +45,7 @@ open class SpinnerFactory<TView : Spinner, TAttributes : SpinnerAttributes>(inst
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(SpinnerFactory<Spinner, SpinnerAttributes>())
-        }
+        const val elementType: String = "spinner"
 
         inline operator fun <reified TView : Spinner, reified TAttributes : SpinnerAttributes> invoke() = SpinnerFactory(TView::class.java, TAttributes::class.java)
     }

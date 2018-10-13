@@ -28,7 +28,8 @@ data class AttributeTypesForSetter (
     val hasAttributeType : Boolean
         get() = mutableAttributeType != null
     val attributeType : TypeName
-        get() = mutableAttributeType as TypeName
+        get() = if(mutableAttributeType != null) mutableAttributeType
+            else throw java.lang.NullPointerException("Attribute type is null. Setter type: $setterType, attribute formats: ${formats}'")
 
     val attributeCanonicalNames = mutableListOf<String>()
 

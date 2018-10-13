@@ -11,13 +11,22 @@ import com.laidpack.sourcerer.generator.peeker.MethodInfo
 class GetterFlowInterpreter(
         private val potentialGetter: MethodInfo,
         field: FieldDeclaration,
+        variableName: String,
         conditions: Map<String, String>,
         attribute: Attribute,
         classInfo: ClassInfo
     ) : BaseFlowInterpreter() {
 
     private val visitor = FlowVisitor(this::onNodeIteration)
-    private val flow = GetterFlow(this, potentialGetter, field, conditions, attribute, classInfo)
+    private val flow = GetterFlow(
+            this,
+            potentialGetter,
+            field,
+            variableName,
+            conditions,
+            attribute,
+            classInfo
+    )
 
     override val handlers = listOf(
             ReturnStmtHandler(flow)

@@ -21,7 +21,7 @@ class SetterFlow (
         private val attribute: Attribute,
         val classInfo: ClassInfo
 ) {
-    private val fields = mutableListOf<FieldDeclaration>()
+    private val fields = mutableMapOf<String /* variable name */, FieldDeclaration>()
     private val conditions = mutableMapOf<String /* var name */, String /* value */>()
 
     fun isParameterBeingAssigned(expression: Expression): Boolean {
@@ -62,9 +62,9 @@ class SetterFlow (
         throw IllegalStateException("Expression has no assigned value. Expression: '$expression'")
     }
 
-    fun addFieldIfNew(fieldDeclaration: FieldDeclaration) {
-        if (!fields.contains(fieldDeclaration)) {
-            fields.add(fieldDeclaration)
+    fun addFieldIfNew(variableName: String, fieldDeclaration: FieldDeclaration) {
+        if (!fields.contains(variableName)) {
+            fields[variableName] = fieldDeclaration
         }
     }
 

@@ -11,6 +11,7 @@ class MultiAttributesAndSingleSetterGenerator(attributesParam: ParameterSpec, co
     private val setter = codeBlock.setter
     private val setterHashCode = setter.hashCode()
     private val delegate = this
+    private val attributesToParameters = setter.callSignatureMaps.getCallSignatureMapUsedByAnOfTheseAttributes(attributes.values)
 
     fun addCodeBlockToBuilder(builder: FunSpec.Builder){
         builder.beginFlowIfAnyValueIsSet()
@@ -68,7 +69,7 @@ class MultiAttributesAndSingleSetterGenerator(attributesParam: ParameterSpec, co
         val setter = codeBlock.setter
         var index = 0
         val parameters = setter.parameters.joinToString(", ") { parameter ->
-            val attributeToParameters =  setter.attributeToParameter.filter { it.value == index } //codeBlock.attributes.values.find { it.hasParameterIndex && it.resolvedParameterIndex == index}
+            val attributeToParameters =  attributesToParameters.filter { it.value == index } //codeBlock.attributes.values.find { it.hasParameterIndex && it.resolvedParameterIndex == index}
             val attribute = if (attributeToParameters.isNotEmpty()) {
                 codeBlock.attributes[attributeToParameters.keys.first()] as Attribute
             } else null

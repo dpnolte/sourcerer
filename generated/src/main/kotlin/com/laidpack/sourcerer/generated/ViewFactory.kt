@@ -7,15 +7,13 @@ import android.os.Build
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.BaseViewFactory
-import com.laidpack.sourcerer.service.api.init
-import com.laidpack.sourcerer.service.api.toPorterDuffMode
+import com.laidpack.sourcerer.services.api.BaseViewFactory
+import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
 open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : BaseViewFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "view"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = View(context)
 
@@ -24,17 +22,20 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
         context: Context,
         attributes: TAttributes
     ) {
-        view.init {
+        view.apply {
             attributes.id?.let {
                 if (id != it) {
                     id = it
                 }
             }
-            if (attributes.scrollX != null || attributes.scrollY != null) {
-                val immutableScrollX = attributes.scrollX ?: scrollX
-                val immutableScrollY = attributes.scrollY ?: scrollY
-                if (scrollX != immutableScrollX || scrollY != immutableScrollY) {
-                    scrollTo(immutableScrollX, immutableScrollY)
+            attributes.scrollX?.let {
+                if (scrollX != it) {
+                    scrollTo(it, )
+                }
+            }
+            attributes.scrollY?.let {
+                if (scrollY != it) {
+                    scrollTo(, it)
                 }
             }
             attributes.focusableInTouchMode?.let {
@@ -249,7 +250,7 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                 }
             }
             if (Build.VERSION.SDK_INT >= 17) {
-                if (attributes.paddingLeft != null || attributes.paddingTop != null || attributes.paddingRight != null || attributes.paddingBottom != null || attributes.paddingStart != null || attributes.paddingEnd != null) {
+                if (attributes.paddingLeft != null || attributes.paddingBottom != null || attributes.paddingStart != null || attributes.paddingEnd != null || attributes.paddingTop != null || attributes.paddingRight != null) {
                     val immutablePaddingBottomDimension = attributes.paddingBottom ?: paddingBottom
                     val immutablePaddingLeftDimension = attributes.paddingLeft ?: paddingLeft
                     val immutablePaddingRightDimension = attributes.paddingRight ?: paddingRight
@@ -457,9 +458,7 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(ViewFactory<View, ViewAttributes>())
-        }
+        const val elementType: String = "view"
 
         inline operator fun <reified TView : View, reified TAttributes : ViewAttributes> invoke() = ViewFactory(TView::class.java, TAttributes::class.java)
     }

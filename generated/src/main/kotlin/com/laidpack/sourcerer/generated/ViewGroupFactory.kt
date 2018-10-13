@@ -5,18 +5,11 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.view.ViewGroup
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class ViewGroupFactory<TView : ViewGroup, TAttributes : ViewGroupAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "viewGroup"
-
-    override fun createInstance(context: Context): View {
-        // // ViewGroup is abstract
-        return super.createInstance(context)
-    }
+    override val elementType: String = Companion.elementType
 
     override fun init(
         view: View,
@@ -25,7 +18,7 @@ open class ViewGroupFactory<TView : ViewGroup, TAttributes : ViewGroupAttributes
     ) {
         super.init(view, context, attributes)
         if (view is ViewGroup) {
-            view.init {
+            view.apply {
                 attributes.addStatesFromChildren?.let {
                     if (addStatesFromChildren() != it) {
                         setAddStatesFromChildren(it)
@@ -91,9 +84,7 @@ open class ViewGroupFactory<TView : ViewGroup, TAttributes : ViewGroupAttributes
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(ViewGroupFactory<ViewGroup, ViewGroupAttributes>())
-        }
+        const val elementType: String = "viewGroup"
 
         inline operator fun <reified TView : ViewGroup, reified TAttributes : ViewGroupAttributes> invoke() = ViewGroupFactory(TView::class.java, TAttributes::class.java)
     }

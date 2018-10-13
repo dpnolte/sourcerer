@@ -3,13 +3,11 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.View
 import android.widget.GridLayout
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class GridLayoutFactory<TView : GridLayout, TAttributes : GridLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "gridLayout"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = GridLayout(context)
 
@@ -20,10 +18,10 @@ open class GridLayoutFactory<TView : GridLayout, TAttributes : GridLayoutAttribu
     ) {
         super.init(view, context, attributes)
         if (view is GridLayout) {
-            view.init {
+            view.apply {
                 attributes.orientation?.let {
-                    if (orientation != it) {
-                        orientation = it
+                    if (orientation != it.value) {
+                        orientation = it.value
                     }
                 }
                 attributes.rowCount?.let {
@@ -42,8 +40,8 @@ open class GridLayoutFactory<TView : GridLayout, TAttributes : GridLayoutAttribu
                     }
                 }
                 attributes.alignmentMode?.let {
-                    if (alignmentMode != it) {
-                        alignmentMode = it
+                    if (alignmentMode != it.value) {
+                        alignmentMode = it.value
                     }
                 }
                 attributes.rowOrderPreserved?.let {
@@ -61,9 +59,7 @@ open class GridLayoutFactory<TView : GridLayout, TAttributes : GridLayoutAttribu
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(GridLayoutFactory<GridLayout, GridLayoutAttributes>())
-        }
+        const val elementType: String = "gridLayout"
 
         inline operator fun <reified TView : GridLayout, reified TAttributes : GridLayoutAttributes> invoke() = GridLayoutFactory(TView::class.java, TAttributes::class.java)
     }

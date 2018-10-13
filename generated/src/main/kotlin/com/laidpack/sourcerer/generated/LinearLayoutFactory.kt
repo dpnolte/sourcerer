@@ -6,13 +6,11 @@ import android.os.Build
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class LinearLayoutFactory<TView : LinearLayout, TAttributes : LinearLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "linearLayout"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = LinearLayout(context)
 
@@ -23,10 +21,10 @@ open class LinearLayoutFactory<TView : LinearLayout, TAttributes : LinearLayoutA
     ) {
         super.init(view, context, attributes)
         if (view is LinearLayout) {
-            view.init {
+            view.apply {
                 attributes.orientation?.let {
-                    if (orientation != it) {
-                        orientation = it
+                    if (orientation != it.value) {
+                        orientation = it.value
                     }
                 }
                 attributes.baselineAligned?.let {
@@ -42,6 +40,16 @@ open class LinearLayoutFactory<TView : LinearLayout, TAttributes : LinearLayoutA
                 attributes.measureWithLargestChild?.let {
                     if (isMeasureWithLargestChildEnabled != it) {
                         isMeasureWithLargestChildEnabled = it
+                    }
+                }
+                attributes.showDividers?.let {
+                    if (showDividers != it.value) {
+                        showDividers = it.value
+                    }
+                }
+                attributes.dividerPadding?.let {
+                    if (dividerPadding != it) {
+                        dividerPadding = it
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 16) {
@@ -64,9 +72,7 @@ open class LinearLayoutFactory<TView : LinearLayout, TAttributes : LinearLayoutA
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(LinearLayoutFactory<LinearLayout, LinearLayoutAttributes>())
-        }
+        const val elementType: String = "linearLayout"
 
         inline operator fun <reified TView : LinearLayout, reified TAttributes : LinearLayoutAttributes> invoke() = LinearLayoutFactory(TView::class.java, TAttributes::class.java)
     }

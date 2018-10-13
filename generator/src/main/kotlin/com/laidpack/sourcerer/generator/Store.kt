@@ -34,6 +34,7 @@ object Store {
                 XdCodeBlock,
                 XdGetter,
                 XdResolvedStatus,
+                XdCallSignatureMap,
                 XdAttributeToParameterIndex,
                 XdConstructorExpression
         )

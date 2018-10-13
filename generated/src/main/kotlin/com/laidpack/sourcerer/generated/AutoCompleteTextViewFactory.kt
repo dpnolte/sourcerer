@@ -4,13 +4,11 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.widget.AutoCompleteTextView
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class AutoCompleteTextViewFactory<TView : AutoCompleteTextView, TAttributes : AutoCompleteTextViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : EditTextFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "autoCompleteTextView"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = AutoCompleteTextView(context)
 
@@ -21,7 +19,7 @@ open class AutoCompleteTextViewFactory<TView : AutoCompleteTextView, TAttributes
     ) {
         super.init(view, context, attributes)
         if (view is AutoCompleteTextView) {
-            view.init {
+            view.apply {
                 attributes.completionThreshold?.let {
                     if (threshold != it) {
                         threshold = it
@@ -54,9 +52,7 @@ open class AutoCompleteTextViewFactory<TView : AutoCompleteTextView, TAttributes
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(AutoCompleteTextViewFactory<AutoCompleteTextView, AutoCompleteTextViewAttributes>())
-        }
+        const val elementType: String = "autoCompleteTextView"
 
         inline operator fun <reified TView : AutoCompleteTextView, reified TAttributes : AutoCompleteTextViewAttributes> invoke() = AutoCompleteTextViewFactory(TView::class.java, TAttributes::class.java)
     }

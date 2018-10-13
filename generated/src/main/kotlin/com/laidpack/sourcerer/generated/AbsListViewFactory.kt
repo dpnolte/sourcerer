@@ -6,18 +6,11 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.AbsListView
 import androidx.core.content.ContextCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class AbsListViewFactory<TView : AbsListView, TAttributes : AbsListViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AdapterViewFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "absListView"
-
-    override fun createInstance(context: Context): View {
-        // // AbsListView is abstract
-        return super.createInstance(context)
-    }
+    override val elementType: String = Companion.elementType
 
     override fun init(
         view: View,
@@ -26,7 +19,7 @@ open class AbsListViewFactory<TView : AbsListView, TAttributes : AbsListViewAttr
     ) {
         super.init(view, context, attributes)
         if (view is AbsListView) {
-            view.init {
+            view.apply {
                 if (attributes.listSelector.hasColor || attributes.listSelector.hasReference) {
                     val immutableListSelector = when {
                         attributes.listSelector.hasColor -> ColorDrawable(attributes.listSelector.color)
@@ -86,9 +79,7 @@ open class AbsListViewFactory<TView : AbsListView, TAttributes : AbsListViewAttr
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(AbsListViewFactory<AbsListView, AbsListViewAttributes>())
-        }
+        const val elementType: String = "absListView"
 
         inline operator fun <reified TView : AbsListView, reified TAttributes : AbsListViewAttributes> invoke() = AbsListViewFactory(TView::class.java, TAttributes::class.java)
     }

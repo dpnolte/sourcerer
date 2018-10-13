@@ -1,10 +1,7 @@
 package com.laidpack.sourcerer.generator.javadoc
 
-import com.github.javaparser.javadoc.JavadocBlockTag
 import com.laidpack.sourcerer.generator.AttributeManager
 import com.laidpack.sourcerer.generator.Interpretation
-import com.laidpack.sourcerer.generator.generators.delegates.DelegateGeneratorBase
-import com.laidpack.sourcerer.generator.peeker.ClassCategory
 import com.laidpack.sourcerer.generator.peeker.ClassInfo
 import com.laidpack.sourcerer.generator.peeker.MethodInfo
 import com.laidpack.sourcerer.generator.target.Attribute
@@ -20,12 +17,16 @@ class JavaDocForSetterInterpreter(
     private val attributes = mutableMapOf<String, Attribute>()
     private val setters = mutableMapOf<Int, Setter>()
 
-    fun interpret(): Interpretation {
+    fun interpret(earlierIdentifiedSetters: Map<Int, Setter>): Interpretation {
         val result = match()
         if (result.success) {
+            val setter = attrManager.getSetter(earlierIdentifiedSetters, methodInfo)
+            val attributesToParameters = mutableMapOf<Attribute, Int>()
             for (match in result.matches) {
-                handleMatch(match.attributeName, match.parameter)
+                val attribute = handleMatch(setter, match.attributeName, match.parameter) ?: continue
+                attributesToParameters[attribute] = match.parameter.index
             }
+            attrManager.linkAttributesAndSetter(attributesToParameters, setter)
         }
 
         if (!isEachParameterMapped(setters)) {
@@ -35,26 +36,25 @@ class JavaDocForSetterInterpreter(
         return Interpretation(attributes, setters)
     }
 
-    private fun handleMatch(attributeName: String, parameter: Parameter) {
+    private fun handleMatch(setter: Setter, attributeName: String, parameter: Parameter): Attribute? {
         val attribute = Attribute(classInfo.targetClassName, attributeName)
-        val setter = attrManager.getSetter(setters, methodInfo)
-        attrManager.linkAttributeAndSetter(attribute, setter, parameter.index)
         attribute.typesPerSetter[setter.hashCode()] = AttributeTypesForSetter(listOf(parameter.describedType))
-        if (ensureGetterCanBeResolved(attribute, setter)) {
+        return if (ensureGetterCanBeResolved(attribute, setter, parameter.index)) {
             attributes[attribute.name] = attribute
             setters[setter.hashCode()] = setter
+            attribute
         } else {
-            setter.attributeToParameter.remove(attributeName)
+            null
         }
     }
 
-    private fun ensureGetterCanBeResolved(attribute: Attribute, setter: Setter): Boolean {
-        return attrManager.canResolveGetter(attribute, setter)
+    private fun ensureGetterCanBeResolved(attribute: Attribute, setter: Setter, parameterIndex: Int): Boolean {
+        return attrManager.canResolveGetter(attribute, setter, parameterIndex)
     }
 
     private fun isEachParameterMapped(setters: Map<Int, Setter>): Boolean {
         setters.values.forEach {setter ->
-            if (setter.parameters.size != setter.attributeToParameter.size) {
+            if (setter.parameters.size != setter.callSignatureMaps.size(attributes.values.first())) {
                 return false
             }
         }

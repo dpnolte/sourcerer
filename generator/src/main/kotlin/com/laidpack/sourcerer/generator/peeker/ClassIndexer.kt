@@ -59,6 +59,7 @@ object ClassIndexer {
                                 val indexedClass = ClassRegistry.add(
                                         targetClassName,
                                         hashCode,
+                                        classOrInterfaceDeclaration.isNestedType,
                                         indexedFile,
                                         indexedPackage
                                 )
@@ -186,6 +187,7 @@ class IndexedClass(
 
     var classCategory by xdLink0_1(XdClassCategory)
     var isViewGroup by xdBooleanProp()
+    var isNestedType by xdBooleanProp ()
     var resolvedClassSymbol by xdBooleanProp ()
     var resolvedWidgetSymbol by xdBooleanProp ()
     var nodeHashCode: Int by xdRequiredIntProp(unique = true)

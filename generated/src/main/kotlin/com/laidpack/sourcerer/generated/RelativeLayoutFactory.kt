@@ -4,13 +4,11 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.widget.RelativeLayout
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class RelativeLayoutFactory<TView : RelativeLayout, TAttributes : RelativeLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "relativeLayout"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = RelativeLayout(context)
 
@@ -21,7 +19,7 @@ open class RelativeLayoutFactory<TView : RelativeLayout, TAttributes : RelativeL
     ) {
         super.init(view, context, attributes)
         if (view is RelativeLayout) {
-            view.init {
+            view.apply {
                 if (Build.VERSION.SDK_INT >= 16) {
                     attributes.gravity?.let {
                         if (gravity != it) {
@@ -34,9 +32,7 @@ open class RelativeLayoutFactory<TView : RelativeLayout, TAttributes : RelativeL
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(RelativeLayoutFactory<RelativeLayout, RelativeLayoutAttributes>())
-        }
+        const val elementType: String = "relativeLayout"
 
         inline operator fun <reified TView : RelativeLayout, reified TAttributes : RelativeLayoutAttributes> invoke() = RelativeLayoutFactory(TView::class.java, TAttributes::class.java)
     }

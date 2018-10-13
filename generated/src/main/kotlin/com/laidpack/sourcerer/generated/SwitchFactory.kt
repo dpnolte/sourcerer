@@ -7,14 +7,12 @@ import android.view.View
 import android.widget.Switch
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
-import com.laidpack.sourcerer.service.api.toPorterDuffMode
+import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
 open class SwitchFactory<TView : Switch, TAttributes : SwitchAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ButtonFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "switch"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = Switch(context)
 
@@ -25,7 +23,7 @@ open class SwitchFactory<TView : Switch, TAttributes : SwitchAttributes>(instanc
     ) {
         super.init(view, context, attributes)
         if (view is Switch) {
-            view.init {
+            view.apply {
                 attributes.textOn?.let {
                     if (textOn != it) {
                         textOn = it
@@ -108,9 +106,7 @@ open class SwitchFactory<TView : Switch, TAttributes : SwitchAttributes>(instanc
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(SwitchFactory<Switch, SwitchAttributes>())
-        }
+        const val elementType: String = "switch"
 
         inline operator fun <reified TView : Switch, reified TAttributes : SwitchAttributes> invoke() = SwitchFactory(TView::class.java, TAttributes::class.java)
     }

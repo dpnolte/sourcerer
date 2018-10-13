@@ -93,7 +93,7 @@ class AndroidWidgetParser : WidgetConnoisseur {
 
     override fun getDependencies(widget: Widget): List<String> {
         return listOf(
-                "project(\":service\")"
+                "project(\":services\")"
         )
     }
 }
@@ -128,7 +128,7 @@ class MaterialDesignWidgetParser : WidgetConnoisseur {
     override fun getDependencies(widget: Widget): List<String> {
         return listOf(
                 "com.google.android.material:material:\$materialDesign",
-                "project(\":service\")",
+                "project(\":services\")",
                 "project(\":generated\")",
                 "project(\":generated-cardview\")"
         )
@@ -201,7 +201,7 @@ class SupportWidgetParser : WidgetConnoisseur {
         }
         val dependencies = mutableListOf(
                 "${libInfo.module}:${libInfo.name}:\$$version",
-                "project(\":service\")",
+                "project(\":services\")",
                 "project(\":generated\")"
         )
         if (libInfo.name == "leanback") {
@@ -280,7 +280,8 @@ class Widget (entity: Entity) : XdEntity(entity) {
 class WidgetRegistry(
         private val env: SourcererEnvironment,
         parsersList: List<WidgetConnoisseur>
-) {
+): Iterable<Widget> {
+
     val paths = parsersList.map { it.paths }.flatten()
     private val parsers = paths.associate { path ->
         Pair(path, parsersList.first { it.paths.contains(path) })
@@ -291,7 +292,7 @@ class WidgetRegistry(
         }
     }
 
-    operator fun iterator(): Iterator<Widget> {
+    override operator fun iterator(): Iterator<Widget> {
         return widgets.iterator()
     }
 

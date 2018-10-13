@@ -14,6 +14,7 @@ class GetterFlow (
         private val interpreter: GetterFlowInterpreter,
         private val potentialGetter: MethodInfo,
         private val field: FieldDeclaration,
+        private val variableName: String,
         private val conditions: Map<String, String>,
         private val attribute: Attribute,
         val classInfo: ClassInfo
@@ -23,7 +24,7 @@ class GetterFlow (
     var conditionCount = 0
         private set
 
-    private val variableName = field.variables.first().nameAsString
+
 
     fun getFieldFromStatement(statement: Statement): NameExpr? {
         val nameExpressions = statement.descendantsOfType(NameExpr::class.java)

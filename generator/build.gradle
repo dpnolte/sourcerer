@@ -21,6 +21,8 @@ dependencies {
     api 'com.github.dpnolte.ts-rhymer:annotation:0.1'
     // lint
     implementation "com.android.tools.lint:lint:$lintVersion"
+    // colored print
+    implementation 'com.github.ajalt:mordant:1.2.0'
 
 }
 

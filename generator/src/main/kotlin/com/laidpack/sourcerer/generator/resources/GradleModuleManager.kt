@@ -15,16 +15,19 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
         val parser = widgetRegistry[widget]
         val moduleName = parser.getModuleName(widget)
         val sourcePath = env.rootPath.resolve("$moduleName/src/main/kotlin")
+        val flagFilePath = env.rootPath.resolve("$moduleName/$generatedFlagFileName")
         if (!sourcePath.toFile().exists()) {
             generateModule(moduleName, parser.getDependencies(widget))
             updatedModules.add(moduleName)
         } else if (!updatedModules.contains(moduleName)) {
-            // always update gradle build file & pro guard rules
+            // always update gradle build file, pro guard rules
             val modulePath = getModulePath(moduleName)
             generateBuildGradleFile(modulePath, parser.getDependencies(widget))
             generateProguardRulesFile(modulePath)
             updatedModules.add(moduleName)
         }
+        // always create flag file
+        findOrCreateFile(flagFilePath)
         return sourcePath.toFile()
     }
 
@@ -112,6 +115,10 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
         if (!content.contains(moduleEntry)) {
             settingsGradleFile.writeText("$content,\n\t\t$moduleEntry")
         }
+    }
+
+    companion object {
+        const val generatedFlagFileName = ".generated"
     }
 
 }

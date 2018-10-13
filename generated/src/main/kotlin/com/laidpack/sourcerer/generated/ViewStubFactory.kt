@@ -3,13 +3,11 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.View
 import android.view.ViewStub
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class ViewStubFactory<TAttributes : ViewStubAttributes>(attributesType: Class<TAttributes>) : ViewFactory<ViewStub, TAttributes>(ViewStub::class.java, attributesType) {
-    override val elementName: String = "viewStub"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = ViewStub(context)
 
@@ -20,7 +18,7 @@ open class ViewStubFactory<TAttributes : ViewStubAttributes>(attributesType: Cla
     ) {
         super.init(view, context, attributes)
         if (view is ViewStub) {
-            view.init {
+            view.apply {
                 attributes.layout?.let {
                     if (layoutResource != it) {
                         layoutResource = it
@@ -36,9 +34,7 @@ open class ViewStubFactory<TAttributes : ViewStubAttributes>(attributesType: Cla
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(ViewStubFactory<ViewStubAttributes>())
-        }
+        const val elementType: String = "viewStub"
 
         inline operator fun <reified TAttributes : ViewStubAttributes> invoke() = ViewStubFactory(TAttributes::class.java)
     }

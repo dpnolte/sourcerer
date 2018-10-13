@@ -6,7 +6,7 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.laidpack.sourcerer"
+        applicationId "com.laidpack.sourcerer.stub"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -45,6 +45,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$androidX"
     implementation "androidx.car:car:$androidXcar"
     implementation "androidx.cardview:cardview:$androidX"
+    implementation "androidx.constraintlayout:constraintlayout:$androidXconstraintlayout"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidX"
     implementation "androidx.core:core:$androidX"
     implementation "androidx.drawerlayout:drawerlayout:$androidX"
@@ -62,7 +63,7 @@ dependencies {
     implementation "androidx.viewpager:viewpager:$androidX"
     implementation "androidx.wear:wear:$androidX"
     //api project(path: ":service", configuration: 'default')
-    releaseImplementation project(":service")
+    releaseImplementation project(':services')
 
 }
 

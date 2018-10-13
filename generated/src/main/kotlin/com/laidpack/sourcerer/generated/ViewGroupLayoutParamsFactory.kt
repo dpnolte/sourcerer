@@ -2,14 +2,12 @@ package com.laidpack.sourcerer.generated
 
 import android.content.Context
 import android.view.ViewGroup
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.BaseLayoutParamsFactory
-import com.laidpack.sourcerer.service.api.init
+import com.laidpack.sourcerer.services.api.BaseLayoutParamsFactory
 import java.lang.Class
 import kotlin.String
 
 open class ViewGroupLayoutParamsFactory<TLayoutParams : ViewGroup.LayoutParams, TAttributes : ViewGroupLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : BaseLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "android.view.ViewGroup.LayoutParams"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
 
@@ -18,7 +16,7 @@ open class ViewGroupLayoutParamsFactory<TLayoutParams : ViewGroup.LayoutParams, 
         context: Context,
         attributes: TAttributes
     ) {
-        layoutParams.init {
+        layoutParams.apply {
             attributes.layout_width?.let {
                 if (it.value != width) {
                     width = it.value
@@ -33,9 +31,7 @@ open class ViewGroupLayoutParamsFactory<TLayoutParams : ViewGroup.LayoutParams, 
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(ViewGroupLayoutParamsFactory<ViewGroup.LayoutParams, ViewGroupLayoutParamsAttributes>())
-        }
+        const val elementType: String = "android.view.ViewGroup.LayoutParams"
 
         inline operator fun <reified TLayoutParams : ViewGroup.LayoutParams, reified TAttributes : ViewGroupLayoutParamsAttributes> invoke() = ViewGroupLayoutParamsFactory(TLayoutParams::class.java, TAttributes::class.java)
     }

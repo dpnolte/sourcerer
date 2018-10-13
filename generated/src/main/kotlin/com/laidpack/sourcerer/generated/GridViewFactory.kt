@@ -4,13 +4,11 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.widget.GridView
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AdapterViewFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "gridView"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = GridView(context)
 
@@ -21,7 +19,7 @@ open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(i
     ) {
         super.init(view, context, attributes)
         if (view is GridView) {
-            view.init {
+            view.apply {
                 attributes.stretchMode?.let {
                     if (stretchMode != it.value) {
                         stretchMode = it.value
@@ -59,9 +57,7 @@ open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(i
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(GridViewFactory<GridView, GridViewAttributes>())
-        }
+        const val elementType: String = "gridView"
 
         inline operator fun <reified TView : GridView, reified TAttributes : GridViewAttributes> invoke() = GridViewFactory(TView::class.java, TAttributes::class.java)
     }

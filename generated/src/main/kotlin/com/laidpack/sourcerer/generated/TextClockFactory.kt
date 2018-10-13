@@ -4,13 +4,11 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.widget.TextClock
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class TextClockFactory<TView : TextClock, TAttributes : TextClockAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : TextViewFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "textClock"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View {
         if (Build.VERSION.SDK_INT >= 17) {
@@ -29,7 +27,7 @@ open class TextClockFactory<TView : TextClock, TAttributes : TextClockAttributes
         super.init(view, context, attributes)
         if (Build.VERSION.SDK_INT >= 17) {
             if (view is TextClock) {
-                view.init {
+                view.apply {
                     attributes.format12Hour?.let {
                         if (format12Hour != it) {
                             format12Hour = it
@@ -51,9 +49,7 @@ open class TextClockFactory<TView : TextClock, TAttributes : TextClockAttributes
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(TextClockFactory<TextClock, TextClockAttributes>())
-        }
+        const val elementType: String = "textClock"
 
         inline operator fun <reified TView : TextClock, reified TAttributes : TextClockAttributes> invoke() = TextClockFactory(TView::class.java, TAttributes::class.java)
     }

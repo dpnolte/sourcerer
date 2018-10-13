@@ -170,6 +170,7 @@ class ClassRegistry(
         fun add(
                 className: ClassName,
                 nodeHashCode: Int,
+                isNestedType: Boolean,
                 indexedFile: IndexedFile,
                 providedPackage: IndexedPackage
         ): IndexedClass {
@@ -178,6 +179,7 @@ class ClassRegistry(
                 indexedClass.canonicalName = className.canonicalName
                 indexedClass.simpleName = className.simpleName
                 indexedClass.nodeHashCode = nodeHashCode
+                indexedClass.isNestedType = isNestedType
                 indexedClass.file = indexedFile
                 indexedClass.indexedPackage = providedPackage
                 indexedClass.resolvedClassSymbol = false

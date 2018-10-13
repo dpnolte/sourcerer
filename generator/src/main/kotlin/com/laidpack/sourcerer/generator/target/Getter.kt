@@ -39,6 +39,8 @@ data class Getter(
     val hasResolvedType: Boolean
         get() = mutableResolvedType != null
 
+    val setterHashCodes = mutableSetOf<Int>()
+
     override fun hashCode(): Int {
         return Objects.hash(
                 name,
@@ -62,6 +64,7 @@ data class Getter(
                     it.toEntity(xdGetter)
                 }
         )
+        xdGetter.setterHashCodes = this.setterHashCodes
         return xdGetter
     }
 
@@ -99,6 +102,7 @@ class XdGetter(entity: Entity) : XdEntity(entity) {
     var typeNameAsString by xdStringProp()
     var resolvedTypeAsString by xdStringProp()
     var attribute : XdAttribute by xdParent(XdAttribute::getters)
+    var setterHashCodes by xdSetProp<XdGetter, Int>()
 
     fun toSnapshot(transaction: Boolean = true): Getter {
         val block = {
@@ -117,6 +121,7 @@ class XdGetter(entity: Entity) : XdEntity(entity) {
             if (resolvedTypeAsString != null) {
                 getter.mutableResolvedType = ClassName.bestGuess(this.resolvedTypeAsString as String)
             }
+            getter.setterHashCodes.addAll(this.setterHashCodes)
             getter
         }
         return if(transaction) Store.transactional { block() } else block()

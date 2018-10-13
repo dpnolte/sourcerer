@@ -1,6 +1,5 @@
 package com.laidpack.sourcerer.generator.generators.delegates
 
-import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.target.CodeBlock
 import com.laidpack.sourcerer.generator.target.Setter
 import com.laidpack.sourcerer.generator.generators.delegates.statements.*
@@ -13,7 +12,7 @@ class SingleAttributeAndSingleSetterGenerator(attributesParam: ParameterSpec, co
     private val typesForThisSetter = attribute.typesForFirstSetter
     private val isMultiFormatted = attribute.formats.size > 1
     private val delegate = this
-
+    private val parameterIndex = setter.callSignatureMaps[attribute]
 
     fun addCodeBlockToBuilder(builder : FunSpec.Builder) {
         val typesPerSetter = attribute.resolvedTypesPerSetter(codeBlock.setter.hashCode())
@@ -34,7 +33,7 @@ class SingleAttributeAndSingleSetterGenerator(attributesParam: ParameterSpec, co
         }
         BeginIfAnyValueIsDifferentThanCurrent(this, attributesParam)
                 .addAsIf(builder, attribute, setter, typesForThisSetter, valueLiteral)
-        builder.addSetter(attribute, setter, valueLiteral)
+        builder.addSetter(setter, valueLiteral)
         builder.endControlFlow() // ends if value not equal to current
         builder.endControlFlow() // ends if not null
 
@@ -51,7 +50,7 @@ class SingleAttributeAndSingleSetterGenerator(attributesParam: ParameterSpec, co
         return this
     }
 
-    private fun FunSpec.Builder.addSetter(attribute: Attribute, setter: Setter, valueLiteral: String): FunSpec.Builder {
+    private fun FunSpec.Builder.addSetter(setter: Setter, valueLiteral: String): FunSpec.Builder {
         when {
             setter.hasPropertyName -> {
                 this.addStatement("%N = %L", setter.propertyName, valueLiteral)
@@ -61,10 +60,9 @@ class SingleAttributeAndSingleSetterGenerator(attributesParam: ParameterSpec, co
             }
             setter.parameters.size > 1 -> {
                 var index = 0
-                val attributeParameterIndex = setter.attributeToParameter[attribute.name]
                 val parameters = setter.parameters.joinToString(", ") { parameter ->
                     val result = when {
-                        attributeParameterIndex == index -> valueLiteral
+                        parameterIndex == index -> valueLiteral
                         parameter.defaultValue.isNotBlank() -> parameter.defaultValue
                         parameter.isNullable -> "null"
                         else -> ""

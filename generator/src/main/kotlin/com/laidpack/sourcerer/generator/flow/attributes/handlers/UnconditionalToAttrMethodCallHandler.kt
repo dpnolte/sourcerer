@@ -3,16 +3,17 @@ package com.laidpack.sourcerer.generator.flow.attributes.handlers
 import android.content.Context
 import android.content.res.Resources
 import android.content.res.TypedArray
-import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.VariableDeclarator
 import com.github.javaparser.ast.expr.AssignExpr
 import com.github.javaparser.ast.expr.FieldAccessExpr
 import com.github.javaparser.ast.expr.MethodCallExpr
 import com.github.javaparser.ast.expr.NameExpr
 import com.github.javaparser.resolution.UnsolvedSymbolException
+import com.laidpack.sourcerer.generator.ancestorsOfType
 import com.laidpack.sourcerer.generator.firstAncestorOfType
 import com.laidpack.sourcerer.generator.firstDescendantOfType
 import com.laidpack.sourcerer.generator.flow.attributes.AttributeFlow
+import com.laidpack.sourcerer.generator.flow.attributes.AttributeInSource
 import com.laidpack.sourcerer.generator.flow.attributes.BaseAttributesHandler
 import com.laidpack.sourcerer.generator.peeker.MethodInfo
 
@@ -20,17 +21,26 @@ internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAt
     override val handler = ::onCurrentClassMethodCallUnconditionalToAttr
 
     private fun onCurrentClassMethodCallUnconditionalToAttr(node: MethodCallExpr): Boolean {
+        var canContinue = true
         if (!flow.isConditionalToAttribute) {
-            return when {
-                flow.classInfo.isMethodCallFromThisClass(node) && isTypedArrayOneOfTheArguments(node) -> handleAttributeDelegateMethod(node)
-                flow.classInfo.isPublicMethodCallFromThisClass(node) -> handleSetterCall(node)
-                isMethodCallToObtainStyleAttributes(node) -> handleObtainStyleAttributes(node)
-                isMethodCallOnTypedArray(node) -> handleMethodCallOnTypedArray(node)
-                else -> true
+            canContinue = if (flow.classInfo.isMethodCallFromThisClass(node) && isTypedArrayOneOfTheArguments(node)) {
+                handleAttributeDelegateMethod(node)
+            }
+            else if (flow.classInfo.isPublicMethodCallFromThisClass(node)) {
+                handleSetterCall(node)
+            }
+            else if (isMethodCallToObtainStyleAttributes(node)) {
+                handleObtainStyleAttributes(node)
+            }
+            else if (isMethodCallOnTypedArray(node)) {
+                handleMethodCallOnTypedArray(node)
+            }
+            else {
+                true
             }
         }
 
-        return true
+        return canContinue
     }
 
     private fun handleSetterCall(node: MethodCallExpr): Boolean {
@@ -138,37 +148,72 @@ internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAt
 
     private fun handleGetResourceValueCall(node: MethodCallExpr) {
         val resourceIds = getResourceIdsFromArguments(node)
+        val attributesUsedInCall = mutableListOf<AttributeInSource>()
         resourceIds.values.forEach {
             flow.addAttribute(it)
             val attribute = flow.getAttributeByResourceId(it)
             flow.setTypedArrayGetterForAttribute(node, attribute)
-            val assignedVariableName = getAssignedVariableName(node)
-            if (assignedVariableName != null) {
-                // clear any previous variables being derived to
-                flow.addVariableAsDerivedFromAttribute(assignedVariableName, node, attribute)
-            } else {
+            attributesUsedInCall.add(attribute)
+        }
+        val attributeNames = attributesUsedInCall.map { it.name }
+        attributesUsedInCall.forEach { attribute ->
+            // check if attr is assigned to public member field
+            val assignExpressions = node.ancestorsOfType(AssignExpr::class.java)
+            var attributeIsAssignedToField = false
+            for (assignExpr in assignExpressions) {
+                val target = assignExpr.target
+                when {
+                    target is NameExpr && flow.isPublicField(target.nameAsString) -> {
+                        flow.addSetterToAttribute(
+                                flow.getField(target.nameAsString ),
+                                attribute
+                        )
+                        attributeIsAssignedToField = true
+                    }
+                    target is FieldAccessExpr
+                            && target.scope.isThisExpr
+                            && flow.isPublicField(target.nameAsString)-> {
+                        flow.addSetterToAttribute(
+                                flow.getField(target.nameAsString ),
+                                attribute
+                        )
+                        attributeIsAssignedToField = true
+                    }
+                }
+            }
+            if (!attributeIsAssignedToField) {
+                // check if attr is assigned with method call
                 val parentCall = node.firstAncestorOfType(MethodCallExpr::class.java)
                 if (parentCall != null && flow.classInfo.isPublicMethodCallFromThisClass(parentCall)) {
                     val parameterIndex = parentCall.arguments.indexOfFirst { arg ->
                         arg.firstDescendantOfType(MethodCallExpr::class.java) == node
                     }
-                    flow.addSetterToAttribute(parentCall, parameterIndex, attribute)
+                    flow.addSetterToAttribute(parentCall, parameterIndex, attributeNames, attribute)
+                } else {
+                    val assignedVariableNames = getAnyAssignedVariableNames(node)
+                    for (assignedVariableName in assignedVariableNames) {
+                        flow.addVariableAsDerivedFromAttribute(assignedVariableName, node, attribute)
+                    }
                 }
 
             }
         }
     }
 
-    private fun getAssignedVariableName(node: MethodCallExpr): String? {
+    private fun getAnyAssignedVariableNames(node: MethodCallExpr): List<String> {
         val variableDeclarator = node.firstAncestorOfType(VariableDeclarator::class.java)
         if (variableDeclarator != null) {
-            return variableDeclarator.nameAsString
+            return listOf(variableDeclarator.nameAsString)
         }
-        val assignExpr = node.firstAncestorOfType(AssignExpr::class.java)
-        if (assignExpr != null && assignExpr.target is NameExpr) {
-            return assignExpr.target.asNameExpr().nameAsString
+        val assignExpressions = node.ancestorsOfType(AssignExpr::class.java)
+        val variablesNames = mutableListOf<String>()
+        for (assignExpr in assignExpressions) {
+            val target = assignExpr.target
+            if (target is NameExpr) {
+                variablesNames.add(target.nameAsString)
+            }
         }
-        return null
+        return variablesNames
     }
 
     private fun handleObtainStyleAttributes(node: MethodCallExpr): Boolean {

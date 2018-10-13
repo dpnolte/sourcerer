@@ -7,7 +7,7 @@ import com.laidpack.sourcerer.generator.peeker.ClassRegistry
 import com.laidpack.sourcerer.generator.peeker.TypedArrayInfo
 
 interface Interpreter {
-    fun interpret(): InterpretationResult
+    fun interpret(earlierIdentifiedSetters: Map<Int, Setter>): InterpretationResult
 }
 
 interface InterpreterFactory {
@@ -20,7 +20,10 @@ interface InterpreterFactory {
 }
 
 data class Interpretation(val attributes: Map<String, Attribute>, val setters: Map<Int, Setter>)
-data class InterpretationResult (val name: String, val interpretations: List<Interpretation>) {
+data class InterpretationResult (
+        val name: String,
+        val interpretations: List<Interpretation>
+) {
     val identified = interpretations.sumBy { it.attributes.size }
     var identifiedNew = 0
     var resolved = 0

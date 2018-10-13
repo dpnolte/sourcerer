@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import com.github.javaparser.JavaParser
 import com.github.javaparser.ast.body.*
 import com.github.javaparser.ast.body.Parameter
+import com.github.javaparser.ast.expr.AnnotationExpr
 import com.github.javaparser.javadoc.Javadoc
 import com.github.javaparser.javadoc.description.JavadocDescription
 import com.laidpack.sourcerer.generator.*
@@ -21,6 +22,7 @@ class SourcePeeker(
         val constructorDeclarations = mutableMapOf<String, MutableList<ConstructorInfo>>()
         val methodDeclarations = mutableMapOf<String, MutableList<MethodInfo>>()
         val fieldDeclarations = mutableMapOf<String, FieldDeclaration>()
+        var intDefinedAnnotations = mapOf<String, AnnotationExpr>()
 
         // only analyze class body if we have an associated widget and any attributes defined
         val classDeclaration = resolvedClass.classDeclarationProvider()
@@ -50,6 +52,8 @@ class SourcePeeker(
                         }
                     }
                 }
+                intDefinedAnnotations = getIntDefinedAnnotations(classDeclaration)
+
             }
 
             return ClassInfo(
@@ -69,12 +73,12 @@ class SourcePeeker(
                     fieldDeclarations,
                     getConstructorExpression(resolvedClass.classCategory, classDeclaration, constructorDeclarations),
                     resolvedClass.indexedClass,
-                    classDeclaration.annotations.toList()
+                    classDeclaration.annotations.toList(),
+                    intDefinedAnnotations
             )
         }
 
         return null
-
     }
 
     private fun getConstructorExpression(
@@ -207,6 +211,18 @@ class SourcePeeker(
     private fun isParameterTypeNameEqualToAttributeSet(parameter: Parameter): Boolean {
         return parameter.type.isClassOrInterfaceType
                 && parameter.type.asClassOrInterfaceType().nameAsString == attributeSetClassType.simpleName
+    }
+
+    private fun getIntDefinedAnnotations(classDeclaration: ClassOrInterfaceDeclaration): Map<String, AnnotationExpr> {
+        val intDefinedAnnotations = mutableMapOf<String, AnnotationExpr>()
+        val annotationsExpressions = classDeclaration.descendantsOfType(AnnotationExpr::class.java)
+        for (annotationExpression in annotationsExpressions) {
+            if (annotationExpression.nameAsString == "IntDef") {
+                val declaration = annotationExpression.firstAncestorOfType(AnnotationDeclaration::class.java) as AnnotationDeclaration
+                intDefinedAnnotations[declaration.nameAsString] = annotationExpression
+            }
+        }
+        return intDefinedAnnotations
     }
 
 

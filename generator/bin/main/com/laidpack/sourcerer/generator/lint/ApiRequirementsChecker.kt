@@ -24,8 +24,6 @@ class ApiRequirementsChecker(env: SourcererEnvironment, private val classRegistr
         }
     }
     fun checkMinApiRequirements(classInfo: ClassInfo, codeBlocks : List<CodeBlock>): ClassApiRequirements {
-        if (!classInfo.hasResolvedAttributes) throw IllegalArgumentException("Class ${classInfo.targetClassName} has not yet resolved attributes")
-
         val classMinApiLevel = apiDetector.getClassVersion(classInfo)
         val fallbackClassName = getFallbackClassNameIfNeeded(classInfo, classMinApiLevel)
         val codeBlockMinApiLevelList = mutableListOf<Int>()
@@ -65,7 +63,7 @@ class ApiRequirementsChecker(env: SourcererEnvironment, private val classRegistr
 
         fun assignMinApiLevelRequirementsToCodeBlocks(codeBlocks: List<CodeBlock>) {
             if (codeBlockMinApiLevelList.size != codeBlocks.size) {
-                throw IllegalArgumentException("Number of code block api requirements doesn't match up with number of code blocks in provided list")
+                throw IllegalArgumentException("Number of code block api requirements doesn't match up with number of code blocks in provided attributesToParameters")
             }
             codeBlocks.forEachIndexed { index, codeBlock ->
                 codeBlock.minimumApiLevel = codeBlockMinApiLevelList[index]

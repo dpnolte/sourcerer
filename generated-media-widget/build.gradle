@@ -46,6 +46,6 @@ dependencies {
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
     api 'com.github.dpnolte.ts-rhymer:annotation:0.1'
 	implementation "androidx.media:media-widget:$androidXmediaWidget"
-	implementation project(":service")
+	implementation project(":services")
 	implementation project(":generated")
 }

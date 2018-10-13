@@ -4,13 +4,11 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.widget.ViewAnimator
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class ViewAnimatorFactory<TView : ViewAnimator, TAttributes : ViewAnimatorAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "viewAnimator"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = ViewAnimator(context)
 
@@ -21,7 +19,7 @@ open class ViewAnimatorFactory<TView : ViewAnimator, TAttributes : ViewAnimatorA
     ) {
         super.init(view, context, attributes)
         if (view is ViewAnimator) {
-            view.init {
+            view.apply {
                 if (Build.VERSION.SDK_INT >= 17) {
                     attributes.animateFirstView?.let {
                         if (animateFirstView != it) {
@@ -34,9 +32,7 @@ open class ViewAnimatorFactory<TView : ViewAnimator, TAttributes : ViewAnimatorA
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(ViewAnimatorFactory<ViewAnimator, ViewAnimatorAttributes>())
-        }
+        const val elementType: String = "viewAnimator"
 
         inline operator fun <reified TView : ViewAnimator, reified TAttributes : ViewAnimatorAttributes> invoke() = ViewAnimatorFactory(TView::class.java, TAttributes::class.java)
     }

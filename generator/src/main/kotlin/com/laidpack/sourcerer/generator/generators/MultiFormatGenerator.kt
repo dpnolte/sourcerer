@@ -4,7 +4,6 @@ import com.laidpack.annotation.TypeScript
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 import com.squareup.kotlinpoet.*
-import com.squareup.moshi.JsonClass
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -130,7 +129,11 @@ class MultiFormatGenerator {
                 .returns(
                         SortedMap::class.asTypeName().parameterizedBy(
                                 FormatEnumGenerator.formatEnumClassName,
-                                JsonAdapter::class.asTypeName().parameterizedBy(WildcardTypeName.STAR)
+                                LambdaTypeName.get(
+                                        null,
+                                        listOf(),
+                                        JsonAdapter::class.asTypeName().parameterizedBy(WildcardTypeName.STAR)
+                                )
                         )
                 )
         val sortedFormats = formats.sortedWith (
@@ -146,15 +149,15 @@ class MultiFormatGenerator {
         sortedFormats.forEachIndexed { index, format ->
             val typeName = format.toClass().asTypeName()
             val paramFormat = if (format.requiresQualifier) {
-                "%T::class.java, %T::class.java"
-            } else "%T::class.java"
+                "%T::class.javaObjectType, %T::class.java"
+            } else "%T::class.javaObjectType"
 
             val comma = if (index < formats.lastIndex) "," else ""
-            code +=  "\t\t\t%T.%N to %N.adapter<%T>($paramFormat) as %T$comma\n"
+            code +=  "\t\t\t%T.%N to {%N.adapter<%T>($paramFormat) as %T}$comma\n"
             args.add(FormatEnumGenerator.formatEnumClassName)
             args.add(format.name)
             args.add(moshiParameterName)
-            args.add(typeName)
+            args.add(typeName.asNullable())
             if (format.requiresQualifier) {
                 args.add(typeName)
                 args.add(format.toQualifierAnnotationClassName())
@@ -175,7 +178,7 @@ class MultiFormatGenerator {
 
 
     companion object {
-        val multiFormatClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "MultiFormat")
-        val multiFormatQualifierClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "MultiFormatQualifier")
+        val multiFormatClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "MultiFormat")
+        val multiFormatQualifierClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "MultiFormatQualifier")
     }
 }

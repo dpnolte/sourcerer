@@ -18,6 +18,7 @@ open class Attribute(
         val enumValues: MutableList<StyleableAttributeEnumValue> = mutableListOf(),
         var resolvedStatus: ResolvedStatus = ResolvedStatus.NONE
 ) {
+    var resolvedByInterpreter: String = "None"
     var localVariableName = ""
     val setterHashCodes = mutableSetOf<Int>()
     val typesPerSetter = mutableMapOf<Int /* setter hash code */, AttributeTypesForSetter>()
@@ -34,6 +35,8 @@ open class Attribute(
             if (getters.size != 1) throw IllegalStateException(if (getters.size == 0) "There are no getters" else "There are multiple getters")
             return getters.first()
         }
+
+    var oneFormatRequiresMultipleSetters = false
 
     val formatsUsedBySetters : Set<StyleableAttributeFormat>
         get () {

@@ -4,12 +4,11 @@ import android.content.Context
 import android.os.Build
 import android.view.ViewGroup
 import android.widget.Toolbar
-import com.laidpack.sourcerer.service.InflaterComponent
 import java.lang.Class
 import kotlin.String
 
 open class ToolbarLayoutParamsFactory<TLayoutParams : Toolbar.LayoutParams, TAttributes : ToolbarLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "android.widget.Toolbar.LayoutParams"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams {
         if (Build.VERSION.SDK_INT >= 21) {
@@ -21,9 +20,7 @@ open class ToolbarLayoutParamsFactory<TLayoutParams : Toolbar.LayoutParams, TAtt
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(ToolbarLayoutParamsFactory<Toolbar.LayoutParams, ToolbarLayoutParamsAttributes>())
-        }
+        const val elementType: String = "android.widget.Toolbar.LayoutParams"
 
         inline operator fun <reified TLayoutParams : Toolbar.LayoutParams, reified TAttributes : ToolbarLayoutParamsAttributes> invoke() = ToolbarLayoutParamsFactory(TLayoutParams::class.java, TAttributes::class.java)
     }

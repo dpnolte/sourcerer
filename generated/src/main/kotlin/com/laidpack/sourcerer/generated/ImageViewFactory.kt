@@ -8,15 +8,12 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
-import com.laidpack.sourcerer.service.api.toPorterDuffMode
-import com.laidpack.sourcerer.service.api.toScaleType
+import com.laidpack.sourcerer.services.api.toScaleType
 import java.lang.Class
 import kotlin.String
 
 open class ImageViewFactory<TView : ImageView, TAttributes : ImageViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "imageView"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = ImageView(context)
 
@@ -27,7 +24,7 @@ open class ImageViewFactory<TView : ImageView, TAttributes : ImageViewAttributes
     ) {
         super.init(view, context, attributes)
         if (view is ImageView) {
-            view.init {
+            view.apply {
                 if (attributes.src.hasColor || attributes.src.hasReference) {
                     val immutableSrc = when {
                         attributes.src.hasColor -> ColorDrawable(attributes.src.color)
@@ -87,21 +84,13 @@ open class ImageViewFactory<TView : ImageView, TAttributes : ImageViewAttributes
                             imageTintList = immutableTint
                         }
                     }
-                    attributes.tintMode?.let {
-                        val immutableTintMode = it.toPorterDuffMode()
-                        if (imageTintMode != immutableTintMode) {
-                            imageTintMode = immutableTintMode
-                        }
-                    }
                 }
             }
         }
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(ImageViewFactory<ImageView, ImageViewAttributes>())
-        }
+        const val elementType: String = "imageView"
 
         inline operator fun <reified TView : ImageView, reified TAttributes : ImageViewAttributes> invoke() = ImageViewFactory(TView::class.java, TAttributes::class.java)
     }

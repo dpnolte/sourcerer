@@ -1,22 +1,17 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
-import com.laidpack.sourcerer.service.api.toPorterDuffMode
-import com.laidpack.sourcerer.service.api.toTruncateAt
+import com.laidpack.sourcerer.services.api.toPorterDuffMode
+import com.laidpack.sourcerer.services.api.toTruncateAt
 import java.lang.Class
 import kotlin.String
 
 open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "textView"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = TextView(context)
 
@@ -27,7 +22,7 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
     ) {
         super.init(view, context, attributes)
         if (view is TextView) {
-            view.init {
+            view.apply {
                 attributes.text?.let {
                     if (text != it) {
                         text = it
@@ -205,53 +200,6 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                         }
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 17) {
-                    if (attributes.drawableTop.hasColor || attributes.drawableTop.hasReference || attributes.drawableBottom.hasColor || attributes.drawableBottom.hasReference || attributes.drawableLeft.hasColor || attributes.drawableLeft.hasReference || attributes.drawableRight.hasColor || attributes.drawableRight.hasReference) {
-                        val immutableDrawableLeftColor = when {
-                            attributes.drawableLeft.hasColor -> ColorDrawable(attributes.drawableLeft.color)
-                            attributes.drawableLeft.hasReference -> ContextCompat.getDrawable(context, attributes.drawableLeft.reference) as Drawable
-                            else -> compoundDrawables[0]
-                        }
-                        val immutableDrawableLeftReference = when {
-                            attributes.drawableLeft.hasColor -> ColorDrawable(attributes.drawableLeft.color)
-                            attributes.drawableLeft.hasReference -> ContextCompat.getDrawable(context, attributes.drawableLeft.reference) as Drawable
-                            else -> compoundDrawables[0]
-                        }
-                        val immutableDrawableTopColor = when {
-                            attributes.drawableTop.hasColor -> ColorDrawable(attributes.drawableTop.color)
-                            attributes.drawableTop.hasReference -> ContextCompat.getDrawable(context, attributes.drawableTop.reference) as Drawable
-                            else -> compoundDrawablesRelative[1]
-                        }
-                        val immutableDrawableTopReference = when {
-                            attributes.drawableTop.hasColor -> ColorDrawable(attributes.drawableTop.color)
-                            attributes.drawableTop.hasReference -> ContextCompat.getDrawable(context, attributes.drawableTop.reference) as Drawable
-                            else -> compoundDrawablesRelative[1]
-                        }
-                        val immutableDrawableRightColor = when {
-                            attributes.drawableRight.hasColor -> ColorDrawable(attributes.drawableRight.color)
-                            attributes.drawableRight.hasReference -> ContextCompat.getDrawable(context, attributes.drawableRight.reference) as Drawable
-                            else -> compoundDrawables[2]
-                        }
-                        val immutableDrawableRightReference = when {
-                            attributes.drawableRight.hasColor -> ColorDrawable(attributes.drawableRight.color)
-                            attributes.drawableRight.hasReference -> ContextCompat.getDrawable(context, attributes.drawableRight.reference) as Drawable
-                            else -> compoundDrawables[2]
-                        }
-                        val immutableDrawableBottomColor = when {
-                            attributes.drawableBottom.hasColor -> ColorDrawable(attributes.drawableBottom.color)
-                            attributes.drawableBottom.hasReference -> ContextCompat.getDrawable(context, attributes.drawableBottom.reference) as Drawable
-                            else -> compoundDrawablesRelative[3]
-                        }
-                        val immutableDrawableBottomReference = when {
-                            attributes.drawableBottom.hasColor -> ColorDrawable(attributes.drawableBottom.color)
-                            attributes.drawableBottom.hasReference -> ContextCompat.getDrawable(context, attributes.drawableBottom.reference) as Drawable
-                            else -> compoundDrawablesRelative[3]
-                        }
-                        if (compoundDrawables[0] != immutableDrawableLeftReference || compoundDrawablesRelative[1] != immutableDrawableTopReference || compoundDrawables[2] != immutableDrawableRightReference || compoundDrawablesRelative[3] != immutableDrawableBottomReference) {
-                            setCompoundDrawablesWithIntrinsicBounds(immutableDrawableLeftReference, immutableDrawableTopReference, immutableDrawableRightReference, immutableDrawableBottomReference)
-                        }
-                    }
-                }
                 if (Build.VERSION.SDK_INT >= 21) {
                     attributes.letterSpacing?.let {
                         if (letterSpacing != it) {
@@ -332,9 +280,7 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(TextViewFactory<TextView, TextViewAttributes>())
-        }
+        const val elementType: String = "textView"
 
         inline operator fun <reified TView : TextView, reified TAttributes : TextViewAttributes> invoke() = TextViewFactory(TView::class.java, TAttributes::class.java)
     }

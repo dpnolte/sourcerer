@@ -5,7 +5,6 @@ import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.VariableDeclarator
 import com.github.javaparser.ast.expr.*
 import com.github.javaparser.ast.type.Type
-import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration
 import com.laidpack.sourcerer.generator.*
 import com.laidpack.sourcerer.generator.peeker.ClassInfo
 import com.laidpack.sourcerer.generator.peeker.ClassRegistry
@@ -66,7 +65,7 @@ class AttributeFlow (
         private val classRegistry: ClassRegistry
 ) {
     // API:
-    val memberFieldsToAttributes = mutableMapOf<FieldDeclaration, String>()
+    val variablesToAttributes = mutableMapOf<String, String>()
     val typedArrayVariableNames = mutableSetOf<SimpleName>()
     var typedValueVariableName: SimpleName? = null
     private set
@@ -113,7 +112,8 @@ class AttributeFlow (
     private var conditionalToAttributeBeingTrueControlFlowLevel: Int = -1
     private var conditionalToTypeValueControlFlowLevel : Int = -1
 
-    private var currentAttributeName = ""
+    var currentAttributeName = ""
+        private set
 
     private val currentAttribute : AttributeInSource
         get() {
@@ -150,6 +150,9 @@ class AttributeFlow (
     }
     fun injectSetters(flowInterpreter: FlowInMethodInterpreter) {
         flowInterpreter.setters = setters
+    }
+    fun injectVariableNamesToAttributes(flowInterpreter: FlowInMethodInterpreter) {
+        flowInterpreter.variablesToAttributes = variablesToAttributes
     }
 
     fun addVariable(variableDeclarator: VariableDeclarator, initializer: Expression) {
@@ -308,6 +311,15 @@ class AttributeFlow (
         return isConditionalToAttribute && classInfo.isPublicMethodCallFromThisClass(methodCallExpr)
     }
 
+    fun isPublicField(name: String): Boolean {
+        val field = classRegistry.getFieldFromThisClassOrSuperClass(name, classInfo) ?: return false
+        return ClassInfo.isEligibleField(field)
+    }
+    fun getField(name: String): FieldDeclaration {
+        return classRegistry.getFieldFromThisClassOrSuperClass(name, classInfo)
+                ?: throw IllegalArgumentException("No field '$name' in ${classInfo.targetClassName}")
+    }
+
     fun addVariableAsDerivedFromAttribute(variableName: String, methodCallExpr: MethodCallExpr, providedAttribute: AttributeInSource? = null) {
         val attribute = if (providedAttribute != null) providedAttribute else {
             ensureThereIsConditionalAttribute()
@@ -316,7 +328,12 @@ class AttributeFlow (
 
         val fieldMember = classRegistry.getFieldFromThisClassOrSuperClass(variableName, classInfo)
         if (fieldMember != null) {
-            memberFieldsToAttributes[fieldMember] = attribute.name
+            variablesToAttributes[variableName] = attribute.name
+            // for the case, int m1 = m2 = m3 = attr
+            // where each m is a private member that will be mapped to its own setter
+            if (variablesToAttributes.values.count { it == attribute.name } > 1) {
+                attribute.oneFormatRequiresMultipleSetters = true
+            }
         } else {
             attribute.derivedVariables[variableName] = VariableImpact.ASSIGNED
 
@@ -373,7 +390,23 @@ class AttributeFlow (
         }
     }
 
-    fun addSetterToAttribute(methodCallExpr: MethodCallExpr, parameterIndex: Int, providedAttribute: AttributeInSource? = null) {
+    fun addSetterToAttribute(
+            methodCallExpr: MethodCallExpr,
+            parameterIndex: Int,
+            otherAttributeNames: List<String>,
+            providedAttribute: AttributeInSource? = null
+    ) {
+        val setterInfo = classInfo.getMethodInfoByCallExpr(methodCallExpr) as MethodInfo
+        addSetterToAttribute(setterInfo, parameterIndex, otherAttributeNames, providedAttribute, methodCallExpr)
+    }
+
+    fun addSetterToAttribute(
+            setterInfo: MethodInfo,
+            parameterIndex: Int,
+            otherAttributeNames: List<String>,
+            providedAttribute: AttributeInSource? = null,
+            methodCallExpr: MethodCallExpr? = null
+    ) {
         val attribute = if (providedAttribute != null) {
             providedAttribute
         }  else {
@@ -381,11 +414,10 @@ class AttributeFlow (
             currentAttribute
         }
 
-        val setterInfo = classInfo.getMethodInfoByCallExpr(methodCallExpr) as MethodInfo
         val setter = manager.getSetter(setters, setterInfo, methodCallExpr)
         val setterHashCode = setter.hashCode()
         setters[setterHashCode] = setter
-        manager.linkAttributeAndSetter(attribute, setter, parameterIndex)
+        manager.linkAttributeAndSetter(attribute, setter, parameterIndex, otherAttributeNames)
         val typesForThisSetter = manager.getAttributeTypesForSetter(attribute.targetClassNames, attribute.defaultValue, parameterIndex)
         if (attribute.transformingCodes.isNotEmpty()) {
             typesForThisSetter.transformingCode.addAll(attribute.transformingCodes)
@@ -393,7 +425,6 @@ class AttributeFlow (
 
         }
         attribute.typesPerSetter[setterHashCode] = typesForThisSetter
-
     }
 
     // setter is field (e.g., width in ViewGroup.LayoutParams)
@@ -408,7 +439,12 @@ class AttributeFlow (
         val setter = manager.getSetter(setters, fieldDeclaration)
         val setterHashCode = setter.hashCode()
         setters[setterHashCode] = setter
-        manager.linkAttributeAndSetter(attribute, setter, Parameter.UNASSOCIATED_TO_PARAMETER)
+        manager.linkAttributeAndSetter(
+                attribute,
+                setter,
+                Parameter.UNASSOCIATED_TO_PARAMETER,
+                listOf(attribute.name)
+        )
         val typesForThisSetter = manager.getAttributeTypesForSetter(
                 attribute.targetClassNames,
                 attribute.defaultValue,
@@ -426,12 +462,13 @@ class AttributeFlow (
         ensureListIsNotEmpty(variablesNames)
         variablesNames.forEachIndexed { parameterIndex, name ->
             variableNameToAttribute[name]?.let { attributeNames ->
+                val attributeNameList = attributeNames.toList()
                 attributeNames.forEach {
                     val attribute = getAttribute(it)
                     val impact = attribute.derivedVariables[name] as VariableImpact
                     when (impact) {
-                        VariableImpact.ASSIGNED -> addSetterToAttribute(methodCallExpr, parameterIndex, attribute)
-                        VariableImpact.CHAINED -> addSetterToAttribute(methodCallExpr, parameterIndex, attribute)
+                        VariableImpact.ASSIGNED -> addSetterToAttribute(methodCallExpr, parameterIndex, attributeNameList, attribute)
+                        VariableImpact.CHAINED -> addSetterToAttribute(methodCallExpr, parameterIndex, attributeNameList, attribute)
                         // currently unused -->
                         //VariableImpact.IF_TRUE -> addSetterWithTransformingCode(methodCallExpr, variablesNames, attribute)
                         else -> throw IllegalStateException("Could not convert variable impact '$impact' to a setter")
@@ -440,7 +477,7 @@ class AttributeFlow (
             }
         }
     }
-
+/*
     private fun addSetterWithTransformingCode(methodCallExpr: MethodCallExpr, variablesNames: List<String>, attribute: AttributeInSource) {
         ensureListIsNotEmpty(variablesNames)
         variablesNames.forEachIndexed { index, name ->
@@ -467,7 +504,7 @@ class AttributeFlow (
             attribute.targetClassNames.add(transformingCode.toClassNames)
         }
         addSetterToAttribute(methodCallExpr, Parameter.UNASSOCIATED_TO_PARAMETER, attribute)
-    }
+    }*/
 
     fun addAttributesFromArguments(methodCallExpr: MethodCallExpr, resourceIdArguments: Map<Int, String>) {
         val methodInfo = classInfo.getMethodInfoByCallExpr(methodCallExpr) as MethodInfo
@@ -510,7 +547,7 @@ class AttributeFlow (
         return variables[variableName] as Variable
     }
 
-    private fun getAttribute(attributeName: String): AttributeInSource {
+    fun getAttribute(attributeName: String): AttributeInSource {
         ensureAttributeExists(attributeName)
         return attributes[attributeName] as AttributeInSource
     }
@@ -534,7 +571,7 @@ class AttributeFlow (
     }
 
     private fun ensureListIsNotEmpty(list: List<String>) {
-        if (list.isEmpty()) throw IllegalStateException("At least one list item is required")
+        if (list.isEmpty()) throw IllegalStateException("At least one attributesToParameters item is required")
     }
     companion object {
         private val typedArrayCanonicalName = TypedArray::class.java.canonicalName

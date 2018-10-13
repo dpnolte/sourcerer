@@ -6,13 +6,11 @@ import android.os.Build
 import android.view.View
 import android.widget.Toolbar
 import androidx.core.content.ContextCompat
-import com.laidpack.sourcerer.service.InflaterComponent
-import com.laidpack.sourcerer.service.api.init
 import java.lang.Class
 import kotlin.String
 
 open class ToolbarFactory<TView : Toolbar, TAttributes : ToolbarAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
-    override val elementName: String = "toolbar"
+    override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View {
         if (Build.VERSION.SDK_INT >= 21) {
@@ -31,7 +29,7 @@ open class ToolbarFactory<TView : Toolbar, TAttributes : ToolbarAttributes>(inst
         super.init(view, context, attributes)
         if (Build.VERSION.SDK_INT >= 21) {
             if (view is Toolbar) {
-                view.init {
+                view.apply {
                     attributes.title?.let {
                         if (title != it) {
                             title = it
@@ -121,9 +119,7 @@ open class ToolbarFactory<TView : Toolbar, TAttributes : ToolbarAttributes>(inst
     }
 
     companion object {
-        init {
-            InflaterComponent.addFactory(ToolbarFactory<Toolbar, ToolbarAttributes>())
-        }
+        const val elementType: String = "toolbar"
 
         inline operator fun <reified TView : Toolbar, reified TAttributes : ToolbarAttributes> invoke() = ToolbarFactory(TView::class.java, TAttributes::class.java)
     }

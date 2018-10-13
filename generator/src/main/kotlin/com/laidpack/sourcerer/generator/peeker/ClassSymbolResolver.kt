@@ -201,7 +201,7 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
         // if multiple results, it is either:
         // --- in same package
         // --- imported
-        // --- for nested classes only, is class declared in parent's super class
+        // --- nested class declared in parent's super class
 
         fun resolveClassOrInterfaceType(classOrInterfaceType: ClassOrInterfaceType): IndexedClass {
             // is full name specified?
@@ -221,7 +221,7 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
 
         private fun resolveSharedSimpleName(classOrInterfaceType: ClassOrInterfaceType, indexedClasses: List<IndexedClass>): IndexedClass {
             val cu = classOrInterfaceType.findRootNode() as CompilationUnit
-            findAnyNestedClassDeclaredParent(cu, classOrInterfaceType)?.let {
+            findAnyNestedClassDeclaredInSuperOrParent(cu, classOrInterfaceType)?.let {
                 return it
             }
             findAnyImportedClass(cu, classOrInterfaceType, indexedClasses)?.let {
@@ -288,12 +288,22 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
             return null
         }
 
-        private fun findAnyNestedClassDeclaredParent(
+        private fun findAnyNestedClassDeclaredInSuperOrParent(
                 cu: CompilationUnit,
                 classOrInterfaceType: ClassOrInterfaceType
         ): IndexedClass? {
             val classDeclaration =
                     classOrInterfaceType.firstAncestorOfType(ClassOrInterfaceDeclaration::class.java) as ClassOrInterfaceDeclaration
+            // check if the class type is declared as nested class in current target class
+            val directNestedIndexedClass= PackageRegistry.findDirectlyNestedClass(
+                    cu,
+                    classDeclaration,
+                    classOrInterfaceType
+            )
+            if (directNestedIndexedClass != null) {
+                return getIndexedClassFromDeclaration(cu, directNestedIndexedClass.node)
+            }
+
             if (classDeclaration.isNestedType) {
                 val parentClassDeclaration = classDeclaration.firstAncestorOfType(ClassOrInterfaceDeclaration::class.java) as ClassOrInterfaceDeclaration
                 // since we're indexing depth first.. the subclasses of parent should be known (TBC)
@@ -307,6 +317,21 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
                         }
                     }
                 }
+            }
+            // this class is not nested..
+            // but perhaps the class is defined as nested class in the parent's super classes
+            // so many opportunities in our world :-)
+            val indexClass = getIndexedClassFromDeclaration(cu, classDeclaration)
+            for (superClass in ClassRegistry.getSuperClasses(indexClass)) {
+                val superClassDeclaration = superClass.node
+                val targetClassDeclaration = superClassDeclaration.firstDescendantOfType(
+                        ClassOrInterfaceDeclaration::class.java
+                ) { c -> c.name.identifier == classOrInterfaceType.name.identifier }
+                    ?: continue
+                return getIndexedClassFromDeclaration(
+                        targetClassDeclaration.findRootNode() as CompilationUnit,
+                        targetClassDeclaration
+                )
             }
 
             return null

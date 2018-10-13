@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generator
 
 import com.laidpack.sourcerer.generator.flow.attributes.FlowInterpreter
+import com.laidpack.sourcerer.generator.generators.ClassGeneratorManager
 import com.laidpack.sourcerer.generator.javadoc.JavaDocInterpreter
 import com.laidpack.sourcerer.generator.lint.ApiDetector
 import com.laidpack.sourcerer.generator.lint.ApiRequirementsChecker
@@ -11,7 +12,6 @@ import com.squareup.kotlinpoet.ClassName
 import jetbrains.exodus.entitystore.Entity
 import kotlinx.dnq.*
 import kotlinx.dnq.query.*
-import java.io.File
 
 class Sourcerer(
         private val env: SourcererEnvironment,
@@ -47,10 +47,20 @@ class Sourcerer(
             println("\t--retrieved saved result")
         }
         if (result != null) {
-            generateAttributeFile(env.stubAppDir, result)
-            generateFactoryFiles(env.stubAppDir, result, env.minSdkVersion)
+            val generator = ClassGeneratorManager(
+                    env.stubAppDir,
+                    SourcererEnvironment.generatedPackageName,
+                    SourcererEnvironment.generatedPackageName,
+                    result,
+                    env.minSdkVersion,
+                    setOf()
+            )
+            generator.generateAttributeFile()
+            generator.generateFactoryFile()
             println("----")
-            println("Generated files for ${result.targetClassName.simpleName} @ ${getTargetPathAsString()}")
+            println("Generated files for ${result.targetClassName.simpleName} @ ${generator.targetPathAsString}:")
+            println("\t+ ${generator.attributesFileName}")
+            println("\t+ ${generator.factoryFileName}")
         }
         println("=================================")
     }
@@ -74,12 +84,13 @@ class Sourcerer(
         /** interpret interesting methods/constructors and derive setters + attributes **/
         var codeBlocks : List<CodeBlock>
         val resolvedAttributes : Map<String, Attribute>
+        val resolvedSetters: Map<Int, Setter>
         println("\t--analyzing source code")
         if (attributes.isNotEmpty()) {
             println("\t\t------------")
             interpreterFactories.forEach { factory ->
                 val interpreter = factory.create(classInfo, typedArrayInfo, attributeManager, classRegistry)
-                val interpretationResult = interpreter.interpret()
+                val interpretationResult = interpreter.interpret(setters)
                 mergeInterpretations(attributes, interpretationResult)
                 println("\t\t------------")
                 println("\t\t${classInfo.targetClassName.simpleName}'s attributes identified with ${interpretationResult.name} interpretation: ${interpretationResult.identified}/${attributes.size}")
@@ -88,16 +99,18 @@ class Sourcerer(
             }
 
             println("\t\t------------")
-            resolvedAttributes = attributes.filter { it.value.resolvedStatus == ResolvedStatus.SETTER_DEFINED }
-            println("\t\t${classInfo.targetClassName.simpleName}'s attributes resolved total: ${resolvedAttributes.size}/${attributes.size}")
             /** resolve type and group attributes to code blocks **/
             val codeBlockCollector = CodeBlockCollector(classInfo, attributeManager)
-            codeBlocks = codeBlockCollector.reflectOnCodeBlockSociety(resolvedAttributes, setters)
+            val potentialResolvedAttributes = attributes.filter { it.value.resolvedStatus == ResolvedStatus.SETTER_DEFINED }
+            codeBlocks = codeBlockCollector.reflectOnCodeBlockSociety(potentialResolvedAttributes, setters)
             val typePhilosopher = TypePhilosopher(attributeManager, classInfo)
             codeBlocks = typePhilosopher.contemplateOnTheMeaningOfTypes(codeBlocks)
-            classInfo.setResolvedAttributes(resolvedAttributes)
+            resolvedAttributes = codeBlocks.map { it.attributes.values }.flatten().associateBy { it.name }
+            resolvedSetters = codeBlocks.map { it.setters.values }.flatten().associateBy { it.hashCode() }
+            println("\t\t${classInfo.targetClassName.simpleName}'s attributes resolved total: ${resolvedAttributes.size}/${attributes.size}")
         } else {
             resolvedAttributes = mapOf()
+            resolvedSetters = mapOf()
             codeBlocks = listOf()
             classInfo.setResolvedAttributes(resolvedAttributes)
             println("\t\tNo attributes specified, skipping source interpretation")
@@ -130,7 +143,7 @@ class Sourcerer(
                 classInfo.isViewGroup,
                 classMiniApiLevel,
                 resolvedAttributes,
-                setters,
+                resolvedSetters,
                 codeBlocks,
                 classInfo.indexedClass
         )
@@ -159,7 +172,12 @@ class Sourcerer(
         }
     }
 
-    private fun mergeAttributesAndSetters(attributes: Map<String, Attribute>, attributesFoundInSource: Map<String, Attribute>, settersFoundInSource: Map<Int, Setter>, interpretationResult: InterpretationResult) {
+    private fun mergeAttributesAndSetters(
+            attributes: Map<String, Attribute>,
+            attributesFoundInSource: Map<String, Attribute>,
+            settersFoundInSource: Map<Int, Setter>,
+            interpretationResult: InterpretationResult
+    ) {
         for (attrInSource in attributesFoundInSource.values) {
             if (!attributes.containsKey(attrInSource.name)) {
                 //throw IllegalStateException("Attribute ${attrInSource.name} does not exist in attrs.xml")
@@ -178,19 +196,30 @@ class Sourcerer(
                     attrInSource.typesPerSetter.forEach {
                         attribute.typesPerSetter[it.key] = it.value
                     }
+                    attribute.oneFormatRequiresMultipleSetters = attrInSource.oneFormatRequiresMultipleSetters
                     attribute.resolvedStatus = ResolvedStatus.SETTER_DEFINED
+                    attribute.resolvedByInterpreter = interpretationResult.name
                     interpretationResult.resolved += 1
                     interpretationResult.identifiedNew += 1
                 }
-                attrInSource.setterHashCodes.isNotEmpty() && attribute.resolvedStatus == ResolvedStatus.SETTER_DEFINED -> // only findOrCreate new settersFoundInSource
+                attrInSource.setterHashCodes.isNotEmpty() && attribute.resolvedStatus == ResolvedStatus.SETTER_DEFINED -> { // only add new settersFoundInSource
+                    var hasAddedSetter = false
                     for (setterHashCode in attrInSource.setterHashCodes) {
                         if (!attribute.setterHashCodes.contains(setterHashCode)) {
                             attribute.setterHashCodes.add(setterHashCode)
                             setters[setterHashCode] = settersFoundInSource[setterHashCode] as Setter
                             val typesPerSetter = attrInSource.resolvedTypesPerSetter(setterHashCode)
                             attribute.typesPerSetter[setterHashCode] = typesPerSetter
+                            hasAddedSetter = true
                         }
                     }
+                    if (hasAddedSetter) {
+                        if (!attribute.oneFormatRequiresMultipleSetters && attrInSource.oneFormatRequiresMultipleSetters) {
+                            attribute.oneFormatRequiresMultipleSetters = true
+                        }
+                        attribute.resolvedByInterpreter += ", ${interpretationResult.name}"
+                    }
+                }
                 attrInSource.setterHashCodes.isEmpty() && attribute.resolvedStatus < ResolvedStatus.IDENTIFIED_IN_SOURCE -> {
                     attrInSource.typesPerSetter.forEach {
                         attribute.typesPerSetter[it.key] = it.value
@@ -238,11 +267,6 @@ class Sourcerer(
         return if (classInfo.classCategory == ClassCategory.View) {
             Store.transactional { classInfo.widget.layoutParamClasses.firstOrNull()?.targetClassName }
         } else null
-    }
-
-
-    private fun getTargetPathAsString(): String {
-        return ".${env.stubAppPath.toString().replace(env.rootPath.toString(), "")}${File.separator}${SourcererEnvironment.generatedPackagePathAsString}"
     }
 
     companion object {

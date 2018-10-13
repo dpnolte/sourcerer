@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generator.peeker
 
 import com.github.javaparser.ast.CompilationUnit
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.laidpack.sourcerer.generator.Store
 import jetbrains.exodus.entitystore.Entity
@@ -31,18 +32,27 @@ object PackageRegistry {
             return Store.transactional {
 
                 val indexedPackage = IndexedPackage.query(IndexedPackage::packageName eq currentPackageName).firstOrNull()
-                var result = indexedPackage?.classes?.query(
+                val result = indexedPackage?.classes?.query(
                         IndexedClass::simpleName eq simpleName
-                )
+                ) ?: return@transactional listOf()
 
-                if (result != null && classOrInterfaceType.scope.isPresent) {
-                    val scope = classOrInterfaceType.scope.get().nameAsString
-                    result = result.query(
-                            IndexedClass::canonicalName startsWith "$currentPackageName.$scope"
-                    )
+                val resultList = result.toList()
+                when {
+                    classOrInterfaceType.scope.isPresent -> {
+                        val scope = classOrInterfaceType.scope.get().nameAsString
+                        resultList.filter {indexedClass ->
+                            indexedClass.canonicalName.startsWith("$currentPackageName.$scope")
+                        }
+                    }
+                    !classOrInterfaceType.scope.isPresent && resultList.size > 1 -> {
+                        resultList.filter {indexedClass ->
+                            if (!indexedClass.isNestedType) {
+                                indexedClass.canonicalName == "$currentPackageName.$simpleName"
+                            } else true
+                        }
+                    }
+                    else -> resultList
                 }
-
-                result?.toList() ?: listOf()
             }
         }
         return listOf()
@@ -59,6 +69,24 @@ object PackageRegistry {
             }
         }
         return result
+    }
+
+    fun findDirectlyNestedClass(
+            cu: CompilationUnit,
+            classDeclaration: ClassOrInterfaceDeclaration,
+            classOrInterfaceType: ClassOrInterfaceType
+    ): IndexedClass? {
+        if (cu.packageDeclaration.isPresent) {
+            val packageName = cu.packageDeclaration.get().nameAsString
+            val className = classDeclaration.nameAsString
+            val nestedClassName = classOrInterfaceType.nameAsString
+            return Store.transactional {
+                IndexedClass.query(
+                        IndexedClass::canonicalName eq  "$packageName.$className.$nestedClassName"
+                ).firstOrNull()
+            }
+        }
+        return null
     }
 
 
@@ -94,5 +122,14 @@ object PackageRegistry {
         return Store.transactional {
             IndexedPackage.query(IndexedPackage::packageName eq packageName).firstOrNull()
         }
+    }
+
+    private fun isDirectlyNested(
+            indexedClass: IndexedClass,
+            packageName: String,
+            simpleName: String
+    ): Boolean {
+        val regex = Regex(".*?${Regex.escape(packageName)}.\\w+\\.${Regex.escape(simpleName)}.*?")
+        return regex.matches(indexedClass.targetClassName.canonicalName)
     }
 }

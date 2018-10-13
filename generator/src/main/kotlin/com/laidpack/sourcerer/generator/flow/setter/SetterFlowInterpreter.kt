@@ -9,17 +9,22 @@ import com.laidpack.sourcerer.generator.flow.setter.handlers.AssignHandler
 import com.laidpack.sourcerer.generator.peeker.ClassInfo
 import com.laidpack.sourcerer.generator.peeker.MethodInfo
 
-data class GetterRequirements(val fields: List<FieldDeclaration>, val conditions: Map<String /* var name */, String /* value as string */>)
+data class GetterRequirements(
+        val fields: Map<String /* var name */, FieldDeclaration>,
+        val conditions: Map<String /* var name */, String /* value as string */>
+)
 
 class SetterFlowInterpreter(
         private val setterInfo: MethodInfo,
         setter: Setter,
         attribute: Attribute,
-        classInfo: ClassInfo
+        classInfo: ClassInfo,
+        providedParameterIndex: Int? = null
     ) : BaseFlowInterpreter() {
 
     private val visitor = FlowVisitor(this::onNodeIteration)
-    private val parameter = setter.parameters[setter.attributeToParameter[attribute.name] as Int]
+    private val parameterIndex = providedParameterIndex ?: setter.callSignatureMaps[attribute.name]
+    private val parameter = setter.parameters[parameterIndex]
     private val flow = SetterFlow(this, setterInfo, setter, parameter, attribute, classInfo)
 
     override val handlers = listOf(
