@@ -4,10 +4,11 @@ import android.content.Context
 import android.util.Log
 import android.view.ViewGroup
 import com.laidpack.sourcerer.services.adapters.*
-import com.laidpack.sourcerer.services.api.MultiFormat
+import com.laidpack.sourcerer.services.api.FlagsAccumulator
 import com.squareup.moshi.*
 import java.lang.Exception
 import java.lang.NullPointerException
+import java.lang.ref.WeakReference
 import kotlin.reflect.KClass
 
 
@@ -23,7 +24,7 @@ interface SerializerComponent {
             adapterProvider: (Any) -> Any?,
             elementType: String?
     ): SerializerComponent
-    fun associateThisViewGroupWithLayoutParams(
+    fun associateViewGroupWithLayoutParams(
             viewGroupElementType: String,
             layoutParamsElementType: String
     ): SerializerComponent
@@ -55,12 +56,11 @@ interface SerializerComponent {
 }
 
 class SerializerModule(
-        defaultQualifierAdaptersList: List<Pair<KClass<*>, Any>> = listOf(
-                Int::class to DimensionAdapter(),
-                Int::class to ReferenceAdapter(),
-                Int::class to ColorAdapter(),
-                MultiFormat::class to MultiFormatAdapterFactory()
-        )
+        dimensionAdapter: Any = DimensionAdapter(),
+        private val referenceAdapter: Any = ReferenceAdapter(),
+        colorAdapter: Any = ColorAdapter(),
+        multiformatAdapter: Any = MultiFormatAdapterFactory(),
+        flagsAdapter: Any = FlagsAdapterFactory()
 ) : SerializerComponent {
     private val registeredAdapters = mutableMapOf<KClass<*>, (moshi: Moshi) -> Any?>()
     private val elementTypeToSubjectType = mutableMapOf<String, KClass<*>>()
@@ -70,17 +70,17 @@ class SerializerModule(
     private lateinit var defaultLayoutParamsDelegateProvider: () -> LayoutParamsDelegateWrapper
     private lateinit var defaultLayoutParamsDelegate: LayoutParamsDelegateWrapper
     private var builder = Moshi.Builder()
-    private val defaultAdapters : Map<KClass<*>, Any> = defaultQualifierAdaptersList.associateBy { it::class }
     // add default adapters
     init {
         /* currently, we cannot use strict mode since we allow attributes json object be parsed into view and lp attributes
         if (BuildConfig.DEBUG) {
             builder.add(StrictAdapterFactory())
         }*/
-        for(adapterPair in defaultQualifierAdaptersList) {
-            val (subjectType, delegate) = adapterPair
-            registerAdapter(subjectType, delegate)
-        }
+        registerAdapter(Int::class, dimensionAdapter)
+        registerAdapter(Int::class, referenceAdapter)
+        registerAdapter(Int::class, colorAdapter)
+        registerAdapter(Int::class, multiformatAdapter)
+        registerAdapter(FlagsAccumulator::class, flagsAdapter)
         registerAdapter(LayoutMap::class, LayoutMapAdapterFactory(
                 { elementType ->
                     val layoutParamsElementType = viewGroupToLayoutParams[elementType] ?: throw  IllegalArgumentException("No view group registered with '$elementType' as element type")
@@ -102,9 +102,8 @@ class SerializerModule(
     }
 
     override fun assignContext(context: Context) {
-        if (defaultAdapters.containsKey(ReferenceAdapter::class)) {
-            val referenceAdapter = defaultAdapters[ReferenceAdapter::class] as ReferenceAdapter
-            referenceAdapter.context = context
+        if (referenceAdapter is ContextAwareAdapter) {
+            referenceAdapter.context = WeakReference(context)
         }
     }
 
@@ -165,7 +164,7 @@ class SerializerModule(
         return this
     }
 
-    override fun associateThisViewGroupWithLayoutParams(
+    override fun associateViewGroupWithLayoutParams(
             viewGroupElementType: String,
             layoutParamsElementType: String
     ): SerializerComponent {

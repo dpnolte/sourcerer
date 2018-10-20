@@ -1,12 +1,12 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import com.laidpack.sourcerer.services.api.BaseViewFactory
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
@@ -28,19 +28,11 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     id = it
                 }
             }
-            attributes.scrollX?.let {
-                if (scrollX != it) {
-                    scrollTo(it, )
-                }
-            }
-            attributes.scrollY?.let {
-                if (scrollY != it) {
-                    scrollTo(, it)
-                }
-            }
-            attributes.focusableInTouchMode?.let {
-                if (isFocusableInTouchMode != it) {
-                    isFocusableInTouchMode = it
+            if (attributes.scrollX != null || attributes.scrollY != null) {
+                val localScrollX = attributes.scrollX ?: scrollX
+                val localScrollY = attributes.scrollY ?: scrollY
+                if (scrollX != localScrollX || scrollY != localScrollY) {
+                    scrollTo(localScrollX, localScrollY)
                 }
             }
             attributes.visibility?.let {
@@ -51,12 +43,6 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
             attributes.scrollbarStyle?.let {
                 if (scrollBarStyle != it.value) {
                     scrollBarStyle = it.value
-                }
-            }
-            attributes.requiresFadingEdge?.let {
-                val immutableRequiresFadingEdge = it.value == 1
-                if (isHorizontalFadingEdgeEnabled != immutableRequiresFadingEdge) {
-                    isHorizontalFadingEdgeEnabled = immutableRequiresFadingEdge
                 }
             }
             attributes.nextFocusLeft?.let {
@@ -79,29 +65,9 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     nextFocusDownId = it
                 }
             }
-            attributes.clickable?.let {
-                if (isClickable != it) {
-                    isClickable = it
-                }
-            }
-            attributes.longClickable?.let {
-                if (isLongClickable != it) {
-                    isLongClickable = it
-                }
-            }
-            attributes.saveEnabled?.let {
-                if (isSaveEnabled != it) {
-                    isSaveEnabled = it
-                }
-            }
             attributes.keepScreenOn?.let {
                 if (keepScreenOn != it) {
                     keepScreenOn = it
-                }
-            }
-            attributes.soundEffectsEnabled?.let {
-                if (isSoundEffectsEnabled != it) {
-                    isSoundEffectsEnabled = it
                 }
             }
             attributes.drawingCacheQuality?.let {
@@ -109,19 +75,9 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     drawingCacheQuality = it.value
                 }
             }
-            attributes.hapticFeedbackEnabled?.let {
-                if (isHapticFeedbackEnabled != it) {
-                    isHapticFeedbackEnabled = it
-                }
-            }
             attributes.contentDescription?.let {
                 if (contentDescription != it) {
                     contentDescription = it
-                }
-            }
-            attributes.fadeScrollbars?.let {
-                if (isScrollbarFadingEnabled != it) {
-                    isScrollbarFadingEnabled = it
                 }
             }
             attributes.filterTouchesWhenObscured?.let {
@@ -140,58 +96,42 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                 }
             }
             attributes.alpha?.let {
-                if (alpha != it) {
-                    alpha = it
-                }
+                alpha = it
             }
             attributes.translationX?.let {
-                val immutableTranslationX = it.toFloat()
-                if (translationX != immutableTranslationX) {
-                    translationX = immutableTranslationX
-                }
+                val localTranslationX = it.toFloat()
+                translationX = localTranslationX
             }
             attributes.translationY?.let {
-                val immutableTranslationY = it.toFloat()
-                if (translationY != immutableTranslationY) {
-                    translationY = immutableTranslationY
-                }
+                val localTranslationY = it.toFloat()
+                translationY = localTranslationY
             }
             attributes.transformPivotX?.let {
-                val immutableTransformPivotX = it.toFloat()
-                if (pivotX != immutableTransformPivotX) {
-                    pivotX = immutableTransformPivotX
+                val localTransformPivotX = it.toFloat()
+                if (pivotX != localTransformPivotX) {
+                    pivotX = localTransformPivotX
                 }
             }
             attributes.transformPivotY?.let {
-                val immutableTransformPivotY = it.toFloat()
-                if (pivotY != immutableTransformPivotY) {
-                    pivotY = immutableTransformPivotY
+                val localTransformPivotY = it.toFloat()
+                if (pivotY != localTransformPivotY) {
+                    pivotY = localTransformPivotY
                 }
             }
             attributes.rotation?.let {
-                if (rotation != it) {
-                    rotation = it
-                }
+                rotation = it
             }
             attributes.rotationX?.let {
-                if (rotationX != it) {
-                    rotationX = it
-                }
+                rotationX = it
             }
             attributes.rotationY?.let {
-                if (rotationY != it) {
-                    rotationY = it
-                }
+                rotationY = it
             }
             attributes.scaleX?.let {
-                if (scaleX != it) {
-                    scaleX = it
-                }
+                scaleX = it
             }
             attributes.scaleY?.let {
-                if (scaleY != it) {
-                    scaleY = it
-                }
+                scaleY = it
             }
             attributes.layerType?.let {
                 if (layerType != it.value) {
@@ -199,23 +139,18 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                 }
             }
             if (Build.VERSION.SDK_INT >= 16) {
-                when {
-                    attributes.background.hasColor || attributes.background.hasReference ->  {
-                        val immutableBackground = when {
-                            attributes.background.hasColor -> ColorDrawable(attributes.background.color)
-                            else -> ContextCompat.getDrawable(context, attributes.background.reference) as Drawable
-                        }
-                        background = immutableBackground
+                if (attributes.background.hasColor || attributes.background.hasReference) {
+                    val localBackground = when {
+                        attributes.background.hasColor -> ColorDrawable(attributes.background.color)
+                        else -> ContextCompat.getDrawable(context, attributes.background.reference) as Drawable
+                    }
+                    if (background != localBackground) {
+                        background = localBackground
                     }
                 }
                 attributes.fitsSystemWindows?.let {
                     if (fitsSystemWindows != it) {
                         fitsSystemWindows = it
-                    }
-                }
-                attributes.isScrollContainer?.let {
-                    if (isScrollContainer != it) {
-                        isScrollContainer = it
                     }
                 }
                 attributes.scrollbarFadeDuration?.let {
@@ -243,35 +178,29 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                         minimumWidth = it
                     }
                 }
-                attributes.importantForAccessibility?.let {
-                    if (importantForAccessibility != it.value) {
-                        importantForAccessibility = it.value
+                if (attributes.importantForAccessibility.hasInteger || attributes.importantForAccessibility.hasEnum) {
+                    val localImportantForAccessibility = when {
+                        attributes.importantForAccessibility.hasInteger -> attributes.importantForAccessibility.integer
+                        else -> attributes.importantForAccessibility.enum
+                    }
+                    if (importantForAccessibility != localImportantForAccessibility) {
+                        importantForAccessibility = localImportantForAccessibility
                     }
                 }
             }
             if (Build.VERSION.SDK_INT >= 17) {
-                if (attributes.paddingLeft != null || attributes.paddingBottom != null || attributes.paddingStart != null || attributes.paddingEnd != null || attributes.paddingTop != null || attributes.paddingRight != null) {
-                    val immutablePaddingBottomDimension = attributes.paddingBottom ?: paddingBottom
-                    val immutablePaddingLeftDimension = attributes.paddingLeft ?: paddingLeft
-                    val immutablePaddingRightDimension = attributes.paddingRight ?: paddingRight
-                    val immutablePaddingTopDimension = attributes.paddingTop ?: paddingTop
-                    if (paddingBottom != immutablePaddingBottomDimension || paddingLeft != immutablePaddingLeftDimension || paddingRight != immutablePaddingRightDimension || paddingTop != immutablePaddingTopDimension) {
-                        setPadding(immutablePaddingLeftDimension, immutablePaddingTopDimension, immutablePaddingRightDimension, immutablePaddingBottomDimension)
-                    }
-                    val immutablePaddingStartDimension = attributes.paddingStart ?: paddingStart
-                    val immutablePaddingEndDimension = attributes.paddingEnd ?: paddingEnd
-                    if (paddingBottom != immutablePaddingBottomDimension || paddingStart != immutablePaddingStartDimension || paddingEnd != immutablePaddingEndDimension || paddingTop != immutablePaddingTopDimension) {
-                        setPaddingRelative(immutablePaddingStartDimension, immutablePaddingTopDimension, immutablePaddingEndDimension, immutablePaddingBottomDimension)
-                    }
-                }
                 attributes.layoutDirection?.let {
                     if (layoutDirection != it.value) {
                         layoutDirection = it.value
                     }
                 }
-                attributes.textDirection?.let {
-                    if (textDirection != it.value) {
-                        textDirection = it.value
+                if (attributes.textDirection.hasInteger || attributes.textDirection.hasEnum) {
+                    val localTextDirection = when {
+                        attributes.textDirection.hasInteger -> attributes.textDirection.integer
+                        else -> attributes.textDirection.enum
+                    }
+                    if (textDirection != localTextDirection) {
+                        textDirection = localTextDirection
                     }
                 }
                 attributes.textAlignment?.let {
@@ -286,24 +215,24 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                 }
             }
             if (Build.VERSION.SDK_INT >= 19) {
-                attributes.accessibilityLiveRegion?.let {
-                    if (accessibilityLiveRegion != it.value) {
-                        accessibilityLiveRegion = it.value
+                if (attributes.accessibilityLiveRegion.hasInteger || attributes.accessibilityLiveRegion.hasEnum) {
+                    val localAccessibilityLiveRegion = when {
+                        attributes.accessibilityLiveRegion.hasInteger -> attributes.accessibilityLiveRegion.integer
+                        else -> attributes.accessibilityLiveRegion.enum
+                    }
+                    if (accessibilityLiveRegion != localAccessibilityLiveRegion) {
+                        accessibilityLiveRegion = localAccessibilityLiveRegion
                     }
                 }
             }
             if (Build.VERSION.SDK_INT >= 21) {
                 attributes.elevation?.let {
-                    val immutableElevation = it.toFloat()
-                    if (elevation != immutableElevation) {
-                        elevation = immutableElevation
-                    }
+                    val localElevation = it.toFloat()
+                    elevation = localElevation
                 }
                 attributes.translationZ?.let {
-                    val immutableTranslationZ = it.toFloat()
-                    if (translationZ != immutableTranslationZ) {
-                        translationZ = immutableTranslationZ
-                    }
+                    val localTranslationZ = it.toFloat()
+                    translationZ = localTranslationZ
                 }
                 attributes.transitionName?.let {
                     if (transitionName != it) {
@@ -311,20 +240,18 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     }
                 }
                 attributes.nestedScrollingEnabled?.let {
-                    if (isNestedScrollingEnabled != it) {
-                        isNestedScrollingEnabled = it
-                    }
+                    isNestedScrollingEnabled = it
                 }
                 attributes.backgroundTint?.let {
-                    val immutableBackgroundTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (backgroundTintList != immutableBackgroundTint) {
-                        backgroundTintList = immutableBackgroundTint
+                    val localBackgroundTint = ColorStateList.valueOf(it)
+                    if (backgroundTintList != localBackgroundTint) {
+                        backgroundTintList = localBackgroundTint
                     }
                 }
                 attributes.backgroundTintMode?.let {
-                    val immutableBackgroundTintMode = it.value.toPorterDuffMode()
-                    if (backgroundTintMode != immutableBackgroundTintMode) {
-                        backgroundTintMode = immutableBackgroundTintMode
+                    val localBackgroundTintMode = it.value.toPorterDuffMode()
+                    if (backgroundTintMode != localBackgroundTintMode) {
+                        backgroundTintMode = localBackgroundTintMode
                     }
                 }
             }
@@ -341,64 +268,59 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                 }
             }
             if (Build.VERSION.SDK_INT >= 23) {
-                attributes.contextClickable?.let {
-                    if (isContextClickable != it) {
-                        isContextClickable = it
-                    }
-                }
                 if (attributes.foreground.hasColor || attributes.foreground.hasReference) {
-                    val immutableForeground = when {
+                    val localForeground = when {
                         attributes.foreground.hasColor -> ColorDrawable(attributes.foreground.color)
                         else -> ContextCompat.getDrawable(context, attributes.foreground.reference) as Drawable
                     }
-                    if (foreground != immutableForeground) {
-                        foreground = immutableForeground
-                    }
+                    foreground = localForeground
                 }
                 attributes.foregroundGravity?.let {
-                    if (foregroundGravity != it.value) {
-                        foregroundGravity = it.value
+                    val localForegroundGravity = it.value
+                    if (foregroundGravity != localForegroundGravity) {
+                        foregroundGravity = localForegroundGravity
                     }
                 }
                 attributes.foregroundTint?.let {
-                    val immutableForegroundTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (foregroundTintList != immutableForegroundTint) {
-                        foregroundTintList = immutableForegroundTint
+                    val localForegroundTint = ColorStateList.valueOf(it)
+                    if (foregroundTintList != localForegroundTint) {
+                        foregroundTintList = localForegroundTint
                     }
                 }
                 attributes.foregroundTintMode?.let {
-                    val immutableForegroundTintMode = it.value.toPorterDuffMode()
-                    if (foregroundTintMode != immutableForegroundTintMode) {
-                        foregroundTintMode = immutableForegroundTintMode
-                    }
-                }
-                attributes.scrollIndicators?.let {
-                    if (scrollIndicators != it.value) {
-                        scrollIndicators = it.value
+                    val localForegroundTintMode = it.value.toPorterDuffMode()
+                    if (foregroundTintMode != localForegroundTintMode) {
+                        foregroundTintMode = localForegroundTintMode
                     }
                 }
             }
             if (Build.VERSION.SDK_INT >= 24) {
                 attributes.forceHasOverlappingRendering?.let {
-                    if (hasOverlappingRendering != it) {
-                        forceHasOverlappingRendering(it)
-                    }
+                    forceHasOverlappingRendering(it)
                 }
             }
             if (Build.VERSION.SDK_INT >= 26) {
                 when {
                     attributes.focusable.hasBoolean ->  {
-                        val immutableFocusable = attributes.focusable.boolean
-                        isFocusable = immutableFocusable
+                        val localFocusable = attributes.focusable.boolean
+                        isFocusable = localFocusable
                     }
                     attributes.focusable.hasEnum ->  {
-                        val immutableFocusable = attributes.focusable.enum
-                        focusable = immutableFocusable
+                        val localFocusable = attributes.focusable.enum
+                        focusable = localFocusable
                     }
                 }
+                if (attributes.autofillHints.hasReference || attributes.autofillHints.hasString) {
+                    val localAutofillHints = when {
+                        attributes.autofillHints.hasReference -> context.resources.getString(attributes.autofillHints.reference)
+                        else -> attributes.autofillHints.string
+                    }
+                    setAutofillHints(localAutofillHints)
+                }
                 attributes.importantForAutofill?.let {
-                    if (importantForAutofill != it.value) {
-                        importantForAutofill = it.value
+                    val localImportantForAutofill = it.value
+                    if (importantForAutofill != localImportantForAutofill) {
+                        importantForAutofill = localImportantForAutofill
                     }
                 }
                 attributes.tooltipText?.let {
@@ -407,9 +329,7 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     }
                 }
                 attributes.keyboardNavigationCluster?.let {
-                    if (isKeyboardNavigationCluster != it) {
-                        isKeyboardNavigationCluster = it
-                    }
+                    isKeyboardNavigationCluster = it
                 }
                 attributes.nextClusterForward?.let {
                     if (nextClusterForwardId != it) {
@@ -417,9 +337,7 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     }
                 }
                 attributes.focusedByDefault?.let {
-                    if (isFocusedByDefault != it) {
-                        isFocusedByDefault = it
-                    }
+                    isFocusedByDefault = it
                 }
                 attributes.defaultFocusHighlightEnabled?.let {
                     if (defaultFocusHighlightEnabled != it) {
@@ -429,9 +347,7 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
             }
             if (Build.VERSION.SDK_INT >= 28) {
                 attributes.screenReaderFocusable?.let {
-                    if (isScreenReaderFocusable != it) {
-                        isScreenReaderFocusable = it
-                    }
+                    isScreenReaderFocusable = it
                 }
                 attributes.accessibilityPaneTitle?.let {
                     if (accessibilityPaneTitle != it) {
@@ -439,19 +355,13 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     }
                 }
                 attributes.accessibilityHeading?.let {
-                    if (isAccessibilityHeading != it) {
-                        isAccessibilityHeading = it
-                    }
+                    isAccessibilityHeading = it
                 }
                 attributes.outlineSpotShadowColor?.let {
-                    if (outlineSpotShadowColor != it) {
-                        outlineSpotShadowColor = it
-                    }
+                    outlineSpotShadowColor = it
                 }
                 attributes.outlineAmbientShadowColor?.let {
-                    if (outlineAmbientShadowColor != it) {
-                        outlineAmbientShadowColor = it
-                    }
+                    outlineAmbientShadowColor = it
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.laidpack.sourcerer.generator.generators
 
+import com.laidpack.sourcerer.generator.resources.WidgetConnoisseur
 import com.laidpack.sourcerer.generator.toCamelCase
 import com.squareup.kotlinpoet.ClassName
 import java.io.File
@@ -8,6 +9,7 @@ class ModuleGeneratorManager(
         private val targetDir: File,
         private val moduleName: String,
         private val targetPackageName: String,
+        private val widgetConnoisseur: WidgetConnoisseur,
         private val classGenerators: List<ClassGeneratorManager>
 ) {
     private val adapterWrappers = classGenerators.map { it.adapterRegistrationWrapper }
@@ -35,5 +37,14 @@ class ModuleGeneratorManager(
                 factoryWrappers
         ).generateFile()
         fileSpec.writeTo(targetDir)
+    }
+
+    fun generateTemplateFiles() {
+        TemplateGenerator().generateTemplates(
+                moduleName,
+                widgetConnoisseur,
+                targetDir,
+                targetPackageName
+        )
     }
 }

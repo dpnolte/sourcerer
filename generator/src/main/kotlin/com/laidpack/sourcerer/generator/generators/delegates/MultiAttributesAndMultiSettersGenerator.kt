@@ -8,7 +8,11 @@ import com.laidpack.sourcerer.generator.generators.delegates.statements.*
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.ParameterSpec
 
-class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, contextParam: ParameterSpec, private val codeBlock: CodeBlock) : DelegateGeneratorBase(attributesParam, contextParam) {
+class MultiAttributesAndMultiSettersGenerator(
+        attributesParam: ParameterSpec,
+        private val contextParam: ParameterSpec,
+        private val codeBlock: CodeBlock
+) : DelegateGeneratorBase(attributesParam, contextParam) {
     private val attributes = codeBlock.attributes
     private val variableNames = mutableMapOf<Int /* setter hash code */, MutableMap<String /* attr name */, String /* variable name */>>()
     private val attrToVarNames = mutableMapOf<String /* attr name */, MutableSet<String> /* var name */>()
@@ -19,10 +23,16 @@ class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, co
     fun addCodeBlockToBuilder(builder: FunSpec.Builder){
         builder.beginFlowIfAnyValueIsSet()
         for (setter in selectedSetters) {
+            val setterHashCode = setter.hashCode()
             builder.addLocalVars(setter)
             builder.beginFlowIfAnyValueIsNotDefault(setter)
             builder.addSetter(setter)
-            builder.endControlFlow()
+            if (attributes.values.any {
+                        it.setterHashCodes.contains(setterHashCode)
+                        && it.resolvedTypesPerSetter(setterHashCode).hasMatchedGetter }
+            ) {
+                builder.endControlFlow()
+            }
         }
         builder.endControlFlow()
     }
@@ -105,13 +115,13 @@ class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, co
                 }
                 varNames.add(variableName)
 
-                if (attr.formats.size > 1) {
+                if (attr.formatsUsedBySetters.size > 1) {
                     DeclareMultiFormatVariable(delegate, attributesParam)
                             .addDeclaredVar(
                                     this,
                                     attr,
                                     typesPerSetter,
-                                    defaultToGetterValue = true,
+                                    defaultToGetterValue = typesPerSetter.hasMatchedGetter,
                                     variableName = variableName
                             )
                 } else {
@@ -120,7 +130,7 @@ class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, co
                                     this,
                                     attr,
                                     typesPerSetter,
-                                    defaultToGetterValue = true,
+                                    defaultToGetterValue = typesPerSetter.hasMatchedGetter,
                                     variableName = variableName
                             )
                 }
@@ -156,23 +166,15 @@ class MultiAttributesAndMultiSettersGenerator(attributesParam: ParameterSpec, co
     private fun FunSpec.Builder.addSetter(setter: Setter): FunSpec.Builder {
         val setterHashCode = setter.hashCode()
         val setterVariableNames = variableNames[setterHashCode] as MutableMap<String, String>
-        var index = 0
-        val parameters = setter.parameters.joinToString(", ") { parameter ->
-            val attributeToParameters =  getAttributesToParameters(setter)
-                    .filter { it.value == index }
-            val attribute = if (attributeToParameters.isNotEmpty()) {
-                codeBlock.attributes[attributeToParameters.keys.first()] as Attribute
-            } else null
-            val result = when {
-                attribute != null -> setterVariableNames[attribute.name] as String
-                parameter.defaultValue.isNotBlank() -> parameter.defaultValue
-                parameter.isNullable -> "null"
-                else -> ""
-            }
-            index += 1
-            result
-        }
-        return this.addStatement("${setter.name}($parameters)")
+        InvokeSetter(delegate, contextParam)
+                .addAsStatement(
+                        this,
+                        setter,
+                        attributes,
+                        setterVariableNames
+                )
+
+        return this
     }
 
     private fun getAttributesToParameters(setter: Setter): Map<String, Int> {

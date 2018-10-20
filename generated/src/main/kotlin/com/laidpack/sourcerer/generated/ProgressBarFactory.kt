@@ -1,12 +1,12 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
@@ -39,65 +39,64 @@ open class ProgressBarFactory<TView : ProgressBar, TAttributes : ProgressBarAttr
                         isIndeterminate = it
                     }
                 }
+                attributes.interpolator?.let {
+                    setInterpolator(context, it)
+                }
                 if (Build.VERSION.SDK_INT >= 21) {
                     attributes.indeterminateDrawable?.let {
-                        val immutableIndeterminateDrawable = ContextCompat.getDrawable(context, it) as Drawable
-                        if (indeterminateDrawable != immutableIndeterminateDrawable) {
-                            setIndeterminateDrawableTiled(immutableIndeterminateDrawable)
-                        }
+                        val localIndeterminateDrawable = ContextCompat.getDrawable(context, it) as Drawable
+                        setIndeterminateDrawableTiled(localIndeterminateDrawable)
                     }
                     attributes.progressDrawable?.let {
-                        val immutableProgressDrawable = ContextCompat.getDrawable(context, it) as Drawable
-                        if (progressDrawable != immutableProgressDrawable) {
-                            setProgressDrawableTiled(immutableProgressDrawable)
-                        }
+                        val localProgressDrawable = ContextCompat.getDrawable(context, it) as Drawable
+                        setProgressDrawableTiled(localProgressDrawable)
                     }
                     attributes.progressTint?.let {
-                        val immutableProgressTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                        if (progressTintList != immutableProgressTint) {
-                            progressTintList = immutableProgressTint
+                        val localProgressTint = ColorStateList.valueOf(it)
+                        if (progressTintList != localProgressTint) {
+                            progressTintList = localProgressTint
                         }
                     }
                     attributes.progressTintMode?.let {
-                        val immutableProgressTintMode = it.value.toPorterDuffMode()
-                        if (progressTintMode != immutableProgressTintMode) {
-                            progressTintMode = immutableProgressTintMode
+                        val localProgressTintMode = it.value.toPorterDuffMode()
+                        if (progressTintMode != localProgressTintMode) {
+                            progressTintMode = localProgressTintMode
                         }
                     }
                     attributes.progressBackgroundTint?.let {
-                        val immutableProgressBackgroundTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                        if (progressBackgroundTintList != immutableProgressBackgroundTint) {
-                            progressBackgroundTintList = immutableProgressBackgroundTint
+                        val localProgressBackgroundTint = ColorStateList.valueOf(it)
+                        if (progressBackgroundTintList != localProgressBackgroundTint) {
+                            progressBackgroundTintList = localProgressBackgroundTint
                         }
                     }
                     attributes.progressBackgroundTintMode?.let {
-                        val immutableProgressBackgroundTintMode = it.value.toPorterDuffMode()
-                        if (progressBackgroundTintMode != immutableProgressBackgroundTintMode) {
-                            progressBackgroundTintMode = immutableProgressBackgroundTintMode
+                        val localProgressBackgroundTintMode = it.value.toPorterDuffMode()
+                        if (progressBackgroundTintMode != localProgressBackgroundTintMode) {
+                            progressBackgroundTintMode = localProgressBackgroundTintMode
                         }
                     }
                     attributes.secondaryProgressTint?.let {
-                        val immutableSecondaryProgressTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                        if (secondaryProgressTintList != immutableSecondaryProgressTint) {
-                            secondaryProgressTintList = immutableSecondaryProgressTint
+                        val localSecondaryProgressTint = ColorStateList.valueOf(it)
+                        if (secondaryProgressTintList != localSecondaryProgressTint) {
+                            secondaryProgressTintList = localSecondaryProgressTint
                         }
                     }
                     attributes.secondaryProgressTintMode?.let {
-                        val immutableSecondaryProgressTintMode = it.value.toPorterDuffMode()
-                        if (secondaryProgressTintMode != immutableSecondaryProgressTintMode) {
-                            secondaryProgressTintMode = immutableSecondaryProgressTintMode
+                        val localSecondaryProgressTintMode = it.value.toPorterDuffMode()
+                        if (secondaryProgressTintMode != localSecondaryProgressTintMode) {
+                            secondaryProgressTintMode = localSecondaryProgressTintMode
                         }
                     }
                     attributes.indeterminateTint?.let {
-                        val immutableIndeterminateTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                        if (indeterminateTintList != immutableIndeterminateTint) {
-                            indeterminateTintList = immutableIndeterminateTint
+                        val localIndeterminateTint = ColorStateList.valueOf(it)
+                        if (indeterminateTintList != localIndeterminateTint) {
+                            indeterminateTintList = localIndeterminateTint
                         }
                     }
                     attributes.indeterminateTintMode?.let {
-                        val immutableIndeterminateTintMode = it.value.toPorterDuffMode()
-                        if (indeterminateTintMode != immutableIndeterminateTintMode) {
-                            indeterminateTintMode = immutableIndeterminateTintMode
+                        val localIndeterminateTintMode = it.value.toPorterDuffMode()
+                        if (indeterminateTintMode != localIndeterminateTintMode) {
+                            indeterminateTintMode = localIndeterminateTintMode
                         }
                     }
                 }

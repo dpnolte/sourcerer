@@ -17,12 +17,12 @@ class UnconditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHand
                 }
                 /*
                 // check if assigned variable value is retrieved from type array getter earlier
-                node.target.isNameExpr && node.value.isNameExpr -> {
-                    variableValueIsAssignedToAnotherVariable(node)
+                classOrInterfaceDeclarationProvider.target.isNameExpr && classOrInterfaceDeclarationProvider.value.isNameExpr -> {
+                    variableValueIsAssignedToAnotherVariable(classOrInterfaceDeclarationProvider)
                 }
                 // check if variable is assigned via binary expression
-                node.target is NameExpr && node.value is BinaryExpr -> {
-                    handleBinaryExpression(node.target as NameExpr, node.value as BinaryExpr)
+                classOrInterfaceDeclarationProvider.target is NameExpr && classOrInterfaceDeclarationProvider.value is BinaryExpr -> {
+                    handleBinaryExpression(classOrInterfaceDeclarationProvider.target as NameExpr, classOrInterfaceDeclarationProvider.value as BinaryExpr)
                 }*/
             }
 
@@ -43,22 +43,22 @@ class UnconditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHand
     }
 
     /*
-    private fun variableValueIsAssignedToAnotherVariable(node: AssignExpr) {
-        val targetExpr = node.target.asNameExpr()
+    private fun variableValueIsAssignedToAnotherVariable(classOrInterfaceDeclarationProvider: AssignExpr) {
+        val targetExpr = classOrInterfaceDeclarationProvider.target.asNameExpr()
         if (flow.isVariableDerivedFromAttribute(targetExpr.nameAsString) || flow.isAttributeConditionalToTrue()) {
             val impact = if(flow.isAttributeConditionalToTrue()) VariableImpact.IF_TRUE else VariableImpact.CHAINED
-            flow.addIndirectVariableAsDerivedFromAttribute(targetExpr.nameAsString, node, impact)
+            flow.addIndirectVariableAsDerivedFromAttribute(targetExpr.nameAsString, classOrInterfaceDeclarationProvider, impact)
         }
     }
 
     private fun handleBinaryExpression(targetExpr: NameExpr, valueExpr: BinaryExpr) {
         // check if there are any method calls within binary expression
         val methodCallExpressions = valueExpr.descendantsOfType(MethodCallExpr::class.java)
-        val isFieldFromThisClass = flow.isFieldFromThisClass(targetExpr.nameAsString)
+        val isFieldFromCurrentClass = flow.isFieldFromCurrentClass(targetExpr.nameAsString)
         // if yes, try to resolve to typedarray getter (even if nested in other methods)
         methodCallExpressions.forEach { methodCallExpr ->
             when {
-                !isFieldFromThisClass && flow.isAttributeValueRetrievedWithMethodCall(methodCallExpr) -> {
+                !isFieldFromCurrentClass && flow.isAttributeValueRetrievedWithMethodCall(methodCallExpr) -> {
                     flow.setTypedArrayGetterForAttribute(methodCallExpr)
                     flow.addVariableAsDerivedFromAttribute(targetExpr.nameAsString, methodCallExpr)
                 }

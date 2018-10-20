@@ -3,11 +3,11 @@ package com.laidpack.sourcerer.generated.appcompat
 import android.content.Context
 import android.view.View
 import androidx.appcompat.widget.AppCompatCheckedTextView
-import com.laidpack.sourcerer.generated.TextViewFactory
+import com.laidpack.sourcerer.generated.CheckedTextViewFactory
 import java.lang.Class
 import kotlin.String
 
-open class AppCompatCheckedTextViewFactory<TView : AppCompatCheckedTextView, TAttributes : AppCompatCheckedTextViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : TextViewFactory<TView, TAttributes>(instanceType, attributesType) {
+open class AppCompatCheckedTextViewFactory<TView : AppCompatCheckedTextView, TAttributes : AppCompatCheckedTextViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : CheckedTextViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = AppCompatCheckedTextView(context)

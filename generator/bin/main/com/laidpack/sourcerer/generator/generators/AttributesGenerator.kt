@@ -189,7 +189,7 @@ class AttributesGenerator(
                     .build()
             )
         } else {
-            // if we only have one format, check if qualifier is needed
+            // if we only have one formats, check if qualifier is needed
             val firstFormatWithQualifier = formats.find { it.requiresQualifier }
                     ?: return this
             val firstQualifierClass = firstFormatWithQualifier.toQualifierAnnotationClassName()

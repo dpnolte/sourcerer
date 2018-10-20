@@ -3,10 +3,7 @@ package com.laidpack.sourcerer.services.adapters
 import com.laidpack.sourcerer.services.api.*
 import com.squareup.moshi.*
 import java.lang.reflect.Type
-
-// TODO.. move this to a jsonfactory? There we are supposed to delegate to adapters and we can
-// let's check this in a different module when we have our view factories
-// see also here as reference: https://stackoverflow.com/questions/49490641/passing-information-between-moshi-custom-type-adaptors
+import kotlin.reflect.KClass
 
 internal class MultiFormatAdapterFactory : JsonAdapter.Factory {
     override fun create(type: Type, annotations: MutableSet<out Annotation>, moshi: Moshi): JsonAdapter<*>? {
@@ -15,7 +12,12 @@ internal class MultiFormatAdapterFactory : JsonAdapter.Factory {
         } ?: return null
 
         val multiFormatQualifier = annotation as MultiFormatQualifier
-        return MultiFormatAdapter(getSortedFormats(multiFormatQualifier), moshi)
+        return MultiFormatAdapter(
+                getSortedFormats(multiFormatQualifier),
+                multiFormatQualifier.enumType,
+                multiFormatQualifier.flagsType,
+                moshi
+        )
 
     }
 
@@ -29,18 +31,24 @@ internal class MultiFormatAdapterFactory : JsonAdapter.Factory {
         ).toSet()
     }
 
+
     companion object {
         val qualifierType = MultiFormatQualifier::class
     }
 }
 
 
-internal class MultiFormatAdapter(private val allowedFormats: Set<Format>, private val moshi: Moshi) : JsonAdapter<MultiFormat>() {
+internal class MultiFormatAdapter(
+        private val allowedFormats: Set<Format>,
+        private val enumType: KClass<out AttributeEnum>,
+        private val flagsType: KClass<out AttributeEnum>,
+        private val moshi: Moshi
+) : JsonAdapter<MultiFormat>() {
     override fun fromJson(reader: JsonReader): MultiFormat? {
         val multiFormatValue = MultiFormat(allowedFormats)
         val jsonValue = reader.readJsonValue()
         val stringValue = jsonValue.toString()
-        val delegates = MultiFormat.getAdaptersMap(moshi)
+        val delegates = MultiFormat.getDelegatesPerFormat(moshi, enumType, flagsType)
         for (format in allowedFormats) {
             try {
                 val delegateProvider = delegates[format] ?: continue

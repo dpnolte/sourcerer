@@ -62,7 +62,7 @@ internal class LayoutElementAdapter(private val moshi: Moshi, private val elemen
                 id = id ?: throw JsonDataException("Required property 'id' missing at ${reader.path}"),
                 type = type,
                 attributes =  attributesDelegate.fromJsonValue(attributesAsJson) as IAttributes,
-                children = children ?: throw JsonDataException("Required property 'children' missing at ${reader.path}")
+                children = children?.toSet() ?: throw JsonDataException("Required property 'children' missing at ${reader.path}")
         )
     }
 

@@ -2,9 +2,10 @@ package com.laidpack.sourcerer.generated.material.components
 
 import android.content.Context
 import android.view.View
-import com.google.android.material.animation.MotionSpec
+import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.laidpack.sourcerer.generated.ImageViewFactory
+import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
@@ -21,15 +22,20 @@ open class FloatingActionButtonFactory<TView : FloatingActionButton, TAttributes
         super.init(view, context, attributes)
         if (view is FloatingActionButton) {
             view.apply {
+                attributes.backgroundTintMode?.let {
+                    val localBackgroundTintMode = it.value.toPorterDuffMode()
+                    if (backgroundTintMode != localBackgroundTintMode) {
+                        backgroundTintMode = localBackgroundTintMode
+                    }
+                }
                 attributes.rippleColor?.let {
-                    if (rippleColor != it) {
-                        rippleColor = it
+                    val localRippleColor = ResourcesCompat.getColorStateList(context.resources, it, null)
+                    if (rippleColorStateList != localRippleColor) {
+                        setRippleColor(localRippleColor)
                     }
                 }
                 attributes.fabSize?.let {
-                    if (size != it.value) {
-                        size = it.value
-                    }
+                    size = it.value
                 }
                 attributes.fabCustomSize?.let {
                     if (customSize != it) {
@@ -37,21 +43,21 @@ open class FloatingActionButtonFactory<TView : FloatingActionButton, TAttributes
                     }
                 }
                 attributes.elevation?.let {
-                    val immutableElevation = it.toFloat()
-                    if (compatElevation != immutableElevation) {
-                        compatElevation = immutableElevation
+                    val localElevation = it.toFloat()
+                    if (compatElevation != localElevation) {
+                        compatElevation = localElevation
                     }
                 }
                 attributes.hoveredFocusedTranslationZ?.let {
-                    val immutableHoveredFocusedTranslationZ = it.toFloat()
-                    if (compatHoveredFocusedTranslationZ != immutableHoveredFocusedTranslationZ) {
-                        compatHoveredFocusedTranslationZ = immutableHoveredFocusedTranslationZ
+                    val localHoveredFocusedTranslationZ = it.toFloat()
+                    if (compatHoveredFocusedTranslationZ != localHoveredFocusedTranslationZ) {
+                        compatHoveredFocusedTranslationZ = localHoveredFocusedTranslationZ
                     }
                 }
                 attributes.pressedTranslationZ?.let {
-                    val immutablePressedTranslationZ = it.toFloat()
-                    if (compatPressedTranslationZ != immutablePressedTranslationZ) {
-                        compatPressedTranslationZ = immutablePressedTranslationZ
+                    val localPressedTranslationZ = it.toFloat()
+                    if (compatPressedTranslationZ != localPressedTranslationZ) {
+                        compatPressedTranslationZ = localPressedTranslationZ
                     }
                 }
                 attributes.useCompatPadding?.let {
@@ -60,15 +66,13 @@ open class FloatingActionButtonFactory<TView : FloatingActionButton, TAttributes
                     }
                 }
                 attributes.showMotionSpec?.let {
-                    val immutableShowMotionSpec = MotionSpec.createFromResource(context, it)
-                    if (showMotionSpec != immutableShowMotionSpec) {
-                        showMotionSpec = immutableShowMotionSpec
+                    if (id != it) {
+                        setShowMotionSpecResource(it)
                     }
                 }
                 attributes.hideMotionSpec?.let {
-                    val immutableHideMotionSpec = MotionSpec.createFromResource(context, it)
-                    if (hideMotionSpec != immutableHideMotionSpec) {
-                        hideMotionSpec = immutableHideMotionSpec
+                    if (id != it) {
+                        setHideMotionSpecResource(it)
                     }
                 }
             }

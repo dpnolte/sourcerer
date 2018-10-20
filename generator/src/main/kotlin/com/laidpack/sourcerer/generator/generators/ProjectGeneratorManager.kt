@@ -30,8 +30,8 @@ class ProjectGeneratorManager(private val targetDir: File, moduleGenerators: Lis
             val file2 = FormatEnumGenerator().generateFile()
             file2.writeTo(targetDir)
 
-            //ApiGenerator(targetDir, env.apiSourcePath).writeFiles()
-            println("Created multi-format class and format enum...")
+            //TemplateGenerator(targetDir, env.apiSourcePath).writeFiles()
+            println("Created multi-formats class and formats enum...")
             println("=================================")
         }
 
@@ -53,11 +53,11 @@ class ProjectGeneratorManager(private val targetDir: File, moduleGenerators: Lis
 
         fun deleteTempFiles(env: SourcererEnvironment) {
             println("=================================")
-            for (file in env.stubAppGeneratedPackageDir.listFiles()) {
+            for (file in env.stubModuleGeneratedPackageDir.listFiles()) {
                 file.deleteRecursively()
             }
-            val dir = ".${env.stubAppGeneratedPackageDir.toString().replace(env.rootPath.toString(), "")}"
-            println("Deleted temp classes in stub app @ $dir")
+            val dir = ".${env.stubModuleGeneratedPackageDir.toString().replace(env.rootPath.toString(), "")}"
+            println("Deleted temp classes in stub module @ $dir")
             println("=================================")
         }
     }

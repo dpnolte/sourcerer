@@ -26,21 +26,24 @@ open class BottomNavigationViewFactory<TView : BottomNavigationView, TAttributes
                         labelVisibilityMode = it.value
                     }
                 }
+                attributes.itemBackground?.let {
+                    itemBackgroundResource = it
+                }
                 attributes.itemIconSize?.let {
                     if (itemIconSize != it) {
                         itemIconSize = it
                     }
                 }
                 attributes.itemIconTint?.let {
-                    val immutableItemIconTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (itemIconTintList != immutableItemIconTint) {
-                        itemIconTintList = immutableItemIconTint
+                    val localItemIconTint = ResourcesCompat.getColorStateList(context.resources, it, null)
+                    if (itemIconTintList != localItemIconTint) {
+                        itemIconTintList = localItemIconTint
                     }
                 }
                 attributes.itemTextColor?.let {
-                    val immutableItemTextColor = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (itemTextColor != immutableItemTextColor) {
-                        itemTextColor = immutableItemTextColor
+                    val localItemTextColor = ResourcesCompat.getColorStateList(context.resources, it, null)
+                    if (itemTextColor != localItemTextColor) {
+                        itemTextColor = localItemTextColor
                     }
                 }
             }

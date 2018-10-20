@@ -1,7 +1,6 @@
 package com.laidpack.sourcerer.generator.flow.attributes
 
 import com.laidpack.sourcerer.generator.*
-import com.laidpack.sourcerer.generator.peeker.ClassCategory
 import com.laidpack.sourcerer.generator.peeker.ClassInfo
 import com.laidpack.sourcerer.generator.peeker.ClassRegistry
 import com.laidpack.sourcerer.generator.peeker.TypedArrayInfo
@@ -12,18 +11,18 @@ class FlowInterpreter (
         private val classInfo: ClassInfo,
         private val typedArrayInfo: TypedArrayInfo,
         private val attributeManager: AttributeManager,
-        private val classRegistry: ClassRegistry
+        private val attributesDefinedInXml: Boolean
 ) : Interpreter {
     private val interpretations = mutableListOf<Interpretation>()
 
     override fun interpret(earlierIdentifiedSetters: Map<Int, Setter>): InterpretationResult {
-        classInfo.getMethodLikeWithAttributeSetAsParam().forEach { relevantConstructorOrMethod ->
+        classInfo.getCallablesWithAttributeSetAsParameter().forEach { relevantConstructorOrMethod ->
             val methodFlowInterpreter = FlowInMethodInterpreter(
                     relevantConstructorOrMethod,
                     classInfo,
                     typedArrayInfo,
                     attributeManager,
-                    classRegistry
+                    attributesDefinedInXml
             )
             val interpretation = methodFlowInterpreter.interpret()
             interpretations.add(interpretation)
@@ -36,13 +35,13 @@ class FlowInterpreter (
                 classInfo: ClassInfo,
                 typedArrayInfo: TypedArrayInfo,
                 attrManager: AttributeManager,
-                classRegistry: ClassRegistry
+                attributesDefinedInXml: Boolean
         ): Interpreter {
             return FlowInterpreter(
                     classInfo,
                     typedArrayInfo,
                     attrManager,
-                    classRegistry
+                    attributesDefinedInXml
             )
         }
 

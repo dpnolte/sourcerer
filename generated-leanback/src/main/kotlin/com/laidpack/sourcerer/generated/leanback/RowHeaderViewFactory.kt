@@ -3,11 +3,11 @@ package com.laidpack.sourcerer.generated.leanback
 import android.content.Context
 import android.view.View
 import androidx.leanback.widget.RowHeaderView
-import com.laidpack.sourcerer.generated.TextViewFactory
+import com.laidpack.sourcerer.generated.ViewFactory
 import java.lang.Class
 import kotlin.String
 
-open class RowHeaderViewFactory<TAttributes : RowHeaderViewAttributes>(attributesType: Class<TAttributes>) : TextViewFactory<RowHeaderView, TAttributes>(RowHeaderView::class.java, attributesType) {
+open class RowHeaderViewFactory<TAttributes : RowHeaderViewAttributes>(attributesType: Class<TAttributes>) : ViewFactory<RowHeaderView, TAttributes>(RowHeaderView::class.java, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = RowHeaderView(context)

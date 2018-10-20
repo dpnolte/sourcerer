@@ -25,8 +25,8 @@ fun generateMultiFormatFiles(targetPath: Path) {
     val file2 = FormatEnumGenerator().generateFile()
     file2.writeTo(targetDir)
 
-    //ApiGenerator(targetPath, env.apiSourcePath).writeFiles()
-    println("Created multi-format class and format enum...")
+    //TemplateGenerator(targetPath, env.apiSourcePath).writeFiles()
+    println("Created multi-formats class and formats enum...")
     println("=================================")
 }
 

@@ -3,16 +3,10 @@ package com.laidpack.sourcerer.generator.peeker
 import com.github.javaparser.ast.Node
 import com.github.javaparser.ast.body.*
 import com.github.javaparser.ast.expr.*
-import com.github.javaparser.javadoc.Javadoc
-import com.github.javaparser.resolution.UnsolvedSymbolException
-import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration
-import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration
-import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclaration
 import com.laidpack.sourcerer.generator.Store
 import com.laidpack.sourcerer.generator.firstAncestorOfType
 import com.laidpack.sourcerer.generator.firstDescendantOfType
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeEnumValue
-import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.target.Setter
 import com.laidpack.sourcerer.generator.resources.Widget
 import com.laidpack.sourcerer.generator.target.Getter
@@ -23,34 +17,9 @@ import kotlinx.dnq.enum.XdEnumEntityType
 import kotlinx.dnq.query.eq
 import kotlinx.dnq.query.first
 import kotlinx.dnq.query.query
+import kotlinx.dnq.query.toList
 import kotlinx.dnq.xdRequiredStringProp
 
-
-data class MethodInfo(
-        val resolvedMethodDeclaration: ResolvedMethodDeclaration,
-        val methodDeclaration: MethodDeclaration,
-        val javadoc: Javadoc
-) {
-    val line : Int = methodDeclaration.begin.get().line
-    fun describeReturnType(): String {
-        return try {
-            resolvedMethodDeclaration.returnType.describe()
-        } catch (e: Exception) {
-            val returnType = methodDeclaration.type
-            if (returnType.isClassOrInterfaceType) {
-                val indexedClass = ClassSymbolResolver.resolveClassOrInterfaceType(returnType.asClassOrInterfaceType())
-                indexedClass.targetClassName.canonicalName
-            } else throw e
-        }
-    }
-}
-
-
-
-data class ConstructorInfo(
-        val resolvedConstructorDeclaration: ResolvedConstructorDeclaration,
-        val constructorDeclaration: ConstructorDeclaration
-)
 data class ClassInfo(
         val targetClassName: ClassName,
         val widget: Widget,
@@ -58,21 +27,32 @@ data class ClassInfo(
         val isViewGroup: Boolean,
         val classDeclaration: ClassOrInterfaceDeclaration,
         val superClassNames: List<ClassName>,
-        val constructorOrMethodsWithAttributeSetParamKeys : Map<String, List<Int>>,
+        val callablesWithAttributeSetParameters : Map<Pair<CallableType, String>, List<Int>>,
         val methodsWithAttributeBlockTagKeys : Map<String, List<Int>>,
         val constructorDeclarations: Map<String, List<ConstructorInfo>>,
         val methodDeclarations: Map<String, List<MethodInfo>>,
         val fieldDeclarations: Map<String, FieldDeclaration>,
         val constructorExpression: ConstructorExpression,
-        val indexedClass: IndexedClass,
+        val xdClass: XdClass,
         val annotations: List<AnnotationExpr>,
         val intDefinedAnnotations: Map<String, AnnotationExpr>
 ) {
-    var hasResolvedAttributes: Boolean = false
-    val specifiedAttributes = mutableMapOf<String, Attribute>()
-    private var mutableResolvedAttributes = mapOf<String, Attribute>()
-    val resolvedAttributes : Map<String, Attribute>
-            get() = mutableResolvedAttributes
+    val superClassesInfo by lazy {
+        val superClassSymbolDescriptions= mutableListOf<ClassSymbolDescription>()
+        Store.transactional {
+            for (superClass in xdClass.superClasses.toList()) {
+                if (superClass.widget != null) {
+                    val superClassSymbol = ClassRegistry.getResolvedClassSymbolDescription(superClass)
+                    superClassSymbolDescriptions.add(superClassSymbol)
+                }
+            }
+        }
+        val classBodyPeeker = ClassBodyPeeker()
+        superClassSymbolDescriptions.map {
+            classBodyPeeker.peek(it)
+        }
+    }
+
     val hasSuperClass = superClassNames.isNotEmpty()
 
     val potentialGetters : List<MethodInfo> by lazy {
@@ -97,17 +77,17 @@ data class ClassInfo(
         }
     }
 
-    fun getMethodLikeWithAttributeSetAsParam(): List<Pair<ResolvedMethodLikeDeclaration, CallableDeclaration<*>>> {
-        val list = mutableListOf<Pair<ResolvedMethodLikeDeclaration, CallableDeclaration<*>>>()
-        constructorOrMethodsWithAttributeSetParamKeys.keys.forEach { key ->
-            val isConstructor = constructorDeclarations.containsKey(key)
-            constructorOrMethodsWithAttributeSetParamKeys[key]!!.forEach { index ->
-                if (isConstructor) {
-                    val constructorInfo = constructorDeclarations[key]!![index]
-                    list.add(Pair(constructorInfo.resolvedConstructorDeclaration, constructorInfo.constructorDeclaration))
+    fun getCallablesWithAttributeSetAsParameter(): List<CallableDeclaration<*>> {
+        val list = mutableListOf<CallableDeclaration<*>>()
+        for (key in callablesWithAttributeSetParameters.keys) {
+            val (callableType, memberName) = key
+            for (callableIndex in callablesWithAttributeSetParameters[key] as List<Int>) {
+                if (callableType == CallableType.Constructor) {
+                    val constructorInfo = constructorDeclarations[memberName]?.get(callableIndex) as ConstructorInfo
+                    list.add(constructorInfo.constructorDeclaration)
                 } else {
-                    val methodInfo = methodDeclarations[key]!![index]
-                    list.add(Pair(methodInfo.resolvedMethodDeclaration, methodInfo.methodDeclaration))
+                    val methodInfo = methodDeclarations[memberName]?.get(callableIndex) as MethodInfo
+                    list.add(methodInfo.methodDeclaration)
                 }
             }
         }
@@ -124,7 +104,24 @@ data class ClassInfo(
     }
 
     fun getMethodInfoByCallExpr(methodCallExpr: MethodCallExpr): MethodInfo? {
-        if(!methodCallExpr.scope.isPresent && methodDeclarations.containsKey(methodCallExpr.nameAsString)) {
+        val methodInfo = getMethodInfoByCallExprForThisClass(methodCallExpr)
+        if (methodInfo != null) {
+            return methodInfo
+        }
+
+        for (superClass in superClassesInfo) {
+            val superMethodInfo= superClass.getMethodInfoByCallExprForThisClass(methodCallExpr)
+            if (superMethodInfo != null) {
+                return superMethodInfo
+            }
+        }
+        return null
+    }
+
+    private fun getMethodInfoByCallExprForThisClass(methodCallExpr: MethodCallExpr): MethodInfo? {
+        if((!methodCallExpr.scope.isPresent || methodCallExpr.scope.get() is ThisExpr)
+                && methodDeclarations.containsKey(methodCallExpr.nameAsString)
+        ) {
             methodDeclarations[methodCallExpr.nameAsString]?.let {methodDeclarations ->
                 return if (methodDeclarations.size == 1) {
                     methodDeclarations.first()
@@ -149,29 +146,110 @@ data class ClassInfo(
         return null
     }
 
-    fun isPublicMethodCallFromThisClass(methodCallExpr: MethodCallExpr): Boolean {
+    fun isPublicMethodCallFromThisClassOrSuperClass(methodCallExpr: MethodCallExpr): Boolean {
+        if (isPublicMethodCallFromThisClass(methodCallExpr)) {
+            return true
+        }
+
+        for (superClass in superClassesInfo) {
+            if (superClass.isPublicMethodCallFromThisClass(methodCallExpr)) {
+                return true
+            }
+        }
+        return false
+    }
+    fun isMethodCallFromThisClassOrSuperClass(methodCallExpr: MethodCallExpr): Boolean {
+        if (isMethodCallFromThisClass(methodCallExpr)) {
+            return true
+        }
+
+        for (superClass in superClassesInfo) {
+            if (superClass.isMethodCallFromThisClass(methodCallExpr)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun isPublicMethodCallFromThisClass(methodCallExpr: MethodCallExpr): Boolean {
         val methodInfo = this.getMethodInfoByCallExpr(methodCallExpr)
         return methodInfo != null && methodInfo.methodDeclaration.isPublic
     }
 
-    fun isMethodCallFromThisClass(methodCallExpr: MethodCallExpr): Boolean {
-        return this.getMethodInfoByCallExpr(methodCallExpr) != null
+    private fun isMethodCallFromThisClass(methodCallExpr: MethodCallExpr): Boolean {
+        return this.methodDeclarations.containsKey(methodCallExpr.nameAsString)
     }
 
-    fun isFieldFromThisClass(variableName: String): Boolean {
+    fun getFieldFromThisClassOrSuperClass(variableName: String): FieldDeclaration? {
+        if (isFieldFromThisClass(variableName)) {
+            return getFieldFromThisClass(variableName)
+        }
+
+        for (superClass in superClassesInfo) {
+            if (superClass.isFieldFromThisClass(variableName)) {
+                return superClass.getFieldFromThisClass(variableName)
+            }
+        }
+        return null
+    }
+    fun getResolvedFieldFromThisClassOrSuperClass(variableName: String): FieldDeclaration {
+        return getFieldFromThisClassOrSuperClass(variableName)
+                ?: throw IllegalArgumentException("No field declaration with name '$variableName' in class '$targetClassName' or super classes '${superClassNames.joinToString()}'")
+    }
+
+    private fun isFieldFromThisClass(variableName: String): Boolean {
         return this.fieldDeclarations.containsKey(variableName)
     }
 
-    fun isPublicFieldFromThisClass(variableName: String): Boolean {
+    fun isPublicFieldFromThisClassOrSuperClass(variableName: String): Boolean {
+        if (isPublicFieldFromThisClass(variableName)) {
+            return true
+        }
+
+        for (superClass in superClassesInfo) {
+            if (superClass.isPublicFieldFromThisClass(variableName)) {
+                return true
+            }
+        }
+        return false
+    }
+    fun isFieldFromThisClassOrSuperClass(variableName: String): Boolean {
+        if (isFieldFromThisClass(variableName)) {
+            return true
+        }
+
+        for (superClass in superClassesInfo) {
+            if (superClass.isFieldFromThisClass(variableName)) {
+                return true
+            }
+        }
+        return false
+    }
+    private fun isPublicFieldFromThisClass(variableName: String): Boolean {
         return isFieldFromThisClass(variableName) && getFieldFromThisClass(variableName).isPublic
     }
 
-    fun getFieldFromThisClass(variableName: String): FieldDeclaration {
+    private fun getFieldFromThisClass(variableName: String): FieldDeclaration {
         if (!isFieldFromThisClass(variableName)) throw IllegalStateException("$variableName is not a member variable of $targetClassName")
         return this.fieldDeclarations[variableName] as FieldDeclaration
     }
 
-    fun getSetterMethodInfo(setter: Setter): MethodInfo {
+    fun getSetterFromThisClassOrSuperClass(setter: Setter): MethodInfo {
+        try {
+            return getSetterMethodInfo(setter)
+        } catch (e: IllegalArgumentException) {
+            for (superClass in superClassesInfo) {
+                try {
+                    return superClass.getSetterMethodInfo(setter)
+                } catch (e: IllegalArgumentException) {
+                    continue
+                }
+            }
+        }
+        throw IllegalArgumentException("No method info for setter '${setter.name}' in class '$targetClassName' or super classes '${superClassNames.joinToString()}'")
+    }
+
+    private fun getSetterMethodInfo(setter: Setter): MethodInfo {
         val methodInfos = methodDeclarations[setter.name] ?: throw IllegalArgumentException("No method info for setter ${setter.name}, no match based on name")
         if (methodInfos.size == 1) return methodInfos.first()
 
@@ -181,7 +259,22 @@ data class ClassInfo(
         }
     }
 
-    fun getGetterMethodInfo(getter: Getter): MethodInfo {
+    fun getGetterFromThisClassOrSuperClass(getter: Getter): MethodInfo {
+        try {
+            return getGetterMethodInfo(getter)
+        } catch (e: IllegalArgumentException) {
+            for (superClass in superClassesInfo) {
+                try {
+                    return superClass.getGetterMethodInfo(getter)
+                } catch (e: IllegalArgumentException) {
+                    continue
+                }
+            }
+        }
+        throw IllegalArgumentException("No method info for getter '${getter.name}' in class '$targetClassName' or super classes '${superClassNames.joinToString()}'")
+    }
+
+    private fun getGetterMethodInfo(getter: Getter): MethodInfo {
         val methodInfos = methodDeclarations[getter.name] ?: throw IllegalArgumentException("No method info for getter ${getter.name}, no match based on name")
         if (methodInfos.size == 1) return methodInfos.first()
 
@@ -189,11 +282,6 @@ data class ClassInfo(
         return methodInfos.first {
             Getter.getHashCodeFromMethodInfo(it) == hashCode
         }
-    }
-
-    fun setResolvedAttributes(attrs : Map<String, Attribute>) {
-        mutableResolvedAttributes = attrs
-        hasResolvedAttributes = true
     }
 
     fun convertIntDefinedAnnotationToEnum(
@@ -233,15 +321,15 @@ data class ClassInfo(
             val fieldAccessExpr = node.firstDescendantOfType(FieldAccessExpr::class.java)
             if (fieldAccessExpr != null) {
                 return resolveFieldAccessExpr(fieldAccessExpr)
-                    ?: throw IllegalStateException("Could not resolve int value for node $node with field access expression $fieldAccessExpr")
+                    ?: throw IllegalStateException("Could not resolve int value for classOrInterfaceDeclarationProvider $node with field access expression $fieldAccessExpr")
             }
             val binaryExpr = node.firstDescendantOfType(BinaryExpr::class.java)
             if (binaryExpr != null) {
                 return resolveBinaryExpr(binaryExpr)
-                        ?: throw IllegalStateException("Could not resolve int value for node $node with binary expression $binaryExpr")
+                        ?: throw IllegalStateException("Could not resolve int value for classOrInterfaceDeclarationProvider $node with binary expression $binaryExpr")
             }
             val nameExpr = node.firstDescendantOfType(NameExpr::class.java)
-                    ?: throw IllegalArgumentException("Cannot resolve node to Int. No integer literal expression, field access expression, binary expression, or name expression found for node '$node'")
+                    ?: throw IllegalArgumentException("Cannot resolve classOrInterfaceDeclarationProvider to Int. No integer literal expression, field access expression, binary expression, or name expression found for classOrInterfaceDeclarationProvider '$node'")
 
             return resolveNameExpr(nameExpr)
         }
@@ -288,7 +376,7 @@ data class ClassInfo(
         val foundClasses = ClassRegistry.findBySimpleName(simpleName)
         if (foundClasses.isNotEmpty()) {
             for (foundClass in foundClasses) {
-                val classDeclaration = foundClass.node
+                val classDeclaration = foundClass.classOrInterfaceDeclarationProvider()
                 return classDeclaration.firstDescendantOfType(
                         VariableDeclarator::class.java
                 ) { v -> v.nameAsString == fieldName } ?: continue

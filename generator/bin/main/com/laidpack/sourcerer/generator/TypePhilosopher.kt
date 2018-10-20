@@ -68,9 +68,9 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
                 println("\t\t\t! - Skipping code block (no setter remaining after getter matching). Attribute name(s): '${codeBlock.attributes.values.joinToString(", "){ it.name }}'")
             }
         }
-        // we need post-process multi-formatted attrs -- only with all processed setters, we can establish 1-by-1 format/setter links
+        // we need post-process multi-formatted attrs -- only with all processed setters, we can establish 1-by-1 formats/setter links
         selectedCodeBlocks.forEach { codeBlock ->
-            // only focus on multi-format attributes with multiple setters
+            // only focus on multi-formats attributes with multiple setters
             if (codeBlock.attributes.values.any { attr -> attr.formats.size > 1 && attr.setterHashCodes.size > 1 }) {
                 handleMultiFormatAttributesWithMultipleSetters(codeBlock)
             }
@@ -97,7 +97,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
             typesForThisSetter.hasEnumAsAttributeType = true
             typesForThisSetter.enumClassName = result.enumClassName
         }
-        // assign new format when it was unspecified and it is based on setter type
+        // assign new formats when it was unspecified and it is based on setter type
         if (attribute.formats.size == 1
                 && attribute.formats.first() == StyleableAttributeFormat.Unspecified
                 && typesForThisSetter.formats.first() != StyleableAttributeFormat.Unspecified
@@ -165,7 +165,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
                 )
             }
             attribute.formats.size == 1 && attribute.flags.isNotEmpty() -> {
-                // TODO: make this multi format value (i.e., flags and random integer)?
+                // TODO: make this multi formats value (i.e., flags and random integer)?
                 val className = ClassName(SourcererEnvironment.generatedPackageName, attribute.name.toCamelCase() + "FlagsEnum")
                 AttributeTypeResult(
                         className,
@@ -181,7 +181,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
                             setOf(format)
                     )
                 } else {
-                    // try to specify format by setter parameter type
+                    // try to specify formats by setter parameter type
                     val setterType = considerWhatTypeReallyIsAtTheRudimentaryLevel(typesForThisSetter.setterClassName)
                     val matchedFormat = StyleableAttributeFormat.fromTypeName(setterType)
                     AttributeTypeResult(matchedFormat.toClass().asTypeName(), setOf(matchedFormat))
@@ -210,7 +210,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
             else -> null
         }
         for (format in attribute.formats) {
-            //if (formatAssignedToOtherSetter(otherSetters, attribute, format)) continue
+            //if (formatAssignedToOtherSetter(otherSetters, attribute, formats)) continue
             val formatTypeName = format.toClass().asTypeName()
             val parameterFormatTypeName = parameter.format.toClass().asTypeName()
             val directlyMatchingFormat = getFormatThatMatchesDirectlyWithSetter(setter, attribute, format)
@@ -223,7 +223,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
             }
         }
         if (formats.isEmpty())
-            throw IllegalStateException("No appropriate format found for '${attribute.name}'. Setter parameter type: '$setterType'. Possible formats: '${attribute.formats.joinToString(", ")}'")
+            throw IllegalStateException("No appropriate formats found for '${attribute.name}'. Setter parameter type: '$setterType'. Possible formats: '${attribute.formats.joinToString(", ")}'")
         return AttributeTypeResult(MultiFormatGenerator.multiFormatClassName, formats, enumClassName)
     }
 
@@ -305,7 +305,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
         // only focus on attributes with multiple setters
 
         for (attribute in codeBlock.attributes.values) {
-            // secondly, build a format to setter map to identify formats being used for multiple setters
+            // secondly, build a formats to setter map to identify formats being used for multiple setters
             if (attribute.formats.size > 1 && attribute.setterHashCodes.size > 1) {
                 val formatToSetterHashCodesMap = mutableMapOf<StyleableAttributeFormat, MutableSet<Int>>()
                 for (typesForSetterPair in attribute.typesPerSetter) {

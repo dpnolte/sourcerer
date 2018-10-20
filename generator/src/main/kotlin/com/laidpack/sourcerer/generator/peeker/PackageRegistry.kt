@@ -4,36 +4,28 @@ import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.laidpack.sourcerer.generator.Store
-import jetbrains.exodus.entitystore.Entity
-import kotlinx.dnq.*
 import kotlinx.dnq.query.*
 
 
-class IndexedPackage(entity: Entity) : XdEntity(entity) {
-    companion object : XdNaturalEntityType<IndexedPackage>()
-    var packageName by xdRequiredStringProp(unique = true, trimmed = true)
-    val classes  by xdLink0_N(IndexedClass::indexedPackage)
-}
-
 object PackageRegistry {
-    fun findOrCreate(packageName: String): IndexedPackage {
+    fun findOrCreate(packageName: String): XdPackage {
         return Store.transactional {
-            IndexedPackage.query(IndexedPackage::packageName eq packageName).firstOrNull() ?:
-                    IndexedPackage.new {
+            XdPackage.query(XdPackage::packageName eq packageName).firstOrNull() ?:
+                    XdPackage.new {
                        this.packageName = packageName
                     }
         }
     }
 
-    fun findClassInPackage(cu: CompilationUnit, classOrInterfaceType: ClassOrInterfaceType): List<IndexedClass> {
+    fun findClassInPackage(cu: CompilationUnit, classOrInterfaceType: ClassOrInterfaceType): List<XdClass> {
         if (cu.packageDeclaration.isPresent) {
             val currentPackageName = cu.packageDeclaration.get().nameAsString
             val simpleName = classOrInterfaceType.name.identifier
             return Store.transactional {
 
-                val indexedPackage = IndexedPackage.query(IndexedPackage::packageName eq currentPackageName).firstOrNull()
+                val indexedPackage = XdPackage.query(XdPackage::packageName eq currentPackageName).firstOrNull()
                 val result = indexedPackage?.classes?.query(
-                        IndexedClass::simpleName eq simpleName
+                        XdClass::simpleName eq simpleName
                 ) ?: return@transactional listOf()
 
                 val resultList = result.toList()
@@ -58,13 +50,13 @@ object PackageRegistry {
         return listOf()
     }
 
-    fun findClassInPackage(packageName: String, simpleName: String): IndexedClass? {
-        var result : IndexedClass? = null
+    fun findClassInPackage(packageName: String, simpleName: String): XdClass? {
+        var result : XdClass? = null
         Store.transactional {
-            val nullableIndexedPackage = IndexedPackage.query(IndexedPackage::packageName eq packageName).firstOrNull()
+            val nullableIndexedPackage = XdPackage.query(XdPackage::packageName eq packageName).firstOrNull()
             nullableIndexedPackage?.let { indexedPackage ->
                 result = indexedPackage.classes.query(
-                        IndexedClass::simpleName eq simpleName
+                        XdClass::simpleName eq simpleName
                 ).firstOrNull()
             }
         }
@@ -75,14 +67,14 @@ object PackageRegistry {
             cu: CompilationUnit,
             classDeclaration: ClassOrInterfaceDeclaration,
             classOrInterfaceType: ClassOrInterfaceType
-    ): IndexedClass? {
+    ): XdClass? {
         if (cu.packageDeclaration.isPresent) {
             val packageName = cu.packageDeclaration.get().nameAsString
             val className = classDeclaration.nameAsString
             val nestedClassName = classOrInterfaceType.nameAsString
             return Store.transactional {
-                IndexedClass.query(
-                        IndexedClass::canonicalName eq  "$packageName.$className.$nestedClassName"
+                XdClass.query(
+                        XdClass::canonicalName eq  "$packageName.$className.$nestedClassName"
                 ).firstOrNull()
             }
         }
@@ -91,45 +83,47 @@ object PackageRegistry {
 
 
 
-    private val androidXPackages = mutableListOf<IndexedPackage>()
+    private val androidXPackages = mutableListOf<XdPackage>()
     private fun retrieveAndroidXPackages() {
         androidXPackages.clear()
         Store.transactional {
-            androidXPackages.addAll(IndexedPackage.query(
-                    IndexedPackage::packageName startsWith "androidx"
+            androidXPackages.addAll(XdPackage.query(
+                XdPackage::packageName startsWith "androidx"
             ).toList())
         }
     }
 
-    fun findClassInAndroidX(simpleName: String): List<IndexedClass> {
+    fun findClassInAndroidX(simpleName: String): List<XdClass> {
         if (androidXPackages.isEmpty()) {
             retrieveAndroidXPackages()
         }
         return Store.transactional {
-            val matchedClasses = mutableListOf<IndexedClass>()
+            val matchedClasses = mutableListOf<XdClass>()
             for (androidXPackage in androidXPackages) run {
-                matchedClasses.addAll(IndexedClass.query(
-                        (IndexedClass::indexedPackage eq androidXPackage)
+                matchedClasses.addAll(XdClass.query(
+                        (XdClass::xdPackage eq androidXPackage)
                                 and
-                            (IndexedClass::simpleName eq simpleName)
+                            (XdClass::simpleName eq simpleName)
                 ).toList())
             }
-            matchedClasses
+            if (matchedClasses.size > 1) {
+                matchedClasses.filter { !it.canonicalName.contains("legacy") }
+            } else matchedClasses
         }
     }
 
-    operator fun get(packageName: String): IndexedPackage? {
+    operator fun get(packageName: String): XdPackage? {
         return Store.transactional {
-            IndexedPackage.query(IndexedPackage::packageName eq packageName).firstOrNull()
+            XdPackage.query(XdPackage::packageName eq packageName).firstOrNull()
         }
     }
 
     private fun isDirectlyNested(
-            indexedClass: IndexedClass,
+            xdClass: XdClass,
             packageName: String,
             simpleName: String
     ): Boolean {
         val regex = Regex(".*?${Regex.escape(packageName)}.\\w+\\.${Regex.escape(simpleName)}.*?")
-        return regex.matches(indexedClass.targetClassName.canonicalName)
+        return regex.matches(xdClass.targetClassName.canonicalName)
     }
 }

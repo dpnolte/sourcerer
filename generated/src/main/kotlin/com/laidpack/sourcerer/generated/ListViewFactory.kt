@@ -24,35 +24,35 @@ open class ListViewFactory<TView : ListView, TAttributes : ListViewAttributes>(i
         if (view is ListView) {
             view.apply {
                 if (attributes.divider.hasColor || attributes.divider.hasReference) {
-                    val immutableDivider = when {
+                    val localDivider = when {
                         attributes.divider.hasColor -> ColorDrawable(attributes.divider.color)
                         else -> ContextCompat.getDrawable(context, attributes.divider.reference) as Drawable
                     }
-                    if (divider != immutableDivider) {
-                        divider = immutableDivider
+                    if (divider != localDivider) {
+                        divider = localDivider
                     }
                 }
                 attributes.dividerHeight?.let {
-                    if (dividerHeight != it) {
+                    if (height != it) {
                         dividerHeight = it
                     }
                 }
                 if (attributes.overScrollHeader.hasColor || attributes.overScrollHeader.hasReference) {
-                    val immutableOverScrollHeader = when {
+                    val localOverScrollHeader = when {
                         attributes.overScrollHeader.hasColor -> ColorDrawable(attributes.overScrollHeader.color)
                         else -> ContextCompat.getDrawable(context, attributes.overScrollHeader.reference) as Drawable
                     }
-                    if (overscrollHeader != immutableOverScrollHeader) {
-                        overscrollHeader = immutableOverScrollHeader
+                    if (overscrollHeader != localOverScrollHeader) {
+                        overscrollHeader = localOverScrollHeader
                     }
                 }
                 if (attributes.overScrollFooter.hasColor || attributes.overScrollFooter.hasReference) {
-                    val immutableOverScrollFooter = when {
+                    val localOverScrollFooter = when {
                         attributes.overScrollFooter.hasColor -> ColorDrawable(attributes.overScrollFooter.color)
                         else -> ContextCompat.getDrawable(context, attributes.overScrollFooter.reference) as Drawable
                     }
-                    if (overscrollFooter != immutableOverScrollFooter) {
-                        overscrollFooter = immutableOverScrollFooter
+                    if (overscrollFooter != localOverScrollFooter) {
+                        overscrollFooter = localOverScrollFooter
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 19) {

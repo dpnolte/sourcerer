@@ -2,19 +2,21 @@
 package com.laidpack.sourcerer.services.api
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.services.adapters.FlagsAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.SortedMap
 import kotlin.Any
 import kotlin.Boolean
 import kotlin.Float
 import kotlin.Int
 import kotlin.String
+import kotlin.collections.Map
 import kotlin.collections.Set
 import kotlin.jvm.Transient
+import kotlin.reflect.KClass
 
 @TypeScript
-class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) {
+open class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) {
     var mutableBoolean: Boolean? = null
 
     val hasBoolean: Boolean
@@ -92,7 +94,20 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
             return mutableString ?: throw IllegalStateException("String is null")
         }
 
-    var mutableEnum: Int? = null
+    @Transient
+    var mutableFlags: FlagsAccumulator? = null
+
+    val hasFlags: Boolean
+        get() = mutableFlags != null
+
+    val flags: Int
+        get() {
+            if (!allowedFormats.contains(Format.Flags)) throw IllegalStateException("Format 'Flags' is not allowed as value")
+            return mutableFlags?.value ?: throw IllegalStateException("Flags is null")
+        }
+
+    @Transient
+    var mutableEnum: AttributeEnum? = null
 
     val hasEnum: Boolean
         get() = mutableEnum != null
@@ -100,7 +115,7 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
     val enum: Int
         get() {
             if (!allowedFormats.contains(Format.Enum)) throw IllegalStateException("Format 'Enum' is not allowed as value")
-            return mutableEnum ?: throw IllegalStateException("Enum is null")
+            return mutableEnum?.value ?: throw IllegalStateException("Enum is null")
         }
 
     var mutableFraction: Float? = null
@@ -133,12 +148,13 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
         			|| mutableDimension != null
         			|| mutableInteger != null
         			|| mutableString != null
+        			|| mutableFlags != null
         			|| mutableEnum != null
         			|| mutableFraction != null
         			|| mutableUnspecified != null
 
-    fun setValue(format: Format, value: Any) {
-        when (format) {
+    fun setValue(formats: Format, value: Any) {
+        when (formats) {
             Format.Boolean -> mutableBoolean = value as Boolean
             Format.Color -> mutableColor = value as Int
             Format.Reference -> mutableReference = value as Int
@@ -146,24 +162,52 @@ class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) 
             Format.Dimension -> mutableDimension = value as Int
             Format.Integer -> mutableInteger = value as Int
             Format.String -> mutableString = value as String
-            Format.Enum -> mutableEnum = value as Int
+            Format.Flags -> mutableFlags = value as FlagsAccumulator
+            Format.Enum -> mutableEnum = value as AttributeEnum
             Format.Fraction -> mutableFraction = value as Float
             Format.Unspecified -> mutableUnspecified = value as Int
         }
     }
 
     companion object {
-        fun getAdaptersMap(moshi: Moshi): SortedMap<Format, () -> JsonAdapter<*>> = sortedMapOf(
-        			Format.Reference to {moshi.adapter<Int?>(Int::class.javaObjectType, ReferenceQualifier::class.java) as JsonAdapter<*>},
-        			Format.Color to {moshi.adapter<Int?>(Int::class.javaObjectType, ColorQualifier::class.java) as JsonAdapter<*>},
-        			Format.Dimension to {moshi.adapter<Int?>(Int::class.javaObjectType, DimensionQualifier::class.java) as JsonAdapter<*>},
-        			Format.Boolean to {moshi.adapter<Boolean?>(Boolean::class.javaObjectType) as JsonAdapter<*>},
-        			Format.Float to {moshi.adapter<Float?>(Float::class.javaObjectType) as JsonAdapter<*>},
-        			Format.Integer to {moshi.adapter<Int?>(Int::class.javaObjectType) as JsonAdapter<*>},
-        			Format.String to {moshi.adapter<String?>(String::class.javaObjectType) as JsonAdapter<*>},
-        			Format.Enum to {moshi.adapter<Int?>(Int::class.javaObjectType) as JsonAdapter<*>},
-        			Format.Fraction to {moshi.adapter<Float?>(Float::class.javaObjectType) as JsonAdapter<*>},
-        			Format.Unspecified to {moshi.adapter<Int?>(Int::class.javaObjectType) as JsonAdapter<*>}
-        		)
+        private val delegatesMapProvider: (moshi: Moshi) -> Map<Format, () -> JsonAdapter<*>> =
+                {moshi -> sortedMapOf(
+                			Format.Reference to {moshi.adapter<Int?>(Int::class.javaObjectType, ReferenceQualifier::class.java) as JsonAdapter<*>},
+                			Format.Color to {moshi.adapter<Int?>(Int::class.javaObjectType, ColorQualifier::class.java) as JsonAdapter<*>},
+                			Format.Dimension to {moshi.adapter<Int?>(Int::class.javaObjectType, DimensionQualifier::class.java) as JsonAdapter<*>},
+                			Format.Flags to {moshi.adapter<Int?>(Int::class.javaObjectType, FlagsQualifier::class.java) as JsonAdapter<*>},
+                			Format.Boolean to {moshi.adapter<Boolean?>(Boolean::class.javaObjectType) as JsonAdapter<*>},
+                			Format.Float to {moshi.adapter<Float?>(Float::class.javaObjectType) as JsonAdapter<*>},
+                			Format.Integer to {moshi.adapter<Int?>(Int::class.javaObjectType) as JsonAdapter<*>},
+                			Format.String to {moshi.adapter<String?>(String::class.javaObjectType) as JsonAdapter<*>},
+                			Format.Fraction to {moshi.adapter<Float?>(Float::class.javaObjectType) as JsonAdapter<*>},
+                			Format.Unspecified to {moshi.adapter<Int?>(Int::class.javaObjectType) as JsonAdapter<*>}
+                		)}
+
+        private var initializedDelegatesMap: Boolean = false
+
+        private lateinit var delegatesMap: Map<Format, () -> JsonAdapter<*>>
+
+        fun getDelegatesPerFormat(
+            moshi: Moshi,
+            enumType: KClass<out AttributeEnum> = MissingType::class,
+            flagsType: KClass<out AttributeEnum> = MissingType::class
+        ): Map<Format, () -> JsonAdapter<*>> {
+            if (!initializedDelegatesMap) {
+                delegatesMap = delegatesMapProvider(moshi)
+                initializedDelegatesMap = true
+            }
+            if (enumType != MissingType::class || flagsType != MissingType::class) {
+                val map = delegatesMap.toMutableMap()
+                if (enumType != MissingType::class) {
+                    map[Format.Enum] = {moshi.adapter(enumType.javaObjectType) as JsonAdapter<*>}
+                }
+                if (flagsType != MissingType::class) {
+                    map[Format.Flags] = {FlagsAdapter(flagsType)}
+                }
+                return map
+            }
+            return delegatesMap
+        }
     }
 }

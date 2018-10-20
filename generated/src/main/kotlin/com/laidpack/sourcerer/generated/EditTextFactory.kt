@@ -6,7 +6,7 @@ import android.widget.EditText
 import java.lang.Class
 import kotlin.String
 
-open class EditTextFactory<TView : EditText, TAttributes : EditTextAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : TextViewFactory<TView, TAttributes>(instanceType, attributesType) {
+open class EditTextFactory<TView : EditText, TAttributes : EditTextAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = EditText(context)

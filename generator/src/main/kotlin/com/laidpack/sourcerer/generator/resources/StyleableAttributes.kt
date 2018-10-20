@@ -14,18 +14,22 @@ import kotlinx.dnq.xdRequiredStringProp
 import org.w3c.dom.Document
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
+import java.lang.NumberFormatException
 import java.net.URL
-import java.nio.file.Path
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 
 
-class StyleableAttributeManager {
+class StyleableAttributeManager(private val env: SourcererEnvironment) {
     private val docFactory = DocumentBuilderFactory.newInstance()
     private val docBuilder = docFactory.newDocumentBuilder()
     private val docs = mutableMapOf<String, Document>()
     private val xpFactory = XPathFactory.newInstance()
+    private val rootLevelAttributes = getStylableAttributes(
+            getResourcesNode(),
+            isResourcesNode = true
+    )
 
     fun hasAttributesDefined(className: ClassName, widget: Widget): Boolean {
         return widget.hasAttributesFile && findStyleable(getStyleableNameFromClassName(className), widget) != null
@@ -75,7 +79,7 @@ class StyleableAttributeManager {
             val attribute = Attribute(
                     classInfo.targetClassName,
                     styleableAttr.name,
-                    styleableAttr.format,
+                    styleableAttr.formats,
                     styleableAttr.flags,
                     styleableAttr.enumValues,
                     ResolvedStatus.IDENTIFIED_IN_XML
@@ -85,6 +89,16 @@ class StyleableAttributeManager {
         return attributes
     }
 
+    private fun getResourcesNode(): Node {
+        val xPath = xpFactory.newXPath()
+        val selector = "/resources"
+        val nodeList = xPath.compile(selector)
+                .evaluate(
+                        getDoc(env.sdkStructure.attributesFilePath.toUri().toURL()),
+                        XPathConstants.NODESET
+                ) as NodeList
+        return nodeList.item(0)
+    }
     private fun findStyleable(name: String, widget: Widget): Node? {
         if (!cachedStyleableNodes.containsKey(name)) {
             val xPath = xpFactory.newXPath()
@@ -107,10 +121,10 @@ class StyleableAttributeManager {
         return cachedAttributes[styleableName] as Map<String, StyleableAttribute>
     }
 
-    private fun getStylableAttributes(stylable: Node) : Map<String, StyleableAttribute> {
+    private fun getStylableAttributes(stylableOrResources: Node, isResourcesNode: Boolean = false) : Map<String, StyleableAttribute> {
         val xPath = xpFactory.newXPath()
         val selector = "attr"
-        val nodes =  xPath.compile(selector).evaluate(stylable, XPathConstants.NODESET) as DTMNodeList
+        val nodes =  xPath.compile(selector).evaluate(stylableOrResources, XPathConstants.NODESET) as DTMNodeList
         val attributes = mutableMapOf<String, StyleableAttribute>()
         for (i in 0 until nodes.length) {
             val node = nodes.item(i)
@@ -118,21 +132,32 @@ class StyleableAttributeManager {
                 val name = node.attributes.getNamedItem("name").nodeValue
                 if (name.startsWith("__removed")) continue
 
-                val format = mutableListOf<StyleableAttributeFormat>()
+                val formats = mutableListOf<StyleableAttributeFormat>()
                 if (node.attributes.getNamedItem("format") != null) {
                     val formatString = node.attributes.getNamedItem("format").nodeValue
-                    format.addAll(StyleableAttributeFormat.fromString(formatString))
+                    formats.addAll(StyleableAttributeFormat.fromString(formatString))
                 }
                 val flags = getFlags(node)
                 val enumValues = getEnumValues(node)
-                if (format.isEmpty()) {
-                    when {
-                        enumValues.isNotEmpty() -> format.add(StyleableAttributeFormat.Enum)
-                        flags.isNotEmpty() -> format.add(StyleableAttributeFormat.Integer)
-                        else -> format.add(StyleableAttributeFormat.Unspecified)
+                when {
+                    enumValues.isNotEmpty() && !formats.contains(StyleableAttributeFormat.Enum)
+                        -> formats.add(StyleableAttributeFormat.Enum)
+                    flags.isNotEmpty() && !formats.contains(StyleableAttributeFormat.Flags)
+                        -> formats.add(StyleableAttributeFormat.Flags)
+                    formats.isEmpty() -> {
+                        // check if attribute is defined at root level
+                        if (!isResourcesNode && rootLevelAttributes.containsKey(name)) {
+                            val rootLevelAttr = rootLevelAttributes[name] as StyleableAttribute
+                            formats.addAll(rootLevelAttr.formats)
+                            flags.addAll(rootLevelAttr.flags)
+                            enumValues.addAll(rootLevelAttr.enumValues)
+                        } else {
+                            formats.add(StyleableAttributeFormat.Unspecified)
+                        }
                     }
                 }
-                val attribute = StyleableAttribute(name, format, flags, enumValues)
+
+                val attribute = StyleableAttribute(name, formats, flags, enumValues)
                 attributes[attribute.name] = attribute
             }
         }
@@ -148,14 +173,18 @@ class StyleableAttributeManager {
             val flagNode = flagNodes.item(i)
             if (flagNode.hasAttributes() && flagNode.attributes.getNamedItem("name") != null && flagNode.attributes.getNamedItem("value") != null) {
                 val valueAsString = flagNode.attributes.getNamedItem("value").nodeValue
-                val value = when {
-                    valueAsString.startsWith("0x") -> valueAsString.substring(2).toInt(16)
-                    else -> valueAsString.toInt()
+                try {
+                    val value = when {
+                        valueAsString.startsWith("0x") -> valueAsString.substring(2).toInt(16)
+                        else -> valueAsString.toInt()
+                    }
+                    flags.add(StyleableAttributeFlag(
+                            flagNode.attributes.getNamedItem("name").nodeValue,
+                            value
+                    ))
+                } catch (e: NumberFormatException) {
+                    continue // out of bounds flag.. ignore for now
                 }
-                flags.add(StyleableAttributeFlag(
-                        flagNode.attributes.getNamedItem("name").nodeValue,
-                        value
-                ))
             }
         }
         return flags
@@ -199,8 +228,8 @@ class StyleableAttributeManager {
             val nodes = xPath.compile(selector).evaluate(getDoc(url), XPathConstants.NODESET) as DTMNodeList
             for (i in 0 until nodes.length) {
                 val node = nodes.item(i)
-                if (node.hasAttributes() && node.attributes.getNamedItem("format") != null) {
-                    val attributeFormat = node.attributes.getNamedItem("format").nodeValue
+                if (node.hasAttributes() && node.attributes.getNamedItem("formats") != null) {
+                    val attributeFormat = node.attributes.getNamedItem("formats").nodeValue
                     if (!formats.contains(attributeFormat)) {
                         formats.add(attributeFormat)
                     }
@@ -218,7 +247,7 @@ class StyleableAttributeManager {
 
 data class StyleableAttribute(
         val name: String,
-        val format: MutableList<StyleableAttributeFormat>,
+        val formats: MutableList<StyleableAttributeFormat>,
         val flags: MutableList<StyleableAttributeFlag>,
         val enumValues: MutableList<StyleableAttributeEnumValue>
 )

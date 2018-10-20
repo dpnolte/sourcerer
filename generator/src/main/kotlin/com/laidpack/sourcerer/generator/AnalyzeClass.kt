@@ -2,6 +2,7 @@
 
 package com.laidpack.sourcerer.generator
 
+import com.laidpack.sourcerer.generator.flow.BaseNodeHandler
 import com.laidpack.sourcerer.generator.peeker.*
 import com.laidpack.sourcerer.generator.resources.*
 import com.laidpack.sourcerer.generator.target.XdAttribute
@@ -12,14 +13,15 @@ import com.github.javaparser.ast.Node as JavaNode
 
 
 fun main(args: Array<String>) {
-    //val input = "CoordinatorLayout" // simple name
-    val input = "androidx.recyclerview.widget.RecyclerView" // canonical name
+    //val input = "TextView" // simple name
+    val input = "androidx.wear.widget.WearableRecyclerView" // canonical name
     SourcererEnvironment.printFlowInterpreterTrace = true
     val env = SourcererEnvironment(args)
     initParserAndStore(env)
 
-    val widgetRegistry = getWidgetRegistry(env)
+    val widgetRegistry = WidgetRegistry.create(env)
     val sourcerer = Sourcerer(env)
+    //Store.deleteSourcererResults()
 
     val indexedClasses = when {
         input.contains(".") ->  {
@@ -28,7 +30,8 @@ fun main(args: Array<String>) {
         }
         else -> ClassRegistry.findBySimpleName(input)
     }
-    var anyDependingDerivedClasses = listOf<IndexedClass>()
+    var anyDependingDerivedClasses = listOf<XdClass>()
+    val anyDependingDerivedClassNames = mutableListOf<String>()
     when {
         indexedClasses.size > 1 -> {
             val classNames = Store.transactional {
@@ -55,13 +58,16 @@ fun main(args: Array<String>) {
                 }
             }
             // remove class index to force re-index
-            ClassRegistry.assignResolvementStatus(indexedClass, false, false)
-            FileRegistry.deleteFileIndexByClass(indexedClass)
             anyDependingDerivedClasses.forEach { derivedClass ->
-                ClassRegistry.assignResolvementStatus(derivedClass, false, false)
-                FileRegistry.deleteFileIndexByClass(derivedClass)
+                try {
+                    anyDependingDerivedClassNames.add(derivedClass.targetClassName.canonicalName)
+                    FileRegistry.deleteFileIndexByClass(derivedClass)
+                } catch (e: Exception) {
+                    // continue
+                }
 
             }
+            FileRegistry.deleteFileIndexByClass(indexedClass)
             //Store.deleteSourcererResult(simpleName)
         }
         else -> throw java.lang.IllegalArgumentException("No class found with (simple) name '$input'")
@@ -77,15 +83,18 @@ fun main(args: Array<String>) {
     sourcerer.generateFactoriesForClass(targetClass)
 
     // process any dependent classes
-    if (anyDependingDerivedClasses.isNotEmpty()) {
+    if (anyDependingDerivedClassNames.isNotEmpty()) {
         SourcererEnvironment.printFlowInterpreterTrace = false
         println("=======================================")
         println("=======================================")
         println("=======================================")
         println("Processing derived depending classes")
-        anyDependingDerivedClasses.forEach {
-            sourcerer.generateFactoriesForClass(it)
+        anyDependingDerivedClassNames.forEach {
+            val dependingTargetClass = ClassRegistry[it] ?: throw IllegalStateException("Class '$input' not found")
+            sourcerer.generateFactoriesForClass(dependingTargetClass)
         }
     }
+
+    BaseNodeHandler.printExecutionTimes()
 }
 

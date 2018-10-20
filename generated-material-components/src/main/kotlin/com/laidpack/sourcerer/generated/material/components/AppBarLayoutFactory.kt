@@ -21,10 +21,13 @@ open class AppBarLayoutFactory<TView : AppBarLayout, TAttributes : AppBarLayoutA
         if (view is AppBarLayout) {
             view.apply {
                 attributes.elevation?.let {
-                    val immutableElevation = it.toFloat()
-                    if (targetElevation != immutableElevation) {
-                        targetElevation = immutableElevation
+                    val localElevation = it.toFloat()
+                    if (elevation != localElevation) {
+                        targetElevation = localElevation
                     }
+                }
+                attributes.liftOnScroll?.let {
+                    isLiftOnScroll = it
                 }
             }
         }

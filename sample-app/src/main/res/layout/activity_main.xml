@@ -10,13 +10,31 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
+        <TextView
+            android:id="@+id/explain1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="-10dp"
+            android:text="@string/start_the_sample_server_by_gradlew_sample_server_run" />
+
+        <TextView
+            android:id="@+id/explain2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="@string/edit_json_remotely_http_0_0_0_0_9000"
+            android:textSize="14sp" />
     </FrameLayout>
 
     <TextView
         android:id="@+id/connectionStatus"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/container"
         android:layout_centerHorizontal="true"
-        android:text="connection status:" />
+        android:background="@color/cardview_shadow_start_color"
+        android:gravity="center_horizontal"
+        android:text="@string/connection_status_connecting" />
 </RelativeLayout>

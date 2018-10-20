@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.laidpack.sourcerer">
     <uses-sdk tools:overrideLibrary="androidx.car, androidx.media.widget, androidx.leanback, androidx.wear"/>
@@ -11,4 +11,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning" />
 
-</manifest>
+</manifest> -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.laidpack.sourcerer.services" />
+

@@ -13,6 +13,7 @@ import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
+import java.lang.ref.WeakReference
 
 class SerializationServiceTest {
     private var mutableSerializerService : SerializerModule? = null
@@ -31,7 +32,7 @@ class SerializationServiceTest {
             }
         }
         val referenceAdapter = ReferenceAdapter(
-            { name, c, type ->
+            { name, c, type, p ->
                 when (type) {
                     "drawable" -> 100
                     "style" -> 999
@@ -39,16 +40,17 @@ class SerializationServiceTest {
                 }
             }
         )
-        referenceAdapter.context = Mockito.mock(Context::class.java)
+        referenceAdapter.context = WeakReference(Mockito.mock(Context::class.java))
         val colorAdapter = ColorAdapter {
             it.substring(1).toInt()
         }
-        mutableSerializerService =  SerializerModule(listOf(
-                DimensionQualifier::class to dimensionAdapter,
-                ReferenceQualifier::class to referenceAdapter,
-                ColorQualifier::class to colorAdapter,
-                MultiFormat::class to MultiFormatAdapterFactory()
-        ))
+        mutableSerializerService =  SerializerModule(
+                dimensionAdapter,
+                referenceAdapter,
+                colorAdapter,
+                MultiFormatAdapterFactory(),
+                FlagsAdapterFactory()
+        )
         serializerService.registerAdapter(DefaultLayoutParamsAttributes::class, DefaultLayoutParamsAdapter())
         serializerService.assignDefaultLayoutParameterDelegate(DefaultLayoutParamsAttributes::class)
     }
@@ -98,7 +100,8 @@ class SerializationServiceTest {
 
     @Test
     fun `success - element with dimension qualifier`() {
-        serializerService.registerAdapter(DummyDimensionElement::class, DummyElementAdapter(), "dummyElement2").buildAdapters()
+        serializerService.registerAdapter(DummyDimensionElement::class, DummyElementAdapter(), "dummyElement2")
+                .buildAdapters()
         val json = """
             |[
             |   { "id": "test", "children": ["test2"], "type": "dummyElement2", "attributes":{ "dimension": "12sp" }},
@@ -114,17 +117,18 @@ class SerializationServiceTest {
         map.forEachIndexed { index, element ->
             element.attributes shouldBeInstanceOf DummyDimensionElement::class
             val attrs = element.attributes as DummyDimensionElement
-            attrs.dimension shouldEqualTo expectedValues[index]
+            attrs.dimension shouldBe expectedValues[index]
         }
     }
 
     @Test
     fun `success - element with reference qualifier`() {
-        serializerService.registerAdapter(DummyReferenceElement::class, DummyElementAdapter(), "dummyElement2").buildAdapters()
+        serializerService.registerAdapter(DummyReferenceElement::class, DummyElementAdapter(), "dummyElement2")
+                .buildAdapters()
         val json = """
             |[
-            |   { "id": "test", "children": ["test2"], "type": "dummyElement2", "attributes":{ "reference": "R.TextAppearance_DeviceDefault_Small" }},
-            |   { "id": "test2", "children": [], "type": "dummyElement2", "attributes":{ "reference": "@drawable:R.nav_icon" }}
+            |   { "id": "test", "children": ["test2"], "type": "dummyElement2", "attributes":{ "reference": "@style/TextAppearance_DeviceDefault_Small" }},
+            |   { "id": "test2", "children": [], "type": "dummyElement2", "attributes":{ "reference": "@drawable/nav_icon" }}
             |]""".trimMargin()
         val result = serializerService.deserialize(LayoutMap::class, json)
 
@@ -135,13 +139,14 @@ class SerializationServiceTest {
         map.forEachIndexed { index, element ->
             element.attributes shouldBeInstanceOf DummyReferenceElement::class
             val attrs = element.attributes as DummyReferenceElement
-            attrs.reference shouldEqualTo expectedValues[index]
+            attrs.reference as Int shouldEqualTo expectedValues[index]
         }
     }
 
     @Test
     fun `success - element with color qualifier`() {
-        serializerService.registerAdapter(DummyColorElement::class, DummyElementAdapter(), "dummyElement2").buildAdapters()
+        serializerService.registerAdapter(DummyColorElement::class, DummyElementAdapter(), "dummyElement2")
+                .buildAdapters()
         val json = """
             |[
             |   { "id": "test1", "children": ["test2"], "type": "dummyElement2", "attributes":{ "color": "#123456" }},
@@ -157,19 +162,20 @@ class SerializationServiceTest {
         map.forEachIndexed { index, element ->
             element.attributes shouldBeInstanceOf DummyColorElement::class
             val attrs = element.attributes as DummyColorElement
-            attrs.color shouldEqualTo expectedValues[index]
+            attrs.color as Int shouldEqualTo expectedValues[index]
         }
     }
 
     @Test
     fun `success - element with multi-format qualifier`() {
-        serializerService.registerAdapter(DummyMultiFormatElement::class, DummyElementAdapter(), "dummyElement2").buildAdapters()
+        serializerService.registerAdapter(DummyMultiFormatElement::class, DummyElementAdapter(), "dummyElement2")
+                .buildAdapters()
         val json = """
             |[
             |   { "id": "test1", "children": ["test2"], "type": "dummyElement2", "attributes":{ "booleanOrString": true }},
             |   { "id": "test2", "children": ["test3"], "type": "dummyElement2", "attributes":{ "booleanOrString": "String" }},
             |   { "id": "test3", "children": ["test4"], "type": "dummyElement2", "attributes":{ "booleanOrString": "true" }},
-            |   { "id": "test4", "children": ["test5"], "type": "dummyElement2", "attributes":{ "referenceColorOrDimension": "R.TextAppearance_DeviceDefault_Small" }},
+            |   { "id": "test4", "children": ["test5"], "type": "dummyElement2", "attributes":{ "referenceColorOrDimension": "@style/R.TextAppearance_DeviceDefault_Small" }},
             |   { "id": "test5", "children": ["test6"], "type": "dummyElement2", "attributes":{ "referenceColorOrDimension": "12" }},
             |   { "id": "test6", "children": ["test7"], "type": "dummyElement2", "attributes":{ "referenceColorOrDimension": "12sp" }},
             |   { "id": "test7", "children": [], "type": "dummyElement2", "attributes":{ "referenceColorOrDimension": "#123" }}
@@ -198,11 +204,11 @@ class SerializationServiceTest {
     fun `success - combining element and layout params attributes`() {
         serializerService.registerAdapter(DummyMultiFormatElement::class, DummyElementAdapter(), "dummyElement2")
                 .registerAdapter(LayoutParamsAttributes::class, LayoutParamsAdapter(), "layoutParams")
-                .associateThisViewGroupWithLayoutParams("dummyElement2", "layoutParams")
+                .associateViewGroupWithLayoutParams("dummyElement2", "layoutParams")
                 .buildAdapters()
         val json = """
             |[
-            |   { "id": "lpTest1", "children": ["lpTest2"], "type": "dummyElement2", "attributes":{ "referenceColorOrDimension": "R.TextAppearance_DeviceDefault_Small" }},
+            |   { "id": "lpTest1", "children": ["lpTest2"], "type": "dummyElement2", "attributes":{ "referenceColorOrDimension": "@style/R.TextAppearance_DeviceDefault_Small" }},
             |   { "id": "lpTest2", "children": [], "type": "dummyElement2", "attributes":{ "referenceColorOrDimension": "#123", "layout_height": 300, "layout_width": 200  }}
             |]""".trimMargin()
         val result = serializerService.deserialize(LayoutMap::class, json)
@@ -230,17 +236,17 @@ class SerializationServiceTest {
     }
 
     @Test
-    fun `success - reverting to default layout params attributes`() {
+    fun `success - fallback to default layout params attributes`() {
         serializerService.registerAdapter(DummyMultiFormatElement::class, DummyElementAdapter(), "dummyElement2")
                 .registerAdapter(DummyMultiFormatElement::class, DummyElementAdapter(), "dummyElementWithoutLinkedLP")
                 .registerAdapter(LayoutParamsAttributes::class, LayoutParamsAdapter(), "layoutParams")
-                .associateThisViewGroupWithLayoutParams("dummyElement2", "layoutParams")
+                .associateViewGroupWithLayoutParams("dummyElement2", "layoutParams")
                 .buildAdapters()
         val json = """
             |[
-            |   { "id": "lpTest1", "children": ["lpTest2", "lpTest3"], "type": "dummyElement2", "attributes":{ "referenceColorOrDimension": "R.TextAppearance_DeviceDefault_Small" }},
+            |   { "id": "lpTest1", "children": ["lpTest2", "lpTest3"], "type": "dummyElement2", "attributes":{ "referenceColorOrDimension": "@style/R.TextAppearance_DeviceDefault_Small" }},
             |   { "id": "lpTest2", "children": [], "type": "dummyElement2", "attributes":{ "referenceColorOrDimension": "#123", "layout_height": 300, "layout_width": 200  }},
-            |   { "id": "lpTest3", "children": ["lpTest4"], "type": "dummyElementWithoutLinkedLP", "attributes":{ "referenceColorOrDimension": "R.TextAppearance_DeviceDefault_Small" }},
+            |   { "id": "lpTest3", "children": ["lpTest4"], "type": "dummyElementWithoutLinkedLP", "attributes":{ "referenceColorOrDimension": "@style/R.TextAppearance_DeviceDefault_Small" }},
             |   { "id": "lpTest4", "children": [], "type": "dummyElementWithoutLinkedLP", "attributes":{ "referenceColorOrDimension": "#123", "layout_default": true }}
             |]""".trimMargin()
         val result = serializerService.deserialize(LayoutMap::class, json)
@@ -302,23 +308,74 @@ class SerializationServiceTest {
         map.firstTypeOf("dummyElement").id shouldBeEqualTo "test1"
     }
 
+    @Test
+    fun `success - mulitformat value with enum and dimensions`() {
+        serializerService.registerAdapter(DummyMultiFormatWithEnumElement::class, DummyElementAdapter(), "dummyElement2").buildAdapters()
+        val json = """
+            |[
+            |   { "id": "test1", "children": ["test2"], "type": "dummyElement2", "attributes":{ "dimensionOrEnum": "value1" }},
+            |   { "id": "test2", "children": ["test3"], "type": "dummyElement2", "attributes":{ "dimensionOrEnum": "12sp" }},
+            |   { "id": "test3", "children": [], "type": "dummyElement2", "attributes":{ "dimensionOrEnum": "value2" }}
+            |]""".trimMargin()
+        val result = serializerService.deserialize(LayoutMap::class, json)
+
+        result shouldBeInstanceOf LayoutMap::class
+        val map = result as LayoutMap
+        map.size shouldEqualTo 3
+        map.forEachIndexed { index, element ->
+            element.attributes shouldBeInstanceOf DummyMultiFormatWithEnumElement::class
+            val attrs = element.attributes as DummyMultiFormatWithEnumElement
+            when (index) {
+                0 -> attrs.dimensionOrEnum.enum shouldEqualTo 1
+                1 -> attrs.dimensionOrEnum.dimension shouldEqualTo 24
+                2 -> attrs.dimensionOrEnum.enum shouldEqualTo 2
+            }
+        }
+    }
+
+    @Test
+    fun `success - mulitformat value with flags and dimensions`() {
+        serializerService.registerAdapter(DummyMultiFormatWithFlagsElement::class, DummyElementAdapter(), "dummyElement2").buildAdapters()
+        val json = """
+            |[
+            |   { "id": "test1", "children": ["test2"], "type": "dummyElement2", "attributes":{ "dimensionOrFlags": "value1" }},
+            |   { "id": "test2", "children": ["test3"], "type": "dummyElement2", "attributes":{ "dimensionOrFlags": "12sp" }},
+            |   { "id": "test3", "children": [], "type": "dummyElement2", "attributes":{ "dimensionOrFlags": "value1|value2" }}
+            |]""".trimMargin()
+        val result = serializerService.deserialize(LayoutMap::class, json)
+
+        result shouldBeInstanceOf LayoutMap::class
+        val map = result as LayoutMap
+        map.size shouldEqualTo 3
+        map.forEachIndexed { index, element ->
+            element.attributes shouldBeInstanceOf DummyMultiFormatWithFlagsElement::class
+            val attrs = element.attributes as DummyMultiFormatWithFlagsElement
+            when (index) {
+                0 -> attrs.dimensionOrFlags.flags shouldEqualTo 1
+                1 -> attrs.dimensionOrFlags.dimension shouldEqualTo 24
+                2 -> attrs.dimensionOrFlags.flags shouldEqualTo (1.or(2))
+            }
+        }
+    }
+
+
     class LayoutParamsAttributes(val width: Int, val height: Int) : IAttributes
     class DummyElement(val a: String, val b: Int) : IAttributes
     class DummyDimensionElement(
             @field:DimensionQualifier
-            val dimension: Int,
+            val dimension: Int?,
             val a: String = "test",
             val b: Int = 0
     ) : IAttributes
     class DummyReferenceElement(
             @field:ReferenceQualifier
-            val reference: Int,
+            val reference: Int?,
             val a: String = "test",
             val b: Int = 0
     ) : IAttributes
     class DummyColorElement(
             @field:ColorQualifier
-            val color: Int,
+            val color: Int?,
             val a: String = "test",
             val b: Int = 0
     ) : IAttributes
@@ -327,6 +384,24 @@ class SerializationServiceTest {
             val booleanOrString: MultiFormat = MultiFormat(),
             @field:MultiFormatQualifier([Format.Dimension, Format.Color, Format.Reference])
             val referenceColorOrDimension: MultiFormat = MultiFormat(),
+            val a: String = "test",
+            val b: Int = 0
+    ) : IAttributes
+    class DummyMultiFormatWithEnumElement(
+            @field:MultiFormatQualifier(formats = [Format.Dimension, Format.Enum], enumType = TestEnum::class)
+            val dimensionOrEnum: MultiFormat = MultiFormat(),
+            val a: String = "test",
+            val b: Int = 0
+    ) : IAttributes
+    enum class TestEnum(override val key: String, override val value: Int) : AttributeEnum {
+        @Json(name = "value1")
+        Value1("value1", 1),
+        @Json(name = "value2")
+        Value2("value2", 2)
+    }
+    class DummyMultiFormatWithFlagsElement(
+            @field:MultiFormatQualifier(formats = [Format.Dimension, Format.Flags], flagsType = TestEnum::class)
+            val dimensionOrFlags: MultiFormat = MultiFormat(),
             val a: String = "test",
             val b: Int = 0
     ) : IAttributes

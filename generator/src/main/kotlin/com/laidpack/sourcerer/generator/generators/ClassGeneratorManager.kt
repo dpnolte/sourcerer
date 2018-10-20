@@ -17,8 +17,9 @@ import java.nio.file.Path
 class ClassGeneratorManager(
         private val targetDir: File,
         private val targetPackageName: String,
-        private val targetPackageNameSuperClass: String?,
+        targetPackageNameSuperClass: String?,
         private val result: SourcererResult,
+        superClassResults: List<SourcererResult>,
         private val minSdkVersion: Int,
         reservedElementTypes: Set<String> = setOf()
 ) {
@@ -104,12 +105,23 @@ class ClassGeneratorManager(
         ".${splitDir[splitDir.lastIndex]}${File.separator}${SourcererEnvironment.generatedPackagePathAsString}"
     }
 
+    private val superClassAttributes = superClassResults.associate {
+        Pair (
+                AttributesGenerator.getAttributesClassName(
+                        it.targetPackageName,
+                        it.targetClassName,
+                        it.classCategory
+                ),
+                it.attributes
+        )
+    }
     fun generateAttributeFile()  {
         val file = AttributesGenerator(
                 targetPackageName,
                 attributesClassName,
                 attributesSuperClassName,
-                result.attributes
+                result.attributes,
+                superClassAttributes
         ).generateFile()
         file.writeTo(targetDir)
     }

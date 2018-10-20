@@ -210,13 +210,13 @@ class IndexedClass(
         get() {
             /*if (cachedNode == null) {
                 Store.transactional {
-                    //val scope = canonicalName.replace(indexedPackage.packageName + ".", "")
+                    //val scope = canonicalName.replace(xdPackage.packageName + ".", "")
                     cachedNode = JavaParser.parse(file.paths.toFile())
-                            .firstDescendantOfType(ClassOrInterfaceDeclaration::class.java) { node ->
-                                node.name.identifier == simpleName
+                            .firstDescendantOfType(ClassOrInterfaceDeclaration::class.java) { classOrInterfaceDeclarationProvider ->
+                                classOrInterfaceDeclarationProvider.name.identifier == simpleName
                             }
                     if (cachedNode == null) {
-                        throw IllegalStateException("Indexed class node '$targetClassName' cannot be resolved @ ${file.urlAsString}")
+                        throw IllegalStateException("Indexed class classOrInterfaceDeclarationProvider '$targetClassName' cannot be resolved @ ${file.urlAsString}")
                     }
                 }
             }

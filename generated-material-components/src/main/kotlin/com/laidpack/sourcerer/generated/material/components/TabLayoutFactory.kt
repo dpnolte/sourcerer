@@ -1,8 +1,8 @@
 package com.laidpack.sourcerer.generated.material.components
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.View
-import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.tabs.TabLayout
 import com.laidpack.sourcerer.generated.HorizontalScrollViewFactory
 import java.lang.Class
@@ -21,6 +21,9 @@ open class TabLayoutFactory<TView : TabLayout, TAttributes : TabLayoutAttributes
         super.init(view, context, attributes)
         if (view is TabLayout) {
             view.apply {
+                attributes.tabIndicatorColor?.let {
+                    setSelectedTabIndicatorColor(it)
+                }
                 attributes.tabIndicatorHeight?.let {
                     if (height != it) {
                         setSelectedTabIndicatorHeight(it)
@@ -32,14 +35,10 @@ open class TabLayoutFactory<TView : TabLayout, TAttributes : TabLayoutAttributes
                     }
                 }
                 attributes.tabIndicatorFullWidth?.let {
-                    if (isTabIndicatorFullWidth != it) {
-                        isTabIndicatorFullWidth = it
-                    }
+                    isTabIndicatorFullWidth = it
                 }
                 attributes.tabMode?.let {
-                    if (tabMode != it.value) {
-                        tabMode = it.value
-                    }
+                    tabMode = it.value
                 }
                 attributes.tabGravity?.let {
                     if (tabGravity != it.value) {
@@ -52,10 +51,13 @@ open class TabLayoutFactory<TView : TabLayout, TAttributes : TabLayoutAttributes
                     }
                 }
                 attributes.tabRippleColor?.let {
-                    val immutableTabRippleColor = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (tabRippleColor != immutableTabRippleColor) {
-                        tabRippleColor = immutableTabRippleColor
+                    val localTabRippleColor = ColorStateList.valueOf(it)
+                    if (tabRippleColor != localTabRippleColor) {
+                        tabRippleColor = localTabRippleColor
                     }
+                }
+                attributes.tabUnboundedRipple?.let {
+                    setUnboundedRipple(it)
                 }
             }
         }

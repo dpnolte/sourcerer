@@ -1,10 +1,14 @@
 package com.laidpack.sourcerer.generator.target
 
+import android.content.Context
+import android.view.View
 import com.github.javaparser.ast.body.FieldDeclaration
+import com.github.javaparser.ast.body.MethodDeclaration
 import com.laidpack.sourcerer.generator.Store
 import com.laidpack.sourcerer.generator.XdSourcererResult
 import com.laidpack.sourcerer.generator.peeker.MethodInfo
 import com.laidpack.sourcerer.generator.peeker.describeType
+import com.squareup.kotlinpoet.ClassName
 import jetbrains.exodus.entitystore.Entity
 import kotlinx.dnq.*
 import kotlinx.dnq.query.addAll
@@ -15,7 +19,10 @@ data class Setter(
         val name: String,
         val parameters: List<Parameter>,
         val line: Int,
-        val isField: Boolean = false
+        val isField: Boolean = false,
+        val isStaticSetter: Boolean = false,
+        val isPropertyCategorizedAsMeasurementInViewDebug: Boolean = false,
+        val scopeClassName: ClassName? = null /* only used for static calls */
 ) {
     var mutablePropertyName : String? = null
     val hasPropertyName : Boolean
@@ -29,6 +36,35 @@ data class Setter(
     }
     fun addCallSignatureMap(attr: Attribute, parameterIndex: Int, otherAttributes: List<String>) {
         callSignatureMaps.add(attr, parameterIndex, otherAttributes)
+    }
+
+    fun isEachParameterMapped(callSignatureMap: Map<String, Int>): Boolean {
+        val mappedParamsByAttributes = callSignatureMap.values.toSet()
+        parameters.forEachIndexed { index, parameter ->
+            if (!mappedParamsByAttributes.contains(index)
+                    && parameter.defaultValue.isBlank()
+                    && parameter.describedType != contextCanonicalName
+                    && parameter.describedType != viewCanonicalName
+                    && !parameter.isNullable
+            ) {
+                return false
+            }
+        }
+        return true
+    }
+    fun toString(callSignatureMap: Map<String, Int>): String {
+        val reversedMap = callSignatureMap.entries.associateBy({ it.value }) { it.key }
+        val descriptors = mutableListOf<String>()
+        parameters.forEachIndexed { index, parameter ->
+            when {
+                reversedMap.containsKey(index) -> descriptors.add("${parameter.name}: ${reversedMap[index]}")
+                parameter.describedType == contextCanonicalName -> descriptors.add("${parameter.name}: Context")
+                parameter.defaultValue.isNotBlank() -> descriptors.add("${parameter.name}: ${parameter.defaultValue}")
+                parameter.isNullable -> descriptors.add("${parameter.name}: null")
+                else -> descriptors.add("${parameter.name}: !- missing ${parameter.describedType}")
+            }
+        }
+        return "$name(${descriptors.joinToString()})"
     }
 
     fun getParameterByAttribute(attr: Attribute): Parameter {
@@ -74,6 +110,7 @@ data class Setter(
         })
         xdSetter.line = this.line
         xdSetter.isField = this.isField
+        xdSetter.isPropertyCategorizedAsMeasurementInViewDebug = this.isPropertyCategorizedAsMeasurementInViewDebug
         if (this.hasPropertyName) xdSetter.propertyName = this.propertyName
         xdSetter.sourcererResult = sourcererResult
         for (callSignatureMap in this.callSignatureMaps.attributesToParameters) {
@@ -93,12 +130,24 @@ data class Setter(
     }
 
     companion object {
+        private val contextCanonicalName = Context::class.java.canonicalName
+        private val viewCanonicalName = View::class.java.canonicalName
         fun getHashCodeFromMethodInfo(method: MethodInfo): Int {
             return Objects.hash(
                     method.methodDeclaration.nameAsString,
-                    method.methodDeclaration.begin.get().line,
+                    method.line,
                     /*isField*/ false,
                     *method.methodDeclaration.parameters.map {
+                        it.describeType()
+                    }.toTypedArray()
+            )
+        }
+        fun getHashCodeFromMethodDeclaration(methodDeclaration: MethodDeclaration): Int {
+            return Objects.hash(
+                    methodDeclaration.nameAsString,
+                    methodDeclaration.begin.get().line,
+                    /*isField*/ false,
+                    *methodDeclaration.parameters.map {
                         it.describeType()
                     }.toTypedArray()
             )
@@ -166,14 +215,17 @@ class CallSignatureMapList(
         return getCallSignatureMap(attr.name)
     }
     fun getCallSignatureMap(codeBlock: CodeBlock): MutableMap<String, Int> {
-        for (attribute in codeBlock.attributes.values) {
+        return getCallSignatureMap(codeBlock.attributes)
+    }
+    fun getCallSignatureMap(attributes: Map<String, Attribute>): MutableMap<String, Int> {
+        for (attribute in attributes.values) {
             try {
                 return getCallSignatureMap(attribute)
             } catch (e: java.lang.IllegalArgumentException) {
                 continue
             }
         }
-        throw java.lang.IllegalArgumentException("Setter $setterName contains none of the following attributes in the code block: ${codeBlock.attributes.keys.joinToString()}")
+        throw java.lang.IllegalArgumentException("Setter $setterName contains none of the following attributes in the code block: ${attributes.keys.joinToString()}")
     }
     fun getCallSignatureMapUsedByAnOfTheseAttributes(attributes: Iterable<Attribute>): Map<String, Int> {
         for (attribute in attributes) {
@@ -199,6 +251,7 @@ class XdSetter (entity: Entity) : XdEntity(entity) {
     val parameters by xdChildren0_N(XdParameter::setter)
     var line by xdRequiredIntProp()
     var isField by xdBooleanProp()
+    var isPropertyCategorizedAsMeasurementInViewDebug by xdBooleanProp()
     var propertyName by xdStringProp()
     var sourcererResult : XdSourcererResult by xdParent(XdSourcererResult::setters)
     val callSignatureMaps
@@ -212,7 +265,8 @@ class XdSetter (entity: Entity) : XdEntity(entity) {
                         xdParam.toSnapshot(false)
                     },
                     this.line,
-                    this.isField
+                    this.isField,
+                    this.isPropertyCategorizedAsMeasurementInViewDebug
             )
             setter.mutablePropertyName = this.propertyName
             for (a2pList in callSignatureMaps.toList()) {

@@ -3,7 +3,6 @@ package com.laidpack.sourcerer.generator.lint
 import com.laidpack.sourcerer.generator.Store
 import com.laidpack.sourcerer.generator.XdSourcererResult
 import com.laidpack.sourcerer.generator.peeker.ClassInfo
-import com.laidpack.sourcerer.generator.peeker.ClassRegistry
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.target.CodeBlock
 import com.squareup.kotlinpoet.ClassName
@@ -11,8 +10,8 @@ import kotlinx.dnq.query.eq
 import kotlinx.dnq.query.firstOrNull
 import kotlinx.dnq.query.query
 
-class ApiRequirementsChecker(env: SourcererEnvironment, private val classRegistry: ClassRegistry) {
-    private val apiDetector = ApiDetector(env.stubAppProjectDir, classRegistry)
+class ApiRequirementsChecker(env: SourcererEnvironment) {
+    private val apiDetector = ApiDetector(env.stubModuleProjectDir)
     private val minSdkVersion = env.minSdkVersion
 
     fun canCheckRequirements(classInfo: ClassInfo): Boolean {
@@ -73,11 +72,11 @@ class ApiRequirementsChecker(env: SourcererEnvironment, private val classRegistr
 
     private fun getFallbackClassNameIfNeeded(classInfo: ClassInfo, classMinApiLevel: Int): ClassName? {
         if (classMinApiLevel > minSdkVersion) {
-            for (superClassName in classInfo.superClassNames) {
-                val superClassMinApiLevel = getSavedMinApiLevelIfAvailable(superClassName)
-                        ?: apiDetector.getClassVersion(classRegistry[superClassName] as ClassInfo)
+            for (superClass in classInfo.superClassesInfo) {
+                val superClassMinApiLevel = getSavedMinApiLevelIfAvailable(superClass.targetClassName)
+                        ?: apiDetector.getClassVersion(superClass)
                 if (superClassMinApiLevel <= minSdkVersion) {
-                    return superClassName
+                    return superClass.targetClassName
                 }
             }
         }

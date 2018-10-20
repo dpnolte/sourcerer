@@ -19,48 +19,34 @@ open class ViewGroupFactory<TView : ViewGroup, TAttributes : ViewGroupAttributes
         super.init(view, context, attributes)
         if (view is ViewGroup) {
             view.apply {
+                attributes.clipChildren?.let {
+                    clipChildren = it
+                }
                 attributes.addStatesFromChildren?.let {
-                    if (addStatesFromChildren() != it) {
-                        setAddStatesFromChildren(it)
-                    }
+                    setAddStatesFromChildren(it)
                 }
                 attributes.animationCache?.let {
-                    if (isAnimationCacheEnabled != it) {
+                    if (isEnabled != it) {
                         isAnimationCacheEnabled = it
                     }
                 }
                 attributes.persistentDrawingCache?.let {
-                    if (persistentDrawingCache != it.value) {
-                        persistentDrawingCache = it.value
+                    val localPersistentDrawingCache = it.value
+                    if (persistentDrawingCache != localPersistentDrawingCache) {
+                        persistentDrawingCache = localPersistentDrawingCache
                     }
                 }
                 attributes.alwaysDrawnWithCache?.let {
-                    if (isAlwaysDrawnWithCacheEnabled != it) {
-                        isAlwaysDrawnWithCacheEnabled = it
-                    }
+                    isAlwaysDrawnWithCacheEnabled = it
                 }
                 attributes.animateLayoutChanges?.let {
-                    val immutableAnimateLayoutChanges = if (it) LayoutTransition() else null
-                    if (layoutTransition != immutableAnimateLayoutChanges) {
-                        layoutTransition = immutableAnimateLayoutChanges
+                    val localAnimateLayoutChanges = if (it) LayoutTransition() else null
+                    if (layoutTransition != localAnimateLayoutChanges) {
+                        layoutTransition = localAnimateLayoutChanges
                     }
                 }
                 attributes.splitMotionEvents?.let {
-                    if (isMotionEventSplittingEnabled != it) {
-                        isMotionEventSplittingEnabled = it
-                    }
-                }
-                if (Build.VERSION.SDK_INT >= 18) {
-                    attributes.clipChildren?.let {
-                        if (clipChildren != it) {
-                            clipChildren = it
-                        }
-                    }
-                    attributes.layoutMode?.let {
-                        if (layoutMode != it.value) {
-                            layoutMode = it.value
-                        }
-                    }
+                    isMotionEventSplittingEnabled = it
                 }
                 if (Build.VERSION.SDK_INT >= 21) {
                     attributes.clipToPadding?.let {
@@ -69,14 +55,10 @@ open class ViewGroupFactory<TView : ViewGroup, TAttributes : ViewGroupAttributes
                         }
                     }
                     attributes.touchscreenBlocksFocus?.let {
-                        if (touchscreenBlocksFocus != it) {
-                            touchscreenBlocksFocus = it
-                        }
+                        touchscreenBlocksFocus = it
                     }
                     attributes.transitionGroup?.let {
-                        if (isTransitionGroup != it) {
-                            isTransitionGroup = it
-                        }
+                        isTransitionGroup = it
                     }
                 }
             }

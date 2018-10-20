@@ -1,11 +1,9 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
 import android.widget.CalendarView
-import androidx.core.content.ContextCompat
 import java.lang.Class
 import kotlin.String
 
@@ -28,15 +26,15 @@ open class CalendarViewFactory<TView : CalendarView, TAttributes : CalendarViewA
                     }
                 }
                 attributes.minDate?.let {
-                    val immutableMinDate = it.toLong()
-                    if (minDate != immutableMinDate) {
-                        minDate = immutableMinDate
+                    val localMinDate = it.toLong()
+                    if (minDate != localMinDate) {
+                        minDate = localMinDate
                     }
                 }
                 attributes.maxDate?.let {
-                    val immutableMaxDate = it.toLong()
-                    if (maxDate != immutableMaxDate) {
-                        maxDate = immutableMaxDate
+                    val localMaxDate = it.toLong()
+                    if (maxDate != localMaxDate) {
+                        maxDate = localMaxDate
                     }
                 }
                 attributes.showWeekNumber?.let {
@@ -60,40 +58,29 @@ open class CalendarViewFactory<TView : CalendarView, TAttributes : CalendarViewA
                             shownWeekCount = it
                         }
                     }
-                    if (attributes.selectedWeekBackgroundColor.hasColor) {
-                        val immutableSelectedWeekBackgroundColor = attributes.selectedWeekBackgroundColor.color
-                        if (selectedWeekBackgroundColor != immutableSelectedWeekBackgroundColor) {
-                            selectedWeekBackgroundColor = immutableSelectedWeekBackgroundColor
+                    attributes.selectedWeekBackgroundColor?.let {
+                        if (selectedWeekBackgroundColor != it) {
+                            selectedWeekBackgroundColor = it
                         }
                     }
-                    if (attributes.focusedMonthDateColor.hasColor) {
-                        val immutableFocusedMonthDateColor = attributes.focusedMonthDateColor.color
-                        if (focusedMonthDateColor != immutableFocusedMonthDateColor) {
-                            focusedMonthDateColor = immutableFocusedMonthDateColor
+                    attributes.focusedMonthDateColor?.let {
+                        if (focusedMonthDateColor != it) {
+                            focusedMonthDateColor = it
                         }
                     }
-                    if (attributes.unfocusedMonthDateColor.hasColor) {
-                        val immutableUnfocusedMonthDateColor = attributes.unfocusedMonthDateColor.color
-                        if (unfocusedMonthDateColor != immutableUnfocusedMonthDateColor) {
-                            unfocusedMonthDateColor = immutableUnfocusedMonthDateColor
+                    attributes.unfocusedMonthDateColor?.let {
+                        if (unfocusedMonthDateColor != it) {
+                            unfocusedMonthDateColor = it
                         }
                     }
-                    if (attributes.weekNumberColor.hasColor) {
-                        val immutableWeekNumberColor = attributes.weekNumberColor.color
-                        if (weekNumberColor != immutableWeekNumberColor) {
-                            weekNumberColor = immutableWeekNumberColor
+                    attributes.weekNumberColor?.let {
+                        if (weekNumberColor != it) {
+                            weekNumberColor = it
                         }
                     }
-                    if (attributes.weekSeparatorLineColor.hasColor) {
-                        val immutableWeekSeparatorLineColor = attributes.weekSeparatorLineColor.color
-                        if (weekSeparatorLineColor != immutableWeekSeparatorLineColor) {
-                            weekSeparatorLineColor = immutableWeekSeparatorLineColor
-                        }
-                    }
-                    attributes.selectedDateVerticalBar?.let {
-                        val immutableSelectedDateVerticalBar = ContextCompat.getDrawable(context, it) as Drawable
-                        if (selectedDateVerticalBar != immutableSelectedDateVerticalBar) {
-                            selectedDateVerticalBar = immutableSelectedDateVerticalBar
+                    attributes.weekSeparatorLineColor?.let {
+                        if (weekSeparatorLineColor != it) {
+                            weekSeparatorLineColor = it
                         }
                     }
                 }

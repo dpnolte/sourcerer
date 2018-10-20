@@ -2,38 +2,47 @@ package com.laidpack.sourcerer.generated.material.components
 
 import com.laidpack.annotation.TypeScript
 import com.laidpack.sourcerer.generated.LinearLayoutLayoutParamsAttributes
+import com.laidpack.sourcerer.services.api.AttributeEnum
+import com.laidpack.sourcerer.services.api.FlagsAccumulator
+import com.laidpack.sourcerer.services.api.FlagsQualifier
+import com.laidpack.sourcerer.services.api.Format
 import com.laidpack.sourcerer.services.api.IAttributes
+import com.laidpack.sourcerer.services.api.MultiFormat
 import com.laidpack.sourcerer.services.api.ReferenceQualifier
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlin.Float
 import kotlin.Int
 import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class AppBarLayoutLayoutParamsAttributes : LinearLayoutLayoutParamsAttributes(), IAttributes {
-    var layout_scrollFlags: LayoutScrollFlagsEnum? = null
+open class AppBarLayoutLayoutParamsAttributes(
+    @field:FlagsQualifier(flagsType = LayoutScrollFlagsFlagsEnum::class) val layout_scrollFlags: FlagsAccumulator? = null,
+    @field:ReferenceQualifier val layout_scrollInterpolator: Int? = null,
+    layout_weight: Float? = null,
+    layout_gravity: FlagsAccumulator? = null,
+    layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
+    layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum))
+) : LinearLayoutLayoutParamsAttributes(layout_weight = layout_weight, layout_gravity = layout_gravity, layout_width = layout_width, layout_height = layout_height),
+        IAttributes
 
-    @field:ReferenceQualifier
-    var layout_scrollInterpolator: Int? = null
-}
+enum class LayoutScrollFlagsFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
+    @Json(name = "scroll")
+    Scroll("scroll", 1),
 
-enum class LayoutScrollFlagsEnum(val attributeName: String, val value: Int) {
-    @Json(name = "scroll_flag_scroll")
-    ScrollFlagScroll("scroll_flag_scroll", 1),
+    @Json(name = "exitUntilCollapsed")
+    ExitUntilCollapsed("exitUntilCollapsed", 2),
 
-    @Json(name = "scroll_flag_exit_until_collapsed")
-    ScrollFlagExitUntilCollapsed("scroll_flag_exit_until_collapsed", 2),
+    @Json(name = "enterAlways")
+    EnterAlways("enterAlways", 4),
 
-    @Json(name = "scroll_flag_enter_always")
-    ScrollFlagEnterAlways("scroll_flag_enter_always", 4),
+    @Json(name = "enterAlwaysCollapsed")
+    EnterAlwaysCollapsed("enterAlwaysCollapsed", 8),
 
-    @Json(name = "scroll_flag_enter_always_collapsed")
-    ScrollFlagEnterAlwaysCollapsed("scroll_flag_enter_always_collapsed", 8),
+    @Json(name = "snap")
+    Snap("snap", 16),
 
-    @Json(name = "scroll_flag_snap")
-    ScrollFlagSnap("scroll_flag_snap", 16),
-
-    @Json(name = "scroll_flag_snap_margins")
-    ScrollFlagSnapMargins("scroll_flag_snap_margins", 32);
+    @Json(name = "snapMargins")
+    SnapMargins("snapMargins", 32);
 }

@@ -26,7 +26,9 @@ class JavaDocForSetterInterpreter(
                 val attribute = handleMatch(setter, match.attributeName, match.parameter) ?: continue
                 attributesToParameters[attribute] = match.parameter.index
             }
-            attrManager.linkAttributesAndSetter(attributesToParameters, setter)
+            if (attributesToParameters.isNotEmpty()) {
+                attrManager.linkAttributesAndSetter(attributesToParameters, setter)
+            }
         }
 
         if (!isEachParameterMapped(setters)) {

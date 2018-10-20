@@ -21,7 +21,7 @@ open class SearchViewFactory<TView : SearchView, TAttributes : SearchViewAttribu
         if (view is SearchView) {
             view.apply {
                 attributes.iconifiedByDefault?.let {
-                    if (isIconified != it) {
+                    if (isIconfiedByDefault != it) {
                         setIconifiedByDefault(it)
                     }
                 }
@@ -37,13 +37,15 @@ open class SearchViewFactory<TView : SearchView, TAttributes : SearchViewAttribu
                         }
                     }
                     attributes.imeOptions?.let {
-                        if (imeOptions != it) {
-                            imeOptions = it
+                        val localImeOptions = it.value
+                        if (imeOptions != localImeOptions) {
+                            imeOptions = localImeOptions
                         }
                     }
                     attributes.inputType?.let {
-                        if (inputType != it) {
-                            inputType = it
+                        val localInputType = it.value
+                        if (inputType != localInputType) {
+                            inputType = localInputType
                         }
                     }
                 }

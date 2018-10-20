@@ -1,8 +1,11 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
+import com.laidpack.sourcerer.services.api.AttributeEnum
 import com.laidpack.sourcerer.services.api.ColorQualifier
 import com.laidpack.sourcerer.services.api.DimensionQualifier
+import com.laidpack.sourcerer.services.api.FlagsAccumulator
+import com.laidpack.sourcerer.services.api.FlagsQualifier
 import com.laidpack.sourcerer.services.api.Format
 import com.laidpack.sourcerer.services.api.IAttributes
 import com.laidpack.sourcerer.services.api.MultiFormat
@@ -17,201 +20,75 @@ import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class ViewAttributes : IAttributes {
-    @field:ReferenceQualifier
-    var id: Int? = null
-
-    @field:DimensionQualifier
-    var scrollX: Int? = null
-
-    @field:DimensionQualifier
-    var scrollY: Int? = null
-
-    @field:MultiFormatQualifier(formats = [Format.Color, Format.Reference])
-    var background: MultiFormat = MultiFormat(setOf(Format.Color, Format.Reference))
-
-    @field:DimensionQualifier
-    var paddingLeft: Int? = null
-
-    @field:DimensionQualifier
-    var paddingBottom: Int? = null
-
-    @field:DimensionQualifier
-    var paddingStart: Int? = null
-
-    @field:DimensionQualifier
-    var paddingEnd: Int? = null
-
-    @field:DimensionQualifier
-    var paddingTop: Int? = null
-
-    @field:DimensionQualifier
-    var paddingRight: Int? = null
-
-    @field:MultiFormatQualifier(formats = [Format.Boolean, Format.Enum])
-    var focusable: MultiFormat = MultiFormat(setOf(Format.Boolean, Format.Enum))
-
-    var importantForAutofill: ImportantForAutofillEnum? = null
-
-    var focusableInTouchMode: Boolean? = null
-
-    var visibility: VisibilityEnum? = null
-
-    var fitsSystemWindows: Boolean? = null
-
-    var scrollbarStyle: ScrollbarStyleEnum? = null
-
-    var isScrollContainer: Boolean? = null
-
-    var fadeScrollbars: Boolean? = null
-
-    var scrollbarFadeDuration: Int? = null
-
-    var scrollbarDefaultDelayBeforeFade: Int? = null
-
-    @field:DimensionQualifier
-    var scrollbarSize: Int? = null
-
-    var requiresFadingEdge: RequiresFadingEdgeFlagsEnum? = null
-
-    @field:ReferenceQualifier
-    var nextFocusLeft: Int? = null
-
-    @field:ReferenceQualifier
-    var nextFocusRight: Int? = null
-
-    @field:ReferenceQualifier
-    var nextFocusUp: Int? = null
-
-    @field:ReferenceQualifier
-    var nextFocusDown: Int? = null
-
-    @field:ReferenceQualifier
-    var nextFocusForward: Int? = null
-
-    var clickable: Boolean? = null
-
-    var longClickable: Boolean? = null
-
-    var contextClickable: Boolean? = null
-
-    var saveEnabled: Boolean? = null
-
-    var filterTouchesWhenObscured: Boolean? = null
-
-    var drawingCacheQuality: DrawingCacheQualityEnum? = null
-
-    var keepScreenOn: Boolean? = null
-
-    var minHeight: Int? = null
-
-    var minWidth: Int? = null
-
-    var soundEffectsEnabled: Boolean? = null
-
-    var hapticFeedbackEnabled: Boolean? = null
-
-    var contentDescription: String? = null
-
-    var accessibilityTraversalBefore: Int? = null
-
-    var accessibilityTraversalAfter: Int? = null
-
-    var overScrollMode: OverScrollModeEnum? = null
-
-    var alpha: Float? = null
-
-    @field:DimensionQualifier
-    var elevation: Int? = null
-
-    @field:DimensionQualifier
-    var translationX: Int? = null
-
-    @field:DimensionQualifier
-    var translationY: Int? = null
-
-    @field:DimensionQualifier
-    var translationZ: Int? = null
-
-    @field:DimensionQualifier
-    var transformPivotX: Int? = null
-
-    @field:DimensionQualifier
-    var transformPivotY: Int? = null
-
-    var rotation: Float? = null
-
-    var rotationX: Float? = null
-
-    var rotationY: Float? = null
-
-    var scaleX: Float? = null
-
-    var scaleY: Float? = null
-
-    var layerType: LayerTypeEnum? = null
-
-    var layoutDirection: LayoutDirectionEnum? = null
-
-    var textDirection: TextDirectionEnum? = null
-
-    var textAlignment: TextAlignmentEnum? = null
-
-    var importantForAccessibility: ImportantForAccessibilityEnum? = null
-
-    var accessibilityLiveRegion: AccessibilityLiveRegionEnum? = null
-
-    @field:ReferenceQualifier
-    var labelFor: Int? = null
-
-    var transitionName: String? = null
-
-    var nestedScrollingEnabled: Boolean? = null
-
-    @field:ColorQualifier
-    var backgroundTint: Int? = null
-
-    var backgroundTintMode: BackgroundTintModeEnum? = null
-
-    @field:MultiFormatQualifier(formats = [Format.Color, Format.Reference])
-    var foreground: MultiFormat = MultiFormat(setOf(Format.Color, Format.Reference))
-
-    var foregroundGravity: ForegroundGravityFlagsEnum? = null
-
-    @field:ColorQualifier
-    var foregroundTint: Int? = null
-
-    var foregroundTintMode: ForegroundTintModeEnum? = null
-
-    var scrollIndicators: ScrollIndicatorsEnum? = null
-
-    var forceHasOverlappingRendering: Boolean? = null
-
-    var tooltipText: String? = null
-
-    var keyboardNavigationCluster: Boolean? = null
-
-    @field:ReferenceQualifier
-    var nextClusterForward: Int? = null
-
-    var focusedByDefault: Boolean? = null
-
-    var defaultFocusHighlightEnabled: Boolean? = null
-
-    var screenReaderFocusable: Boolean? = null
-
-    var accessibilityPaneTitle: String? = null
-
-    var accessibilityHeading: Boolean? = null
-
-    @field:ColorQualifier
-    var outlineSpotShadowColor: Int? = null
-
-    @field:ColorQualifier
-    var outlineAmbientShadowColor: Int? = null
-}
-
-enum class FocusableEnum(val attributeName: String, val value: Int) {
+open class ViewAttributes(
+    @field:ReferenceQualifier val id: Int? = null,
+    @field:DimensionQualifier val scrollX: Int? = null,
+    @field:DimensionQualifier val scrollY: Int? = null,
+    @field:MultiFormatQualifier(formats = [Format.Color, Format.Reference]) val background: MultiFormat = MultiFormat(setOf(Format.Color, Format.Reference)),
+    @field:MultiFormatQualifier(formats = [Format.Boolean, Format.Enum], enumType = FocusableEnum::class) val focusable: MultiFormat = MultiFormat(setOf(Format.Boolean, Format.Enum)),
+    @field:MultiFormatQualifier(formats = [Format.Reference, Format.String]) val autofillHints: MultiFormat = MultiFormat(setOf(Format.Reference, Format.String)),
+    @field:FlagsQualifier(flagsType = ImportantForAutofillFlagsEnum::class) val importantForAutofill: FlagsAccumulator? = null,
+    val visibility: VisibilityEnum? = null,
+    val fitsSystemWindows: Boolean? = null,
+    val scrollbarStyle: ScrollbarStyleEnum? = null,
+    val scrollbarFadeDuration: Int? = null,
+    val scrollbarDefaultDelayBeforeFade: Int? = null,
+    @field:DimensionQualifier val scrollbarSize: Int? = null,
+    @field:ReferenceQualifier val nextFocusLeft: Int? = null,
+    @field:ReferenceQualifier val nextFocusRight: Int? = null,
+    @field:ReferenceQualifier val nextFocusUp: Int? = null,
+    @field:ReferenceQualifier val nextFocusDown: Int? = null,
+    @field:ReferenceQualifier val nextFocusForward: Int? = null,
+    val filterTouchesWhenObscured: Boolean? = null,
+    val drawingCacheQuality: DrawingCacheQualityEnum? = null,
+    val keepScreenOn: Boolean? = null,
+    @field:DimensionQualifier val minHeight: Int? = null,
+    @field:DimensionQualifier val minWidth: Int? = null,
+    val contentDescription: String? = null,
+    val accessibilityTraversalBefore: Int? = null,
+    val accessibilityTraversalAfter: Int? = null,
+    val overScrollMode: OverScrollModeEnum? = null,
+    val alpha: Float? = null,
+    @field:DimensionQualifier val elevation: Int? = null,
+    @field:DimensionQualifier val translationX: Int? = null,
+    @field:DimensionQualifier val translationY: Int? = null,
+    @field:DimensionQualifier val translationZ: Int? = null,
+    @field:DimensionQualifier val transformPivotX: Int? = null,
+    @field:DimensionQualifier val transformPivotY: Int? = null,
+    val rotation: Float? = null,
+    val rotationX: Float? = null,
+    val rotationY: Float? = null,
+    val scaleX: Float? = null,
+    val scaleY: Float? = null,
+    val layerType: LayerTypeEnum? = null,
+    val layoutDirection: LayoutDirectionEnum? = null,
+    @field:MultiFormatQualifier(formats = [Format.Integer, Format.Enum], enumType = TextDirectionEnum::class) val textDirection: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
+    val textAlignment: TextAlignmentEnum? = null,
+    @field:MultiFormatQualifier(formats = [Format.Integer, Format.Enum], enumType = ImportantForAccessibilityEnum::class) val importantForAccessibility: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
+    @field:MultiFormatQualifier(formats = [Format.Integer, Format.Enum], enumType = AccessibilityLiveRegionEnum::class) val accessibilityLiveRegion: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
+    @field:ReferenceQualifier val labelFor: Int? = null,
+    val transitionName: String? = null,
+    val nestedScrollingEnabled: Boolean? = null,
+    @field:ColorQualifier val backgroundTint: Int? = null,
+    val backgroundTintMode: BackgroundTintModeEnum? = null,
+    @field:MultiFormatQualifier(formats = [Format.Color, Format.Reference]) val foreground: MultiFormat = MultiFormat(setOf(Format.Color, Format.Reference)),
+    @field:FlagsQualifier(flagsType = ForegroundGravityFlagsEnum::class) val foregroundGravity: FlagsAccumulator? = null,
+    @field:ColorQualifier val foregroundTint: Int? = null,
+    val foregroundTintMode: ForegroundTintModeEnum? = null,
+    val forceHasOverlappingRendering: Boolean? = null,
+    val tooltipText: String? = null,
+    val keyboardNavigationCluster: Boolean? = null,
+    @field:ReferenceQualifier val nextClusterForward: Int? = null,
+    val focusedByDefault: Boolean? = null,
+    val defaultFocusHighlightEnabled: Boolean? = null,
+    val screenReaderFocusable: Boolean? = null,
+    val accessibilityPaneTitle: String? = null,
+    val accessibilityHeading: Boolean? = null,
+    @field:ColorQualifier val outlineSpotShadowColor: Int? = null,
+    @field:ColorQualifier val outlineAmbientShadowColor: Int? = null
+) : IAttributes
+
+enum class FocusableEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "auto")
     Auto("auto", 16),
 
@@ -225,24 +102,24 @@ enum class FocusableEnum(val attributeName: String, val value: Int) {
     FocusableAuto("focusable_auto", 16);
 }
 
-enum class ImportantForAutofillEnum(val attributeName: String, val value: Int) {
-    @Json(name = "important_for_autofill_auto")
-    ImportantForAutofillAuto("important_for_autofill_auto", 0),
+enum class ImportantForAutofillFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
+    @Json(name = "auto")
+    Auto("auto", 0),
 
-    @Json(name = "important_for_autofill_yes")
-    ImportantForAutofillYes("important_for_autofill_yes", 1),
+    @Json(name = "yes")
+    Yes("yes", 1),
 
-    @Json(name = "important_for_autofill_no")
-    ImportantForAutofillNo("important_for_autofill_no", 2),
+    @Json(name = "no")
+    No("no", 2),
 
-    @Json(name = "important_for_autofill_yes_exclude_descendants")
-    ImportantForAutofillYesExcludeDescendants("important_for_autofill_yes_exclude_descendants", 4),
+    @Json(name = "yesExcludeDescendants")
+    YesExcludeDescendants("yesExcludeDescendants", 4),
 
-    @Json(name = "important_for_autofill_no_exclude_descendants")
-    ImportantForAutofillNoExcludeDescendants("important_for_autofill_no_exclude_descendants", 8);
+    @Json(name = "noExcludeDescendants")
+    NoExcludeDescendants("noExcludeDescendants", 8);
 }
 
-enum class VisibilityEnum(val attributeName: String, val value: Int) {
+enum class VisibilityEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "visible")
     Visible("visible", 0),
 
@@ -253,7 +130,7 @@ enum class VisibilityEnum(val attributeName: String, val value: Int) {
     Gone("gone", 8);
 }
 
-enum class ScrollbarStyleEnum(val attributeName: String, val value: Int) {
+enum class ScrollbarStyleEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "insideOverlay")
     InsideOverlay("insideOverlay", 0),
 
@@ -279,18 +156,7 @@ enum class ScrollbarStyleEnum(val attributeName: String, val value: Int) {
     ScrollbarsOutsideInset("scrollbars_outside_inset", 50331648);
 }
 
-enum class RequiresFadingEdgeFlagsEnum(val attributeName: String, val value: Int) {
-    @Json(name = "none")
-    None("none", 0),
-
-    @Json(name = "horizontal")
-    Horizontal("horizontal", 4096),
-
-    @Json(name = "vertical")
-    Vertical("vertical", 8192);
-}
-
-enum class DrawingCacheQualityEnum(val attributeName: String, val value: Int) {
+enum class DrawingCacheQualityEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "auto")
     Auto("auto", 0),
 
@@ -310,7 +176,7 @@ enum class DrawingCacheQualityEnum(val attributeName: String, val value: Int) {
     DrawingCacheQualityAuto("drawing_cache_quality_auto", 0);
 }
 
-enum class OverScrollModeEnum(val attributeName: String, val value: Int) {
+enum class OverScrollModeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "always")
     Always("always", 0),
 
@@ -321,7 +187,7 @@ enum class OverScrollModeEnum(val attributeName: String, val value: Int) {
     Never("never", 2);
 }
 
-enum class LayerTypeEnum(val attributeName: String, val value: Int) {
+enum class LayerTypeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),
 
@@ -332,7 +198,7 @@ enum class LayerTypeEnum(val attributeName: String, val value: Int) {
     Hardware("hardware", 2);
 }
 
-enum class LayoutDirectionEnum(val attributeName: String, val value: Int) {
+enum class LayoutDirectionEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "ltr")
     Ltr("ltr", 0),
 
@@ -358,7 +224,7 @@ enum class LayoutDirectionEnum(val attributeName: String, val value: Int) {
     LayoutDirectionLocale("layout_direction_locale", 3);
 }
 
-enum class TextDirectionEnum(val attributeName: String, val value: Int) {
+enum class TextDirectionEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "inherit")
     Inherit("inherit", 0),
 
@@ -384,7 +250,7 @@ enum class TextDirectionEnum(val attributeName: String, val value: Int) {
     FirstStrongRtl("firstStrongRtl", 7);
 }
 
-enum class TextAlignmentEnum(val attributeName: String, val value: Int) {
+enum class TextAlignmentEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "inherit")
     Inherit("inherit", 0),
 
@@ -428,7 +294,7 @@ enum class TextAlignmentEnum(val attributeName: String, val value: Int) {
     TextAlignmentViewEnd("text_alignment_view_end", 6);
 }
 
-enum class ImportantForAccessibilityEnum(val attributeName: String, val value: Int) {
+enum class ImportantForAccessibilityEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "auto")
     Auto("auto", 0),
 
@@ -442,7 +308,7 @@ enum class ImportantForAccessibilityEnum(val attributeName: String, val value: I
     NoHideDescendants("noHideDescendants", 4);
 }
 
-enum class AccessibilityLiveRegionEnum(val attributeName: String, val value: Int) {
+enum class AccessibilityLiveRegionEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),
 
@@ -453,7 +319,7 @@ enum class AccessibilityLiveRegionEnum(val attributeName: String, val value: Int
     Assertive("assertive", 2);
 }
 
-enum class BackgroundTintModeEnum(val attributeName: String, val value: Int) {
+enum class BackgroundTintModeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "src_over")
     SrcOver("src_over", 3),
 
@@ -473,7 +339,7 @@ enum class BackgroundTintModeEnum(val attributeName: String, val value: Int) {
     Add("add", 16);
 }
 
-enum class ForegroundGravityFlagsEnum(val attributeName: String, val value: Int) {
+enum class ForegroundGravityFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "top")
     Top("top", 48),
 
@@ -511,7 +377,7 @@ enum class ForegroundGravityFlagsEnum(val attributeName: String, val value: Int)
     ClipHorizontal("clip_horizontal", 8);
 }
 
-enum class ForegroundTintModeEnum(val attributeName: String, val value: Int) {
+enum class ForegroundTintModeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "src_over")
     SrcOver("src_over", 3),
 
@@ -529,24 +395,4 @@ enum class ForegroundTintModeEnum(val attributeName: String, val value: Int) {
 
     @Json(name = "add")
     Add("add", 16);
-}
-
-enum class ScrollIndicatorsEnum(val attributeName: String, val value: Int) {
-    @Json(name = "scroll_indicator_top")
-    ScrollIndicatorTop("scroll_indicator_top", 1),
-
-    @Json(name = "scroll_indicator_bottom")
-    ScrollIndicatorBottom("scroll_indicator_bottom", 2),
-
-    @Json(name = "scroll_indicator_left")
-    ScrollIndicatorLeft("scroll_indicator_left", 4),
-
-    @Json(name = "scroll_indicator_right")
-    ScrollIndicatorRight("scroll_indicator_right", 8),
-
-    @Json(name = "scroll_indicator_start")
-    ScrollIndicatorStart("scroll_indicator_start", 16),
-
-    @Json(name = "scroll_indicator_end")
-    ScrollIndicatorEnd("scroll_indicator_end", 32);
 }

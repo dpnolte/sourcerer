@@ -70,8 +70,8 @@ class GetterFlow (
         if (binaryExpr.right is NameExpr) {
             val name = getVariableName(binaryExpr)
             if (name != null) {
-                if (classInfo.isFieldFromThisClass(name)) {
-                    val variable = classInfo.getFieldFromThisClass(name).variables.first()
+                if (classInfo.isFieldFromThisClassOrSuperClass(name)) {
+                    val variable = classInfo.getResolvedFieldFromThisClassOrSuperClass(name).variables.first()
                     if (variable.initializer.isPresent && variable.initializer.get() is LiteralStringValueExpr) {
                         return variable.initializer.get().asLiteralStringValueExpr().value
                     }

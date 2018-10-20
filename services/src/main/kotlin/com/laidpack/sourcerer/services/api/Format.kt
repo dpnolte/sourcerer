@@ -18,6 +18,8 @@ enum class Format(val value: StringAlias) {
 
     String("string"),
 
+    Flags("flag"),
+
     Enum("enum"),
 
     Fraction("fraction"),

@@ -15,7 +15,7 @@ interface InterpreterFactory {
             classInfo: ClassInfo,
             typedArrayInfo: TypedArrayInfo,
             attrManager: AttributeManager,
-            classRegistry: ClassRegistry
+            attributesDefinedInXml: Boolean
     ): Interpreter
 }
 

@@ -34,10 +34,10 @@ class SourcererEnvironment(args: Array<String>) {
     val generatedPackageDir = generatedPath.resolve(
             generatedPackageName.replace(".", File.separator)
     ).toFile()
-    val stubAppProjectDir = rootPath.resolve("stub-app").toFile()
-    val stubAppPath = rootPath.resolve("stub-app/src/main/kotlin")
-    val stubAppDir = stubAppPath.toFile()
-    val stubAppGeneratedPackageDir = stubAppPath.resolve(
+    val stubModuleProjectDir = rootPath.resolve("stub-module").toFile()
+    val stubModulePath = rootPath.resolve("stub-module/src/main/kotlin")
+    val stubModuleDir = stubModulePath.toFile()
+    val stubModuleGeneratedPackageDir = stubModulePath.resolve(
             generatedPackageName.replace(".", File.separator)
     ).toFile()
     val lintReportsFilePath : Path = rootPath.resolve("stub-app/build/reports/lint-results.xml")
@@ -58,6 +58,7 @@ class SourcererEnvironment(args: Array<String>) {
         const val rootPackageName = "com.laidpack.sourcerer"
         const val servicePackageName =  "$rootPackageName.services"
         const val servicesApiPackageName = "$servicePackageName.api"
+        const val servicesAdaptersPackageName = "$servicePackageName.adapters"
         const val generatedPackageName = "$rootPackageName.generated"
         val generatedPackagePathAsString = generatedPackageName.replace(".", File.separator)
     }

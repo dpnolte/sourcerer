@@ -7,7 +7,7 @@ import android.widget.Chronometer
 import java.lang.Class
 import kotlin.String
 
-open class ChronometerFactory<TView : Chronometer, TAttributes : ChronometerAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : TextViewFactory<TView, TAttributes>(instanceType, attributesType) {
+open class ChronometerFactory<TView : Chronometer, TAttributes : ChronometerAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = Chronometer(context)
@@ -21,9 +21,7 @@ open class ChronometerFactory<TView : Chronometer, TAttributes : ChronometerAttr
         if (view is Chronometer) {
             view.apply {
                 attributes.format?.let {
-                    if (format != it) {
-                        format = it
-                    }
+                    format = it
                 }
                 if (Build.VERSION.SDK_INT >= 24) {
                     attributes.countDown?.let {

@@ -4,6 +4,7 @@ import com.laidpack.annotation.TypeScript
 import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.peeker.ClassCategory
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
+import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 import com.laidpack.sourcerer.generator.target.AttributeTypesForSetter
 import com.laidpack.sourcerer.generator.toCamelCase
 import com.squareup.kotlinpoet.*
@@ -15,44 +16,14 @@ class AttributesGenerator(
         private val targetPackageName: String,
         private val attributesClassName: ClassName,
         private val attributesSuperClassName: ClassName?,
-        private val attributes: Map<String, Attribute>
+        private val attributes: Map<String, Attribute>,
+        private val superClassAttributes: Map<ClassName, Map<String, Attribute>>
 ) {
-    private val enumTypeSpecs = mutableListOf<TypeSpec>()
-    private val propertySpecs = mutableListOf<PropertySpec>()
 
     fun generateFile(): FileSpec {
-        for (attribute in attributes.values) {
-            if (attribute.isDeclaredInSuperClass) continue
-
-            if (attribute.enumValues.isNotEmpty() || attribute.flags.isNotEmpty()) {
-                val enumType = createEnumType(attribute)
-                enumTypeSpecs.add(enumType)
-            }
-            val propertyType = when {
-                attribute.formats.size > 1
-                    -> MultiFormatGenerator.multiFormatClassName
-                attribute.typesForFirstSetter.hasEnumAsAttributeType
-                    -> getEnumClassName(attribute.typesForFirstSetter, false).asNullable()
-                else
-                    -> attribute.typesForFirstSetter.attributeType.asNullable()
-            }
-            propertySpecs.add(
-                    PropertySpec.builder(
-                            attribute.name,
-                            propertyType
-                    )
-                            .addQualifierAnnotationIfNeeded(attribute)
-                            .mutable(true)
-                            .addInitializer(attribute)
-                            .build()
-            )
-
-        }
         val file = FileSpec.builder(targetPackageName, attributesClassName.simpleName)
         file.addType(getClassTypeSpec())
-        for (enumTypeSpec in enumTypeSpecs) {
-            file.addType(enumTypeSpec)
-        }
+        file.addEnumTypes()
 
         return file.build()
     }
@@ -67,18 +38,91 @@ class AttributesGenerator(
                 )
                 .addAnnotation(TypeScript::class.java)
                 .addSuperinterface(attributesInterfaceName)
-                .addProperties(propertySpecs)
-        if (attributesSuperClassName != null) {
-            classTypeSpec.superclass(attributesSuperClassName)
-        }
+                .addSuperClassSpec()
+                .primaryConstructor( FunSpec.constructorBuilder()
+                        .addParameters(getParameterSpecsForClass(attributesClassName, attributes))
+                        .addParametersForSuperClassAttributes()
+                        .build()
+                )
+                .addProperties(getPropertySpecsForClass(attributesClassName, attributes))
+                //.addAllPropertySpecs()
+
         return classTypeSpec.build()
     }
 
-    private fun PropertySpec.Builder.addInitializer(attribute: Attribute): PropertySpec.Builder {
-        return if (attribute.formats.size == 1) {
-            this.initializer("null")
+    private fun FileSpec.Builder.addEnumTypes(): FileSpec.Builder {
+        for (attribute in attributes.values) {
+            if (!attribute.isDeclaredInSuperClass
+                && (attribute.enumValues.isNotEmpty() || attribute.flags.isNotEmpty())
+            ) {
+                this.addEnumTypesForAttribute(attribute)
+            }
+        }
+        return this
+    }
+
+    private fun TypeSpec.Builder.addAllPropertySpecs(): TypeSpec.Builder {
+        this.addProperties(getPropertySpecsForClass(attributesClassName, attributes))
+        for ((className, attrs) in superClassAttributes) {
+            this.addProperties(getPropertySpecsForClass(className, attrs))
+        }
+        return this
+    }
+
+    private fun getPropertySpecsForClass(
+            className: ClassName,
+            attributes: Map<String, Attribute>
+    ): List<PropertySpec> {
+        val propertySpecs = mutableListOf<PropertySpec>()
+        for (attribute in attributes.values) {
+            if (attribute.isDeclaredInSuperClass) continue
+
+            propertySpecs.add(
+                    PropertySpec.builder(
+                            attribute.name,
+                            getPropertyType(className, attribute)
+                    )
+                            .addQualifierAnnotationIfNeeded(className, attribute)
+                            .initializer(attribute.name)
+                            .build()
+            )
+        }
+        return propertySpecs
+    }
+
+    private fun FunSpec.Builder.addParametersForSuperClassAttributes(): FunSpec.Builder {
+        for ((className, attrs) in superClassAttributes) {
+            //this.addComment("Super class $className attributes")
+            this.addParameters(getParameterSpecsForClass(className, attrs))
+        }
+        return this
+    }
+
+    private fun getParameterSpecsForClass(
+            className: ClassName,
+            attributes: Map<String, Attribute>
+    ): List<ParameterSpec> {
+        val parameterSpecs = mutableListOf<ParameterSpec>()
+        for (attribute in attributes.values) {
+            if (attribute.isDeclaredInSuperClass) continue
+
+            parameterSpecs.add(
+                    ParameterSpec.builder(
+                                    attribute.name,
+                                    getPropertyType(className, attribute)
+                            )
+                            .addModifiers(className)
+                            .addDefaultValue(attribute)
+                            .build()
+            )
+        }
+        return parameterSpecs
+    }
+    private fun ParameterSpec.Builder.addDefaultValue(attribute: Attribute): ParameterSpec.Builder {
+        return if (attribute.formatsUsedBySetters.size == 1) {
+            this.defaultValue("null")
         } else {
-            this.initializer(
+            this.defaultValue(
                     "%T(setOf(${attribute.formats.joinToString(", ") { "%T.%L" }}))",
                     MultiFormatGenerator.multiFormatClassName,
                     *attribute.formats.map { listOf(FormatEnumGenerator.formatEnumClassName, it.toString()) }
@@ -87,64 +131,121 @@ class AttributesGenerator(
             )
         }
     }
-
-    private fun createEnumType(attribute: Attribute): TypeSpec {
-        if (attribute.flags.isEmpty() && attribute.enumValues.isEmpty()) IllegalStateException("Attribute '${attribute.name}' does not need an enum type (no enums or flags)")
-        val isFlagsEnum : Boolean =!attribute.enumValues.isNotEmpty()
-        val enumTypeSpecBuilder = TypeSpec.enumBuilder(getEnumClassName(attribute.typesForFirstSetter))
-                .primaryConstructor(FunSpec.constructorBuilder()
-                        .addParameter("attributeName", String::class)
-                        .addParameter("value", Int::class)
-                        .build()
-                )
-                .addProperty(
-                        PropertySpec.builder("attributeName", String::class)
-                                .initializer("attributeName")
-                                .build()
-                )
-                .addProperty(
-                        PropertySpec.builder("value", Int::class)
-                                .initializer("value")
-                                .build()
-                )
-
-        val enumConstants : List<Pair<String, Int>> = if (isFlagsEnum) {
-            attribute.flags.map { Pair(it.name, it.value)  }
-        } else {
-            attribute.enumValues.map { Pair(it.name, it.value)  }
-        }
-        enumConstants.forEach {
-            val name = it.first
-            val value = it.second
-            enumTypeSpecBuilder.addEnumConstant(
-                    name.toCamelCase(),
-                    TypeSpec.anonymousClassBuilder()
-                            .addSuperclassConstructorParameter("%S", name)
-                            .addSuperclassConstructorParameter("%L", value)
-                            .addAnnotation(
-                                    AnnotationSpec.builder(Json::class)
-                                            .addMember("name = %S", name)
-                                            .build()
-                            )
-                            .build()
-            )
-        }
-        return enumTypeSpecBuilder.build()
+    private fun ParameterSpec.Builder.addModifiers(className: ClassName): ParameterSpec.Builder {
+        /*return if (className != attributesClassName) {
+            this.addModifiers(KModifier.OVERRIDE, KModifier.OPEN)
+        } else this.addModifiers(KModifier.OPEN)*/
+        return this
     }
 
-    private fun getEnumClassName(typesForThisSetter: AttributeTypesForSetter, checkForUsedClassName: Boolean = true): ClassName {
-        var className = ClassName(targetPackageName, (typesForThisSetter.enumClassName as ClassName).simpleName)
-        if (checkForUsedClassName) {
-            while (usedEnumClassNames.contains(className)) {
-                className = ClassName(targetPackageName, className.simpleName + "_")
-            }
-            usedEnumClassNames.add(className)
+    private fun FileSpec.Builder.addEnumTypesForAttribute(attribute: Attribute): FileSpec.Builder {
+        val createEnumForFormats = attribute.formats.filter {
+            it == StyleableAttributeFormat.Flags || it == StyleableAttributeFormat.Enum
         }
+        if (createEnumForFormats.isEmpty()) IllegalStateException("Attribute '${attribute.name}' does not need an enum type (no enums or flags)")
+        for (format in createEnumForFormats) {
+            val enumClassName = getEnumClassName(
+                    attributesClassName,
+                    attribute,
+                    attribute.typesForFirstSetter
+            )
+            val enumTypeSpecBuilder = TypeSpec.enumBuilder(enumClassName)
+                    .primaryConstructor(FunSpec.constructorBuilder()
+                            .addParameter("key", String::class, KModifier.OVERRIDE)
+                            .addParameter("value", Int::class, KModifier.OVERRIDE)
+                            .build()
+                    )
+                    .addProperty(
+                            PropertySpec.builder("key", String::class)
+                                    .initializer("key")
+                                    .build()
+                    )
+                    .addProperty(
+                            PropertySpec.builder("value", Int::class)
+                                    .initializer("value")
+                                    .build()
+                    )
+                    .addSuperinterface(enumInterfaceName)
+
+            val enumConstants: List<Pair<String, Int>> = if (format == StyleableAttributeFormat.Flags) {
+                attribute.flags.map { Pair(it.name, it.value) }
+            } else attribute.enumValues.map { Pair(it.name, it.value) }
+            enumConstants.forEach {
+                val name = it.first
+                val value = it.second
+                enumTypeSpecBuilder.addEnumConstant(
+                        name.toCamelCase(),
+                        TypeSpec.anonymousClassBuilder()
+                                .addSuperclassConstructorParameter("%S", name)
+                                .addSuperclassConstructorParameter("%L", value)
+                                .addAnnotation(
+                                        AnnotationSpec.builder(Json::class)
+                                                .addMember("name = %S", name)
+                                                .build()
+                                )
+                                .build()
+                )
+            }
+            this.addType(enumTypeSpecBuilder.build())
+        }
+        return this
+    }
+
+    private fun TypeSpec.Builder.addSuperClassSpec(): TypeSpec.Builder {
+        if (attributesSuperClassName != null) {
+            this.superclass(attributesSuperClassName)
+            for (attrs in superClassAttributes.values) {
+                for (attr in attrs.values) {
+                    if (!attr.isDeclaredInSuperClass) {
+                        this.addSuperclassConstructorParameter("%N = %N", attr.name, attr.name)
+                    }
+                }
+            }
+
+        }
+        return this
+    }
+
+    private fun getEnumClassName(
+            attributeClassName: ClassName,
+            attribute: Attribute,
+            typesForThisSetter: AttributeTypesForSetter
+    ): ClassName {
+        val key = attributeClassName.canonicalName + attribute.name
+        if (enumClassNameRegistry.containsKey(key)) {
+            return enumClassNameRegistry[key] as ClassName
+        }
+        var className = ClassName(attributeClassName.packageName, (typesForThisSetter.enumClassName as ClassName).simpleName)
+        while (usedEnumClassNames.contains(className)) {
+            className = ClassName(attributeClassName.packageName, className.simpleName + "_")
+        }
+        usedEnumClassNames.add(className)
+        enumClassNameRegistry[key] = className
         return className
     }
 
+    private fun getPropertyType(className: ClassName, attribute: Attribute): TypeName {
+        val usedFormats = attribute.formatsUsedBySetters
+        val isMultiFormatted = usedFormats.size > 1
+        val firstFormat = usedFormats.first()
+        return when {
+            isMultiFormatted
+                -> MultiFormatGenerator.multiFormatClassName
+            attribute.typesForFirstSetter.hasFlagsAsAttributeType
+                ->  flagsAccumulatorClassName.asNullable()
+            attribute.typesForFirstSetter.hasEnumAsAttributeType
+                -> getEnumClassName(
+                        className,
+                        attribute,
+                        attribute.typesForFirstSetter
+                ).asNullable()
+            else
+                -> firstFormat.toClass().asTypeName().asNullable()
+        }
+    }
 
-    private fun PropertySpec.Builder.addQualifierAnnotationIfNeeded(attribute: Attribute): PropertySpec.Builder {
+
+    private fun PropertySpec.Builder.addQualifierAnnotationIfNeeded(className: ClassName, attribute: Attribute): PropertySpec.Builder {
         // check if we have different formats, then use multiqualifier..
         // collect all formats that are actually used
         val formats = attribute.formatsUsedBySetters
@@ -156,21 +257,40 @@ class AttributesGenerator(
                 args.add(it.name)
                 "%T.%N"
             }
-            this.addAnnotation(AnnotationSpec.builder(MultiFormatGenerator.multiFormatQualifierClassName)
+            val annotationSpec = AnnotationSpec.builder(MultiFormatGenerator.multiFormatQualifierClassName)
                     .addMember("formats = [$arrayOfFormats]", *args.toTypedArray())
                     .useSiteTarget(AnnotationSpec.UseSiteTarget.FIELD)
-                    .build()
-            )
+
+            if (formats.contains(StyleableAttributeFormat.Enum)) {
+                annotationSpec.addMember("enumType = %T::class", getEnumClassName(
+                        className,
+                        attribute,
+                        attribute.typesForFirstSetter
+                ))
+            }
+            if (formats.contains(StyleableAttributeFormat.Flags)) {
+                annotationSpec.addMember("flagsType = %T::class", getEnumClassName(
+                        className,
+                        attribute,
+                        attribute.typesForFirstSetter
+                ))
+            }
+            this.addAnnotation(annotationSpec.build())
         } else {
-            // if we only have one format, check if qualifier is needed
-            val firstFormatWithQualifier = formats.find { it.requiresQualifier }
-                    ?: return this
-            val firstQualifierClass = firstFormatWithQualifier.toQualifierAnnotationClassName()
-            this.addAnnotation(
-                    AnnotationSpec.builder(firstQualifierClass)
-                            .useSiteTarget(AnnotationSpec.UseSiteTarget.FIELD)
-                            .build()
-            )
+            // if we only have one formats, check if qualifier is needed
+            val format = formats.first()
+            if (!format.requiresQualifier) return this
+            val qualifierClassName = format.toQualifierAnnotationClassName()
+            val annotationSpec = AnnotationSpec.builder(qualifierClassName)
+                    .useSiteTarget(AnnotationSpec.UseSiteTarget.FIELD)
+            if (format == StyleableAttributeFormat.Flags) {
+                annotationSpec.addMember("flagsType = %T::class", getEnumClassName(
+                        className,
+                        attribute,
+                        attribute.typesForFirstSetter
+                ))
+            }
+            this.addAnnotation(annotationSpec.build())
         }
         return this
     }
@@ -186,8 +306,13 @@ class AttributesGenerator(
             }
         }
 
+        private val enumClassNameRegistry = mutableMapOf<String/* target class name + attribute name */, ClassName /* class name with new package and check for dupes*/>()
         private val usedEnumClassNames = mutableSetOf<ClassName>()
         private val attributesInterfaceName = ClassName(SourcererEnvironment.servicesApiPackageName, "IAttributes")
+        private val flagsAccumulatorClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "FlagsAccumulator")
+        val enumInterfaceName = ClassName(SourcererEnvironment.servicesApiPackageName, "AttributeEnum")
+        val flagsAccumalatorClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "FlagsAccumulator")
+
     }
 
 }

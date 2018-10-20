@@ -41,28 +41,26 @@ open class ToolbarFactory<TView : Toolbar, TAttributes : ToolbarAttributes>(inst
                         }
                     }
                     if (attributes.contentInsetStart != null || attributes.contentInsetEnd != null) {
-                        val immutableContentInsetStart = attributes.contentInsetStart ?: contentInsetStart
-                        val immutableContentInsetEnd = attributes.contentInsetEnd ?: contentInsetEnd
-                        if (contentInsetStart != immutableContentInsetStart || contentInsetEnd != immutableContentInsetEnd) {
-                            setContentInsetsRelative(immutableContentInsetStart, immutableContentInsetEnd)
+                        val localContentInsetStart = attributes.contentInsetStart ?: contentInsetStart
+                        val localContentInsetEnd = attributes.contentInsetEnd ?: contentInsetEnd
+                        if (contentInsetStart != localContentInsetStart || contentInsetEnd != localContentInsetEnd) {
+                            setContentInsetsRelative(localContentInsetStart, localContentInsetEnd)
                         }
                     }
                     if (attributes.contentInsetLeft != null || attributes.contentInsetRight != null) {
-                        val immutableContentInsetLeft = attributes.contentInsetLeft ?: contentInsetLeft
-                        val immutableContentInsetRight = attributes.contentInsetRight ?: contentInsetRight
-                        if (contentInsetLeft != immutableContentInsetLeft || contentInsetRight != immutableContentInsetRight) {
-                            setContentInsetsAbsolute(immutableContentInsetLeft, immutableContentInsetRight)
+                        val localContentInsetLeft = attributes.contentInsetLeft ?: contentInsetLeft
+                        val localContentInsetRight = attributes.contentInsetRight ?: contentInsetRight
+                        if (contentInsetLeft != localContentInsetLeft || contentInsetRight != localContentInsetRight) {
+                            setContentInsetsAbsolute(localContentInsetLeft, localContentInsetRight)
                         }
                     }
                     attributes.popupTheme?.let {
-                        if (popupTheme != it) {
-                            popupTheme = it
-                        }
+                        popupTheme = it
                     }
                     attributes.navigationIcon?.let {
-                        val immutableNavigationIcon = ContextCompat.getDrawable(context, it) as Drawable
-                        if (navigationIcon != immutableNavigationIcon) {
-                            navigationIcon = immutableNavigationIcon
+                        val localNavigationIcon = ContextCompat.getDrawable(context, it) as Drawable
+                        if (navigationIcon != localNavigationIcon) {
+                            navigationIcon = localNavigationIcon
                         }
                     }
                     attributes.navigationContentDescription?.let {
@@ -71,15 +69,17 @@ open class ToolbarFactory<TView : Toolbar, TAttributes : ToolbarAttributes>(inst
                         }
                     }
                     attributes.logo?.let {
-                        val immutableLogo = ContextCompat.getDrawable(context, it) as Drawable
-                        if (logo != immutableLogo) {
-                            logo = immutableLogo
-                        }
+                        val localLogo = ContextCompat.getDrawable(context, it) as Drawable
+                        logo = localLogo
                     }
                     attributes.logoDescription?.let {
-                        if (logoDescription != it) {
-                            logoDescription = it
-                        }
+                        logoDescription = it
+                    }
+                    attributes.titleTextColor?.let {
+                        setTitleTextColor(it)
+                    }
+                    attributes.subtitleTextColor?.let {
+                        setSubtitleTextColor(it)
                     }
                     if (Build.VERSION.SDK_INT >= 24) {
                         attributes.titleMarginStart?.let {

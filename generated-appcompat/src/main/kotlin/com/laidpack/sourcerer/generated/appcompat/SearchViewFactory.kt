@@ -21,7 +21,7 @@ open class SearchViewFactory<TView : SearchView, TAttributes : SearchViewAttribu
         if (view is SearchView) {
             view.apply {
                 attributes.iconifiedByDefault?.let {
-                    if (isIconified != it) {
+                    if (isIconfiedByDefault != it) {
                         setIconifiedByDefault(it)
                     }
                 }

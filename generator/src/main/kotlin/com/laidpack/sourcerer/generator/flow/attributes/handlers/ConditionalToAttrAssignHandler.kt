@@ -36,7 +36,7 @@ class ConditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHandle
     private fun methodCallIsAssignedToVariable(node: AssignExpr) {
         val targetExpr = node.target.asNameExpr()
         val valueExpr = node.value.asMethodCallExpr()
-        if (!flow.classInfo.isFieldFromThisClass(targetExpr.nameAsString) && flow.isAttributeValueRetrievedWithMethodCall(valueExpr)) {
+        if (!flow.isField(targetExpr.nameAsString) && flow.isAttributeValueRetrievedWithMethodCall(valueExpr)) {
             flow.setTypedArrayGetterForAttribute(valueExpr)
             flow.addVariableAsDerivedFromAttribute(targetExpr.nameAsString, valueExpr)
         }
@@ -53,7 +53,7 @@ class ConditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHandle
     private fun handleBinaryExpression(targetExpr: NameExpr, valueExpr: BinaryExpr) {
         // check if there are any method calls within binary expression
         val methodCallExpressions = valueExpr.descendantsOfType(MethodCallExpr::class.java)
-        val isMemberVariableFromThisClass = flow.classInfo.isFieldFromThisClass(targetExpr.nameAsString)
+        val isMemberVariableFromThisClass = flow.isField(targetExpr.nameAsString)
         // if yes, try to resolve to typedarray getter (even if nested in other methods)
         methodCallExpressions.forEach { methodCallExpr ->
             when {
@@ -61,7 +61,7 @@ class ConditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHandle
                     flow.setTypedArrayGetterForAttribute(methodCallExpr)
                     flow.addVariableAsDerivedFromAttribute(targetExpr.nameAsString, methodCallExpr)
                 }
-                flow.classInfo.isMethodCallFromThisClass(methodCallExpr) && flow.isMethodCalledWithTypedArrayAsParameter(methodCallExpr) -> {
+                flow.classInfo.isMethodCallFromThisClassOrSuperClass(methodCallExpr) && flow.isMethodCalledWithTypedArrayAsParameter(methodCallExpr) -> {
                     handleMethodCallWithTypedArrayParameter(targetExpr, methodCallExpr)
                 }
             }

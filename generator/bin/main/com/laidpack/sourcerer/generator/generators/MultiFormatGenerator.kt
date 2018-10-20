@@ -105,9 +105,9 @@ class MultiFormatGenerator {
 
     private fun TypeSpec.Builder.addSetValueFunc() : TypeSpec.Builder {
         val funSpec = FunSpec.builder("setValue")
-                .addParameter("format", FormatEnumGenerator.formatEnumClassName)
+                .addParameter("formats", FormatEnumGenerator.formatEnumClassName)
                 .addParameter("value", Any::class.asTypeName())
-                .beginControlFlow("when (format)")
+                .beginControlFlow("when (formats)")
 
         for (format in formats) {
             funSpec.addStatement("%T.%N -> %N = %N as %T",

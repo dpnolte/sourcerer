@@ -63,7 +63,7 @@ class BootstrapModuleGenerator(
         }
         for (viewGroupToLayoutParam in viewGroupToLayoutParams) {
             funSpec.addStatement(
-                    "%N.associateThisViewGroupWithLayoutParams(%S, %S)",
+                    "%N.associateViewGroupWithLayoutParams(%S, %S)",
                     serializerParam,
                     viewGroupToLayoutParam.viewGroupElementType,
                     viewGroupToLayoutParam.layoutParamsElementType

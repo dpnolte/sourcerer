@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generated.material.components
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -25,9 +26,9 @@ open class MaterialButtonFactory<TView : MaterialButton, TAttributes : MaterialB
         if (view is MaterialButton) {
             view.apply {
                 attributes.icon?.let {
-                    val immutableIcon = ContextCompat.getDrawable(context, it) as Drawable
-                    if (icon != immutableIcon) {
-                        icon = immutableIcon
+                    val localIcon = ContextCompat.getDrawable(context, it) as Drawable
+                    if (icon != localIcon) {
+                        icon = localIcon
                     }
                 }
                 attributes.iconSize?.let {
@@ -41,26 +42,27 @@ open class MaterialButtonFactory<TView : MaterialButton, TAttributes : MaterialB
                     }
                 }
                 attributes.iconGravity?.let {
-                    if (iconGravity != it.value) {
-                        iconGravity = it.value
+                    val localIconGravity = it.value
+                    if (iconGravity != localIconGravity) {
+                        iconGravity = localIconGravity
                     }
                 }
                 attributes.iconTint?.let {
-                    val immutableIconTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (iconTint != immutableIconTint) {
-                        setIconTint(immutableIconTint)
+                    val localIconTint = ColorStateList.valueOf(it)
+                    if (iconTint != localIconTint) {
+                        setIconTint(localIconTint)
                     }
                 }
                 attributes.iconTintMode?.let {
-                    val immutableIconTintMode = it.toPorterDuffMode()
-                    if (iconTintMode != immutableIconTintMode) {
-                        iconTintMode = immutableIconTintMode
+                    val localIconTintMode = it.toPorterDuffMode()
+                    if (iconTintMode != localIconTintMode) {
+                        iconTintMode = localIconTintMode
                     }
                 }
                 attributes.strokeColor?.let {
-                    val immutableStrokeColor = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (strokeColor != immutableStrokeColor) {
-                        setStrokeColor(immutableStrokeColor)
+                    val localStrokeColor = ResourcesCompat.getColorStateList(context.resources, it, null)
+                    if (strokeColor != localStrokeColor) {
+                        setStrokeColor(localStrokeColor)
                     }
                 }
                 attributes.strokeWidth?.let {
@@ -74,9 +76,9 @@ open class MaterialButtonFactory<TView : MaterialButton, TAttributes : MaterialB
                     }
                 }
                 attributes.rippleColor?.let {
-                    val immutableRippleColor = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (rippleColor != immutableRippleColor) {
-                        setRippleColor(immutableRippleColor)
+                    val localRippleColor = ResourcesCompat.getColorStateList(context.resources, it, null)
+                    if (rippleColor != localRippleColor) {
+                        setRippleColor(localRippleColor)
                     }
                 }
             }

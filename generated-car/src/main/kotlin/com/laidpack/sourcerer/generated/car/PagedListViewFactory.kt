@@ -1,8 +1,10 @@
 package com.laidpack.sourcerer.generated.car
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.car.widget.PagedListView
+import androidx.core.content.ContextCompat
 import com.laidpack.sourcerer.generated.FrameLayoutFactory
 import java.lang.Class
 import kotlin.String
@@ -20,10 +22,33 @@ open class PagedListViewFactory<TView : PagedListView, TAttributes : PagedListVi
         super.init(view, context, attributes)
         if (view is PagedListView) {
             view.apply {
+                attributes.gutter?.let {
+                    setGutter(it.value)
+                }
+                attributes.gutterSize?.let {
+                    setGutterSize(it)
+                }
+                attributes.scrollBarColor?.let {
+                    setScrollbarColor(it)
+                }
+                attributes.scrollBarTopMargin?.let {
+                    setScrollBarTopMargin(it)
+                }
                 attributes.scrollBarContainerWidth?.let {
                     if (width != it) {
                         setScrollBarContainerWidth(it)
                     }
+                }
+                attributes.upButtonIcon?.let {
+                    val localUpButtonIcon = ContextCompat.getDrawable(context, it) as Drawable
+                    setUpButtonIcon(localUpButtonIcon)
+                }
+                attributes.downButtonIcon?.let {
+                    val localDownButtonIcon = ContextCompat.getDrawable(context, it) as Drawable
+                    setDownButtonIcon(localDownButtonIcon)
+                }
+                attributes.dayNightStyle?.let {
+                    setDayNightStyle(it.value)
                 }
             }
         }

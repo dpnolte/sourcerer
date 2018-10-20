@@ -17,14 +17,22 @@ open class ViewGroupLayoutParamsFactory<TLayoutParams : ViewGroup.LayoutParams, 
         attributes: TAttributes
     ) {
         layoutParams.apply {
-            attributes.layout_width?.let {
-                if (it.value != width) {
-                    width = it.value
+            if (attributes.layout_width.hasDimension || attributes.layout_width.hasEnum) {
+                val localLayoutWidth = when {
+                    attributes.layout_width.hasDimension -> attributes.layout_width.dimension
+                    else -> attributes.layout_width.enum
+                }
+                if (localLayoutWidth != width) {
+                    width = localLayoutWidth
                 }
             }
-            attributes.layout_height?.let {
-                if (it.value != height) {
-                    height = it.value
+            if (attributes.layout_height.hasDimension || attributes.layout_height.hasEnum) {
+                val localLayoutHeight = when {
+                    attributes.layout_height.hasDimension -> attributes.layout_height.dimension
+                    else -> attributes.layout_height.enum
+                }
+                if (localLayoutHeight != height) {
+                    height = localLayoutHeight
                 }
             }
         }

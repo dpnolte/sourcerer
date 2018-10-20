@@ -59,7 +59,7 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
             format == StyleableAttributeFormat.Enum && typeName == intTypeName -> noTransform
             format == StyleableAttributeFormat.Reference && typeName == intTypeName -> noTransform
             format == StyleableAttributeFormat.Color && typeName == intTypeName -> noTransform
-            //format == StyleableAttributeFormat.Unspecified && typeName == boolTypeName -> noTransform
+            //formats == StyleableAttributeFormat.Unspecified && typeName == boolTypeName -> noTransform
             else -> {
                 val conversionPair = Pair(format, typeName)
                 val conversionPairAlternative = Pair(StyleableAttributeFormat.Integer, typeName)

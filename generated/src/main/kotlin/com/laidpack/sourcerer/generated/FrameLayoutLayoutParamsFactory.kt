@@ -20,8 +20,9 @@ open class FrameLayoutLayoutParamsFactory<TLayoutParams : FrameLayout.LayoutPara
         if (layoutParams is FrameLayout.LayoutParams) {
             layoutParams.apply {
                 attributes.layout_gravity?.let {
-                    if (it != gravity) {
-                        gravity = it
+                    val localLayoutGravity = it.value
+                    if (localLayoutGravity != gravity) {
+                        gravity = localLayoutGravity
                     }
                 }
             }

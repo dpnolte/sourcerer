@@ -63,7 +63,7 @@ open class JavaDocAttributeToMethodMatcher(
         val parameter = providedParameter ?: if (hasOneParameter) parameters.first() else throw IllegalStateException("No parameter provided for multi parameter setter")
         val canBeAssigned = attrManager.canAttributeTypeBeConvertedToType(attributeName, parameter.describedType)
         if (!canBeAssigned) {
-            println("\t\t\t! - Skipping potential setter ${methodInfo.methodDeclaration.nameAsString}, because attribute $attributeName cannot be assigned to parameter ${parameter.name}. Parameter type: ${parameter.describedType} vs. Attribute format(s): ${attrManager.getAttributeFormats(attributeName).joinToString(", ")}")
+            println("\t\t\t! - Skipping potential setter ${methodInfo.methodDeclaration.nameAsString}, because attribute $attributeName cannot be assigned to parameter ${parameter.name}. Parameter type: ${parameter.describedType} vs. Attribute formats(s): ${attrManager.getAttributeFormats(attributeName).joinToString(", ")}")
         }
         return canBeAssigned
     }

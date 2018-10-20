@@ -17,13 +17,19 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
         val sourcePath = env.rootPath.resolve("$moduleName/src/main/kotlin")
         val flagFilePath = env.rootPath.resolve("$moduleName/$generatedFlagFileName")
         if (!sourcePath.toFile().exists()) {
-            generateModule(moduleName, parser.getDependencies(widget))
+            generateModule(
+                    moduleName,
+                    parser.getDependencies(widget),
+                    widgetRegistry.getPackageName(widget)
+            )
             updatedModules.add(moduleName)
         } else if (!updatedModules.contains(moduleName)) {
-            // always update gradle build file, pro guard rules
+            // always update the following:
             val modulePath = getModulePath(moduleName)
             generateBuildGradleFile(modulePath, parser.getDependencies(widget))
             generateProguardRulesFile(modulePath)
+            val mainPath = modulePath.resolve("src/main")
+            generateAndroidManifest(mainPath, widgetRegistry.getPackageName(widget))
             updatedModules.add(moduleName)
         }
         // always create flag file
@@ -32,7 +38,11 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
     }
 
 
-    fun generateModule(moduleName: String, extraDependencies: List<String>) {
+    fun generateModule(
+            moduleName: String,
+            extraDependencies: List<String>,
+            packageName: String
+    ) {
         val modulePath = getModulePath(moduleName)
         val mainPath = modulePath.resolve("src/main")
         val paths = mapOf(
@@ -49,7 +59,7 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
         generateGitIgnoreFile(modulePath)
         generateBuildGradleFile(modulePath, extraDependencies)
         generateProguardRulesFile(modulePath)
-        generateAndroidManifest(mainPath)
+        generateAndroidManifest(mainPath, packageName)
         generateStringXmlFile(paths["valuesPath"] as Path)
         addModuleToGradleSettings(moduleName)
     }
@@ -85,10 +95,10 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
         file.writeText(getProguardRulesTemplate())
     }
 
-    private fun generateAndroidManifest(mainPath: Path) {
+    private fun generateAndroidManifest(mainPath: Path, packageName: String) {
         val path = mainPath.resolve("AndroidManifest.xml")
         val file = findOrCreateFile(path)
-        file.writeText(getAndroidManifestTemplate())
+        file.writeText(getAndroidManifestTemplate(packageName))
     }
 
     private fun generateStringXmlFile(valuesPath: Path) {

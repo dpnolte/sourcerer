@@ -1,13 +1,14 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
+import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import com.laidpack.sourcerer.services.api.toScaleType
 import java.lang.Class
 import kotlin.String
@@ -26,18 +27,16 @@ open class ImageViewFactory<TView : ImageView, TAttributes : ImageViewAttributes
         if (view is ImageView) {
             view.apply {
                 if (attributes.src.hasColor || attributes.src.hasReference) {
-                    val immutableSrc = when {
+                    val localSrc = when {
                         attributes.src.hasColor -> ColorDrawable(attributes.src.color)
                         else -> ContextCompat.getDrawable(context, attributes.src.reference) as Drawable
                     }
-                    if (drawable != immutableSrc) {
-                        setImageDrawable(immutableSrc)
-                    }
+                    setImageDrawable(localSrc)
                 }
                 attributes.scaleType?.let {
-                    val immutableScaleType = it.value.toScaleType()
-                    if (scaleType != immutableScaleType) {
-                        scaleType = immutableScaleType
+                    val localScaleType = it.value.toScaleType()
+                    if (scaleType != localScaleType) {
+                        scaleType = localScaleType
                     }
                 }
                 attributes.baselineAlignBottom?.let {
@@ -72,16 +71,20 @@ open class ImageViewFactory<TView : ImageView, TAttributes : ImageViewAttributes
                         }
                     }
                     attributes.drawableAlpha?.let {
-                        if (imageAlpha != it) {
-                            imageAlpha = it
-                        }
+                        imageAlpha = it
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 21) {
                     attributes.tint?.let {
-                        val immutableTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                        if (imageTintList != immutableTint) {
-                            imageTintList = immutableTint
+                        val localTint = ColorStateList.valueOf(it)
+                        if (imageTintList != localTint) {
+                            imageTintList = localTint
+                        }
+                    }
+                    attributes.tintMode?.let {
+                        val localTintMode = it.toPorterDuffMode()
+                        if (imageTintMode != localTintMode) {
+                            imageTintMode = localTintMode
                         }
                     }
                 }

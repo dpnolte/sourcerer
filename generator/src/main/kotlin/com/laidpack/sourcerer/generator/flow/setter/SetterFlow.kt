@@ -35,8 +35,8 @@ class SetterFlow (
         val assignExpression = expression.descendantsOfType(AssignExpr::class.java).last()
         if (assignExpression.value.isNameExpr) {
             val name = assignExpression.value.asNameExpr().nameAsString
-            if (classInfo.isFieldFromThisClass(name)) {
-                val field = classInfo.getFieldFromThisClass(name)
+            if (classInfo.isFieldFromThisClassOrSuperClass(name)) {
+                val field = classInfo.getResolvedFieldFromThisClassOrSuperClass(name)
                 val variable = field.variables.first()
                 // TODO: check for mutability?
                 return variable.initializer.isPresent
@@ -50,8 +50,8 @@ class SetterFlow (
         val assignExpression = expression.descendantsOfType(AssignExpr::class.java).last()
         if (assignExpression.value.isNameExpr) {
             val name = assignExpression.value.asNameExpr().nameAsString
-            if (classInfo.isFieldFromThisClass(name)) {
-                val field = classInfo.getFieldFromThisClass(name)
+            if (classInfo.isFieldFromThisClassOrSuperClass(name)) {
+                val field = classInfo.getResolvedFieldFromThisClassOrSuperClass(name)
                 val variable = field.variables.first()
                 if (variable.initializer.isPresent
                         && variable.initializer.get() is LiteralStringValueExpr) {

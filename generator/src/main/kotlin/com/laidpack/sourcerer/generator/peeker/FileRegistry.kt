@@ -1,62 +1,21 @@
 package com.laidpack.sourcerer.generator.peeker
 
+import com.github.javaparser.ast.CompilationUnit
 import com.laidpack.sourcerer.generator.Store
-import com.laidpack.sourcerer.generator.XdSourcererResult
-import com.laidpack.sourcerer.generator.resources.Widget
-import jetbrains.exodus.entitystore.Entity
-import kotlinx.dnq.*
+import com.laidpack.sourcerer.generator.peeker.serializer.JavaParserJsonDeserializer
+import com.laidpack.sourcerer.generator.peeker.serializer.JavaParserJsonSerializer
 import kotlinx.dnq.query.*
 import java.io.File
+import java.io.StringReader
+import java.io.StringWriter
 import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
 import java.net.URI
 import java.net.URL
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
-
-class IndexedFile(entity: Entity) : XdEntity(entity) {
-    companion object : XdNaturalEntityType<IndexedFile>()
-    var urlAsString by xdRequiredStringProp(unique = true, trimmed = true)
-    private var cachedUrl : URL? = null
-    val url : URL
-        get() {
-            if (cachedUrl == null) {
-                Store.transactional {
-                    cachedUrl = URL(urlAsString)
-                }
-            }
-            return cachedUrl as URL
-        }
-    val content
-        get() = url.readText()
-    var scanPathString by xdRequiredStringProp(trimmed = true)
-    private var cachedScanPath : Path? = null
-    val scanPath : Path
-        get() {
-            if (cachedScanPath == null) {
-                Store.transactional {
-                    cachedScanPath = Paths.get(scanPathString)
-                }
-            }
-            return cachedScanPath as Path
-        }
-    var lastModified by xdRequiredLongProp()
-    var size by xdRequiredLongProp()
-    val classes by xdChildren0_N(IndexedClass::file)
-    val widgets by xdChildren0_N(Widget::file)
-    private var cachedFilePath : Path? = null
-    val filePath : Path
-        get() {
-            if (cachedFilePath == null) {
-                Store.transactional {
-                    cachedFilePath = Paths.get(url.file)
-                }
-            }
-            return cachedFilePath as Path
-        }
-
-}
+import javax.json.Json
+import kotlin.IllegalStateException
 
 object FileRegistry {
     fun isFileIndexed(url: URL): Boolean {
@@ -73,46 +32,46 @@ object FileRegistry {
         }
         return validIndex
     }
-    fun all(): List<IndexedFile> {
+    fun all(): List<XdFile> {
         return Store.transactional {
-            IndexedFile.all().toList()
+            XdFile.all().toList()
         }
     }
-    fun deleteIndexIfExists(indexedFile: IndexedFile) {
-        val classesInFile = getClassesInFile(indexedFile)
+    fun deleteIndexIfExists(xdFile: XdFile) {
+        val classesInFile = getClassesInFile(xdFile)
         Store.transactional {
             classesInFile.forEach { classInFile ->
                 // delete package references
-                IndexedPackage.query(
-                        IndexedPackage::classes contains classInFile
+                XdPackage.query(
+                        XdPackage::classes contains classInFile
                 ).toList().forEach { p ->
                     p.classes.remove(classInFile)
                 }
                 // delete subclass references
-                IndexedClass.query(
-                        IndexedClass::superClasses contains classInFile
+                XdClass.query(
+                        XdClass::superClasses contains classInFile
                 ).toList().forEach { c ->
                     c.superClasses.remove(classInFile)
                     c.resolvedClassSymbol = false
                     c.resolvedWidgetSymbol = false // triggers new class symbol resolvement to determine super classes
                 }
             }
-            indexedFile.delete()
+            xdFile.delete()
         }
     }
-    fun deleteFileIndexByClass(indexedClass: IndexedClass) {
-        val classesInFile = getClassesInFile(indexedClass)
+    fun deleteFileIndexByClass(xdClass: XdClass) {
+        val classesInFile = getClassesInFile(xdClass)
         Store.transactional {
             classesInFile.forEach { classInFile ->
                 // delete package references
-                IndexedPackage.query(
-                        IndexedPackage::classes contains classInFile
+                XdPackage.query(
+                        XdPackage::classes contains classInFile
                 ).toList().forEach { p ->
                     p.classes.remove(classInFile)
                 }
                 // delete subclass references
-                IndexedClass.query(
-                        IndexedClass::superClasses contains classInFile
+                XdClass.query(
+                        XdClass::superClasses contains classInFile
                 ).toList().forEach { c ->
                     c.superClasses.remove(classInFile)
                     c.resolvedClassSymbol = false
@@ -120,22 +79,23 @@ object FileRegistry {
                 }
             }
 
-            indexedClass.file.delete()
+            val file = xdClass.file
+            file.delete()
         }
     }
 
 
-    fun getFilePathForClass(indexedClass: IndexedClass): String {
+    fun getFilePathForClass(xdClass: XdClass): String {
         return Store.transactional {
-            indexedClass.file.urlAsString
+            xdClass.file.urlAsString
         }
     }
 
-    fun findOrCreate(scanPath: Path, url: URL): IndexedFile {
+    fun findOrCreate(scanPath: Path, url: URL, compilationUnit: CompilationUnit): XdFile {
         val providedUrlAsString = url.toString()
         return Store.transactional {
-            IndexedFile.query(IndexedFile::urlAsString eq providedUrlAsString).firstOrNull() ?:
-                    IndexedFile.new {
+            XdFile.query(XdFile::urlAsString eq providedUrlAsString).firstOrNull() ?:
+                    XdFile.new {
                         val file = if (url.isFileInJar()) {
                             scanPath.toFile()
                         } else url.toFile()
@@ -143,38 +103,54 @@ object FileRegistry {
                         this.lastModified = file.lastModified()
                         this.size = file.length()
                         this.scanPathString = scanPath.toString()
+                        this.compilationUnitBlob = serializeCompilationUnit(compilationUnit)
                     }
         }
     }
 
-    fun getClassesInFile(indexedClass: IndexedClass): List<IndexedClass> {
+    fun getClassesInFile(xdClass: XdClass): List<XdClass> {
         return Store.transactional {
-            IndexedClass.query(
-                    IndexedClass::file eq indexedClass.file
+            XdClass.query(
+                    XdClass::file eq xdClass.file
             ).toList()
         }
     }
 
-    fun getClassesInFile(file: IndexedFile): List<IndexedClass> {
+    fun getClassesInFile(file: XdFile): List<XdClass> {
         return Store.transactional {
-            IndexedClass.query(
-                    IndexedClass::file eq file
+            XdClass.query(
+                    XdClass::file eq file
             ).toList()
         }
     }
 
-    operator fun get(file: File): IndexedFile? {
+    operator fun get(file: File): XdFile? {
         val pathAsString = file.toString()
         return this[pathAsString]
     }
-    operator fun get(url: URL): IndexedFile? {
+    operator fun get(url: URL): XdFile? {
         val urlAsString = url.toString()
         return this[urlAsString]
     }
-    operator fun get(urlAsString: String): IndexedFile? {
+    operator fun get(urlAsString: String): XdFile? {
         return Store.transactional {
-            IndexedFile.query(IndexedFile::urlAsString eq urlAsString).firstOrNull()
+            XdFile.query(XdFile::urlAsString eq urlAsString).firstOrNull()
         }
+    }
+
+
+    private val generatorFactory = Json.createGeneratorFactory(mapOf<String, Any>())
+    private val serializer = JavaParserJsonSerializer()
+    private val deserializer = JavaParserJsonDeserializer()
+    fun serializeCompilationUnit(cu: CompilationUnit): String {
+        val jsonWriter = StringWriter()
+        generatorFactory.createGenerator(jsonWriter).use { generator -> serializer.serialize(cu, generator) }
+        return jsonWriter.toString()
+    }
+    fun deserializeCompilationUnit(blob: String): CompilationUnit {
+        return deserializer.deserializeObject(
+                Json.createReader(StringReader(blob))
+        ) as? CompilationUnit ?: throw IllegalStateException("serialized file blob does not deserialize into CompilationUnit")
     }
 }
 

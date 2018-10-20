@@ -199,7 +199,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
                 )
             }
             attribute.formats.size == 1 && attribute.flags.isNotEmpty() -> {
-                // TODO: make this multi format value (i.e., flags and random integer)?
+                // TODO: make this multi formats value (i.e., flags and random integer)?
                 val className = ClassName(generatedPackageName, attribute.name.toCamelCase() + "FlagsEnum")
                 AttributeTypeResult(
                         className,
@@ -215,7 +215,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
                             setOf(format)
                     )
                 } else {
-                    // try to specify format by setter parameter type
+                    // try to specify formats by setter parameter type
                     val setterType = considerWhatTypeReallyIsAtTheRudimentaryLevel(typesForThisSetter.setterClassName)
                     val matchedFormat = StyleableAttributeFormat.fromTypeName(setterType)
                     AttributeTypeResult(matchedFormat.toClass().asTypeName(), setOf(matchedFormat))
@@ -260,7 +260,7 @@ class TypePhilosopher(private val attrManager: AttributeManager, private val cla
             }
         }
         if (formats.isEmpty())
-            throw IllegalStateException("No appropriate format found for '${attribute.name}'. Setter parameter type: '$setterType'. Possible formats: '${attribute.formats.joinToString(", ")}'")
+            throw IllegalStateException("No appropriate formats found for '${attribute.name}'. Setter parameter type: '$setterType'. Possible formats: '${attribute.formats.joinToString(", ")}'")
         return AttributeTypeResult(MultiFormatGenerator.multiFormatClassName, formats, enumClassName)
     }
 

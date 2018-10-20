@@ -4,6 +4,14 @@ import android.graphics.PorterDuff
 import android.text.TextUtils
 import android.widget.ImageView
 
+interface AttributeEnum {
+    val key: String
+    val value: Int
+}
+class FlagsAccumulator(
+        val value: Int,
+        val toggledFlags: List<AttributeEnum>
+)
 
 fun Int.toPorterDuffMode(): PorterDuff.Mode {
     when (this) {

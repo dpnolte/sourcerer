@@ -294,7 +294,7 @@ class AttributeManager(
     }
 
     fun getResolvedSetterPropertyName(setter: Setter): String? {
-        // ensure setter is in right format
+        // ensure setter is in right formats
         val setterMethodNameBase = setter.name.substring(3)
         if (!setter.name.startsWith("set")
                 || setter.parameters.size != 1
@@ -306,7 +306,7 @@ class AttributeManager(
         val parameter = methodInfo.methodDeclaration.parameters.first()
         val requiresNullableGetter = parameter.annotations.any { it.nameAsString == "Nullable" }
 
-        // in right format, but check if we have a matching getter for the setter (based on name and type)
+        // in right formats, but check if we have a matching getter for the setter (based on name and type)
         val classAndSuperClasses = mutableListOf(classInfo)
         classAndSuperClasses.addAll(classInfo.superClassNames.map { classRegistry[it] as ClassInfo })
 

@@ -23,8 +23,8 @@ class AssignHandler(flow: SetterFlow) : BaseSetterHandler<AssignExpr>(flow, Assi
         for(assignExpression in assignExpressions) {
             if (assignExpression.target is NameExpr) {
                 val name = assignExpression.target.asNameExpr().nameAsString
-                if (flow.classInfo.isFieldFromThisClass(name)) {
-                    flow.addFieldIfNew(name, flow.classInfo.getFieldFromThisClass(name))
+                if (flow.classInfo.isFieldFromThisClassOrSuperClass(name)) {
+                    flow.addFieldIfNew(name, flow.classInfo.getResolvedFieldFromThisClassOrSuperClass(name))
                 }
             }
         }
@@ -36,7 +36,7 @@ class AssignHandler(flow: SetterFlow) : BaseSetterHandler<AssignExpr>(flow, Assi
         for(assignExpression in assignExpressions) {
             if (assignExpression.target is NameExpr) {
                 val name = assignExpression.target.asNameExpr().nameAsString
-                if (flow.classInfo.isFieldFromThisClass(name)) {
+                if (flow.classInfo.isFieldFromThisClassOrSuperClass(name)) {
                     flow.addConditionIfNew(name, value)
                 }
             }

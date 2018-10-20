@@ -22,14 +22,15 @@ open class AppBarLayoutLayoutParamsFactory<TLayoutParams : AppBarLayout.LayoutPa
         if (layoutParams is AppBarLayout.LayoutParams) {
             layoutParams.apply {
                 attributes.layout_scrollFlags?.let {
-                    if (scrollFlags != it.value) {
-                        scrollFlags = it.value
+                    val localLayoutScrollFlags = it.value
+                    if (scrollFlags != localLayoutScrollFlags) {
+                        scrollFlags = localLayoutScrollFlags
                     }
                 }
                 attributes.layout_scrollInterpolator?.let {
-                    val immutableLayoutScrollInterpolator = AnimationUtils.loadInterpolator(context, it)
-                    if (scrollInterpolator != immutableLayoutScrollInterpolator) {
-                        scrollInterpolator = immutableLayoutScrollInterpolator
+                    val localLayoutScrollInterpolator = AnimationUtils.loadInterpolator(context, it)
+                    if (scrollInterpolator != localLayoutScrollInterpolator) {
+                        scrollInterpolator = localLayoutScrollInterpolator
                     }
                 }
             }

@@ -20,10 +20,14 @@ open class RelativeLayoutFactory<TView : RelativeLayout, TAttributes : RelativeL
         super.init(view, context, attributes)
         if (view is RelativeLayout) {
             view.apply {
+                attributes.ignoreGravity?.let {
+                    setIgnoreGravity(it)
+                }
                 if (Build.VERSION.SDK_INT >= 16) {
                     attributes.gravity?.let {
-                        if (gravity != it) {
-                            gravity = it
+                        val localGravity = it.value
+                        if (gravity != localGravity) {
+                            gravity = localGravity
                         }
                     }
                 }

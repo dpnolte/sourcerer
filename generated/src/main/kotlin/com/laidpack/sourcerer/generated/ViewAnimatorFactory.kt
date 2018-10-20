@@ -20,6 +20,12 @@ open class ViewAnimatorFactory<TView : ViewAnimator, TAttributes : ViewAnimatorA
         super.init(view, context, attributes)
         if (view is ViewAnimator) {
             view.apply {
+                attributes.inAnimation?.let {
+                    setInAnimation(context, it)
+                }
+                attributes.outAnimation?.let {
+                    setOutAnimation(context, it)
+                }
                 if (Build.VERSION.SDK_INT >= 17) {
                     attributes.animateFirstView?.let {
                         if (animateFirstView != it) {

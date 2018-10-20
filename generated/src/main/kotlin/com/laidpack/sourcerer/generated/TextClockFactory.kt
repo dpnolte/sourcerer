@@ -7,7 +7,7 @@ import android.widget.TextClock
 import java.lang.Class
 import kotlin.String
 
-open class TextClockFactory<TView : TextClock, TAttributes : TextClockAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : TextViewFactory<TView, TAttributes>(instanceType, attributesType) {
+open class TextClockFactory<TView : TextClock, TAttributes : TextClockAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View {

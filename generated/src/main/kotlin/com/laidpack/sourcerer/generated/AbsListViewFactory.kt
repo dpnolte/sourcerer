@@ -3,6 +3,7 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.View
 import android.widget.AbsListView
 import androidx.core.content.ContextCompat
@@ -21,13 +22,16 @@ open class AbsListViewFactory<TView : AbsListView, TAttributes : AbsListViewAttr
         if (view is AbsListView) {
             view.apply {
                 if (attributes.listSelector.hasColor || attributes.listSelector.hasReference) {
-                    val immutableListSelector = when {
+                    val localListSelector = when {
                         attributes.listSelector.hasColor -> ColorDrawable(attributes.listSelector.color)
                         else -> ContextCompat.getDrawable(context, attributes.listSelector.reference) as Drawable
                     }
-                    if (selector != immutableListSelector) {
-                        selector = immutableListSelector
+                    if (selector != localListSelector) {
+                        selector = localListSelector
                     }
+                }
+                attributes.drawSelectorOnTop?.let {
+                    setDrawSelectorOnTop(it)
                 }
                 attributes.stackFromBottom?.let {
                     if (isStackFromBottom != it) {
@@ -35,7 +39,7 @@ open class AbsListViewFactory<TView : AbsListView, TAttributes : AbsListViewAttr
                     }
                 }
                 attributes.scrollingCache?.let {
-                    if (isScrollingCacheEnabled != it) {
+                    if (isEnabled != it) {
                         isScrollingCacheEnabled = it
                     }
                 }
@@ -50,17 +54,17 @@ open class AbsListViewFactory<TView : AbsListView, TAttributes : AbsListViewAttr
                     }
                 }
                 attributes.cacheColorHint?.let {
-                    if (cacheColorHint != it) {
+                    if (solidColor != it) {
                         cacheColorHint = it
                     }
                 }
                 attributes.fastScrollEnabled?.let {
-                    if (isFastScrollEnabled != it) {
+                    if (isEnabled != it) {
                         isFastScrollEnabled = it
                     }
                 }
                 attributes.smoothScrollbar?.let {
-                    if (isSmoothScrollbarEnabled != it) {
+                    if (isEnabled != it) {
                         isSmoothScrollbarEnabled = it
                     }
                 }
@@ -72,6 +76,11 @@ open class AbsListViewFactory<TView : AbsListView, TAttributes : AbsListViewAttr
                 attributes.fastScrollAlwaysVisible?.let {
                     if (isFastScrollAlwaysVisible != it) {
                         isFastScrollAlwaysVisible = it
+                    }
+                }
+                if (Build.VERSION.SDK_INT >= 21) {
+                    attributes.fastScrollStyle?.let {
+                        setFastScrollStyle(it)
                     }
                 }
             }

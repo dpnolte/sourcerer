@@ -89,9 +89,10 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
             !format.requiresQualifier && format.toClass().asTypeName() == typeName -> noTransform
             format == StyleableAttributeFormat.Dimension && typeName == intTypeName -> noTransform
             format == StyleableAttributeFormat.Enum && typeName == intTypeName -> noTransform
+            format == StyleableAttributeFormat.Flags && typeName == intTypeName -> noTransform
             format == StyleableAttributeFormat.Reference && typeName == intTypeName -> noTransform
             format == StyleableAttributeFormat.Color && typeName == intTypeName -> noTransform
-            //format == StyleableAttributeFormat.Unspecified && typeName == boolTypeName -> noTransform
+            //formats == StyleableAttributeFormat.Unspecified && typeName == boolTypeName -> noTransform
             else -> {
                 val conversionPair = Pair(format, typeName)
                 val conversionPairAlternative = Pair(StyleableAttributeFormat.Integer, typeName)
@@ -112,7 +113,7 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
             format == StyleableAttributeFormat.Enum && typeName == intTypeName -> noTransform
             format == StyleableAttributeFormat.Reference && typeName == intTypeName -> noTransform
             format == StyleableAttributeFormat.Color && typeName == intTypeName -> noTransform
-            //format == StyleableAttributeFormat.Unspecified && typeName == boolTypeName -> noTransform
+            //formats == StyleableAttributeFormat.Unspecified && typeName == boolTypeName -> noTransform
             else -> {
                 val conversionPair = Pair(typeName, format)
                 val conversionPairAlternative = Pair(typeName, StyleableAttributeFormat.Integer)
@@ -160,7 +161,7 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
             code
         }
 
-        private val colorToColorStateList: transformingMethod = { valueProvider, args, context, attribute ->
+        private val referenceToColorStateList: transformingMethod = { valueProvider, args, context, attribute ->
             args.add(ClassName("androidx.core.content.res", "ResourcesCompat"))
             args.add("getColorStateList")
             args.add(context)
@@ -170,6 +171,11 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
         }
         private val colorStateListToColor: transformingMethod = { valueProvider, args, context, attribute ->
             val code = "${valueProvider(args)}.defaultColor"
+            code
+        }
+        private val colorToColorStateList: transformingMethod = { valueProvider, args, context, attribute ->
+            args.add(ColorStateList::class.asTypeName())
+            val code = "%T.valueOf(${valueProvider(args)})"
             code
         }
 
@@ -183,10 +189,10 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
             "${valueProvider(args)}.toLong()"
         }
         private val intToBool: transformingMethod = { valueProvider, args,  _na, attribute  ->
-            "${valueProvider(args)} == 1"
+            "(${valueProvider(args)} == 1)"
         }
         private val boolToInt: transformingMethod = { valueProvider, args,  _na, attribute ->
-            "if (${valueProvider(args)}) 1 else 0"
+            "(if (${valueProvider(args)}) 1 else 0)"
         }
 
         private val toPorterDuffTypeName = ClassName(SourcererEnvironment.servicesApiPackageName, "toPorterDuffMode")
@@ -252,6 +258,13 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
             "%N.resources.getString($value)"
         }
 
+        private val stringToBehavior: transformingMethod = { valueProvider, args, context, attribute ->
+            args.add(ClassName("com.laidpack.sourcerer.generated.coordinatorlayout", "BehaviorUtils"))
+            val value = valueProvider(args)
+            args.add(context)
+            "%T.createFromName($value, %N)"
+        }
+
         // array accessor transformers
         private val drawableArrayClassName = ClassName.bestGuess("android.graphics.drawable.Drawable[]")
         private val referenceToDrawables: transformingMethod = { valueProvider, args, context, attribute ->
@@ -285,7 +298,8 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
                 Pair(StyleableAttributeFormat.Integer, boolTypeName) to intToBool,
                 Pair(StyleableAttributeFormat.Dimension, Float::class.asTypeName()) to intToFloat,
                 Pair(StyleableAttributeFormat.Color, ColorStateList::class.asTypeName()) to colorToColorStateList,
-                Pair(StyleableAttributeFormat.Integer, ColorStateList::class.asTypeName()) to colorToColorStateList,
+                Pair(StyleableAttributeFormat.Reference, ColorStateList::class.asTypeName()) to referenceToColorStateList,
+                Pair(StyleableAttributeFormat.Integer, ColorStateList::class.asTypeName()) to referenceToColorStateList,
                 Pair(StyleableAttributeFormat.Enum, PorterDuff.Mode::class.asTypeName()) to enumToPorterDuffMode,
                 Pair(StyleableAttributeFormat.Integer, PorterDuff.Mode::class.asTypeName()) to enumToPorterDuffMode,
                 Pair(StyleableAttributeFormat.Integer, Display.Mode::class.asTypeName()) to enumToPorterDuffMode,
@@ -302,7 +316,8 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
                 Pair(StyleableAttributeFormat.Unspecified, motionSpecClassName) to referenceToMotionSpec,
                 Pair(StyleableAttributeFormat.String, ClassName.bestGuess("java.lang.String[]")) to anyToList,
                 Pair(StyleableAttributeFormat.Reference, String::class.asTypeName()) to referenceToString,
-                Pair(StyleableAttributeFormat.Integer, String::class.asTypeName()) to referenceToString
+                Pair(StyleableAttributeFormat.Integer, String::class.asTypeName()) to referenceToString,
+                Pair(StyleableAttributeFormat.String, ClassName("androidx.coordinatorlayout.widget.CoordinatorLayout", "Behavior")) to stringToBehavior
         )
         val transformTypeToFormatMap = mapOf(
                 Pair(Float::class.asTypeName(), StyleableAttributeFormat.Integer) to floatToInt,

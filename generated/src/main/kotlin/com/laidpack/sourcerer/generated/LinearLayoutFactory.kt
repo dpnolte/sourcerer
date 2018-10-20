@@ -38,13 +38,14 @@ open class LinearLayoutFactory<TView : LinearLayout, TAttributes : LinearLayoutA
                     }
                 }
                 attributes.measureWithLargestChild?.let {
-                    if (isMeasureWithLargestChildEnabled != it) {
+                    if (isEnabled != it) {
                         isMeasureWithLargestChildEnabled = it
                     }
                 }
                 attributes.showDividers?.let {
-                    if (showDividers != it.value) {
-                        showDividers = it.value
+                    val localShowDividers = it.value
+                    if (showDividers != localShowDividers) {
+                        showDividers = localShowDividers
                     }
                 }
                 attributes.dividerPadding?.let {
@@ -54,16 +55,17 @@ open class LinearLayoutFactory<TView : LinearLayout, TAttributes : LinearLayoutA
                 }
                 if (Build.VERSION.SDK_INT >= 16) {
                     attributes.divider?.let {
-                        val immutableDivider = ContextCompat.getDrawable(context, it) as Drawable
-                        if (dividerDrawable != immutableDivider) {
-                            dividerDrawable = immutableDivider
+                        val localDivider = ContextCompat.getDrawable(context, it) as Drawable
+                        if (dividerDrawable != localDivider) {
+                            dividerDrawable = localDivider
                         }
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 24) {
                     attributes.gravity?.let {
-                        if (gravity != it) {
-                            gravity = it
+                        val localGravity = it.value
+                        if (gravity != localGravity) {
+                            gravity = localGravity
                         }
                     }
                 }

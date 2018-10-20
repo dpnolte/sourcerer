@@ -13,7 +13,9 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.squareup:kotlinpoet:1.0.0-RC1'
     implementation "com.squareup.moshi:moshi:$moshi"
-    implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.6.20'
+    implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.6.26'
+    //implementation 'com.github.javaparser:javaparser-core-serialization:3.6.26'
+    //implementation 'com.github.dpnolte:javaparser:1b1a4a2a61'
     implementation 'org.jetbrains.xodus:xodus-openAPI:1.2.3'
     implementation 'org.jetbrains.xodus:xodus-entity-store:1.2.3'
     implementation 'org.jetbrains.xodus:dnq:1.1.325'
@@ -23,12 +25,16 @@ dependencies {
     implementation "com.android.tools.lint:lint:$lintVersion"
     // colored print
     implementation 'com.github.ajalt:mordant:1.2.0'
+    // serializing java parser nodes
+    implementation group: 'javax.json', name: 'javax.json-api', version: '1.1.3'
+    implementation group: 'org.glassfish', name: 'javax.json', version: '1.1.3'
+
 
 }
 
 
-evaluationDependsOn(':stub-app')
-def componentIds = project(":stub-app").configurations.debugCompileClasspath.incoming.resolutionResult.allDependencies
+evaluationDependsOn(':stub-module')
+def componentIds = project(":stub-module").configurations.debugCompileClasspath.incoming.resolutionResult.allDependencies
         .findAll {
            it.selected.id instanceof ModuleComponentIdentifier && (it.selected.id.group == "com.google.android.material" || it.selected.id.group.startsWith("androidx."))
         }
@@ -49,7 +55,7 @@ for (component in result.resolvedComponents) {
         i += 1
     }
 }
-def libFiles = project(":stub-app").configurations.debugCompileClasspath.filter {
+def libFiles = project(":stub-module").configurations.debugCompileClasspath.filter {
     if (it.name.startsWith("project ")) {
         println "filtered ${it.name}"
         return false

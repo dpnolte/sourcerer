@@ -6,17 +6,9 @@ import com.github.javaparser.ParseProblemException
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.ConstructorDeclaration
 import com.laidpack.sourcerer.generator.*
-import com.laidpack.sourcerer.generator.resources.Widget
 import com.laidpack.sourcerer.generator.resources.WidgetConnoisseur
 import com.laidpack.sourcerer.generator.resources.WidgetRegistry
-import com.laidpack.sourcerer.generator.resources.getWidgetRegistry
 import com.squareup.kotlinpoet.ClassName
-import jetbrains.exodus.entitystore.Entity
-import kotlinx.dnq.*
-import kotlinx.dnq.enum.XdEnumEntityType
-import kotlinx.dnq.query.eq
-import kotlinx.dnq.query.first
-import kotlinx.dnq.query.query
 import java.net.URI
 import java.net.URL
 import java.nio.file.FileSystems
@@ -45,7 +37,7 @@ object ClassIndexer {
                     if (cu != null && cu.packageDeclaration.isPresent) {
                         val isAttributeSetImported = cu.imports.any { it.nameAsString == attributeSetCanonicalName }
                         val packageDeclaration = cu.packageDeclaration.get()
-                        val indexedFile = FileRegistry.findOrCreate(path, url)
+                        val indexedFile = FileRegistry.findOrCreate(path, url, cu)
                         val indexedPackage = PackageRegistry.findOrCreate(packageDeclaration.nameAsString)
                         val classOrInterfaceDeclarations = cu.descendantsOfType(ClassOrInterfaceDeclaration::class.java)
                         for (classOrInterfaceDeclaration in classOrInterfaceDeclarations) {
@@ -167,94 +159,3 @@ object ClassIndexer {
     private val attributeSetCanonicalName = attributeSetType.java.canonicalName
 }
 
-
-class IndexedClass(
-        entity: Entity
-) : XdEntity(entity) {
-    companion object : XdNaturalEntityType<IndexedClass>()
-    var canonicalName by xdRequiredStringProp(unique = true, trimmed = true)
-    var simpleName by xdRequiredStringProp(trimmed = true)
-    private var mutableTargetClass: ClassName? = null
-    val targetClassName : ClassName
-        get() {
-            if (mutableTargetClass == null) {
-                Store.transactional {
-                    mutableTargetClass = ClassName.bestGuess(canonicalName)
-                }
-            }
-            return mutableTargetClass as ClassName
-        }
-
-    var classCategory by xdLink0_1(XdClassCategory)
-    var isViewGroup by xdBooleanProp()
-    var isNestedType by xdBooleanProp ()
-    var resolvedClassSymbol by xdBooleanProp ()
-    var resolvedWidgetSymbol by xdBooleanProp ()
-    var nodeHashCode: Int by xdRequiredIntProp(unique = true)
-    var file : IndexedFile by xdParent(IndexedFile::classes)
-    var sourcererResult by xdChild0_1(XdSourcererResult::targetClass)
-    var indexedPackage : IndexedPackage by xdLink1(IndexedPackage::classes)
-    val superClasses by xdLink0_N(IndexedClass)
-    var widgetAsBeingView : Widget? by xdLink0_1(Widget::viewClass)
-    var widgetAsBeingLayoutParams : Widget? by xdLink0_1(Widget::layoutParamClasses)
-    val widget : Widget?
-        get() {
-            return Store.transactional {
-                when {
-                    widgetAsBeingView != null -> widgetAsBeingView
-                    widgetAsBeingLayoutParams != null -> widgetAsBeingLayoutParams
-                    else -> null
-                }
-            }
-        }
-    private var cachedNode : ClassOrInterfaceDeclaration? = null
-    val node : ClassOrInterfaceDeclaration
-        get() {
-            /*if (cachedNode == null) {
-                Store.transactional {
-                    //val scope = canonicalName.replace(indexedPackage.packageName + ".", "")
-                    cachedNode = JavaParser.parse(file.paths.toFile())
-                            .firstDescendantOfType(ClassOrInterfaceDeclaration::class.java) { node ->
-                                node.name.identifier == simpleName
-                            }
-                    if (cachedNode == null) {
-                        throw IllegalStateException("Indexed class node '$targetClassName' cannot be resolved @ ${file.urlAsString}")
-                    }
-                }
-            }
-            return cachedNode as ClassOrInterfaceDeclaration*/
-            return Store.transactional {
-                JavaParser.parse(file.content)
-                        .firstDescendantOfType(ClassOrInterfaceDeclaration::class.java) { node ->
-                            node.name.identifier == simpleName
-                        } as ClassOrInterfaceDeclaration
-            }
-        }
-
-}
-
-enum class ClassCategory {
-    View,
-    LayoutParams;
-
-    fun toEntity(): XdClassCategory {
-        return XdClassCategory.query(
-                XdClassCategory::presentation eq this.name
-        ).first()
-    }
-}
-
-class XdClassCategory (entity: Entity) : XdEnumEntity(entity) {
-    companion object : XdEnumEntityType<XdClassCategory>() {
-        val LayoutParams by enumField { presentation = ClassCategory.LayoutParams.name}
-        val View by enumField { presentation = ClassCategory.View.name}
-    }
-
-    var presentation by xdRequiredStringProp(unique = true, trimmed = true)
-    fun toEnum(transaction: Boolean = true): ClassCategory {
-        val block =  {
-            enumValueOf<ClassCategory>(this.presentation)
-        }
-        return if(transaction) Store.transactional { block() } else block()
-    }
-}

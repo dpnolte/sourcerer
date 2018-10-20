@@ -8,7 +8,8 @@ import com.laidpack.sourcerer.generator.target.Setter
 
 class JavaDocInterpreter(
         private val classInfo: ClassInfo,
-        private val attributeManager: AttributeManager
+        private val attributeManager: AttributeManager,
+        private val attributesDefinedInXml: Boolean
 ) : Interpreter {
     override fun interpret(earlierIdentifiedSetters: Map<Int, Setter>): InterpretationResult {
         val interpretations = mutableListOf<Interpretation>()
@@ -29,9 +30,9 @@ class JavaDocInterpreter(
                 classInfo: ClassInfo,
                 typedArrayInfo: TypedArrayInfo,
                 attrManager: AttributeManager,
-                classRegistry: ClassRegistry
+                attributesDefinedInXml: Boolean
         ): Interpreter {
-            return JavaDocInterpreter(classInfo, attrManager)
+            return JavaDocInterpreter(classInfo, attrManager, attributesDefinedInXml)
         }
     }
 }

@@ -5,53 +5,67 @@ import com.laidpack.sourcerer.generator.generators.ModuleGeneratorManager
 import com.laidpack.sourcerer.generator.generators.ProjectGeneratorManager
 import com.laidpack.sourcerer.generator.resources.*
 import com.squareup.kotlinpoet.ClassName
-import kotlinx.dnq.query.*
 
+
+data class ResultsPerModule(
+        val moduleName: String,
+        val widget: Widget,
+        val widgetConnoisseur: WidgetConnoisseur,
+        val packageName: String,
+        val firstResult: SourcererResult
+) {
+    val results = mutableListOf(firstResult)
+}
 
 fun main(args: Array<String>) {
     val env = SourcererEnvironment(args)
-    val widgetRegistry = getWidgetRegistry(env)
+    val widgetRegistry = WidgetRegistry.create(env)
     val moduleManager = GradleModuleManager(env, widgetRegistry)
     Store.init(env)
     ProjectGeneratorManager.deleteOldGeneratedFiles(env)
     ProjectGeneratorManager.generateMultiFormatFiles(env.servicesDir)
-    val resultsPerModule = sortedMapOf<String, MutableList<SourcererResult>>()
+    val resultsPerModule = sortedMapOf<String, ResultsPerModule>()
     val targetClassNameToPackageName = mutableMapOf<ClassName, String>()
     println("Sorting results...")
-    for (sourcererResult in getSourcererResults()) {
-        val widget = getWidget(sourcererResult)
+    val results = mutableMapOf<ClassName, SourcererResult>()
+    for (sourcererResult in Sourcerer.getAll()) {
+        val widget = widgetRegistry.getWidget(sourcererResult)
         val parser = widgetRegistry[widget]
         val moduleName = parser.getModuleName(widget)
-        val packageName = "${SourcererEnvironment.rootPackageName}.${moduleName.replace("-", ".")}"
+        val packageName = widgetRegistry.getPackageName(widget)
         targetClassNameToPackageName[sourcererResult.targetClassName] = packageName
         if (resultsPerModule.containsKey(moduleName)) {
-            (resultsPerModule[moduleName] as MutableList<SourcererResult>).add(sourcererResult)
+            (resultsPerModule[moduleName] as ResultsPerModule).results.add(sourcererResult)
         } else {
-            resultsPerModule[moduleName] = mutableListOf(sourcererResult)
+            resultsPerModule[moduleName] = ResultsPerModule(
+                    moduleName,
+                    widget,
+                    parser,
+                    packageName,
+                    sourcererResult
+            )
         }
+        results[sourcererResult.targetClassName] = sourcererResult
     }
     val moduleGenerators = mutableListOf<ModuleGeneratorManager>()
     val reservedElementTypes = mutableSetOf<String>()
-    for (moduleNameAndResults in resultsPerModule) {
-        val moduleName = moduleNameAndResults.key
-        val firstResult = moduleNameAndResults.value.first()
-        val packageName = targetClassNameToPackageName[firstResult.targetClassName] as String
-        val widget = getWidget(firstResult)
-        val moduleDir = moduleManager.getModuleDirForWidget(widget)
+    for (resultsList in resultsPerModule.values) {
+        val moduleDir = moduleManager.getModuleDirForWidget(resultsList.widget)
         val classGenerators = mutableListOf<ClassGeneratorManager>()
-        println("Module: $moduleName")
-        println("\t-- package: $packageName")
+        println("Module: ${resultsList.moduleName}")
+        println("\t-- package: ${resultsList.packageName}")
         println("\t-- module dir: .${moduleDir.toString().replace(env.rootPath.toString(), "")}")
         println("========================================")
-        for (sourcererResult in moduleNameAndResults.value) {
+        for (sourcererResult in resultsList.results) {
             val superClassPackageName = if(sourcererResult.superClassName != null) {
                 targetClassNameToPackageName[sourcererResult.superClassName]
             } else null
             val classGenerator = ClassGeneratorManager(
                     moduleDir,
-                    packageName,
+                    resultsList.packageName,
                     superClassPackageName,
                     sourcererResult,
+                    getSuperClassResults(sourcererResult, results),
                     env.minSdkVersion,
                     reservedElementTypes
             )
@@ -62,8 +76,15 @@ fun main(args: Array<String>) {
             println("+ ${classGenerator.attributesFileName}")
             println("+ ${classGenerator.factoryFileName}")
         }
-        val moduleGenerator = ModuleGeneratorManager(moduleDir, moduleName, packageName, classGenerators)
+        val moduleGenerator = ModuleGeneratorManager(
+                moduleDir,
+                resultsList.moduleName,
+                resultsList.packageName,
+                resultsList.widgetConnoisseur,
+                classGenerators
+        )
         moduleGenerator.generateBootstrapModuleFile()
+        moduleGenerator.generateTemplateFiles()
         moduleGenerators.add(moduleGenerator)
         println("-- added module bootstrapper ${moduleGenerator.bootstrapperClassName.simpleName}")
         println("========================================")
@@ -74,22 +95,18 @@ fun main(args: Array<String>) {
     println("-- added services bootstrapper ${projectGenerator.servicesBootstrapperClassName.simpleName}")
     ProjectGeneratorManager.deleteTempFiles(env)
     println("Done!")
-
-
 }
 
-fun getSourcererResults(): List<SourcererResult> {
-    return Store.transactional {
-        XdSourcererResult.all().toList().map {
-            it.toSnapshot()
-        }
+fun getSuperClassResults(sourcererResult: SourcererResult, results: Map<ClassName, SourcererResult>): List<SourcererResult> {
+    var currentResult = sourcererResult
+    val superClassResults = mutableListOf<SourcererResult>()
+    while(currentResult.superClassName != null) {
+        val superClassName = currentResult.superClassName as ClassName
+        val superClassResult = results[superClassName] as SourcererResult
+        superClassResults.add(superClassResult)
+        currentResult = superClassResult
     }
+    return superClassResults
 }
 
-fun getWidget(sourcererResult: SourcererResult): Widget {
-    return Store.transactional {
-        Widget.query(
-                Widget::file eq sourcererResult.indexedClass.file
-        ).firstOrNull() ?: throw IllegalStateException("Widget not found for file ${sourcererResult.indexedClass.file.url}")
-    }
-}
+

@@ -20,6 +20,9 @@ open class CollapsingToolbarLayoutLayoutParamsFactory<TLayoutParams : Collapsing
         super.init(layoutParams, context, attributes)
         if (layoutParams is CollapsingToolbarLayout.LayoutParams) {
             layoutParams.apply {
+                attributes.layout_collapseMode?.let {
+                    collapseMode = it.value
+                }
                 attributes.layout_collapseParallaxMultiplier?.let {
                     if (parallaxMultiplier != it) {
                         parallaxMultiplier = it

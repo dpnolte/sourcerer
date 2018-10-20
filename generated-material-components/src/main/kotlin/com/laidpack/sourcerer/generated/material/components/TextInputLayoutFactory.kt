@@ -21,27 +21,27 @@ open class TextInputLayoutFactory<TView : TextInputLayout, TAttributes : TextInp
         if (view is TextInputLayout) {
             view.apply {
                 attributes.hintEnabled?.let {
-                    if (isHintEnabled != it) {
+                    if (isEnabled != it) {
                         isHintEnabled = it
                     }
                 }
                 attributes.hintAnimationEnabled?.let {
-                    if (isHintAnimationEnabled != it) {
+                    if (isEnabled != it) {
                         isHintAnimationEnabled = it
                     }
                 }
                 attributes.helperTextEnabled?.let {
-                    if (isHelperTextEnabled != it) {
+                    if (isEnabled != it) {
                         isHelperTextEnabled = it
                     }
                 }
                 attributes.errorEnabled?.let {
-                    if (isErrorEnabled != it) {
+                    if (isEnabled != it) {
                         isErrorEnabled = it
                     }
                 }
                 attributes.counterEnabled?.let {
-                    if (isCounterEnabled != it) {
+                    if (isEnabled != it) {
                         isCounterEnabled = it
                     }
                 }
@@ -51,9 +51,12 @@ open class TextInputLayoutFactory<TView : TextInputLayout, TAttributes : TextInp
                     }
                 }
                 attributes.passwordToggleEnabled?.let {
-                    if (isPasswordVisibilityToggleEnabled != it) {
+                    if (isEnabled != it) {
                         isPasswordVisibilityToggleEnabled = it
                     }
+                }
+                attributes.passwordToggleDrawable?.let {
+                    setPasswordVisibilityToggleDrawable(it)
                 }
                 attributes.passwordToggleContentDescription?.let {
                     if (passwordVisibilityToggleContentDescription != it) {

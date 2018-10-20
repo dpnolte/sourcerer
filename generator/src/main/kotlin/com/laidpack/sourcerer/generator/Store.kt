@@ -18,9 +18,9 @@ object Store {
         XdModel.registerNodes(
                 XdSourcererResult,
                 XdClassCategory,
-                IndexedClass,
-                IndexedFile,
-                IndexedPackage,
+                XdClass,
+                XdFile,
+                XdPackage,
                 Widget,
                 XdWidgetSource,
                 XdFormat,
@@ -63,10 +63,10 @@ object Store {
 
     fun deleteAll() {
         instance.transactional {
-            IndexedFile.all().toList().forEach { f ->
+            XdFile.all().toList().forEach { f ->
                 f.delete()
             }
-            IndexedPackage.all().toList().forEach { p ->
+            XdPackage.all().toList().forEach { p ->
                 p.delete()
             }
         }
@@ -74,8 +74,8 @@ object Store {
 
     fun deleteSourcererResult(simpleName: String) {
         instance.transactional {
-            val indexedClasses = IndexedClass.query(
-                    IndexedClass::simpleName eq simpleName
+            val indexedClasses = XdClass.query(
+                    XdClass::simpleName eq simpleName
             ).toList()
             if (indexedClasses.size == 1) {
                 val xdResult = indexedClasses.first().sourcererResult as XdSourcererResult
@@ -100,13 +100,14 @@ object Store {
 
     fun deleteSourcererResults() {
         instance.transactional {
-            IndexedClass.query(
-                    IndexedClass::sourcererResult ne null
+            XdClass.query(
+                    XdClass::sourcererResult ne null
             ).asSequence().forEach {
                 it.sourcererResult = null
             }
             XdGetter.all().entityIterable.forEach { e -> e.delete() }
             XdAttributeToParameterIndex.all().entityIterable.forEach { e -> e.delete() }
+            XdCallSignatureMap.all().entityIterable.forEach { e -> e.delete() }
             XdAttributeTypesForSetter.all().entityIterable.forEach { e -> e.delete() }
             XdParameter.all().entityIterable.forEach { e -> e.delete() }
             XdSetter.all().entityIterable.forEach { e -> e.delete() }

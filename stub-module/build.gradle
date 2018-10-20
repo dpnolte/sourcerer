@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 //apply plugin: 'kotlin-kapt'
@@ -6,7 +6,6 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.laidpack.sourcerer.stub"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -18,6 +17,9 @@ android {
             matchingFallbacks = ['default']
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            matchingFallbacks = ['default']
         }
     }
     sourceSets {
@@ -62,8 +64,9 @@ dependencies {
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$androidX"
     implementation "androidx.viewpager:viewpager:$androidX"
     implementation "androidx.wear:wear:$androidX"
-    //api project(path: ":service", configuration: 'default')
-    releaseImplementation project(':services')
+    //api project(path: ":services", configuration: 'default')
+    releaseApi project(':services')
+    //debugApi project(':services')
 
 }
 

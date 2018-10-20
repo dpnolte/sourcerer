@@ -11,6 +11,23 @@ open class RadioGroupFactory<TView : RadioGroup, TAttributes : RadioGroupAttribu
 
     override fun createInstance(context: Context): View = RadioGroup(context)
 
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is RadioGroup) {
+            view.apply {
+                attributes.orientation?.let {
+                    if (orientation != it.value) {
+                        orientation = it.value
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "radioGroup"
 

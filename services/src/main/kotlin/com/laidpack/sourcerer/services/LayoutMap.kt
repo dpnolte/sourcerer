@@ -52,7 +52,7 @@ data class LayoutProperties(
         val id: String,
         val type: String,
         val attributes: IAttributes,
-        val children: List<String>
+        val children: Set<String>
 ) {
     val hashedId: Int = id.hashCode()
     var parentId: String? = null

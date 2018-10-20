@@ -21,8 +21,9 @@ open class BoxInsetLayoutLayoutParamsFactory<TLayoutParams : BoxInsetLayout.Layo
         if (layoutParams is BoxInsetLayout.LayoutParams) {
             layoutParams.apply {
                 attributes.boxedEdges?.let {
-                    if (it.value != boxedEdges) {
-                        boxedEdges = it.value
+                    val localBoxedEdges = it.value
+                    if (localBoxedEdges != boxedEdges) {
+                        boxedEdges = localBoxedEdges
                     }
                 }
             }

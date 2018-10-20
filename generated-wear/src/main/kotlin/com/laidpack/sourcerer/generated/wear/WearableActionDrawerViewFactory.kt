@@ -21,9 +21,7 @@ open class WearableActionDrawerViewFactory<TView : WearableActionDrawerView, TAt
         if (view is WearableActionDrawerView) {
             view.apply {
                 attributes.drawerTitle?.let {
-                    if (title != it) {
-                        setTitle(it)
-                    }
+                    setTitle(it)
                 }
             }
         }

@@ -16,11 +16,17 @@ typealias JsonChangeEvent = (json: String) -> Unit
 class ServerConnection(private val serverUrl: String) {
 
     private lateinit var webSocket: WebSocket
-    private lateinit var client: OkHttpClient
+    private val client: OkHttpClient = OkHttpClient.Builder()
+            .readTimeout(3, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
+            .build()
     private lateinit var messageHandler: Handler
     private lateinit var statusHandler: Handler
+    private var connectionStatus = ConnectionStatus.UNCONNECTED
 
     enum class ConnectionStatus {
+        UNCONNECTED,
+        CONNECTING,
         DISCONNECTED,
         CONNECTED
     }
@@ -46,16 +52,14 @@ class ServerConnection(private val serverUrl: String) {
     }
 
     fun connect(statusListener: StatusChangeEvent, jsonListener: JsonChangeEvent) {
-        client = OkHttpClient.Builder()
-                .readTimeout(3, TimeUnit.SECONDS)
-                .retryOnConnectionFailure(true)
-                .build()
+        connectionStatus = ConnectionStatus.CONNECTING
         messageHandler = Handler { msg ->
             jsonListener(msg.obj as String)
             true
         }
         statusHandler = Handler { msg ->
-            statusListener(msg.obj as ConnectionStatus)
+            connectionStatus = msg.obj as ConnectionStatus
+            statusListener(connectionStatus)
             true
         }
         val request = Request.Builder()
@@ -65,9 +69,11 @@ class ServerConnection(private val serverUrl: String) {
     }
 
     fun disconnect() {
-        webSocket.cancel()
-        messageHandler.removeCallbacksAndMessages(null)
-        statusHandler.removeCallbacksAndMessages(null)
+        if (connectionStatus != ConnectionStatus.UNCONNECTED) {
+            webSocket.cancel()
+            messageHandler.removeCallbacksAndMessages(null)
+            statusHandler.removeCallbacksAndMessages(null)
+        }
     }
 
     fun sendMessage(message: String) {

@@ -24,9 +24,9 @@ open class SpinnerFactory<TView : Spinner, TAttributes : SpinnerAttributes>(inst
             view.apply {
                 if (Build.VERSION.SDK_INT >= 16) {
                     attributes.popupBackground?.let {
-                        val immutablePopupBackground = ContextCompat.getDrawable(context, it) as Drawable
-                        if (popupBackground != immutablePopupBackground) {
-                            setPopupBackgroundDrawable(immutablePopupBackground)
+                        val localPopupBackground = ContextCompat.getDrawable(context, it) as Drawable
+                        if (popupBackground != localPopupBackground) {
+                            setPopupBackgroundDrawable(localPopupBackground)
                         }
                     }
                     attributes.dropDownWidth?.let {
@@ -35,8 +35,9 @@ open class SpinnerFactory<TView : Spinner, TAttributes : SpinnerAttributes>(inst
                         }
                     }
                     attributes.gravity?.let {
-                        if (gravity != it) {
-                            gravity = it
+                        val localGravity = it.value
+                        if (gravity != localGravity) {
+                            gravity = localGravity
                         }
                     }
                 }

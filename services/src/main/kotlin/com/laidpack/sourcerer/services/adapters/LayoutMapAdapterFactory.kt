@@ -58,6 +58,7 @@ internal class LayoutMapAdapter(
             val jsonValue = reader.readJsonValue()
             val element = layoutElementDelegate.fromJsonValue(jsonValue)
             if (element != null) {
+                if (elements.containsKey(element.id)) throw JsonDataException("Elements with duplicate id: ${element.id}")
                 elements[element.id] = element
                 if (!typeToElements.containsKey(element.type)) {
                     typeToElements[element.type] = mutableListOf()
@@ -96,7 +97,7 @@ internal class LayoutMapAdapter(
             elements: Map<String, LayoutProperties>,
             childToParent: Map<String, String>
     ): String {
-        var rootElement : String = ""
+        var rootElement = ""
         for (element in elements.values) {
             when {
                 childToParent.containsKey(element.id) -> element.parentId = childToParent[element.id]
@@ -112,14 +113,23 @@ internal class LayoutMapAdapter(
             elements: Map<String,LayoutProperties>
     ): LayoutParamsDelegateWrapper? {
         var parentElement = if (element.parentId != null) elements[element.parentId as String] else null
+        var depth = 0
         while(parentElement != null) {
             try {
-                return elementToLayoutParamsDelegate(element.type)
+                return elementToLayoutParamsDelegate(parentElement.type)
             } catch (e: IllegalArgumentException) {
                 // do nothing..
+                depth += 1
+                if (depth == MAX_DEPTH) {
+                    throw JsonDataException("Max depth ($MAX_DEPTH) reached for searching parent element with layout parameters. Element: ${element.type}/${element.id}. Is element added as child to another element and has the parent linked view group to layout params element type (@see SerializerComponent::associateViewGroupWithLayoutParams)?")
+                }
             }
             parentElement = elements[parentElement.parentId]
         }
         return null
+    }
+
+    companion object {
+        const val MAX_DEPTH = 10
     }
 }

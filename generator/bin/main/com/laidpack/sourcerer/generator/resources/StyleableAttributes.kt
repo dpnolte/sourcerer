@@ -119,8 +119,8 @@ class StyleableAttributeManager {
                 if (name.startsWith("__removed")) continue
 
                 val format = mutableListOf<StyleableAttributeFormat>()
-                if (node.attributes.getNamedItem("format") != null) {
-                    val formatString = node.attributes.getNamedItem("format").nodeValue
+                if (node.attributes.getNamedItem("formats") != null) {
+                    val formatString = node.attributes.getNamedItem("formats").nodeValue
                     format.addAll(StyleableAttributeFormat.fromString(formatString))
                 }
                 val flags = getFlags(node)
@@ -199,8 +199,8 @@ class StyleableAttributeManager {
             val nodes = xPath.compile(selector).evaluate(getDoc(url), XPathConstants.NODESET) as DTMNodeList
             for (i in 0 until nodes.length) {
                 val node = nodes.item(i)
-                if (node.hasAttributes() && node.attributes.getNamedItem("format") != null) {
-                    val attributeFormat = node.attributes.getNamedItem("format").nodeValue
+                if (node.hasAttributes() && node.attributes.getNamedItem("formats") != null) {
+                    val attributeFormat = node.attributes.getNamedItem("formats").nodeValue
                     if (!formats.contains(attributeFormat)) {
                         formats.add(attributeFormat)
                     }

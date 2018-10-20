@@ -2,7 +2,12 @@ package com.laidpack.sourcerer.generated.coordinatorlayout
 
 import com.laidpack.annotation.TypeScript
 import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
+import com.laidpack.sourcerer.services.api.AttributeEnum
+import com.laidpack.sourcerer.services.api.FlagsAccumulator
+import com.laidpack.sourcerer.services.api.FlagsQualifier
+import com.laidpack.sourcerer.services.api.Format
 import com.laidpack.sourcerer.services.api.IAttributes
+import com.laidpack.sourcerer.services.api.MultiFormat
 import com.laidpack.sourcerer.services.api.ReferenceQualifier
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -11,21 +16,19 @@ import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class CoordinatorLayoutLayoutParamsAttributes : ViewGroupLayoutParamsAttributes(),
-        IAttributes {
-    @field:ReferenceQualifier
-    var layout_anchor: Int? = null
+open class CoordinatorLayoutLayoutParamsAttributes(
+    val layout_behavior: String? = null,
+    @field:ReferenceQualifier val layout_anchor: Int? = null,
+    val layout_keyline: Int? = null,
+    @field:FlagsQualifier(flagsType = LayoutAnchorGravityFlagsEnum::class) val layout_anchorGravity: FlagsAccumulator? = null,
+    val layout_insetEdge: LayoutInsetEdgeEnum? = null,
+    @field:FlagsQualifier(flagsType = LayoutDodgeInsetEdgesFlagsEnum::class) val layout_dodgeInsetEdges: FlagsAccumulator? = null,
+    layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
+    layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum))
+) : ViewGroupLayoutParamsAttributes(layout_width = layout_width, layout_height = layout_height),
+        IAttributes
 
-    var layout_keyline: Int? = null
-
-    var layout_anchorGravity: LayoutAnchorGravityFlagsEnum? = null
-
-    var layout_insetEdge: LayoutInsetEdgeEnum? = null
-
-    var layout_dodgeInsetEdges: LayoutDodgeInsetEdgesFlagsEnum? = null
-}
-
-enum class LayoutAnchorGravityFlagsEnum(val attributeName: String, val value: Int) {
+enum class LayoutAnchorGravityFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "top")
     Top("top", 48),
 
@@ -69,7 +72,7 @@ enum class LayoutAnchorGravityFlagsEnum(val attributeName: String, val value: In
     End("end", 8388613);
 }
 
-enum class LayoutInsetEdgeEnum(val attributeName: String, val value: Int) {
+enum class LayoutInsetEdgeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),
 
@@ -92,7 +95,7 @@ enum class LayoutInsetEdgeEnum(val attributeName: String, val value: Int) {
     End("end", 8388613);
 }
 
-enum class LayoutDodgeInsetEdgesFlagsEnum(val attributeName: String, val value: Int) {
+enum class LayoutDodgeInsetEdgesFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),
 

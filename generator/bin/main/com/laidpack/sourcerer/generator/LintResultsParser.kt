@@ -95,7 +95,7 @@ class LintResultsParser(lintResultsFilePath: Path) {
     private fun getClassSimpleName(node: Node): String {
         val locationNode = getLocationNode(node)
         val fileLocation = locationNode.attributes.getNamedItem("file").nodeValue
-        val matchResult = fileLocationRegex.find(fileLocation) ?: throw IllegalStateException("File location regex doesn't match. File location format changed? File location: '$fileLocation'")
+        val matchResult = fileLocationRegex.find(fileLocation) ?: throw IllegalStateException("File location regex doesn't match. File location formats changed? File location: '$fileLocation'")
         return matchResult.groupValues[1]
     }
 

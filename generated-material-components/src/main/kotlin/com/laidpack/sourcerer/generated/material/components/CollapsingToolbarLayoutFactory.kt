@@ -41,41 +41,49 @@ open class CollapsingToolbarLayoutFactory<TView : CollapsingToolbarLayout, TAttr
                         expandedTitleMarginBottom = it
                     }
                 }
+                attributes.expandedTitleTextAppearance?.let {
+                    setExpandedTitleTextAppearance(it)
+                }
+                attributes.collapsedTitleTextAppearance?.let {
+                    setCollapsedTitleTextAppearance(it)
+                }
                 attributes.contentScrim?.let {
-                    val immutableContentScrim = ColorDrawable(it)
-                    if (contentScrim != immutableContentScrim) {
-                        contentScrim = immutableContentScrim
+                    val localContentScrim = ColorDrawable(it)
+                    if (contentScrim != localContentScrim) {
+                        contentScrim = localContentScrim
                     }
                 }
                 attributes.statusBarScrim?.let {
-                    val immutableStatusBarScrim = ColorDrawable(it)
-                    if (statusBarScrim != immutableStatusBarScrim) {
-                        statusBarScrim = immutableStatusBarScrim
+                    val localStatusBarScrim = ColorDrawable(it)
+                    if (statusBarScrim != localStatusBarScrim) {
+                        statusBarScrim = localStatusBarScrim
                     }
                 }
                 attributes.scrimVisibleHeightTrigger?.let {
-                    if (scrimVisibleHeightTrigger != it) {
+                    if (height != it) {
                         scrimVisibleHeightTrigger = it
                     }
                 }
                 attributes.scrimAnimationDuration?.let {
-                    val immutableScrimAnimationDuration = it.toLong()
-                    if (scrimAnimationDuration != immutableScrimAnimationDuration) {
-                        scrimAnimationDuration = immutableScrimAnimationDuration
+                    val localScrimAnimationDuration = it.toLong()
+                    if (scrimAnimationDuration != localScrimAnimationDuration) {
+                        scrimAnimationDuration = localScrimAnimationDuration
                     }
                 }
                 attributes.collapsedTitleGravity?.let {
-                    if (collapsedTitleGravity != it.value) {
-                        collapsedTitleGravity = it.value
+                    val localCollapsedTitleGravity = it.value
+                    if (collapsedTitleGravity != localCollapsedTitleGravity) {
+                        collapsedTitleGravity = localCollapsedTitleGravity
                     }
                 }
                 attributes.expandedTitleGravity?.let {
-                    if (expandedTitleGravity != it.value) {
-                        expandedTitleGravity = it.value
+                    val localExpandedTitleGravity = it.value
+                    if (expandedTitleGravity != localExpandedTitleGravity) {
+                        expandedTitleGravity = localExpandedTitleGravity
                     }
                 }
                 attributes.titleEnabled?.let {
-                    if (isTitleEnabled != it) {
+                    if (isEnabled != it) {
                         isTitleEnabled = it
                     }
                 }

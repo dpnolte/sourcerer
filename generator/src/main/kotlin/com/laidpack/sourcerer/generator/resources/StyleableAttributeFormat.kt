@@ -22,6 +22,7 @@ enum class StyleableAttributeFormat(val value: kotlin.String, val requiresQualif
     Dimension("dimension", true),
     Integer("integer", false),
     String("string", false),
+    Flags("flag", true),
     Enum("enum", false),
     Fraction("fraction", false),
     Unspecified( "", false);
@@ -36,6 +37,7 @@ enum class StyleableAttributeFormat(val value: kotlin.String, val requiresQualif
             Integer -> kotlin.Int::class
             String -> kotlin.String::class
             Enum -> kotlin.Int::class
+            Flags -> kotlin.Int::class
             Fraction -> kotlin.Float::class
             Unspecified -> kotlin.Int::class // assuming unspecified is integer (TBC)
         }
@@ -47,6 +49,7 @@ enum class StyleableAttributeFormat(val value: kotlin.String, val requiresQualif
             Color -> colorQualifierClassName
             Reference -> referenceQualifierClassName
             Dimension -> dimensionQualifierClassName
+            Flags -> flagsQualifierClassName
             else -> throw IllegalStateException("Format $this has no required qualifier")
         }
     }
@@ -61,6 +64,7 @@ enum class StyleableAttributeFormat(val value: kotlin.String, val requiresQualif
         val colorQualifierClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "ColorQualifier")
         val referenceQualifierClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "ReferenceQualifier")
         val dimensionQualifierClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "DimensionQualifier")
+        val flagsQualifierClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "FlagsQualifier")
 
         fun fromString(formatString: kotlin.String): List<StyleableAttributeFormat> {
             return formatString.split("|").map {
@@ -97,6 +101,7 @@ class XdFormat(entity: Entity) : XdEnumEntity(entity) {
         val Integer by enumField { presentation = StyleableAttributeFormat.Integer.name }
         val String by enumField { presentation = StyleableAttributeFormat.String.name }
         val Enum by enumField { presentation = StyleableAttributeFormat.Enum.name }
+        val Flags by enumField { presentation = StyleableAttributeFormat.Flags.name }
         val Fraction by enumField { presentation = StyleableAttributeFormat.Fraction.name }
         val Unspecified by enumField { presentation = StyleableAttributeFormat.Unspecified.name }
     }

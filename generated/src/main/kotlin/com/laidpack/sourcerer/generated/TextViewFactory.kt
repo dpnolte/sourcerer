@@ -1,9 +1,13 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import com.laidpack.sourcerer.services.api.toTruncateAt
@@ -33,34 +37,34 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                         hint = it
                     }
                 }
-                attributes.textColor?.let {
-                    if (textColors.defaultColor != it) {
-                        setTextColor(it)
+                if (attributes.textColor.hasColor || attributes.textColor.hasReference) {
+                    val localTextColor = when {
+                        attributes.textColor.hasColor -> ColorStateList.valueOf(attributes.textColor.color)
+                        else -> ResourcesCompat.getColorStateList(context.resources, attributes.textColor.reference, null)
+                    }
+                    if (textColors != localTextColor) {
+                        setTextColor(localTextColor)
                     }
                 }
-                attributes.textColorHint?.let {
-                    if (hintTextColors.defaultColor != it) {
-                        setHintTextColor(it)
+                if (attributes.textColorHint.hasColor || attributes.textColorHint.hasReference) {
+                    val localTextColorHint = when {
+                        attributes.textColorHint.hasColor -> ColorStateList.valueOf(attributes.textColorHint.color)
+                        else -> ResourcesCompat.getColorStateList(context.resources, attributes.textColorHint.reference, null)
                     }
-                }
-                attributes.textSize?.let {
-                    if (textSize != it) {
-                        textSize = it
+                    if (hintTextColors != localTextColorHint) {
+                        setHintTextColor(localTextColorHint)
                     }
                 }
                 attributes.textScaleX?.let {
-                    if (textScaleX != it) {
-                        textScaleX = it
-                    }
+                    textScaleX = it
                 }
-                attributes.textColorLink?.let {
-                    if (linkTextColors.defaultColor != it) {
-                        setLinkTextColor(it)
+                if (attributes.textColorLink.hasColor || attributes.textColorLink.hasReference) {
+                    val localTextColorLink = when {
+                        attributes.textColorLink.hasColor -> ColorStateList.valueOf(attributes.textColorLink.color)
+                        else -> ResourcesCompat.getColorStateList(context.resources, attributes.textColorLink.reference, null)
                     }
-                }
-                attributes.lines?.let {
-                    if (lineCount != it) {
-                        setLines(it)
+                    if (linkTextColors != localTextColorLink) {
+                        setLinkTextColor(localTextColorLink)
                     }
                 }
                 attributes.height?.let {
@@ -74,8 +78,9 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                     }
                 }
                 attributes.gravity?.let {
-                    if (gravity != it) {
-                        gravity = it
+                    val localGravity = it.value
+                    if (gravity != localGravity) {
+                        gravity = localGravity
                     }
                 }
                 attributes.enabled?.let {
@@ -84,8 +89,9 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                     }
                 }
                 attributes.autoLink?.let {
-                    if (autoLinkMask != it) {
-                        autoLinkMask = it
+                    val localAutoLink = it.value
+                    if (autoLinkMask != localAutoLink) {
+                        autoLinkMask = localAutoLink
                     }
                 }
                 attributes.linksClickable?.let {
@@ -99,9 +105,9 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                     }
                 }
                 attributes.ellipsize?.let {
-                    val immutableEllipsize = it.toTruncateAt()
-                    if (ellipsize != immutableEllipsize) {
-                        ellipsize = immutableEllipsize
+                    val localEllipsize = it.value.toTruncateAt()
+                    if (ellipsize != localEllipsize) {
+                        ellipsize = localEllipsize
                     }
                 }
                 attributes.drawablePadding?.let {
@@ -109,30 +115,19 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                         compoundDrawablePadding = it
                     }
                 }
-                attributes.inputType?.let {
-                    if (inputType != it) {
-                        inputType = it
-                    }
-                }
-                attributes.imeOptions?.let {
-                    if (imeOptions != it) {
-                        imeOptions = it
-                    }
-                }
                 attributes.privateImeOptions?.let {
-                    if (privateImeOptions != it) {
-                        privateImeOptions = it
-                    }
+                    privateImeOptions = it
+                }
+                attributes.editorExtras?.let {
+                    setInputExtras(it)
+                }
+                attributes.textIsSelectable?.let {
+                    setTextIsSelectable(it)
                 }
                 if (Build.VERSION.SDK_INT >= 16) {
                     attributes.textColorHighlight?.let {
                         if (highlightColor != it) {
                             highlightColor = it
-                        }
-                    }
-                    attributes.cursorVisible?.let {
-                        if (isCursorVisible != it) {
-                            isCursorVisible = it
                         }
                     }
                     attributes.maxLines?.let {
@@ -143,6 +138,11 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                     attributes.maxHeight?.let {
                         if (maxHeight != it) {
                             maxHeight = it
+                        }
+                    }
+                    attributes.lines?.let {
+                        if (maxLines != it) {
+                            setLines(it)
                         }
                     }
                     attributes.minLines?.let {
@@ -186,43 +186,62 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                         }
                     }
                     if (attributes.shadowColor != null || attributes.shadowDx != null || attributes.shadowDy != null || attributes.shadowRadius != null) {
-                        val immutableShadowColor = attributes.shadowColor ?: shadowColor
-                        val immutableShadowDx = attributes.shadowDx ?: shadowDx
-                        val immutableShadowDy = attributes.shadowDy ?: shadowDy
-                        val immutableShadowRadius = attributes.shadowRadius ?: shadowRadius
-                        if (shadowColor != immutableShadowColor || shadowDx != immutableShadowDx || shadowDy != immutableShadowDy || shadowRadius != immutableShadowRadius) {
-                            setShadowLayer(immutableShadowRadius, immutableShadowDx, immutableShadowDy, immutableShadowColor)
+                        val localShadowColor = attributes.shadowColor ?: shadowColor
+                        val localShadowDx = attributes.shadowDx ?: shadowDx
+                        val localShadowDy = attributes.shadowDy ?: shadowDy
+                        val localShadowRadius = attributes.shadowRadius ?: shadowRadius
+                        if (shadowColor != localShadowColor || shadowDx != localShadowDx || shadowDy != localShadowDy || shadowRadius != localShadowRadius) {
+                            setShadowLayer(localShadowRadius, localShadowDx, localShadowDy, localShadowColor)
                         }
                     }
-                    attributes.marqueeRepeatLimit?.let {
-                        if (marqueeRepeatLimit != it.value) {
-                            marqueeRepeatLimit = it.value
+                    if (attributes.marqueeRepeatLimit.hasInteger || attributes.marqueeRepeatLimit.hasEnum) {
+                        val localMarqueeRepeatLimit = when {
+                            attributes.marqueeRepeatLimit.hasInteger -> attributes.marqueeRepeatLimit.integer
+                            else -> attributes.marqueeRepeatLimit.enum
+                        }
+                        if (marqueeRepeatLimit != localMarqueeRepeatLimit) {
+                            marqueeRepeatLimit = localMarqueeRepeatLimit
                         }
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 21) {
-                    attributes.letterSpacing?.let {
-                        if (letterSpacing != it) {
-                            letterSpacing = it
+                if (Build.VERSION.SDK_INT >= 17) {
+                    if (attributes.drawableTop.hasColor || attributes.drawableTop.hasReference || attributes.drawableLeft.hasColor || attributes.drawableLeft.hasReference || attributes.drawableRight.hasColor || attributes.drawableRight.hasReference || attributes.drawableBottom.hasColor || attributes.drawableBottom.hasReference) {
+                        val localDrawableTop = when {
+                            attributes.drawableTop.hasColor -> ColorDrawable(attributes.drawableTop.color)
+                            attributes.drawableTop.hasReference -> ContextCompat.getDrawable(context, attributes.drawableTop.reference) as Drawable
+                            else -> compoundDrawablesRelative[1]
                         }
-                    }
-                    attributes.fontFeatureSettings?.let {
-                        if (fontFeatureSettings != it) {
-                            fontFeatureSettings = it
+                        val localDrawableLeft = when {
+                            attributes.drawableLeft.hasColor -> ColorDrawable(attributes.drawableLeft.color)
+                            attributes.drawableLeft.hasReference -> ContextCompat.getDrawable(context, attributes.drawableLeft.reference) as Drawable
+                            else -> compoundDrawables[0]
+                        }
+                        val localDrawableRight = when {
+                            attributes.drawableRight.hasColor -> ColorDrawable(attributes.drawableRight.color)
+                            attributes.drawableRight.hasReference -> ContextCompat.getDrawable(context, attributes.drawableRight.reference) as Drawable
+                            else -> compoundDrawables[2]
+                        }
+                        val localDrawableBottom = when {
+                            attributes.drawableBottom.hasColor -> ColorDrawable(attributes.drawableBottom.color)
+                            attributes.drawableBottom.hasReference -> ContextCompat.getDrawable(context, attributes.drawableBottom.reference) as Drawable
+                            else -> compoundDrawablesRelative[3]
+                        }
+                        if (compoundDrawablesRelative[1] != localDrawableTop || compoundDrawables[0] != localDrawableLeft || compoundDrawables[2] != localDrawableRight || compoundDrawablesRelative[3] != localDrawableBottom) {
+                            setCompoundDrawablesWithIntrinsicBounds(localDrawableLeft, localDrawableTop, localDrawableRight, localDrawableBottom)
                         }
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 23) {
                     attributes.drawableTint?.let {
-                        val immutableDrawableTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                        if (compoundDrawableTintList != immutableDrawableTint) {
-                            setCompoundDrawableTintList(immutableDrawableTint)
+                        val localDrawableTint = ColorStateList.valueOf(it)
+                        if (compoundDrawableTintList != localDrawableTint) {
+                            setCompoundDrawableTintList(localDrawableTint)
                         }
                     }
                     attributes.drawableTintMode?.let {
-                        val immutableDrawableTintMode = it.value.toPorterDuffMode()
-                        if (compoundDrawableTintMode != immutableDrawableTintMode) {
-                            setCompoundDrawableTintMode(immutableDrawableTintMode)
+                        val localDrawableTintMode = it.value.toPorterDuffMode()
+                        if (compoundDrawableTintMode != localDrawableTintMode) {
+                            setCompoundDrawableTintMode(localDrawableTintMode)
                         }
                     }
                     attributes.breakStrategy?.let {
@@ -245,9 +264,7 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                 }
                 if (Build.VERSION.SDK_INT >= 28) {
                     attributes.lineHeight?.let {
-                        if (lineHeight != it) {
-                            lineHeight = it
-                        }
+                        lineHeight = it
                     }
                     attributes.firstBaselineToTopHeight?.let {
                         if (firstBaselineToTopHeight != it) {
@@ -259,18 +276,8 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                             lastBaselineToBottomHeight = it
                         }
                     }
-                    attributes.textAllCaps?.let {
-                        if (isAllCaps != it) {
-                            isAllCaps = it
-                        }
-                    }
-                    attributes.elegantTextHeight?.let {
-                        if (isElegantTextHeight != it) {
-                            isElegantTextHeight = it
-                        }
-                    }
                     attributes.fallbackLineSpacing?.let {
-                        if (isFallbackLineSpacing != it) {
+                        if (isEnabled != it) {
                             isFallbackLineSpacing = it
                         }
                     }

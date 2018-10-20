@@ -12,7 +12,6 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.search.GlobalSearchScope
 import com.laidpack.sourcerer.generator.peeker.ClassInfo
-import com.laidpack.sourcerer.generator.peeker.ClassRegistry
 import com.laidpack.sourcerer.generator.peeker.MethodInfo
 import com.laidpack.sourcerer.generator.target.Getter
 import com.laidpack.sourcerer.generator.target.Setter
@@ -20,7 +19,7 @@ import com.squareup.kotlinpoet.ClassName
 import java.io.File
 import java.lang.IllegalArgumentException
 
-class ApiDetector(private val projectDir: File, private val classRegistry: ClassRegistry) {
+class ApiDetector(private val projectDir: File) {
     private lateinit var project : Project
     private val client by lazy {
         val flags = LintCliFlags()
@@ -78,14 +77,14 @@ class ApiDetector(private val projectDir: File, private val classRegistry: Class
             getFieldVersion(
                     classInfo.targetClassName,
                     getter.name,
-                    classRegistry.getResolvedFieldFromThisClassOrSuperClass(getter.name, classInfo)
+                    classInfo.getResolvedFieldFromThisClassOrSuperClass(getter.name)
             )
         } else {
             getMethodVersion(
                     classInfo.targetClassName,
                     getter.name,
                     getter.parameters.map { it.describedType },
-                    classRegistry.getGetterFromThisClassOrSuperClass(getter, classInfo)
+                    classInfo.getGetterFromThisClassOrSuperClass(getter)
             )
         }
     }
@@ -95,14 +94,14 @@ class ApiDetector(private val projectDir: File, private val classRegistry: Class
             getFieldVersion(
                     classInfo.targetClassName,
                     setter.name,
-                    classRegistry.getResolvedFieldFromThisClassOrSuperClass(setter.name, classInfo)
+                    classInfo.getResolvedFieldFromThisClassOrSuperClass(setter.name)
             )
         } else {
             getMethodVersion(
                     classInfo.targetClassName,
                     setter.name,
                     setter.parameters.map { it.describedType },
-                    classRegistry.getSetterFromThisClassOrSuperClass(setter, classInfo)
+                    classInfo.getSetterFromThisClassOrSuperClass(setter)
             )
         }
     }
@@ -124,7 +123,7 @@ class ApiDetector(private val projectDir: File, private val classRegistry: Class
                 it.parameterList.parametersCount == parameterTypes.size
                         && it.parameterList.parameters.all { psiParameter ->
                     paramIndex += 1
-                    parameterTypes[paramIndex] == psiParameter.type.internalCanonicalText
+                    parameterTypes[paramIndex] == psiParameter.type.internalCanonicalText.replace("...", "[]")
                 }
             }
                     ?: throw IllegalArgumentException("No PsiMethod found with signature: ${className.canonicalName}.$methodName(${parameterTypes.joinToString()})")

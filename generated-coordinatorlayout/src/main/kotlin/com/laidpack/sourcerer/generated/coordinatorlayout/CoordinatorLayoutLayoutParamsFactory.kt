@@ -20,6 +20,12 @@ open class CoordinatorLayoutLayoutParamsFactory<TLayoutParams : CoordinatorLayou
         super.init(layoutParams, context, attributes)
         if (layoutParams is CoordinatorLayout.LayoutParams) {
             layoutParams.apply {
+                attributes.layout_behavior?.let {
+                    val localLayoutBehavior = BehaviorUtils.createFromName(it, context)
+                    if (behavior != localLayoutBehavior) {
+                        behavior = localLayoutBehavior
+                    }
+                }
                 attributes.layout_anchor?.let {
                     if (anchorId != it) {
                         anchorId = it
@@ -31,8 +37,9 @@ open class CoordinatorLayoutLayoutParamsFactory<TLayoutParams : CoordinatorLayou
                     }
                 }
                 attributes.layout_anchorGravity?.let {
-                    if (it.value != anchorGravity) {
-                        anchorGravity = it.value
+                    val localLayoutAnchorGravity = it.value
+                    if (localLayoutAnchorGravity != anchorGravity) {
+                        anchorGravity = localLayoutAnchorGravity
                     }
                 }
                 attributes.layout_insetEdge?.let {
@@ -41,8 +48,9 @@ open class CoordinatorLayoutLayoutParamsFactory<TLayoutParams : CoordinatorLayou
                     }
                 }
                 attributes.layout_dodgeInsetEdges?.let {
-                    if (it.value != dodgeInsetEdges) {
-                        dodgeInsetEdges = it.value
+                    val localLayoutDodgeInsetEdges = it.value
+                    if (localLayoutDodgeInsetEdges != dodgeInsetEdges) {
+                        dodgeInsetEdges = localLayoutDodgeInsetEdges
                     }
                 }
             }

@@ -25,9 +25,13 @@ open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(i
                         stretchMode = it.value
                     }
                 }
-                attributes.numColumns?.let {
-                    if (numColumns != it.value) {
-                        numColumns = it.value
+                if (attributes.numColumns.hasInteger || attributes.numColumns.hasEnum) {
+                    val localNumColumns = when {
+                        attributes.numColumns.hasInteger -> attributes.numColumns.integer
+                        else -> attributes.numColumns.enum
+                    }
+                    if (numColumns != localNumColumns) {
+                        numColumns = localNumColumns
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 16) {
@@ -47,8 +51,9 @@ open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(i
                         }
                     }
                     attributes.gravity?.let {
-                        if (gravity != it) {
-                            gravity = it
+                        val localGravity = it.value
+                        if (gravity != localGravity) {
+                            gravity = localGravity
                         }
                     }
                 }

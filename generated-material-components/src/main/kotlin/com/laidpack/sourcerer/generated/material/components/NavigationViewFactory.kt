@@ -1,8 +1,8 @@
 package com.laidpack.sourcerer.generated.material.components
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.View
-import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.navigation.NavigationView
 import com.laidpack.sourcerer.generated.FrameLayoutFactory
 import java.lang.Class
@@ -22,16 +22,19 @@ open class NavigationViewFactory<TView : NavigationView, TAttributes : Navigatio
         if (view is NavigationView) {
             view.apply {
                 attributes.itemIconTint?.let {
-                    val immutableItemIconTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (itemIconTintList != immutableItemIconTint) {
-                        itemIconTintList = immutableItemIconTint
+                    val localItemIconTint = ColorStateList.valueOf(it)
+                    if (itemIconTintList != localItemIconTint) {
+                        itemIconTintList = localItemIconTint
                     }
                 }
                 attributes.itemTextColor?.let {
-                    val immutableItemTextColor = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (itemTextColor != immutableItemTextColor) {
-                        itemTextColor = immutableItemTextColor
+                    val localItemTextColor = ColorStateList.valueOf(it)
+                    if (itemTextColor != localItemTextColor) {
+                        itemTextColor = localItemTextColor
                     }
+                }
+                attributes.itemBackground?.let {
+                    setItemBackgroundResource(it)
                 }
                 attributes.itemHorizontalPadding?.let {
                     if (itemHorizontalPadding != it) {

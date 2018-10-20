@@ -1,7 +1,7 @@
 package com.laidpack.sourcerer.generator
 
-import com.laidpack.sourcerer.generator.peeker.IndexedClass
-import com.laidpack.sourcerer.generator.peeker.IndexedPackage
+import com.laidpack.sourcerer.generator.peeker.XdClass
+import com.laidpack.sourcerer.generator.peeker.XdPackage
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import kotlinx.dnq.query.*
 
@@ -11,20 +11,20 @@ fun main(args: Array<String>) {
     Store.init(env)
     val processedLibs = mutableSetOf<String>()
     Store.transactional {
-        val androidXPackages = IndexedPackage.query(
-                (IndexedPackage::packageName startsWith "androidx")
+        val androidXPackages = XdPackage.query(
+                (XdPackage::packageName startsWith "androidx")
         ).toList()
         for (androidXPackage in androidXPackages) run {
             val splitName = androidXPackage.packageName.split(".")
             val name = splitName[0] + "." + splitName[1]
             if (!processedLibs.contains(name)) {
-                val indexedClass = IndexedClass.query(
-                        (IndexedClass::indexedPackage eq androidXPackage)
+                val indexedClass = XdClass.query(
+                        (XdClass::xdPackage eq androidXPackage)
                         and
                         (
-                                (IndexedClass::widgetAsBeingView ne null)
+                                (XdClass::widgetAsBeingView ne null)
                                 or
-                                (IndexedClass::widgetAsBeingLayoutParams ne null)
+                                (XdClass::widgetAsBeingLayoutParams ne null)
                         )
                 ).firstOrNull()
                 if (indexedClass != null) {

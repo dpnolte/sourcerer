@@ -1,15 +1,11 @@
 package com.laidpack.sourcerer.generator.resources
 
 import com.laidpack.sourcerer.generator.Store
+import com.laidpack.sourcerer.generator.generators.templates.BehaviorUtilsTemplateProvider
 import com.laidpack.sourcerer.generator.peeker.*
-import com.squareup.kotlinpoet.ClassName
 import jetbrains.exodus.entitystore.Entity
 import kotlinx.dnq.*
 import kotlinx.dnq.enum.XdEnumEntityType
-import kotlinx.dnq.query.eq
-import kotlinx.dnq.query.firstOrNull
-import kotlinx.dnq.query.query
-import kotlinx.dnq.query.toList
 import java.io.FileNotFoundException
 import java.lang.IllegalStateException
 import java.net.URL
@@ -17,14 +13,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 
-fun getWidgetRegistry(env: SourcererEnvironment): WidgetRegistry {
-    val widgetParsers = listOf(
-            AndroidWidgetParser(),
-            MaterialDesignWidgetParser(),
-            SupportWidgetParser()
-    )
-    return WidgetRegistry.create(env, widgetParsers)
-}
+
 
 interface WidgetConnoisseur {
     val paths : Set<Path>
@@ -34,6 +23,7 @@ interface WidgetConnoisseur {
     fun getAttributesFileUrl(filePath: Path, env: SourcererEnvironment): URL
     fun getModuleName(widget: Widget): String
     fun getDependencies(widget: Widget): List<String>
+    fun isTemplateWithinScope (moduleName: String, templateName: String): Boolean
 
 }
 
@@ -66,9 +56,11 @@ class AndroidWidgetParser : WidgetConnoisseur {
     }
 
     override fun setRootPath(env: SourcererEnvironment) {
-        val path = env.sdkStructure.sourcePath
-        paths = setOf(path)
-        lastPathName = path.getName(path.nameCount - 1).toString()
+        paths = setOf(
+                env.sdkStructure.sourcePath.resolve("android"),
+                env.sdkStructure.sourcePath.resolve("com/android")
+        )
+        lastPathName = "android"
     }
     override fun getAttributesFileUrl(filePath: Path, env: SourcererEnvironment): URL {
         return env.sdkStructure.attributesFilePath.toUri().toURL()
@@ -95,6 +87,9 @@ class AndroidWidgetParser : WidgetConnoisseur {
         return listOf(
                 "project(\":services\")"
         )
+    }
+    override fun isTemplateWithinScope(moduleName: String, templateName: String): Boolean {
+        return false
     }
 }
 
@@ -132,6 +127,10 @@ class MaterialDesignWidgetParser : WidgetConnoisseur {
                 "project(\":generated\")",
                 "project(\":generated-cardview\")"
         )
+    }
+
+    override fun isTemplateWithinScope(moduleName: String, templateName: String): Boolean {
+        return false
     }
 
     companion object {
@@ -222,6 +221,10 @@ class SupportWidgetParser : WidgetConnoisseur {
         )
     }
 
+    override fun isTemplateWithinScope(moduleName: String, templateName: String): Boolean {
+        return moduleName == "generated-coordinatorlayout" && templateName == BehaviorUtilsTemplateProvider.templateName
+    }
+
     companion object {
         private val libRegex = Regex(".*[\\\\/](androidx\\..+?)[\\\\/](.+?)[\\\\/].*")
     }
@@ -253,9 +256,9 @@ enum class WidgetSource {
 class Widget (entity: Entity) : XdEntity(entity) {
     companion object : XdNaturalEntityType<Widget>()
     var source by xdLink1(XdWidgetSource)
-    var viewClass by xdLink0_1(IndexedClass::widgetAsBeingView)
-    val layoutParamClasses by xdLink0_N(IndexedClass::widgetAsBeingLayoutParams)
-    var file : IndexedFile by xdParent(IndexedFile::widgets)
+    var viewClass by xdLink0_1(XdClass::widgetAsBeingView)
+    val layoutParamClasses by xdLink0_N(XdClass::widgetAsBeingLayoutParams)
+    var file : XdFile by xdParent(XdFile::widgets)
     var attributesXmlUrlAsString by xdStringProp()
     val attributesXmlUrl: URL
         get() = Store.transactional {
@@ -276,70 +279,4 @@ class Widget (entity: Entity) : XdEntity(entity) {
         }
 }
 
-
-class WidgetRegistry(
-        private val env: SourcererEnvironment,
-        parsersList: List<WidgetConnoisseur>
-): Iterable<Widget> {
-
-    val paths = parsersList.map { it.paths }.flatten()
-    private val parsers = paths.associate { path ->
-        Pair(path, parsersList.first { it.paths.contains(path) })
-    }
-    private val widgets by lazy {
-        Store.transactional {
-            Widget.all().toList()
-        }
-    }
-
-    override operator fun iterator(): Iterator<Widget> {
-        return widgets.iterator()
-    }
-
-    operator fun get(path: Path): WidgetConnoisseur {
-        return parsers[path] as WidgetConnoisseur
-    }
-    operator fun get(widget: Widget): WidgetConnoisseur {
-        val path = Store.transactional {
-            widget.file.scanPath
-        }
-        return parsers[path] as WidgetConnoisseur
-    }
-
-    fun findOrCreate (indexedFile: IndexedFile): Widget {
-        return Store.transactional {
-            val widget = Widget.query(
-                    Widget::file eq indexedFile
-            ).firstOrNull()
-            if (widget != null) {
-                widget
-            } else {
-                val parser = parsers[indexedFile.scanPath] as WidgetConnoisseur
-                val attributesXmlPathString = parser.getAttributesFileUrl(indexedFile.filePath, env).toString()
-                Widget.new {
-                    this.source = parser.sourceProvider()
-                    this.file = indexedFile
-                    this.attributesXmlUrlAsString = attributesXmlPathString
-                }
-            }
-        }
-    }
-
-
-    companion object {
-        fun create(env: SourcererEnvironment, parsers: List<WidgetConnoisseur>): WidgetRegistry {
-            parsers.forEach {
-                it.setRootPath(env)
-            }
-            return WidgetRegistry(env, parsers)
-        }
-
-        fun getWidgetViewClassName(classInfo: ClassInfo): ClassName {
-            return Store.transactional {
-                val viewClass = classInfo.widget.viewClass as IndexedClass
-                viewClass.targetClassName
-            }
-        }
-    }
-}
 

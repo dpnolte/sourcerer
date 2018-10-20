@@ -15,7 +15,7 @@ abstract class BaseHandler <T: Node> (
         if (targetType.java.isInstance(node)) {
             return handler(targetType.java.cast(node))
         }
-        throw IllegalStateException("Invalid target type $targetType and node type ${node::class}")
+        throw IllegalStateException("Invalid target type $targetType and classOrInterfaceDeclarationProvider type ${node::class}")
     }
     abstract val handler : NodeHandler<T>
 

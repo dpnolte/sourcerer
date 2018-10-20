@@ -5,7 +5,9 @@ import com.laidpack.sourcerer.generator.generators.MultiFormatGenerator
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 import com.laidpack.sourcerer.generator.generators.delegates.DelegateGeneratorBase
 import com.laidpack.sourcerer.generator.peeker.ClassInfo
+import com.laidpack.sourcerer.generator.peeker.MethodInfo
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
+import com.laidpack.sourcerer.generator.resources.StyleableAttribute
 import com.laidpack.sourcerer.generator.target.*
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeName
@@ -34,33 +36,41 @@ class TypePhilosopher(
         // assign - amongst others - formats per setter
         val selectedCodeBlocks = mutableListOf<CodeBlock>()
         codeBlocks.forEach { codeBlock ->
-            val toBeRemovedSetters = mutableSetOf<Int>()
+            val toBeRemovedFromCodeBlock = mutableSetOf<Int>()
             for (setter in codeBlock.setters.values) {
-                for (attrName in setter.callSignatureMaps.getCallSignatureMap(codeBlock).keys) {
+                val setterHashCode = setter.hashCode()
+                val callSignatureMap = setter.callSignatureMaps.getCallSignatureMap(codeBlock)
+                if (!setter.isEachParameterMapped(callSignatureMap)) {
+                    toBeRemovedFromCodeBlock.add(setterHashCode)
+                    println("\t\t\t! - Removing setter '${setter.name}' from code block - not every parameter is mapped. Signature: ${setter.toString(callSignatureMap)}")
+                    continue
+                }
+                for (attrName in callSignatureMap.keys) {
                     val attribute = codeBlock.attributes[attrName] as Attribute
                     val typesForThisSetter = attribute.resolvedTypesPerSetter(setter.hashCode())
                     assignAttributeType(attribute, setter, typesForThisSetter, codeBlock)
-                    attribute.localVariableName = "immutable${attribute.name.toCamelCase()}"
+                    attribute.localVariableName = "local${attribute.name.toCamelCase()}"
                     try {
                         assignGettersToAttribute(attribute, setter)
-                    } catch (e: IllegalStateException) {
-                        println("\t\t\t! - Removing setter '${setter.name}' from code block - ${e.message}")
-                        toBeRemovedSetters.add(setter.hashCode())
-                        break
+                        setter.mutablePropertyName = attrManager.getResolvedSetterPropertyName(setter)
                     } catch (e: UnmatchedGetterTypeException) {
-                        println("\t\t\t! - Removing setter '${setter.name}' from code block - ${e.message}")
-                        toBeRemovedSetters.add(setter.hashCode())
+                        // flag that attribute has no getter
+                        attribute.resolvedTypesPerSetter(setterHashCode).hasMatchedGetter = false
+                        setter.mutablePropertyName = attrManager.getResolvedSetterPropertyName(setter)
+                    } catch (e: IllegalStateException) {
+                        println("\t\t\t! - Removing setter '${setter.name}' from code block - ${e.message} - Signature:  ${setter.toString(callSignatureMap)}")
+                        toBeRemovedFromCodeBlock.add(setterHashCode)
                         break
                     }
                 }
             }
 
-            if (toBeRemovedSetters.size < codeBlock.setters.size) {
-                val updatedCodeBlock = if (toBeRemovedSetters.isNotEmpty()) {
-                    val setters = codeBlock.setters.filter { !toBeRemovedSetters.contains(it.hashCode()) }
+            if (toBeRemovedFromCodeBlock.size < codeBlock.setters.size) {
+                val updatedCodeBlock = if (toBeRemovedFromCodeBlock.isNotEmpty()) {
+                    val setters = codeBlock.setters.filter { !toBeRemovedFromCodeBlock.contains(it.hashCode()) }
                     val attributes = codeBlock.attributes
                     attributes.values.forEach { attr ->
-                        for (hashCode in toBeRemovedSetters) {
+                        for (hashCode in toBeRemovedFromCodeBlock) {
                             attr.setterHashCodes.remove(hashCode)
                             attr.typesPerSetter.remove(hashCode)
                         }
@@ -73,9 +83,9 @@ class TypePhilosopher(
 
             }
         }
-        // we need post-process multi-formatted attrs -- only with all processed setters, we can establish 1-by-1 format/setter links
+        // we need post-process multi-formatted attrs -- only with all processed setters, we can establish 1-by-1 formats/setter links
         selectedCodeBlocks.forEach { codeBlock ->
-            // only focus on multi-format attributes with multiple setters
+            // only focus on multi-formats attributes with multiple setters
             if (codeBlock.attributes.values.any { attr -> attr.formats.size > 1 && attr.setterHashCodes.size > 1 }) {
                 handleMultiFormatAttributesWithMultipleSetters(codeBlock)
             }
@@ -99,10 +109,12 @@ class TypePhilosopher(
         typesForThisSetter.attributeCanonicalNames.addAll(result.canonicalNames)
         typesForThisSetter.formats.addAll(result.formats)
         if (attribute.enumValues.isNotEmpty() || attribute.flags.isNotEmpty()) {
-            typesForThisSetter.hasEnumAsAttributeType = true
+            if (attribute.flags.isNotEmpty()) {
+                typesForThisSetter.hasFlagsAsAttributeType = true
+            } else typesForThisSetter.hasEnumAsAttributeType = true
             typesForThisSetter.enumClassName = result.enumClassName
         }
-        // assign new format when it was unspecified and it is based on setter type
+        // assign new formats when it was unspecified and it is based on setter type
         if (attribute.formats.size == 1
                 && attribute.formats.first() == StyleableAttributeFormat.Unspecified
                 && typesForThisSetter.formats.first() != StyleableAttributeFormat.Unspecified
@@ -112,7 +124,7 @@ class TypePhilosopher(
         }
     }
 
-    private class UnmatchedGetterTypeException(message: String): Exception(message)
+    class UnmatchedGetterTypeException(message: String): Exception(message)
     private fun assignGettersToAttribute(attribute: Attribute, setter: Setter) {
         val getters = attrManager.getResolvedGetters(
                 attribute,
@@ -137,8 +149,8 @@ class TypePhilosopher(
                 attribute.getters.add(getter)
             }
             getter.setterHashCodes.add(setterHashCode)
+            typesForThisSetter.hasMatchedGetter = true
         }
-        setter.mutablePropertyName = attrManager.getResolvedSetterPropertyName(setter)
     }
 
     private fun assignFormatToAttributeParameter(attribute: Attribute, setter: Setter, typesForThisSetter: AttributeTypesForSetter) {
@@ -159,6 +171,14 @@ class TypePhilosopher(
             codeBlock: CodeBlock
     ): AttributeTypeResult {
         return when {
+            attribute.formats.size == 1 && attribute.flags.isNotEmpty() -> {
+                val className = ClassName(SourcererEnvironment.generatedPackageName, attribute.name.toCamelCase() + "FlagsEnum")
+                AttributeTypeResult(
+                        className,
+                        setOf(StyleableAttributeFormat.Flags),
+                        className
+                )
+            }
             attribute.formats.size == 1 && attribute.enumValues.isNotEmpty() -> {
                 val className = ClassName(SourcererEnvironment.generatedPackageName, attribute.name.toCamelCase() + "Enum")
                 AttributeTypeResult(
@@ -167,37 +187,35 @@ class TypePhilosopher(
                         className
                 )
             }
-            attribute.formats.size == 1 && attribute.flags.isNotEmpty() -> {
-                // TODO: make this multi format value (i.e., flags and random integer)?
-                val className = ClassName(SourcererEnvironment.generatedPackageName, attribute.name.toCamelCase() + "FlagsEnum")
-                AttributeTypeResult(
-                        className,
-                        setOf(StyleableAttributeFormat.Integer),
-                        className
-                )
-            }
             attribute.formats.size == 1 -> {
                 val format = attribute.formats.first()
-                if (format != StyleableAttributeFormat.Unspecified) {
-                    AttributeTypeResult(
+                when {
+                    (format == StyleableAttributeFormat.Unspecified || format == StyleableAttributeFormat.Integer) && setter.isPropertyCategorizedAsMeasurementInViewDebug ->
+                        AttributeTypeResult(
+                            StyleableAttributeFormat.Dimension.toClass().asTypeName(),
+                            setOf(StyleableAttributeFormat.Dimension)
+                    )
+                    format != StyleableAttributeFormat.Unspecified ->
+                        AttributeTypeResult(
                             format.toClass().asTypeName(),
                             setOf(format)
                     )
-                } else {
-                    // try to specify format by setter parameter type
-                    val setterType = considerWhatTypeReallyIsAtTheRudimentaryLevel(typesForThisSetter.setterClassName)
-                    var result : AttributeTypeResult? = null
-                    if (!setter.isField) {
-                        val parameter = setter.getParameterByAttribute(attribute)
-                        if (parameter.format != StyleableAttributeFormat.Unspecified) {
-                            result = AttributeTypeResult(parameter.format.toClass().asTypeName(), setOf(parameter.format))
+                    else -> {
+                        val setterType = considerWhatTypeReallyIsAtTheRudimentaryLevel(typesForThisSetter.setterClassName)
+                        var result : AttributeTypeResult? = null
+                        if (!setter.isField) {
+                            // try to specify formats by setter parameter type
+                            val parameter = setter.getParameterByAttribute(attribute)
+                            if (parameter.format != StyleableAttributeFormat.Unspecified) {
+                                result = AttributeTypeResult(parameter.format.toClass().asTypeName(), setOf(parameter.format))
+                            }
                         }
+                        if(result == null) {
+                            val setterFormat = StyleableAttributeFormat.fromTypeName(setterType)
+                            result = AttributeTypeResult(setterFormat.toClass().asTypeName(), setOf(setterFormat))
+                        }
+                        result
                     }
-                    if(result == null) {
-                        val setterFormat = StyleableAttributeFormat.fromTypeName(setterType)
-                        result = AttributeTypeResult(setterFormat.toClass().asTypeName(), setOf(setterFormat))
-                    }
-                    result
                 }
             }
             attribute.formats.size > 1 -> {
@@ -215,7 +233,7 @@ class TypePhilosopher(
     ): AttributeTypeResult {
         // try to make a smart selection of attribute formats to setter parameter type
         val formats = mutableSetOf<StyleableAttributeFormat>()
-        val parameter = setter.getParameterByAttribute(attribute)
+        val parameter = if(!setter.isField) setter.getParameterByAttribute(attribute) else null
         val setterType = typesForThisSetter.resolvedSetterType
         val enumClassName : TypeName? = when {
             attribute.enumValues.isNotEmpty() ->  ClassName(SourcererEnvironment.generatedPackageName, attribute.name.toCamelCase() + "Enum")
@@ -223,32 +241,32 @@ class TypePhilosopher(
             else -> null
         }
         for (format in attribute.formats) {
-            //if (formatAssignedToOtherSetter(otherSetters, attribute, format)) continue
+            //if (formatAssignedToOtherSetter(otherSetters, attribute, formats)) continue
             val formatTypeName = format.toClass().asTypeName()
-            val parameterFormatTypeName = parameter.format.toClass().asTypeName()
+            val parameterFormatTypeName = parameter?.format?.toClass()?.asTypeName()
             val directlyMatchingFormat = getFormatThatMatchesDirectlyWithSetter(setter, attribute, format)
-            val isFormatSpecified = parameter.format != StyleableAttributeFormat.Unspecified
+            val isFormatSpecified = parameter != null && parameter.format != StyleableAttributeFormat.Unspecified
             when {
                 !isFormatSpecified && formatTypeName.toString() == setterType.toString() -> formats.add(format)
                 !isFormatSpecified && allowedFormatToTypeTransformations.contains(Pair(format, setterType)) -> formats.add(format)
                 directlyMatchingFormat != null -> formats.add(format)
-                allowedFormatToTypeTransformations.contains(Pair(format, parameterFormatTypeName)) -> formats.add(format)
+                parameterFormatTypeName != null && allowedFormatToTypeTransformations.contains(Pair(format, parameterFormatTypeName)) -> formats.add(format)
             }
         }
         if (formats.isEmpty())
-            throw IllegalStateException("No appropriate format found for '${attribute.name}'. Setter parameter type: '$setterType'. Possible formats: '${attribute.formats.joinToString(", ")}'")
+            throw IllegalStateException("No appropriate formats found for '${attribute.name}'. Setter parameter type: '$setterType'. Possible formats: '${attribute.formats.joinToString(", ")}'")
         return AttributeTypeResult(MultiFormatGenerator.multiFormatClassName, formats, enumClassName)
     }
 
     private fun getFormatThatMatchesDirectlyWithSetter(setter: Setter, attribute: Attribute, providedFormat: StyleableAttributeFormat? = null): StyleableAttributeFormat? {
-        val parameter = setter.getParameterByAttribute(attribute)
+        val parameter = if (!setter.isField) setter.getParameterByAttribute(attribute) else null
         val typesForThisSetter = attribute.typesPerSetter[setter.hashCode()] as AttributeTypesForSetter
         val setterType = typesForThisSetter.resolvedSetterType
         var selectedFormat: StyleableAttributeFormat? = null
         val formatList = if (providedFormat != null) listOf(providedFormat) else attribute.formats
         for (format in formatList) {
             val formatTypeName = format.toClass().asTypeName()
-            if (parameter.format != StyleableAttributeFormat.Unspecified) {
+            if (parameter != null && parameter.format != StyleableAttributeFormat.Unspecified) {
                 when {
                     format == parameter.format -> selectedFormat = format
                     format == StyleableAttributeFormat.Enum && parameter.format == StyleableAttributeFormat.Integer -> selectedFormat = format
@@ -325,7 +343,7 @@ class TypePhilosopher(
         // only focus on attributes with multiple setters
 
         for (attribute in codeBlock.attributes.values) {
-            // secondly, build a format to setter map to identify formats being used for multiple setters
+            // secondly, build a formats to setter map to identify formats being used for multiple setters
             if (attribute.formats.size > 1 && attribute.setterHashCodes.size > 1) {
                 val formatToSetterHashCodesMap = mutableMapOf<StyleableAttributeFormat, MutableSet<Int>>()
                 for (typesForSetterPair in attribute.typesPerSetter) {
@@ -353,8 +371,17 @@ class TypePhilosopher(
                         setterHashCodes.forEach { hashCode ->
                             val setter = codeBlock.setters[hashCode] as Setter
                             val typesForSetter = attribute.typesPerSetter[hashCode] as AttributeTypesForSetter
+                            val callSignatureMap = setter.callSignatureMaps.getCallSignatureMap(attribute)
                             // a)
-                            if (setter.callSignatureMaps.size(attribute) > 1) {
+                            if (callSignatureMap.size > 1
+                                && callSignatureMap.keys.any { otherAttrName ->
+                                        otherAttrName != attribute.name
+                                        && codeBlock.setters.values.all {otherSetter ->
+                                            otherSetter.hashCode() == hashCode
+                                            || !otherSetter.callSignatureMaps.containsAttribute(otherAttrName)
+                                        }
+                                    }
+                            ) {
                                 keepSettersWithAnyOtherAttribute.add(hashCode)
                             }
                             // b)
@@ -381,12 +408,18 @@ class TypePhilosopher(
                             if (!selectedHashCodes.contains(hashCode)) {
                                 attribute.resolvedTypesPerSetter(hashCode).formats.remove(format)
                                 if (attribute.resolvedTypesPerSetter(hashCode).formats.isEmpty()) {
-                                    codeBlock.setters.remove(hashCode)
                                     attribute.typesPerSetter.remove(hashCode)
                                     attribute.setterHashCodes.remove(hashCode)
                                 }
                             }
                         }
+                    }
+                }
+
+                // remove setters if not used anymore
+                for (setterHashCode in codeBlock.setters.keys.toList()) {
+                    if (codeBlock.attributes.values.all { !it.setterHashCodes.contains(setterHashCode) }) {
+                        codeBlock.setters.remove(setterHashCode)
                     }
                 }
 
@@ -413,10 +446,12 @@ class TypePhilosopher(
         return getter.typeName
     }
 
+
     companion object {
         private val allowedFormatToTypeTransformations = DelegateGeneratorBase.transformFormatToTypeMap.keys
         private val allowedTypeToFormatTransformations = DelegateGeneratorBase.transformTypeToFormatMap.keys
         private val allowedArrayAccessorTransformations = DelegateGeneratorBase.transformArrayAccessorMap.keys
+
 
         fun isFormatToTypeConversionAvailable(format: StyleableAttributeFormat, typeName: TypeName): Boolean {
             return allowedFormatToTypeTransformations.contains(Pair(format,typeName))

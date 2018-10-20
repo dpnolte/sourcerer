@@ -16,7 +16,11 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
         val moduleName = parser.getModuleName(widget)
         val sourcePath = env.rootPath.resolve("$moduleName/src/main/kotlin")
         if (!sourcePath.toFile().exists()) {
-            generateModule(moduleName, parser.getDependencies(widget))
+            generateModule(
+                    moduleName,
+                    parser.getDependencies(widget),
+                    widgetRegistry.getPackageName(widget)
+            )
             updatedModules.add(moduleName)
         } else if (!updatedModules.contains(moduleName)) {
             // always update gradle build file & pro guard rules
@@ -29,7 +33,7 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
     }
 
 
-    fun generateModule(moduleName: String, extraDependencies: List<String>) {
+    fun generateModule(moduleName: String, extraDependencies: List<String>, packageName: String) {
         val modulePath = getModulePath(moduleName)
         val mainPath = modulePath.resolve("src/main")
         val paths = mapOf(
@@ -46,7 +50,7 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
         generateGitIgnoreFile(modulePath)
         generateBuildGradleFile(modulePath, extraDependencies)
         generateProguardRulesFile(modulePath)
-        generateAndroidManifest(mainPath)
+        generateAndroidManifest(mainPath, packageName)
         generateStringXmlFile(paths["valuesPath"] as Path)
         addModuleToGradleSettings(moduleName)
     }

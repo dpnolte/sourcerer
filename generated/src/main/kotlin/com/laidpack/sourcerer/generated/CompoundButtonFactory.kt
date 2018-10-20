@@ -1,12 +1,13 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
+import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
@@ -28,17 +29,23 @@ open class CompoundButtonFactory<TView : CompoundButton, TAttributes : CompoundB
                 }
                 if (Build.VERSION.SDK_INT >= 21) {
                     attributes.buttonTint?.let {
-                        val immutableButtonTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                        if (buttonTintList != immutableButtonTint) {
-                            buttonTintList = immutableButtonTint
+                        val localButtonTint = ColorStateList.valueOf(it)
+                        if (buttonTintList != localButtonTint) {
+                            buttonTintList = localButtonTint
+                        }
+                    }
+                    attributes.buttonTintMode?.let {
+                        val localButtonTintMode = it.value.toPorterDuffMode()
+                        if (buttonTintMode != localButtonTintMode) {
+                            buttonTintMode = localButtonTintMode
                         }
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 23) {
                     attributes.button?.let {
-                        val immutableButton = ContextCompat.getDrawable(context, it) as Drawable
-                        if (buttonDrawable != immutableButton) {
-                            buttonDrawable = immutableButton
+                        val localButton = ContextCompat.getDrawable(context, it) as Drawable
+                        if (buttonDrawable != localButton) {
+                            buttonDrawable = localButton
                         }
                     }
                 }

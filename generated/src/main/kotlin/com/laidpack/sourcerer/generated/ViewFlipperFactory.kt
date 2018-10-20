@@ -19,6 +19,9 @@ open class ViewFlipperFactory<TView : ViewFlipper, TAttributes : ViewFlipperAttr
         super.init(view, context, attributes)
         if (view is ViewFlipper) {
             view.apply {
+                attributes.flipInterval?.let {
+                    setFlipInterval(it)
+                }
                 attributes.autoStart?.let {
                     if (isAutoStart != it) {
                         isAutoStart = it

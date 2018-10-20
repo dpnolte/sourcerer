@@ -150,8 +150,17 @@ class InflaterModule : InflaterComponent {
         if (oldLayoutMap != null && parentView != null) {
             for (node in layoutMap) {
                 if (oldLayoutMap.contains(node.id)) {
-                    views[node.hashedId] = parentView.findViewById<View>(node.hashedId)
-
+                    val view = parentView.findViewById<View>(node.hashedId)
+                    if (view != null) {
+                        if (view is ViewGroup) {
+                            for (oldChildId in oldLayoutMap[node.id].children) {
+                                if (!node.children.contains(oldChildId)) {
+                                    view.removeView(view.findViewById(oldChildId.hashCode()))
+                                }
+                            }
+                        }
+                        views[node.hashedId] = view
+                    }
                 }
             }
         }

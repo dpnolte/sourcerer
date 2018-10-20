@@ -12,6 +12,27 @@ open class ChipGroupFactory<TView : ChipGroup, TAttributes : ChipGroupAttributes
 
     override fun createInstance(context: Context): View = ChipGroup(context)
 
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is ChipGroup) {
+            view.apply {
+                attributes.chipSpacingHorizontal?.let {
+                    chipSpacingHorizontal = it
+                }
+                attributes.chipSpacingVertical?.let {
+                    chipSpacingVertical = it
+                }
+                attributes.singleLine?.let {
+                    setSingleLine(it)
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "chipGroup"
 

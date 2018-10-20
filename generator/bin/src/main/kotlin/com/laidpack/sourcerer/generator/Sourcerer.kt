@@ -319,5 +319,4 @@ class XdSourcererResult(entity: Entity) : XdEntity(entity) {
         }
         return if(transaction) Store.transactional { block() } else block()
     }
-
 }

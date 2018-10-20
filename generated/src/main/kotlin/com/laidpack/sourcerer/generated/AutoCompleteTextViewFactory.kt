@@ -30,14 +30,22 @@ open class AutoCompleteTextViewFactory<TView : AutoCompleteTextView, TAttributes
                         dropDownAnchor = it
                     }
                 }
-                attributes.dropDownWidth?.let {
-                    if (dropDownWidth != it.value) {
-                        dropDownWidth = it.value
+                if (attributes.dropDownWidth.hasDimension || attributes.dropDownWidth.hasEnum) {
+                    val localDropDownWidth = when {
+                        attributes.dropDownWidth.hasDimension -> attributes.dropDownWidth.dimension
+                        else -> attributes.dropDownWidth.enum
+                    }
+                    if (dropDownWidth != localDropDownWidth) {
+                        dropDownWidth = localDropDownWidth
                     }
                 }
-                attributes.dropDownHeight?.let {
-                    if (dropDownHeight != it.value) {
-                        dropDownHeight = it.value
+                if (attributes.dropDownHeight.hasDimension || attributes.dropDownHeight.hasEnum) {
+                    val localDropDownHeight = when {
+                        attributes.dropDownHeight.hasDimension -> attributes.dropDownHeight.dimension
+                        else -> attributes.dropDownHeight.enum
+                    }
+                    if (dropDownHeight != localDropDownHeight) {
+                        dropDownHeight = localDropDownHeight
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 16) {

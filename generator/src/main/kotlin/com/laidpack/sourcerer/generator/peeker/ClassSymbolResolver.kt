@@ -3,35 +3,26 @@ package com.laidpack.sourcerer.generator.peeker
 import android.view.View
 import android.view.ViewGroup
 import com.github.javaparser.ast.CompilationUnit
+import com.github.javaparser.ast.ImportDeclaration
 import com.github.javaparser.ast.PackageDeclaration
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.expr.Name
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.resolution.UnsolvedSymbolException
 import com.laidpack.sourcerer.generator.*
-import com.laidpack.sourcerer.generator.resources.Widget
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.asClassName
 import java.lang.IllegalArgumentException
 
-data class SymbolResolvedClass (
-        val targetClassName: ClassName,
-        val widget: Widget?,
-        val classCategory : ClassCategory,
-        val isViewGroup: Boolean,
-        val classDeclarationProvider: () -> ClassOrInterfaceDeclaration,
-        val superClassNames: List<ClassName>,
-        val indexedClass: IndexedClass
-)
 class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
-    // check if node is assignable to View or LayoutParams
-    fun resolveAll(): Map<ClassName, SymbolResolvedClass> {
+    // check if classOrInterfaceDeclarationProvider is assignable to View or LayoutParams
+    fun resolveAll(): Map<ClassName, ClassSymbolDescription> {
         return resolve(ClassRegistry.getPotentialWidgetClasses())
     }
 
-    fun resolve(indexedClasses: List<IndexedClass>): Map<ClassName, SymbolResolvedClass> {
-        val resolvedClasses = mutableMapOf<ClassName, SymbolResolvedClass>()
-        for(potentialWidgetClass in indexedClasses) {
+    fun resolve(xdClasses: List<XdClass>): Map<ClassName, ClassSymbolDescription> {
+        val resolvedClasses = mutableMapOf<ClassName, ClassSymbolDescription>()
+        for(potentialWidgetClass in xdClasses) {
             if (isClassAlreadyProcessed(potentialWidgetClass, resolvedClasses)) continue
 
             resolvedClasses.putAll(
@@ -43,42 +34,42 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
         return resolvedClasses
     }
 
-    fun resolveOne(indexedClass: IndexedClass): SymbolResolvedClass? {
-        return resolve(indexedClass).firstOrNull()
+    fun resolveOne(xdClass: XdClass): ClassSymbolDescription? {
+        return resolve(xdClass).firstOrNull()
     }
 
-    fun resolve(indexedClass: IndexedClass, processedClasses : Map<ClassName, SymbolResolvedClass> = mapOf()): List<SymbolResolvedClass> {
-        if (ClassRegistry.isClassSymbolResolved(indexedClass)) {
-            val storedResolvedClass = getStoredResolvedWidgetClass(indexedClass)
+    fun resolve(xdClass: XdClass, processedClasses : Map<ClassName, ClassSymbolDescription> = mapOf()): List<ClassSymbolDescription> {
+        if (ClassRegistry.isClassSymbolResolved(xdClass)) {
+            val storedResolvedClass = getClassSymbolDescription(xdClass)
             if (storedResolvedClass != null) {
                 return listOf(storedResolvedClass)
             }
             return listOf()
         }
 
-        val superClassNames = resolveSuperClasses(indexedClass)
-        val resolvedClasses = mutableListOf<SymbolResolvedClass>()
+        val superClassNames = resolveSuperClasses(xdClass)
+        val resolvedClasses = mutableListOf<ClassSymbolDescription>()
         val resolved: Boolean
-        val isAssignableByView = isAssignableByView(indexedClass.targetClassName, superClassNames)
-        if (isAssignableByView || isAssignableByLayoutParams(indexedClass.targetClassName, superClassNames)) {
+        val isAssignableByView = isAssignableByView(xdClass.targetClassName, superClassNames)
+        if (isAssignableByView || isAssignableByLayoutParams(xdClass.targetClassName, superClassNames)) {
             val classCategory = if (isAssignableByView) ClassCategory.View else ClassCategory.LayoutParams
             val isViewGroup = if (classCategory == ClassCategory.View) {
-                isAssignableByViewGroup(indexedClass.targetClassName, superClassNames)
+                isAssignableByViewGroup(xdClass.targetClassName, superClassNames)
             } else false
             resolved = true
             val mutableClassList = superClassNames.toMutableList()
-            mutableClassList.add(0, indexedClass)
+            mutableClassList.add(0, xdClass)
             while (mutableClassList.isNotEmpty()) {
                 val selectedClass = mutableClassList.first()
                 if (processedClasses.containsKey(selectedClass.targetClassName)) break
 
                 mutableClassList.removeAt(0)
-                resolvedClasses.add(SymbolResolvedClass(
+                resolvedClasses.add(ClassSymbolDescription(
                         selectedClass.targetClassName,
                         selectedClass.widget,
                         classCategory,
                         isViewGroup,
-                        {selectedClass.node},
+                        selectedClass.classOrInterfaceDeclarationProvider,
                         mutableClassList.map {
                             it.targetClassName
                         },
@@ -86,23 +77,24 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
                 ))
                 ClassRegistry.assignSuperClasses(selectedClass, mutableClassList)
                 ClassRegistry.assignClassCategory(selectedClass, classCategory)
-                ClassRegistry.assignViewGroupFlag(indexedClass, isViewGroup)
+                ClassRegistry.assignViewGroupFlag(selectedClass, isViewGroup)
+                val resolvedWidgetSymbol = Store.transactional { selectedClass.widget != null }
+                ClassRegistry.assignResolvementStatus(selectedClass, true, resolvedWidgetSymbol)
                 println("\tY -> Resolved ${selectedClass.targetClassName} as $classCategory class")
             }
         } else {
-            resolved = false
-            println("\tX -> No view or lp class: ${indexedClass.targetClassName}")
-            ClassRegistry.unassignClassFromWidget(indexedClass)
+            ClassRegistry.assignResolvementStatus(xdClass, true, false)
+            println("\tX -> No view or lp class: ${xdClass.targetClassName}")
+            ClassRegistry.unassignClassFromWidget(xdClass)
         }
-        ClassRegistry.assignResolvementStatus(indexedClass, true, resolved)
         return resolvedClasses
     }
 
-    private fun resolveSuperClasses(indexedClass: IndexedClass): List<IndexedClass> {
-        val superClasses = mutableListOf<IndexedClass>()
+    private fun resolveSuperClasses(xdClass: XdClass): List<XdClass> {
+        val superClasses = mutableListOf<XdClass>()
         try {
-            val node = indexedClass.node
-            walk(node, superClasses, indexedClass.targetClassName)
+            val node = xdClass.classOrInterfaceDeclarationProvider()
+            walk(node, superClasses, xdClass.targetClassName)
 
             /* it seems that allSuperClasses can be quirky at times.. for now, use our own walker fun
             val superClassTypes = resolvedNode.asClass().allSuperClasses
@@ -113,14 +105,14 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
                 )
             }*/
         } catch(e: UnsolvedSymbolException) {
-            println("!X -> Could not resolve symbol for ${indexedClass.targetClassName} -> Original message: ${e.message}")
+            println("!X -> Could not resolve symbol for ${xdClass.targetClassName} -> Original message: ${e.message}")
             //listOf()
         }
         return superClasses
     }
 
 
-    private fun walk (node: ClassOrInterfaceDeclaration, superClasses: MutableList<IndexedClass>, originalTargetClass: ClassName) {
+    private fun walk (node: ClassOrInterfaceDeclaration, superClasses: MutableList<XdClass>, originalTargetClass: ClassName) {
         if (node.extendedTypes.isNonEmpty) {
             val superClassType = node.extendedTypes.first()
             try {
@@ -131,7 +123,7 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
                             ClassRegistry.getSuperClasses(superClass)
                     )
                 } else if (!rootClassNames.contains(superClass.targetClassName)) {
-                    walk(superClass.node, superClasses, originalTargetClass)
+                    walk(superClass.classOrInterfaceDeclarationProvider(), superClasses, originalTargetClass)
                 }
             } catch (e: UnsolvedSymbolException) {
                 println("!\tX -> Could not resolve super class symbol for ${node.nameAsString}, initial target class: $originalTargetClass, -> Original message: ${e.message}")
@@ -140,43 +132,43 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
         }
     }
 
-    private fun isAssignableByView(className: ClassName, superClassNames: List<IndexedClass>): Boolean {
+    private fun isAssignableByView(className: ClassName, superClassNames: List<XdClass>): Boolean {
         return className == rootViewClassName || superClassNames.any {
             it.targetClassName == rootViewClassName
         }
     }
-    private fun isAssignableByViewGroup(className: ClassName, superClassNames: List<IndexedClass>): Boolean {
+    private fun isAssignableByViewGroup(className: ClassName, superClassNames: List<XdClass>): Boolean {
         return className == rootViewGroupClassName || superClassNames.any {
             it.targetClassName == rootViewGroupClassName
         }
     }
-    private fun isAssignableByLayoutParams(className: ClassName, superClassNames: List<IndexedClass>): Boolean {
+    private fun isAssignableByLayoutParams(className: ClassName, superClassNames: List<XdClass>): Boolean {
         return className == rootLayoutParamsClassName || superClassNames.any {
             it.targetClassName == rootLayoutParamsClassName
         }
     }
 
-    private fun isClassAlreadyProcessed(indexedClass: IndexedClass, resolvedClasses: MutableMap<ClassName, SymbolResolvedClass>): Boolean {
-        if (resolvedClasses.containsKey(indexedClass.targetClassName)) {
+    private fun isClassAlreadyProcessed(xdClass: XdClass, classSymbolDescriptions: MutableMap<ClassName, ClassSymbolDescription>): Boolean {
+        if (classSymbolDescriptions.containsKey(xdClass.targetClassName)) {
             return true
         }
-        val storedResolvedClass = getStoredResolvedWidgetClass(indexedClass)
+        val storedResolvedClass = getClassSymbolDescription(xdClass)
         return if (storedResolvedClass != null) {
-            resolvedClasses[storedResolvedClass.targetClassName] = storedResolvedClass
+            classSymbolDescriptions[storedResolvedClass.targetClassName] = storedResolvedClass
             true
         } else {
             false
         }
     }
 
-    private fun getStoredResolvedWidgetClass(indexedClass: IndexedClass): SymbolResolvedClass? {
-        if (ClassRegistry.isClassSymbolResolved(indexedClass)) {
-            return if (ClassRegistry.isClassResolvedAsWidget(indexedClass)) {
-                val resolvedClass = ClassRegistry.getClassAsResolvedSymbol(indexedClass)
+    private fun getClassSymbolDescription(xdClass: XdClass): ClassSymbolDescription? {
+        if (ClassRegistry.isClassSymbolResolved(xdClass)) {
+            return if (ClassRegistry.isClassResolvedAsWidget(xdClass)) {
+                val resolvedClass = ClassRegistry.getResolvedClassSymbolDescription(xdClass)
                 println("\tCY -> Resolved ${resolvedClass.targetClassName} as ${resolvedClass.classCategory} class")
                 resolvedClass
             } else {
-                println("\tCX -> No view or lp class: ${indexedClass.targetClassName}")
+                println("\tCX -> No view or lp class: ${xdClass.targetClassName}")
                 null
             }
         }
@@ -203,7 +195,7 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
         // --- imported
         // --- nested class declared in parent's super class
 
-        fun resolveClassOrInterfaceType(classOrInterfaceType: ClassOrInterfaceType): IndexedClass {
+        fun resolveClassOrInterfaceType(classOrInterfaceType: ClassOrInterfaceType): XdClass {
             // is full name specified?
             ClassRegistry.findByCanonicalName(classOrInterfaceType.toString())?.let {
                 return transformLayoutLibMockView(it)
@@ -219,12 +211,12 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
             return transformLayoutLibMockView(indexedClass)
         }
 
-        private fun resolveSharedSimpleName(classOrInterfaceType: ClassOrInterfaceType, indexedClasses: List<IndexedClass>): IndexedClass {
+        private fun resolveSharedSimpleName(classOrInterfaceType: ClassOrInterfaceType, xdClasses: List<XdClass>): XdClass {
             val cu = classOrInterfaceType.findRootNode() as CompilationUnit
             findAnyNestedClassDeclaredInSuperOrParent(cu, classOrInterfaceType)?.let {
                 return it
             }
-            findAnyImportedClass(cu, classOrInterfaceType, indexedClasses)?.let {
+            findAnyImportedClass(cu, classOrInterfaceType, xdClasses)?.let {
                 return it
             }
             findAnyClassInSamePackage(cu, classOrInterfaceType)?.let {
@@ -234,7 +226,7 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
         }
 
 
-        private fun findAnyClassInSamePackage(cu: CompilationUnit, classOrInterfaceType: ClassOrInterfaceType): IndexedClass? {
+        private fun findAnyClassInSamePackage(cu: CompilationUnit, classOrInterfaceType: ClassOrInterfaceType): XdClass? {
             /*val name = if (classOrInterfaceType.scope.isPresent) {
                 classOrInterfaceType.scope.get().nameAsString + "." + classOrInterfaceType.nameAsString
             } else classOrInterfaceType.nameAsString*/
@@ -249,8 +241,8 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
         private fun findAnyImportedClass(
                 cu: CompilationUnit,
                 classOrInterfaceType: ClassOrInterfaceType,
-                indexedClasses: List<IndexedClass>
-        ): IndexedClass? {
+                xdClasses: List<XdClass>
+        ): XdClass? {
             val selectedPart = if (classOrInterfaceType.scope.isPresent) {
                 classOrInterfaceType.scope.get().nameAsString
             } else classOrInterfaceType.nameAsString
@@ -266,7 +258,7 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
                         canonicalName += ".${classOrInterfaceType.name.identifier}"
                     }
                     val matchingClass = Store.transactional {
-                        indexedClasses.find { indexedClass ->
+                        xdClasses.find { indexedClass ->
                             indexedClass.canonicalName == canonicalName
                         }
                     }
@@ -291,7 +283,7 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
         private fun findAnyNestedClassDeclaredInSuperOrParent(
                 cu: CompilationUnit,
                 classOrInterfaceType: ClassOrInterfaceType
-        ): IndexedClass? {
+        ): XdClass? {
             val classDeclaration =
                     classOrInterfaceType.firstAncestorOfType(ClassOrInterfaceDeclaration::class.java) as ClassOrInterfaceDeclaration
             // check if the class type is declared as nested class in current target class
@@ -301,7 +293,7 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
                     classOrInterfaceType
             )
             if (directNestedIndexedClass != null) {
-                return getIndexedClassFromDeclaration(cu, directNestedIndexedClass.node)
+                return getIndexedClassFromDeclaration(cu, directNestedIndexedClass.classOrInterfaceDeclarationProvider())
             }
 
             if (classDeclaration.isNestedType) {
@@ -309,7 +301,7 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
                 // since we're indexing depth first.. the subclasses of parent should be known (TBC)
                 val parentIndexedClass = getIndexedClassFromDeclaration(cu, parentClassDeclaration)
                 for (superClass in ClassRegistry.getSuperClasses(parentIndexedClass)) {
-                    val nestedClassesDeclaredInAncestor = superClass.node.descendantsOfType(ClassOrInterfaceDeclaration::class.java)
+                    val nestedClassesDeclaredInAncestor = superClass.classOrInterfaceDeclarationProvider().descendantsOfType(ClassOrInterfaceDeclaration::class.java)
                     for (nestedClassDeclaration in nestedClassesDeclaredInAncestor) {
                         if (nestedClassDeclaration.name.identifier == classOrInterfaceType.name.identifier) {
                             val ancestorCu = nestedClassDeclaration.findRootNode() as CompilationUnit
@@ -323,7 +315,7 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
             // so many opportunities in our world :-)
             val indexClass = getIndexedClassFromDeclaration(cu, classDeclaration)
             for (superClass in ClassRegistry.getSuperClasses(indexClass)) {
-                val superClassDeclaration = superClass.node
+                val superClassDeclaration = superClass.classOrInterfaceDeclarationProvider()
                 val targetClassDeclaration = superClassDeclaration.firstDescendantOfType(
                         ClassOrInterfaceDeclaration::class.java
                 ) { c -> c.name.identifier == classOrInterfaceType.name.identifier }
@@ -364,10 +356,10 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
             }
         }
 
-        private fun transformLayoutLibMockView(indexedClass: IndexedClass): IndexedClass {
-            return if (indexedClass.targetClassName.canonicalName == mockViewCanonicalName) {
-                ClassRegistry[rootViewClassName] as IndexedClass
-            } else indexedClass
+        private fun transformLayoutLibMockView(xdClass: XdClass): XdClass {
+            return if (xdClass.targetClassName.canonicalName == mockViewCanonicalName) {
+                ClassRegistry[rootViewClassName] as XdClass
+            } else xdClass
         }
 
         fun determineClassName(node: ClassOrInterfaceDeclaration, packageDeclaration: PackageDeclaration): ClassName? {
@@ -377,7 +369,7 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
                         ClassOrInterfaceDeclaration::class.java, packageDeclaration
                 ).asReversed()
                 if (parents.isEmpty()) {
-                    //throw IllegalStateException("Parent classes cannot be empty for nested class ${node.nameAsString} in $indexedPackage")
+                    //throw IllegalStateException("Parent classes cannot be empty for nested class ${classOrInterfaceDeclarationProvider.nameAsString} in $xdPackage")
                     ClassName(packageName, node.nameAsString)
                 } else {
                     try {
@@ -394,7 +386,7 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
         private fun getIndexedClassFromDeclaration(
                 cu: CompilationUnit,
                 classDeclaration: ClassOrInterfaceDeclaration
-        ): IndexedClass {
+        ): XdClass {
             val targetClassName = ClassSymbolResolver.determineClassName(classDeclaration, cu.packageDeclaration.get())
             val result = if (targetClassName != null) {
                 ClassRegistry[targetClassName]
@@ -404,10 +396,13 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
                         classDeclaration.name.identifier
                 )
             }
-            return result as IndexedClass
+            return result as XdClass
+        }
+
+        fun getCanonicalNameFromImport(importDeclaration: ImportDeclaration): String {
+            return jetifyTransformName(importDeclaration.name)
         }
 
     }
-
-
 }
+

@@ -1,9 +1,11 @@
 package com.laidpack.sourcerer.generator
 
+import com.github.javaparser.ast.CompilationUnit
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.MethodDeclaration
 import com.github.javaparser.ast.body.VariableDeclarator
-import com.github.javaparser.ast.expr.MethodCallExpr
+import com.github.javaparser.ast.expr.*
 import com.laidpack.sourcerer.generator.flow.getter.GetterFlowInterpreter
 import com.laidpack.sourcerer.generator.flow.setter.SetterFlowInterpreter
 import com.laidpack.sourcerer.generator.javadoc.JavaDocAttributeToMethodMatcher
@@ -11,12 +13,12 @@ import com.laidpack.sourcerer.generator.peeker.*
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 import com.laidpack.sourcerer.generator.resources.WidgetRegistry
 import com.laidpack.sourcerer.generator.target.*
+import com.squareup.kotlinpoet.ClassName
 import kotlinx.dnq.query.*
 
 class AttributeManager(
         private val classInfo: ClassInfo,
-        private val attributesFromXml: Map<String, Attribute>,
-        private val classRegistry: ClassRegistry
+        private val attributesFromXml: Map<String, Attribute>
 ) {
 
     private val potentialGetters = classInfo.potentialGetters
@@ -97,7 +99,7 @@ class AttributeManager(
         var result = analyzeJavaDocToFindGetter(attribute, setter)
         if (!result.success) result = bestGuessMatchingGetterByName(attribute, setter)
         if (!result.success) result = analyzeSetterFlowToFindGetter(attribute, setter)
-        if (!result.success) throw IllegalStateException("Could not match getter with setterCall. Setter methods name: '${setter.name}', Attribute: '${attribute.name}'")
+        if (!result.success) throw TypePhilosopher.UnmatchedGetterTypeException("Could not match getter with setterCall. Setter methods name: '${setter.name}', Attribute: '${attribute.name}'")
 
         return when {
             result.type == GetterType.METHOD -> {
@@ -131,7 +133,7 @@ class AttributeManager(
             setter: Setter,
             providedParameterIndex: Int? = null
     ): MatchGetterResult {
-        val setterInfo = classInfo.getSetterMethodInfo(setter)
+        val setterInfo = classInfo.getSetterFromThisClassOrSuperClass(setter)
         val setterInterpreter = SetterFlowInterpreter(setterInfo, setter, attribute, classInfo, providedParameterIndex)
         val getterRequirements = setterInterpreter.resolveGetterRequirements()
         if (getterRequirements.fields.isEmpty()) {
@@ -215,7 +217,7 @@ class AttributeManager(
             guesses.addAll(getGuessesForBase(parameterNameBase, targetsBoolean))
         }
 
-        for (classInfo in classRegistry.getClassAndSuperClasses(classInfo)) {
+        for (classInfo in classInfo.superClassesInfo) {
             for (getterNameGuess in guesses) {
                 when {
                     classInfo.methodDeclarations.containsKey(getterNameGuess) -> {
@@ -305,11 +307,19 @@ class AttributeManager(
         if (setters.containsKey(hashCode)) return setters[hashCode] as Setter
 
         val setterParameters = getParameters(setterInfo.methodDeclaration, setterCall)
+        val annotations = setterInfo.methodDeclaration.annotations.toMutableList()
+        val field = getFieldBeingSetInMethod(setterInfo)
+        if (field != null) {
+            annotations.addAll(field.annotations)
+        }
+
         return Setter(
                 setterInfo.methodDeclaration.nameAsString,
                 setterParameters,
                 setterInfo.methodDeclaration.begin.get().line,
-                isField = false
+                isField = false,
+                isStaticSetter =  false,
+                isPropertyCategorizedAsMeasurementInViewDebug = isPropertyCategorizedAsMeasurementInViewDebug(annotations)
         )
 
     }
@@ -324,27 +334,97 @@ class AttributeManager(
                 variableName,
                 listOf(),
                 field.begin.get().line,
-                isField = true
+                isField = true,
+                isStaticSetter =  false,
+                isPropertyCategorizedAsMeasurementInViewDebug = isPropertyCategorizedAsMeasurementInViewDebug(field.annotations)
         )
 
     }
 
+    fun getStaticSetter(
+            setters: Map<Int, Setter>,
+            classDeclaration: ClassOrInterfaceDeclaration,
+            methodDeclaration: MethodDeclaration,
+            setterCall: MethodCallExpr?
+    ): Setter {
+        // setter already exists?
+        val hashCode = Setter.getHashCodeFromMethodDeclaration(methodDeclaration)
+        if (setters.containsKey(hashCode)) return setters[hashCode] as Setter
+
+        val setterParameters = getParameters(methodDeclaration, setterCall)
+        val annotations = methodDeclaration.annotations.toMutableList()
+        val cu = classDeclaration.findRootNode() as CompilationUnit
+        val className = ClassSymbolResolver.determineClassName(classDeclaration, cu.packageDeclaration.get())
+
+        return Setter(
+                methodDeclaration.nameAsString,
+                setterParameters,
+                methodDeclaration.begin.get().line,
+                isField = false,
+                isStaticSetter =  true,
+                isPropertyCategorizedAsMeasurementInViewDebug = isPropertyCategorizedAsMeasurementInViewDebug(annotations),
+                scopeClassName = className as ClassName
+        )
+    }
+
+    private fun isPropertyCategorizedAsMeasurementInViewDebug(annotations: Iterable<AnnotationExpr>): Boolean {
+        val viewDebugAnnotation = annotations.find {
+            it.nameAsString == "ViewDebug.ExportedProperty"
+        } ?: return false
+        val memberValuePair = viewDebugAnnotation.childNodes.find {
+            it is MemberValuePair
+        } as? MemberValuePair ?: return false
+        val memberValue = memberValuePair.value
+        return memberValuePair.nameAsString == "category"
+                && memberValue is StringLiteralExpr && memberValue.asString() == "measurement"
+    }
+
+
+    private fun getFieldBeingSetInMethod(setterInfo: MethodInfo): FieldDeclaration? {
+        if (setterInfo.methodDeclaration.parameters.size == 1) {
+            val assignExpressions = setterInfo.methodDeclaration.descendantsOfType(AssignExpr::class.java)
+            val parameterName = setterInfo.methodDeclaration.parameters[0].nameAsString
+            if (assignExpressions.size == 1) {
+                val assignExpr = assignExpressions.first()
+                val target = assignExpr.target
+                val value = assignExpr.value
+                if (
+                        (target is NameExpr || target is FieldAccessExpr && target.scope is ThisExpr)
+                        && value is NameExpr && value.nameAsString == parameterName
+                ) {
+                    return try {
+                        val variableName = when (target) {
+                            is NameExpr -> target.nameAsString
+                            is FieldAccessExpr -> target.nameAsString
+                            else -> throw IllegalStateException("")
+                        }
+                        classInfo.getFieldFromThisClassOrSuperClass(variableName)
+                    } catch (e: java.lang.IllegalStateException) {
+                        null
+                    }
+                }
+            }
+        }
+        return null
+    }
+
     fun getResolvedSetterPropertyName(setter: Setter): String? {
-        // ensure setter is in right format
+        // ensure setter is in right formats
         val setterMethodNameBase = setter.name.substring(3)
         if (!setter.name.startsWith("set")
                 || setter.parameters.size != 1
                 || setter.parameters.first().isVarArgs
+                || setter.isStaticSetter
         ) {
             return null
         }
-        val methodInfo = classInfo.getSetterMethodInfo(setter)
+        val methodInfo = classInfo.getSetterFromThisClassOrSuperClass(setter)
         val parameter = methodInfo.methodDeclaration.parameters.first()
         val requiresNullableGetter = parameter.annotations.any { it.nameAsString == "Nullable" }
 
-        // in right format, but check if we have a matching getter for the setter (based on name and type)
+        // in right formats, but check if we have a matching getter for the setter (based on name and type)
         val classAndSuperClasses = mutableListOf(classInfo)
-        classAndSuperClasses.addAll(classInfo.superClassNames.map { classRegistry[it] as ClassInfo })
+        classAndSuperClasses.addAll(classInfo.superClassesInfo)
 
         // check if we have a matching getter for the setter (based on name and type)
         val matchingGetterNames = listOf(

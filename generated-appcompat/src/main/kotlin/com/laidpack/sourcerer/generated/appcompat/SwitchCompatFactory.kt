@@ -1,11 +1,11 @@
 package com.laidpack.sourcerer.generated.appcompat
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import com.laidpack.sourcerer.generated.ButtonFactory
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
@@ -25,39 +25,42 @@ open class SwitchCompatFactory<TView : SwitchCompat, TAttributes : SwitchCompatA
         if (view is SwitchCompat) {
             view.apply {
                 attributes.thumbTint?.let {
-                    val immutableThumbTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (thumbTintList != immutableThumbTint) {
-                        thumbTintList = immutableThumbTint
+                    val localThumbTint = ColorStateList.valueOf(it)
+                    if (thumbTintList != localThumbTint) {
+                        thumbTintList = localThumbTint
                     }
                 }
                 attributes.thumbTintMode?.let {
-                    val immutableThumbTintMode = it.value.toPorterDuffMode()
-                    if (thumbTintMode != immutableThumbTintMode) {
-                        thumbTintMode = immutableThumbTintMode
+                    val localThumbTintMode = it.value.toPorterDuffMode()
+                    if (thumbTintMode != localThumbTintMode) {
+                        thumbTintMode = localThumbTintMode
                     }
                 }
                 attributes.track?.let {
-                    val immutableTrack = ContextCompat.getDrawable(context, it) as Drawable
-                    if (trackDrawable != immutableTrack) {
-                        trackDrawable = immutableTrack
+                    val localTrack = ContextCompat.getDrawable(context, it) as Drawable
+                    if (trackDrawable != localTrack) {
+                        trackDrawable = localTrack
                     }
                 }
                 attributes.trackTint?.let {
-                    val immutableTrackTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (trackTintList != immutableTrackTint) {
-                        trackTintList = immutableTrackTint
+                    val localTrackTint = ColorStateList.valueOf(it)
+                    if (trackTintList != localTrackTint) {
+                        trackTintList = localTrackTint
                     }
                 }
                 attributes.trackTintMode?.let {
-                    val immutableTrackTintMode = it.value.toPorterDuffMode()
-                    if (trackTintMode != immutableTrackTintMode) {
-                        trackTintMode = immutableTrackTintMode
+                    val localTrackTintMode = it.value.toPorterDuffMode()
+                    if (trackTintMode != localTrackTintMode) {
+                        trackTintMode = localTrackTintMode
                     }
                 }
                 attributes.thumbTextPadding?.let {
                     if (thumbTextPadding != it) {
                         thumbTextPadding = it
                     }
+                }
+                attributes.switchTextAppearance?.let {
+                    setSwitchTextAppearance(context, it)
                 }
                 attributes.switchMinWidth?.let {
                     if (switchMinWidth != it) {

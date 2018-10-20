@@ -1,6 +1,6 @@
 include ':generator', ':sample-server',
 		':sample-app',
-		':stub-app',
+        ':stub-module',
 		':services',
         ':generated',
         ':generated-appcompat',

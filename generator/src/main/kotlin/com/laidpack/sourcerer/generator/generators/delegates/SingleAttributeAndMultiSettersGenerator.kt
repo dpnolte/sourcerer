@@ -8,9 +8,13 @@ import com.laidpack.sourcerer.generator.target.Setter
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.ParameterSpec
 
-class SingleAttributeAndMultiSettersGenerator(attributesParam: ParameterSpec, contextParam: ParameterSpec, private val codeBlock: CodeBlock) : DelegateGeneratorBase(attributesParam, contextParam) {
+class SingleAttributeAndMultiSettersGenerator(
+        attributesParam: ParameterSpec,
+        private val contextParam: ParameterSpec,
+        private val codeBlock: CodeBlock
+) : DelegateGeneratorBase(attributesParam, contextParam) {
     private val attribute = codeBlock.attributes.values.first()
-    private val isMultiFormatted = attribute.formats.size > 1
+    private val isMultiFormatted = attribute.formatsUsedBySetters.size > 1
     private val delegate = this
 
     fun addCodeBlockToBuilder(builder : FunSpec.Builder) {
@@ -37,7 +41,7 @@ class SingleAttributeAndMultiSettersGenerator(attributesParam: ParameterSpec, co
                 val typesForThisSetter = attribute.typesPerSetter[setterHashCode] as AttributeTypesForSetter
                 val setter = codeBlock.setters[setterHashCode] as Setter
                 var valueLiteral = when {
-                    typesForThisSetter.hasEnumAsAttributeType -> "it.value"
+                    typesForThisSetter.hasEnumAsAttributeType || typesForThisSetter.hasFlagsAsAttributeType -> "it.value"
                     else -> "it"
                 }
                 if (typesForThisSetter.requiresTransformMethod) {
@@ -45,11 +49,15 @@ class SingleAttributeAndMultiSettersGenerator(attributesParam: ParameterSpec, co
                             .addDeclaredVar(builder, attribute, typesForThisSetter, valueLiteral)
                     valueLiteral = attribute.localVariableName
                 }
-                val getters = attribute.getters.filter { it.setterHashCodes.contains(setterHashCode) }
-                BeginIfAnyValueIsDifferentThanCurrent(this, attributesParam)
-                        .addAsIf(builder, attribute, setter, typesForThisSetter, valueLiteral, getters)
-                builder.addSetter(attribute, setter, valueLiteral)
-                builder.endControlFlow() // ends if value not equal to current
+                if (typesForThisSetter.hasMatchedGetter) {
+                    val getters = attribute.getters.filter { it.setterHashCodes.contains(setterHashCode) }
+                    BeginIfAnyValueIsDifferentThanCurrent(this, attributesParam)
+                            .addAsIf(builder, attribute, setter, typesForThisSetter, valueLiteral, getters)
+                }
+                builder.addSetter(setter, valueLiteral)
+                if (typesForThisSetter.hasMatchedGetter) {
+                    builder.endControlFlow() // ends if value not equal to current
+                }
             }
             builder.endControlFlow() // ends if not null
         }
@@ -61,64 +69,13 @@ class SingleAttributeAndMultiSettersGenerator(attributesParam: ParameterSpec, co
                 .addAsWhenEntry(this, attribute, typesForThisSetter)
         DeclareMultiFormatVariable(delegate, attributesParam)
                 .addDeclaredVar(this, attribute, typesForThisSetter)
-        this.addSetter(setter)
+        this.addSetter(setter, attribute.localVariableName)
         return this.endControlFlow()
     }
 
-    private fun FunSpec.Builder.addSetter(setter: Setter): FunSpec.Builder {
-        when {
-            setter.hasPropertyName -> {
-                this.addStatement("%N = %L", setter.propertyName, attribute.localVariableName)
-            }
-            setter.parameters.size > 1 -> {
-                var index = 0
-                val attributeParameterIndex = setter.callSignatureMaps[attribute.name]
-                val parameters = setter.parameters.joinToString(", ") { parameter ->
-                    val result = when {
-                        attributeParameterIndex == index -> attribute.localVariableName
-                        parameter.defaultValue.isNotBlank() -> parameter.defaultValue
-                        parameter.isNullable -> "null"
-                        else -> ""
-                    }
-                    index += 1
-                    result
-                }
-                this.addStatement("%N($parameters)", setter.name)
-            }
-            else -> {
-                this.addStatement("%N(%L)", setter.name, attribute.localVariableName)
-            }
-        }
-        return this
-    }
-
-    private fun FunSpec.Builder.addSetter(attribute: Attribute, setter: Setter, valueLiteral: String): FunSpec.Builder {
-        when {
-            setter.hasPropertyName -> {
-                this.addStatement("%N = %L", setter.propertyName, valueLiteral)
-            }
-            setter.isField -> {
-                this.addStatement("%N = %L", setter.name, valueLiteral)
-            }
-            setter.parameters.size > 1 -> {
-                var index = 0
-                val parameterIndex = setter.callSignatureMaps[attribute]
-                val parameters = setter.parameters.joinToString(", ") { parameter ->
-                    val result = when {
-                        parameterIndex == index -> valueLiteral
-                        parameter.defaultValue.isNotBlank() -> parameter.defaultValue
-                        parameter.isNullable -> "null"
-                        else -> ""
-                    }
-                    index += 1
-                    result
-                }
-                this.addStatement("%N($parameters)", setter.name)
-            }
-            else -> {
-                this.addStatement("%N(%L)", setter.name, valueLiteral)
-            }
-        }
+    private fun FunSpec.Builder.addSetter(setter: Setter, valueLiteral: String): FunSpec.Builder {
+        InvokeSetter(delegate, contextParam)
+                .addAsStatement(this, setter, attribute, valueLiteral)
         return this
     }
 }

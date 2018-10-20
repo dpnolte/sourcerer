@@ -19,22 +19,24 @@ open class ViewGroupMarginLayoutParamsFactory<TLayoutParams : ViewGroup.MarginLa
         super.init(layoutParams, context, attributes)
         if (layoutParams is ViewGroup.MarginLayoutParams) {
             layoutParams.apply {
-                if (attributes.layout_marginLeft != null || attributes.layout_marginTop != null || attributes.layout_marginRight != null || attributes.layout_marginBottom != null) {
-                    val immutableLayoutMarginLeftDimension = attributes.layout_marginLeft ?: leftMargin
-                    if (immutableLayoutMarginLeftDimension != leftMargin) {
-                        leftMargin()
+                attributes.layout_marginLeft?.let {
+                    if (it != leftMargin) {
+                        leftMargin = it
                     }
-                    val immutableLayoutMarginTopDimension = attributes.layout_marginTop ?: topMargin
-                    if (immutableLayoutMarginTopDimension != topMargin) {
-                        topMargin()
+                }
+                attributes.layout_marginTop?.let {
+                    if (it != topMargin) {
+                        topMargin = it
                     }
-                    val immutableLayoutMarginRightDimension = attributes.layout_marginRight ?: rightMargin
-                    if (immutableLayoutMarginRightDimension != rightMargin) {
-                        rightMargin()
+                }
+                attributes.layout_marginRight?.let {
+                    if (it != rightMargin) {
+                        rightMargin = it
                     }
-                    val immutableLayoutMarginBottomDimension = attributes.layout_marginBottom ?: bottomMargin
-                    if (immutableLayoutMarginBottomDimension != bottomMargin) {
-                        bottomMargin()
+                }
+                attributes.layout_marginBottom?.let {
+                    if (it != bottomMargin) {
+                        bottomMargin = it
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 17) {

@@ -12,6 +12,26 @@ open class BottomAppBarFactory<TView : BottomAppBar, TAttributes : BottomAppBarA
 
     override fun createInstance(context: Context): View = BottomAppBar(context)
 
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is BottomAppBar) {
+            view.apply {
+                attributes.fabAlignmentMode?.let {
+                    fabAlignmentMode = it.value
+                }
+                attributes.hideOnScroll?.let {
+                    if (hideOnScroll != it) {
+                        hideOnScroll = it
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "bottomAppBar"
 

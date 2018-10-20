@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
@@ -34,17 +35,20 @@ open class SwitchFactory<TView : Switch, TAttributes : SwitchAttributes>(instanc
                         textOff = it
                     }
                 }
+                attributes.switchTextAppearance?.let {
+                    setSwitchTextAppearance(context, it)
+                }
                 if (Build.VERSION.SDK_INT >= 16) {
                     attributes.thumb?.let {
-                        val immutableThumb = ContextCompat.getDrawable(context, it) as Drawable
-                        if (thumbDrawable != immutableThumb) {
-                            thumbDrawable = immutableThumb
+                        val localThumb = ContextCompat.getDrawable(context, it) as Drawable
+                        if (thumbDrawable != localThumb) {
+                            thumbDrawable = localThumb
                         }
                     }
                     attributes.track?.let {
-                        val immutableTrack = ContextCompat.getDrawable(context, it) as Drawable
-                        if (trackDrawable != immutableTrack) {
-                            trackDrawable = immutableTrack
+                        val localTrack = ContextCompat.getDrawable(context, it) as Drawable
+                        if (trackDrawable != localTrack) {
+                            trackDrawable = localTrack
                         }
                     }
                     attributes.thumbTextPadding?.let {
@@ -77,27 +81,27 @@ open class SwitchFactory<TView : Switch, TAttributes : SwitchAttributes>(instanc
                 }
                 if (Build.VERSION.SDK_INT >= 23) {
                     attributes.thumbTint?.let {
-                        val immutableThumbTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                        if (thumbTintList != immutableThumbTint) {
-                            thumbTintList = immutableThumbTint
+                        val localThumbTint = ResourcesCompat.getColorStateList(context.resources, it, null)
+                        if (thumbTintList != localThumbTint) {
+                            thumbTintList = localThumbTint
                         }
                     }
                     attributes.thumbTintMode?.let {
-                        val immutableThumbTintMode = it.toPorterDuffMode()
-                        if (thumbTintMode != immutableThumbTintMode) {
-                            thumbTintMode = immutableThumbTintMode
+                        val localThumbTintMode = it.toPorterDuffMode()
+                        if (thumbTintMode != localThumbTintMode) {
+                            thumbTintMode = localThumbTintMode
                         }
                     }
                     attributes.trackTint?.let {
-                        val immutableTrackTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                        if (trackTintList != immutableTrackTint) {
-                            trackTintList = immutableTrackTint
+                        val localTrackTint = ColorStateList.valueOf(it)
+                        if (trackTintList != localTrackTint) {
+                            trackTintList = localTrackTint
                         }
                     }
                     attributes.trackTintMode?.let {
-                        val immutableTrackTintMode = it.value.toPorterDuffMode()
-                        if (trackTintMode != immutableTrackTintMode) {
-                            trackTintMode = immutableTrackTintMode
+                        val localTrackTintMode = it.value.toPorterDuffMode()
+                        if (trackTintMode != localTrackTintMode) {
+                            trackTintMode = localTrackTintMode
                         }
                     }
                 }

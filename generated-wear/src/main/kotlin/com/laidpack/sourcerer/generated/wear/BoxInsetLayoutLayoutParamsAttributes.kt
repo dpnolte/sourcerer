@@ -2,7 +2,12 @@ package com.laidpack.sourcerer.generated.wear
 
 import com.laidpack.annotation.TypeScript
 import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
+import com.laidpack.sourcerer.services.api.AttributeEnum
+import com.laidpack.sourcerer.services.api.FlagsAccumulator
+import com.laidpack.sourcerer.services.api.FlagsQualifier
+import com.laidpack.sourcerer.services.api.Format
 import com.laidpack.sourcerer.services.api.IAttributes
+import com.laidpack.sourcerer.services.api.MultiFormat
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.Int
@@ -10,11 +15,14 @@ import kotlin.String
 
 @JsonClass(generateAdapter = true)
 @TypeScript
-open class BoxInsetLayoutLayoutParamsAttributes : ViewGroupLayoutParamsAttributes(), IAttributes {
-    var boxedEdges: BoxedEdgesFlagsEnum? = null
-}
+open class BoxInsetLayoutLayoutParamsAttributes(
+    @field:FlagsQualifier(flagsType = BoxedEdgesFlagsEnum::class) val boxedEdges: FlagsAccumulator? = null,
+    layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
+    layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum))
+) : ViewGroupLayoutParamsAttributes(layout_width = layout_width, layout_height = layout_height),
+        IAttributes
 
-enum class BoxedEdgesFlagsEnum(val attributeName: String, val value: Int) {
+enum class BoxedEdgesFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),
 

@@ -31,7 +31,7 @@
             <option value="$PROJECT_DIR$/sample-app" />
             <option value="$PROJECT_DIR$/sample-server" />
             <option value="$PROJECT_DIR$/services" />
-            <option value="$PROJECT_DIR$/stub-app" />
+            <option value="$PROJECT_DIR$/stub-module" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

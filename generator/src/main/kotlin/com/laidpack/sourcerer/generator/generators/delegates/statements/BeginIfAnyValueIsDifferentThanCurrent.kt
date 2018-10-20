@@ -28,15 +28,19 @@ class BeginIfAnyValueIsDifferentThanCurrent (private val delegate: DelegateGener
         val args = mutableListOf<Any>()
         attributes.forEachIndexed { index, attribute ->
             val typesForThisSetter = attribute.typesPerSetter[setterHashCode] as AttributeTypesForSetter
-            val literal = if (valueLiterals != null && index < valueLiterals.size) {
-                valueLiterals[index]
-            } else null
-            val condition = getCondition(attribute,setter, typesForThisSetter, literal)
-            expressions.add(condition.expression)
-            args.addAll(condition.args)
+            if (typesForThisSetter.hasMatchedGetter) {
+                val literal = if (valueLiterals != null && index < valueLiterals.size) {
+                    valueLiterals[index]
+                } else null
+                val condition = getCondition(attribute, setter, typesForThisSetter, literal)
+                expressions.add(condition.expression)
+                args.addAll(condition.args)
+            }
         }
-        val expression = expressions.joinToString(" || ")
-        builder.beginControlFlow("if ($expression)", *args.toTypedArray())
+        if (expressions.isNotEmpty()) {
+            val expression = expressions.joinToString(" || ")
+            builder.beginControlFlow("if ($expression)", *args.toTypedArray())
+        }
     }
 
     private fun getCondition(

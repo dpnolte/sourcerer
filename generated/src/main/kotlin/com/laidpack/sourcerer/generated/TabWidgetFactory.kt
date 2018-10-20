@@ -29,23 +29,23 @@ open class TabWidgetFactory<TView : TabWidget, TAttributes : TabWidgetAttributes
                 }
                 if (Build.VERSION.SDK_INT >= 16) {
                     attributes.divider?.let {
-                        val immutableDivider = ContextCompat.getDrawable(context, it) as Drawable
-                        if (dividerDrawable != immutableDivider) {
-                            setDividerDrawable(immutableDivider)
+                        val localDivider = ContextCompat.getDrawable(context, it) as Drawable
+                        if (dividerDrawable != localDivider) {
+                            setDividerDrawable(localDivider)
                         }
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 24) {
                     attributes.tabStripLeft?.let {
-                        val immutableTabStripLeft = ContextCompat.getDrawable(context, it) as Drawable
-                        if (leftStripDrawable != immutableTabStripLeft) {
-                            leftStripDrawable = immutableTabStripLeft
+                        val localTabStripLeft = ContextCompat.getDrawable(context, it) as Drawable
+                        if (leftStripDrawable != localTabStripLeft) {
+                            leftStripDrawable = localTabStripLeft
                         }
                     }
                     attributes.tabStripRight?.let {
-                        val immutableTabStripRight = ContextCompat.getDrawable(context, it) as Drawable
-                        if (rightStripDrawable != immutableTabStripRight) {
-                            rightStripDrawable = immutableTabStripRight
+                        val localTabStripRight = ContextCompat.getDrawable(context, it) as Drawable
+                        if (rightStripDrawable != localTabStripRight) {
+                            rightStripDrawable = localTabStripRight
                         }
                     }
                 }
