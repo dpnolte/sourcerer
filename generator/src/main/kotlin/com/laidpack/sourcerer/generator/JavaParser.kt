@@ -2,6 +2,8 @@ package com.laidpack.sourcerer.generator
 
 import com.github.javaparser.JavaParser
 import com.github.javaparser.symbolsolver.JavaSymbolSolver
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade
+import com.github.javaparser.symbolsolver.javaparsermodel.TypeExtractor
 import com.github.javaparser.symbolsolver.resolution.typesolvers.AarTypeSolver
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver
@@ -18,8 +20,11 @@ internal object JavaParserContext {
         }
         JavaParserContext.combinedTypeSolver.add(ReflectionTypeSolver())
 
-        val symbolSolver = JavaSymbolSolver(JavaParserContext.combinedTypeSolver)
+        symbolSolver = JavaSymbolSolver(JavaParserContext.combinedTypeSolver)
         JavaParser.getStaticConfiguration().setSymbolResolver(symbolSolver)
+        typeExtractor = TypeExtractor(combinedTypeSolver, JavaParserFacade.get(combinedTypeSolver))
     }
     val combinedTypeSolver = CombinedTypeSolver()
+    private lateinit var symbolSolver : JavaSymbolSolver
+    lateinit var typeExtractor : TypeExtractor
 }

@@ -21,13 +21,22 @@ open class ChipGroupFactory<TView : ChipGroup, TAttributes : ChipGroupAttributes
         if (view is ChipGroup) {
             view.apply {
                 attributes.chipSpacingHorizontal?.let {
-                    chipSpacingHorizontal = it
+                    if (chipSpacingHorizontal != it) {
+                        chipSpacingHorizontal = it
+                    }
                 }
                 attributes.chipSpacingVertical?.let {
-                    chipSpacingVertical = it
+                    if (chipSpacingVertical != it) {
+                        chipSpacingVertical = it
+                    }
                 }
                 attributes.singleLine?.let {
                     setSingleLine(it)
+                }
+                attributes.singleSelection?.let {
+                    if (isSingleSelection != it) {
+                        isSingleSelection = it
+                    }
                 }
             }
         }

@@ -3,11 +3,11 @@ package com.laidpack.sourcerer.generated.material.components
 import android.content.Context
 import android.view.View
 import com.google.android.material.bottomappbar.BottomAppBar
-import com.laidpack.sourcerer.generated.ViewGroupFactory
+import com.laidpack.sourcerer.generated.appcompat.ToolbarFactory
 import java.lang.Class
 import kotlin.String
 
-open class BottomAppBarFactory<TView : BottomAppBar, TAttributes : BottomAppBarAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
+open class BottomAppBarFactory<TView : BottomAppBar, TAttributes : BottomAppBarAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ToolbarFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = BottomAppBar(context)
@@ -21,7 +21,9 @@ open class BottomAppBarFactory<TView : BottomAppBar, TAttributes : BottomAppBarA
         if (view is BottomAppBar) {
             view.apply {
                 attributes.fabAlignmentMode?.let {
-                    fabAlignmentMode = it.value
+                    if (fabAlignmentMode != it.value) {
+                        fabAlignmentMode = it.value
+                    }
                 }
                 attributes.hideOnScroll?.let {
                     if (hideOnScroll != it) {

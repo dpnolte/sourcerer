@@ -1,7 +1,7 @@
 package com.laidpack.sourcerer.generated.coordinatorlayout
 
 import com.laidpack.annotation.TypeScript
-import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
+import com.laidpack.sourcerer.generated.ViewGroupMarginLayoutParamsAttributes
 import com.laidpack.sourcerer.services.api.AttributeEnum
 import com.laidpack.sourcerer.services.api.FlagsAccumulator
 import com.laidpack.sourcerer.services.api.FlagsQualifier
@@ -24,8 +24,14 @@ open class CoordinatorLayoutLayoutParamsAttributes(
     val layout_insetEdge: LayoutInsetEdgeEnum? = null,
     @field:FlagsQualifier(flagsType = LayoutDodgeInsetEdgesFlagsEnum::class) val layout_dodgeInsetEdges: FlagsAccumulator? = null,
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
-    layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum))
-) : ViewGroupLayoutParamsAttributes(layout_width = layout_width, layout_height = layout_height),
+    layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
+    layout_marginLeft: Int? = null,
+    layout_marginBottom: Int? = null,
+    layout_marginRight: Int? = null,
+    layout_marginTop: Int? = null,
+    layout_marginStart: Int? = null,
+    layout_marginEnd: Int? = null
+) : ViewGroupMarginLayoutParamsAttributes(layout_width = layout_width, layout_height = layout_height, layout_marginLeft = layout_marginLeft, layout_marginBottom = layout_marginBottom, layout_marginRight = layout_marginRight, layout_marginTop = layout_marginTop, layout_marginStart = layout_marginStart, layout_marginEnd = layout_marginEnd),
         IAttributes
 
 enum class LayoutAnchorGravityFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {

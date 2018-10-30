@@ -29,7 +29,9 @@ open class LinearLayoutCompatFactory<TView : LinearLayoutCompat, TAttributes : L
                 }
                 attributes.divider?.let {
                     val localDivider = ContextCompat.getDrawable(context, it) as Drawable
-                    dividerDrawable = localDivider
+                    if (dividerDrawable != localDivider) {
+                        dividerDrawable = localDivider
+                    }
                 }
                 attributes.showDividers?.let {
                     val localShowDividers = it.value

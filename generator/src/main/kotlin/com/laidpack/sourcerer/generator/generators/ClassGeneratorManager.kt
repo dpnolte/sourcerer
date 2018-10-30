@@ -2,17 +2,15 @@ package com.laidpack.sourcerer.generator.generators
 
 import android.view.ViewGroup
 import com.laidpack.sourcerer.generator.SourcererResult
-import com.laidpack.sourcerer.generator.peeker.ClassCategory
-import com.laidpack.sourcerer.generator.peeker.LayoutParamsConstructorExpression
-import com.laidpack.sourcerer.generator.peeker.ViewConstructorExpression
-import com.laidpack.sourcerer.generator.resources.GradleModuleManager
+import com.laidpack.sourcerer.generator.index.ClassCategory
+import com.laidpack.sourcerer.generator.index.LayoutParamsConstructorExpression
+import com.laidpack.sourcerer.generator.index.ViewConstructorExpression
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.WildcardTypeName
 import java.io.File
-import java.nio.file.Path
 
 class ClassGeneratorManager(
         private val targetDir: File,

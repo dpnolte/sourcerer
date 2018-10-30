@@ -12,7 +12,7 @@ import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
-open class SwitchFactory<TView : Switch, TAttributes : SwitchAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ButtonFactory<TView, TAttributes>(instanceType, attributesType) {
+open class SwitchFactory<TView : Switch, TAttributes : SwitchAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : CompoundButtonFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = Switch(context)

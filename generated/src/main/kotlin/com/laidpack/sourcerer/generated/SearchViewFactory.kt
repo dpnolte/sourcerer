@@ -26,26 +26,9 @@ open class SearchViewFactory<TView : SearchView, TAttributes : SearchViewAttribu
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 16) {
-                    attributes.maxWidth?.let {
-                        if (maxWidth != it) {
-                            maxWidth = it
-                        }
-                    }
                     attributes.queryHint?.let {
                         if (queryHint != it) {
                             queryHint = it
-                        }
-                    }
-                    attributes.imeOptions?.let {
-                        val localImeOptions = it.value
-                        if (imeOptions != localImeOptions) {
-                            imeOptions = localImeOptions
-                        }
-                    }
-                    attributes.inputType?.let {
-                        val localInputType = it.value
-                        if (inputType != localInputType) {
-                            inputType = localInputType
                         }
                     }
                 }

@@ -12,6 +12,23 @@ open class NestedScrollViewFactory<TView : NestedScrollView, TAttributes : Neste
 
     override fun createInstance(context: Context): View = NestedScrollView(context)
 
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is NestedScrollView) {
+            view.apply {
+                attributes.fillViewport?.let {
+                    if (isFillViewport != it) {
+                        isFillViewport = it
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "nestedScrollView"
 

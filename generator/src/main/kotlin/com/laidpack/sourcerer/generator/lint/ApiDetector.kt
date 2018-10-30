@@ -6,13 +6,14 @@ import com.android.tools.lint.checks.ApiLookup
 import com.android.tools.lint.detector.api.LintUtils
 import com.android.tools.lint.detector.api.Project
 import com.android.tools.lint.helpers.DefaultJavaEvaluator
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.expr.AnnotationExpr
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.search.GlobalSearchScope
-import com.laidpack.sourcerer.generator.peeker.ClassInfo
-import com.laidpack.sourcerer.generator.peeker.MethodInfo
+import com.laidpack.sourcerer.generator.index.ClassInfo
+import com.laidpack.sourcerer.generator.index.XdMethod
 import com.laidpack.sourcerer.generator.target.Getter
 import com.laidpack.sourcerer.generator.target.Setter
 import com.squareup.kotlinpoet.ClassName
@@ -57,16 +58,16 @@ class ApiDetector(private val projectDir: File) {
         return requiresApiAnnotation.memberValue.asIntegerLiteralExpr().asInt()
     }
 
-    fun getClassVersion(classInfo: ClassInfo): Int {
-        val versionFromAnnotation = getRequiredApiByAnnotation(classInfo.annotations)
+    fun getClassVersion(targetClassName: ClassName, classDeclaration: ClassOrInterfaceDeclaration): Int {
+        val versionFromAnnotation = getRequiredApiByAnnotation(classDeclaration.annotations)
         return if (versionFromAnnotation != null) {
             versionFromAnnotation
         } else {
             val name = try {
-                val psiClass = findPsiClass(classInfo.targetClassName.canonicalName)
+                val psiClass = findPsiClass(targetClassName.canonicalName)
                 evaluator.getInternalName(psiClass)
             } catch (e: IllegalArgumentException) {
-                getNaiveInternalName(classInfo.targetClassName)
+                getNaiveInternalName(targetClassName)
             }
             lookup.getClassVersion(name)
         }
@@ -75,16 +76,16 @@ class ApiDetector(private val projectDir: File) {
     fun getGetterVersion(classInfo: ClassInfo, getter: Getter): Int {
         return if (getter.isField) {
             getFieldVersion(
-                    classInfo.targetClassName,
+                    classInfo.xdDeclaredType.targetClassName,
                     getter.name,
                     classInfo.getResolvedFieldFromThisClassOrSuperClass(getter.name)
             )
         } else {
             getMethodVersion(
-                    classInfo.targetClassName,
+                    classInfo,
                     getter.name,
                     getter.parameters.map { it.describedType },
-                    classInfo.getGetterFromThisClassOrSuperClass(getter)
+                    classInfo.getGetterFromThisClassOrSuperClass(getter) as XdMethod
             )
         }
     }
@@ -92,27 +93,29 @@ class ApiDetector(private val projectDir: File) {
     fun getSetterVersion(classInfo: ClassInfo, setter: Setter): Int {
         return if (setter.isField) {
             getFieldVersion(
-                    classInfo.targetClassName,
+                    classInfo.xdDeclaredType.targetClassName,
                     setter.name,
                     classInfo.getResolvedFieldFromThisClassOrSuperClass(setter.name)
             )
         } else {
             getMethodVersion(
-                    classInfo.targetClassName,
+                    classInfo,
                     setter.name,
                     setter.parameters.map { it.describedType },
-                    classInfo.getSetterFromThisClassOrSuperClass(setter)
+                    classInfo.getSetterFromThisClassOrSuperClass(setter) as XdMethod
             )
         }
     }
 
     private fun getMethodVersion(
-            className: ClassName,
+            classInfo: ClassInfo,
             methodName: String,
             parameterTypes: List<String>,
-            methodInfo: MethodInfo
+            method: XdMethod
     ): Int {
-        return getRequiredApiByAnnotation(methodInfo.methodDeclaration.annotations) ?: try {
+        val methodDeclaration = classInfo.getResolvedMethodDeclarationFromThisClassOrSuperClass(method)
+        val className = classInfo.xdDeclaredType.targetClassName
+        return getRequiredApiByAnnotation(methodDeclaration.annotations) ?: try {
             val psiClass = findPsiClass(className.canonicalName)
             val psiMethods = psiClass.findMethodsByName(
                     methodName, true

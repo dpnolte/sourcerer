@@ -23,7 +23,7 @@ data class SymbolResolvedClass (
         val indexedClass: IndexedClass
 )
 class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
-    // check if classOrInterfaceDeclarationProvider is assignable to View or LayoutParams
+    // check if getClassOrInterfaceDeclaration is assignable to View or LayoutParams
     fun resolveAll(): Map<ClassName, SymbolResolvedClass> {
         return resolve(ClassRegistry.getPotentialWidgetClasses())
     }
@@ -339,7 +339,7 @@ class ClassSymbolResolver(private val useCachedSuperClasses : Boolean = true) {
                         ClassOrInterfaceDeclaration::class.java, packageDeclaration
                 ).asReversed()
                 if (parents.isEmpty()) {
-                    //throw IllegalStateException("Parent classes cannot be empty for nested class ${classOrInterfaceDeclarationProvider.nameAsString} in $xdPackage")
+                    //throw IllegalStateException("Parent classes cannot be empty for nested class ${getClassOrInterfaceDeclaration.nameAsString} in $xdPackage")
                     ClassName(packageName, node.nameAsString)
                 } else {
                     try {

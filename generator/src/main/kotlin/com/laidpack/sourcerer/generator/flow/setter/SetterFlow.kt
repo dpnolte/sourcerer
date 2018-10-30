@@ -6,19 +6,12 @@ import com.github.javaparser.ast.expr.AssignExpr
 import com.github.javaparser.ast.expr.Expression
 import com.github.javaparser.ast.expr.LiteralStringValueExpr
 import com.github.javaparser.ast.expr.NameExpr
-import com.laidpack.sourcerer.generator.target.Attribute
-import com.laidpack.sourcerer.generator.target.Setter
 import com.laidpack.sourcerer.generator.descendantsOfType
-import com.laidpack.sourcerer.generator.peeker.ClassInfo
-import com.laidpack.sourcerer.generator.peeker.MethodInfo
+import com.laidpack.sourcerer.generator.index.ClassInfo
 import com.laidpack.sourcerer.generator.target.Parameter
 
 class SetterFlow (
-        private val interpreter: SetterFlowInterpreter,
-        private val setterInfo: MethodInfo,
-        private val setter: Setter,
         private val parameter: Parameter,
-        private val attribute: Attribute,
         val classInfo: ClassInfo
 ) {
     private val fields = mutableMapOf<String /* variable name */, FieldDeclaration>()

@@ -1,20 +1,24 @@
 package com.laidpack.sourcerer.generator.flow.attributes
 
 import android.content.res.TypedArray
+import com.github.javaparser.JavaParser
 import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.MethodDeclaration
 import com.github.javaparser.ast.body.VariableDeclarator
 import com.github.javaparser.ast.expr.*
+import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.type.Type
 import com.laidpack.sourcerer.generator.*
-import com.laidpack.sourcerer.generator.peeker.*
+import com.laidpack.sourcerer.generator.index.*
 import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.target.Parameter
 import com.laidpack.sourcerer.generator.target.Setter
 import com.laidpack.sourcerer.generator.target.TransformingCode
 import com.squareup.kotlinpoet.ClassName
+import kotlinx.dnq.query.*
+import java.lang.Exception
 
 enum class ConditionStmt {
     SWITCH,
@@ -54,7 +58,7 @@ class AttributeInSource(className: ClassName, name: String, val resourceName: St
     val transformingCodes = mutableListOf<TransformingCode>()
 }
 
-/** essentially state holder for classOrInterfaceDeclarationProvider handlers **/
+/** essentially consolidated node handler **/
 class AttributeFlow (
         val attributeSetVariableName: SimpleName,
         private val manager: AttributeManager,
@@ -86,6 +90,7 @@ class AttributeFlow (
             return cf != null && cf.isConditionalToAttribute
         }
     private var attributeControlFlowLevel: Int = -1
+    val typedArrayIndexToResourceName = mutableMapOf<Pair<String /* var name */, Int /* index number */>, String /* resource name */>()
 
     //private var conditionStmt: ConditionStmt = ConditionStmt.NONE
     val isConditionalToAttributeViaSwitchStmt : Boolean
@@ -177,7 +182,7 @@ class AttributeFlow (
 
     fun addAttribute(resourceName: String) {
         val name = manager.getNameFromResourceId(resourceName)
-        val attribute = AttributeInSource(classInfo.targetClassName, name, resourceName)
+        val attribute = AttributeInSource(classInfo.xdDeclaredType.targetClassName, name, resourceName)
         attributes[attribute.name] = attribute
     }
 
@@ -314,54 +319,13 @@ class AttributeFlow (
         return isConditionalToAttribute && classInfo.isPublicMethodCallFromThisClassOrSuperClass(methodCallExpr)
     }
 
-    fun isPublicField(name: String): Boolean {
-        val field = classInfo.getFieldFromThisClassOrSuperClass(name) ?: return false
-        return ClassInfo.isEligibleField(field)
-    }
-    fun getField(name: String): FieldDeclaration {
-        return classInfo.getFieldFromThisClassOrSuperClass(name)
-                ?: throw IllegalArgumentException("No field '$name' in ${classInfo.targetClassName}")
-    }
-    fun isField(name: String): Boolean {
-        return classInfo.getFieldFromThisClassOrSuperClass(name) != null
-    }
-
-    fun isPublicMethodCall(methodCallExpr: MethodCallExpr): Boolean {
-        return classInfo.isPublicMethodCallFromThisClassOrSuperClass(methodCallExpr)
-    }
-
-    fun isPublicStaticMethod(scope: NameExpr, methodName: String): Boolean {
-        val classOrInterfaceDeclaration = getClassDeclarationFromNameExpression(scope) ?: return false
-        val methodDeclaration = classOrInterfaceDeclaration.methods.first { it.nameAsString == methodName}
-        return methodDeclaration.isPublic
-                && methodDeclaration.isStatic
-    }
-
-    fun getClassDeclarationFromNameExpression(nameExpr: NameExpr): ClassOrInterfaceDeclaration? {
-        val name = nameExpr.nameAsString
-        val indexedClasses = ClassRegistry.findBySimpleName(name)
-        val xdClass : XdClass
-        xdClass = if (indexedClasses.size == 1) {
-            indexedClasses.first()
-        } else {
-            val cu = nameExpr.findRootNode() as? CompilationUnit ?: return null
-            val importDeclaration =  cu.imports.find { it.name.identifier == name } ?: return null
-            val canonicalName = ClassSymbolResolver.getCanonicalNameFromImport(importDeclaration)
-            indexedClasses.find { c ->
-                c.targetClassName.canonicalName == canonicalName
-            } ?: return null
-        }
-        return xdClass.classOrInterfaceDeclarationProvider()
-    }
-
-
     fun addVariableAsDerivedFromAttribute(variableName: String, methodCallExpr: MethodCallExpr, providedAttribute: AttributeInSource? = null) {
         val attribute = if (providedAttribute != null) providedAttribute else {
             ensureThereIsConditionalAttribute()
             currentAttribute
         }
 
-        val fieldMember = classInfo.getFieldFromThisClassOrSuperClass(variableName)
+        val fieldMember = classInfo.getFieldDeclarationFromThisClassOrSuperClass(variableName)
         if (fieldMember != null) {
             variablesToAttributes[variableName] = attribute.name
             // for the case, int m1 = m2 = m3 = attr
@@ -441,12 +405,12 @@ class AttributeFlow (
             otherAttributeNames: List<String>,
             providedAttribute: AttributeInSource? = null
     ) {
-        val setterInfo = classInfo.getMethodInfoByCallExpr(methodCallExpr) as MethodInfo
+        val setterInfo = classInfo.getMethodInfoByCallExpr(methodCallExpr) as XdMethod
         addSetterToAttribute(setterInfo, parameterIndex, otherAttributeNames, providedAttribute, methodCallExpr)
     }
 
     fun addSetterToAttribute(
-            setterInfo: MethodInfo,
+            setterInfo: XdMethod,
             parameterIndex: Int,
             otherAttributeNames: List<String>,
             providedAttribute: AttributeInSource? = null,
@@ -468,7 +432,7 @@ class AttributeFlow (
     }
 
     // setter is field (e.g., width in ViewGroup.LayoutParams)
-    fun addSetterToAttribute(fieldDeclaration: FieldDeclaration, providedAttribute: AttributeInSource? = null) {
+    fun addSetterToAttribute(xdField: XdField, providedAttribute: AttributeInSource? = null) {
         val attribute = if (providedAttribute != null) {
             providedAttribute
         } else {
@@ -476,7 +440,7 @@ class AttributeFlow (
             currentAttribute
         }
 
-        val setter = manager.getSetter(setters, fieldDeclaration)
+        val setter = manager.getSetter(setters, xdField)
         val setterHashCode = setter.hashCode()
         setters[setterHashCode] = setter
         manager.linkAttributeAndSetter(
@@ -555,39 +519,36 @@ class AttributeFlow (
         // addSetterToAttribute(methodCallExpr, parameterIndex, attributeNameList, attribute)
 
     }
-/*
-    private fun addSetterWithTransformingCode(methodCallExpr: MethodCallExpr, variablesNames: List<String>, attribute: AttributeInSource) {
-        ensureListIsNotEmpty(variablesNames)
-        variablesNames.forEachIndexed { index, name ->
-            val variable = getVariable(name)
-            val impactExpression = variable.attributeImpactExpression[attribute.name] as AssignExpr
-            val value = impactExpression.value.asNameExpr()
-            val resolvedValue = value.resolve() as JavaParserFieldDeclaration
-            val initializer = resolvedValue.variableDeclarator.initializer.get()
-            val valueLiteral = if (initializer.isLiteralStringValueExpr) {
-                "/* ${value.nameAsString} */ ${initializer.asLiteralStringValueExpr().value}"
-            } else ""
-            val conditionLiteral = "true"
-            val operator = impactExpression.operator
-            val transformingCode = TransformingCode(
-                    Boolean::class.java.canonicalName,
-                    variable.type.resolve().describe(),
-                    index,
-                    conditionLiteral,
-                    operator.asString(),
-                    operator.toString(),
-                    valueLiteral
-            )
-            attribute.transformingCodes.add(transformingCode)
-            attribute.targetClassNames.add(transformingCode.toClassNames)
+
+    fun isPublicStaticMethod(scope: NameExpr, methodName: String): Boolean {
+        val classOrInterfaceDeclaration = getClassDeclarationFromNameExpression(scope) ?: return false
+        val methodDeclaration = classOrInterfaceDeclaration.methods.first { it.nameAsString == methodName}
+        return methodDeclaration.isPublic
+                && methodDeclaration.isStatic
+    }
+
+    fun getClassDeclarationFromNameExpression(nameExpr: NameExpr): ClassOrInterfaceDeclaration? {
+        val name = nameExpr.nameAsString
+        val indexedClasses = DeclaredTypeRegistry.findBySimpleName(name)
+        val xdDeclaredType : XdDeclaredType
+        xdDeclaredType = if (indexedClasses.size == 1) {
+            indexedClasses.first()
+        } else {
+            val cu = nameExpr.findRootNode() as? CompilationUnit ?: return null
+            val importDeclaration =  cu.imports.find { it.name.identifier == name } ?: return null
+            val canonicalName = DeclaredSymbolResolver.getCanonicalNameFromImport(importDeclaration)
+            indexedClasses.find { c ->
+                c.targetClassName.canonicalName == canonicalName
+            } ?: return null
         }
-        addSetterToAttribute(methodCallExpr, Parameter.UNASSOCIATED_TO_PARAMETER, attribute)
-    }*/
+        return xdDeclaredType.getClassOrInterfaceDeclaration()
+    }
 
     fun addAttributesFromArguments(methodCallExpr: MethodCallExpr, resourceIdArguments: Map<Int, String>) {
-        val methodInfo = classInfo.getMethodInfoByCallExpr(methodCallExpr) as MethodInfo
+        val method = classInfo.getMethodInfoByCallExpr(methodCallExpr) as XdMethod
+        val methodDeclaration = classInfo.getResolvedMethodDeclarationFromThisClassOrSuperClass(method)
         resourceIdArguments.forEach { paramIndex, resourceName ->
-            val parameter = methodInfo.methodDeclaration.parameters[paramIndex]
+            val parameter = methodDeclaration.parameters[paramIndex]
             resourceNamesToParamNames[resourceName] = parameter.nameAsString
             addAttribute(resourceName)
         }
@@ -595,15 +556,16 @@ class AttributeFlow (
 
     }
 
-    fun visitNestedMethodWithTypedArrayParameter(targetExpr: NameExpr? = null, methodInfo: MethodInfo) {
+    fun visitNestedMethodWithTypedArrayParameter(targetExpr: NameExpr? = null, method: XdMethod) {
+        val methodDeclaration = classInfo.getResolvedMethodDeclarationFromThisClassOrSuperClass(method)
         val oldTypedArrayVariableNames = typedArrayVariableNames.toSet()
-        val typedArrayParameter = methodInfo.methodDeclaration.parameters.first { it.type.resolve().describe() == typedArrayCanonicalName }
+        val typedArrayParameter = methodDeclaration.parameters.first { it.type.resolve().describe() == typedArrayCanonicalName }
         typedArrayVariableNames.clear()
         typedArrayVariableNames.add(typedArrayParameter.name)
         withinNestedMethod = true
-        nestedMethodName = methodInfo.methodDeclaration.nameAsString
+        nestedMethodName = methodDeclaration.nameAsString
         if (targetExpr != null) variableNameAssignedByNestedMethod = targetExpr.name
-        interpreter.interpretNestedMethod(methodInfo)
+        interpreter.interpretNestedMethod(methodDeclaration)
         nestedMethodName = ""
         variableNameAssignedByNestedMethod = null
         withinNestedMethod = false
@@ -618,6 +580,200 @@ class AttributeFlow (
             variable.conditionalImpact[nestedMethodName] = mutableListOf()
         }
         variable.conditionalImpact[nestedMethodName]!!.add(conditionalImpact)
+    }
+
+
+    fun checkIfAnyNonDefaultAttributeIsObtained(methodCallExpr: MethodCallExpr) {
+        val scope = methodCallExpr.scope.get()
+        val typedArrayProviderVariable = if (scope is NameExpr && this.variables.containsKey(scope.nameAsString)) {
+            this.variables[scope.nameAsString] as Variable
+        } else null
+        val attributeProvidingClass = when {
+            scope is NameExpr && typedArrayProviderVariable != null -> {
+                getAttributeProvidingClass(typedArrayProviderVariable.type)
+            }
+            scope is MethodCallExpr && classInfo.isMethodCallFromThisClassOrSuperClass(scope) -> {
+                val xdMethod =  classInfo.getMethodInfoByCallExpr(scope) as XdMethod
+                getAttributeProvidingClass(xdMethod)
+            }
+            scope is NameExpr && classInfo.isFieldFromThisClassOrSuperClass(scope.nameAsString) -> {
+                val xdField = classInfo.getFieldFromThisClassOrSuperClass(scope.nameAsString) as XdField
+                getAttributeProvidingClass(xdField)
+            }
+            scope is NameExpr -> {
+                try {
+                    val type = JavaParser.parseClassOrInterfaceType(scope.nameAsString)
+                    getAttributeProvidingClass(type)
+                } catch (e: Exception) {
+                    throw IllegalArgumentException("Could not determine attribute providing class type for scope name ${scope.nameAsString}\nOriginal exception: $e")
+                }
+            }
+            else -> throw IllegalArgumentException("Could not determine attribute providing class type")
+        }
+
+        val resourceParamContext = getAttributeResourceIdParameterContext(attributeProvidingClass, methodCallExpr)
+        if (resourceParamContext.attributesResourceIdParamIndex != null) {
+            val variableDeclarator = methodCallExpr.firstAncestorOfType(VariableDeclarator::class.java)
+            val typedArrayVariable = if (variableDeclarator != null) {
+                this.variables[variableDeclarator.nameAsString]
+            } else null
+            val argument = methodCallExpr.arguments[resourceParamContext.attributesResourceIdParamIndex]
+            when {
+                argument is FieldAccessExpr -> {
+                    addNonDefaultAttributeForFieldAccessExpr(argument, typedArrayVariable, methodCallExpr)
+                }
+                argument is NameExpr && classInfo.isFieldFromThisClassOrSuperClass(argument.nameAsString) -> {
+                    val fieldDeclaration = classInfo.getResolvedFieldFromThisClassOrSuperClass(argument.asNameExpr().nameAsString)
+                    addNonDefaultAttributeFromFieldArray(fieldDeclaration, argument, typedArrayVariable, methodCallExpr)
+                }
+                argument is NameExpr && classInfo.isFieldFromParentClass(argument.nameAsString) -> {
+                    val fieldDeclaration = classInfo.getResolvedFieldDeclarationFromParentClass(argument.nameAsString)
+                    addNonDefaultAttributeFromFieldArray(fieldDeclaration, argument, typedArrayVariable, methodCallExpr)
+                }
+                else -> throw IllegalStateException("Could not convert argument '$argument' containing attribute resource ids into field access expressions")
+            }
+        }
+    }
+
+    private fun addNonDefaultAttributeFromFieldArray(
+            fieldDeclaration: FieldDeclaration,
+            argument: NameExpr,
+            typedArrayVariable: Variable? = null,
+            methodCallExpr: MethodCallExpr? = null
+    ) {
+        val variableDeclarator = fieldDeclaration.variables.first { it.nameAsString == argument.nameAsString }
+        val initializerExpr = variableDeclarator.initializer.get()
+        val arrayInitializerExpr = when (initializerExpr) {
+            is ArrayCreationExpr -> initializerExpr.initializer.get()
+            is ArrayInitializerExpr -> initializerExpr
+            else -> throw IllegalStateException("Cannot retrieve attribute value expressions from field ${argument.nameAsString}, class ${fieldDeclaration.firstAncestorOfType(ClassOrInterfaceDeclaration::class.java)?.nameAsString}")
+        }
+        val attrs = manager.getAnyNonDefaultAttributeObtained(arrayInitializerExpr.values)
+        attrs.forEachIndexed { index, attr ->
+            val methodCallInfo = if (methodCallExpr != null) {
+                " based on $methodCallExpr call"
+            } else ""
+            println("\t\t\tY - added attribute ${attr.name} to ${classInfo.xdDeclaredType.targetClassName}$methodCallInfo")
+            typedArrayVariable?.let {
+                typedArrayIndexToResourceName[Pair(it.name.asString(), index)] = attr.name
+            }
+            manager.addNonDefaultAttribute(attr)
+        }
+    }
+
+    private fun addNonDefaultAttributeForFieldAccessExpr(
+            fieldAccessExpr: FieldAccessExpr,
+            typedArrayVariable: Variable? = null,
+            methodCallExpr: MethodCallExpr? = null
+    ) {
+        val attrs = manager.getAnyNonDefaultAttributeObtained(
+                listOf(fieldAccessExpr)
+        )
+        attrs.forEachIndexed { index, attr ->
+            val methodCallInfo = if (methodCallExpr != null) {
+                " based on $methodCallExpr call"
+            } else ""
+            println("\t\t\tY - added attribute ${attr.name} to ${classInfo.xdDeclaredType.targetClassName}$methodCallInfo")
+            typedArrayVariable?.let {
+                typedArrayIndexToResourceName[Pair(it.name.asString(), index)] = fieldAccessExpr.nameAsString
+            }
+            manager.addNonDefaultAttribute(attr)
+        }
+    }
+
+    private fun getAttributeProvidingClass(type: Type): ClassInfo {
+        val typeAsString = type.asString()
+        if (!attributeProvidingClasses.containsKey(typeAsString)) {
+            if (type !is ClassOrInterfaceType) throw IllegalArgumentException("$type is not a class, enum or interface type")
+            val xdClass = DeclaredSymbolResolver.resolveDeclaredType(type)
+            val classDeclaration = xdClass.getClassOrInterfaceDeclaration()
+            if (!Store.transactional { xdClass.resolvedBody }) {
+                TypeBodyPeeker.peek(classDeclaration, xdClass)
+            }
+            attributeProvidingClasses[typeAsString] = ClassInfo(xdClass, classDeclaration)
+        }
+        return attributeProvidingClasses[typeAsString] as ClassInfo
+    }
+    private fun getAttributeProvidingClass(xdMethod: XdMethod): ClassInfo {
+        val canonicalName = xdMethod.describedReturnType
+        if (!attributeProvidingClasses.containsKey(canonicalName)) {
+            val xdClass = Store.transactional {
+                XdDeclaredType.query(
+                        XdDeclaredType::canonicalName eq canonicalName
+                ).first()
+            }
+            val classDeclaration = xdClass.getClassOrInterfaceDeclaration()
+            if (!Store.transactional { xdClass.resolvedBody }) {
+                TypeBodyPeeker.peek(classDeclaration, xdClass)
+            }
+            attributeProvidingClasses[canonicalName] = ClassInfo(xdClass, classDeclaration)
+        }
+        return attributeProvidingClasses[canonicalName] as ClassInfo
+    }
+    private fun getAttributeProvidingClass(xdField: XdField): ClassInfo {
+        val canonicalName = xdField.describedType
+        if (!attributeProvidingClasses.containsKey(canonicalName)) {
+            val xdClass = Store.transactional {
+                XdDeclaredType.query(
+                        XdDeclaredType::canonicalName eq canonicalName
+                ).first()
+            }
+            val classDeclaration = xdClass.getClassOrInterfaceDeclaration()
+            if (!Store.transactional { xdClass.resolvedBody }) {
+                TypeBodyPeeker.peek(classDeclaration, xdClass)
+            }
+            attributeProvidingClasses[canonicalName] = ClassInfo(xdClass, classDeclaration)
+        }
+        return attributeProvidingClasses[canonicalName] as ClassInfo
+    }
+
+    private fun getAttributeResourceIdParameterContext(
+            attributeProvidingClass: ClassInfo,
+            methodCallExpr: MethodCallExpr
+    ): ResourceParamContext {
+        val xdMethod = attributeProvidingClass.getMethodInfoByCallExpr(
+                methodCallExpr, checkIfMethodIsCalledFromCurrentClass = false
+        ) as XdMethod
+        val hashCode = Setter.getHashCodeFromMethodInfo(xdMethod)
+        if (!attributeResourceIdParameterIndexes.containsKey(hashCode)) {
+            val resourceParamContext = Store.transactional {
+                // ugh, TintTypedArray doesn't use annotations
+                val anyAnnotationUsed = xdMethod.parameters
+                        .toList()
+                        .any { xdParam ->
+                            xdParam.annotationNames.isNotEmpty()
+                        }
+                return@transactional if (anyAnnotationUsed) {
+                    val xdStylableResIdParam = xdMethod.parameters.query(
+                            XdConstructorOrMethodParameter::annotationNames contains "StyleRes"
+                    ).firstOrNull()
+                    val xdAttrResIdsParam = xdMethod.parameters.query(
+                            XdConstructorOrMethodParameter::annotationNames contains "StyleableRes"
+                    ).firstOrNull()
+                    ResourceParamContext(
+                            xdStylableResIdParam?.index,
+                            xdAttrResIdsParam?.index
+                    )
+                } else { // TintTypedArray case, fallback to param names
+                    val xdStylableResIdParam = xdMethod.parameters.query(
+                            XdConstructorOrMethodParameter::name eq "resid"
+                    )
+                            .toList()
+                            .firstOrNull { xdParam -> xdParam.describedType == "int" }
+                    val xdAttrResIdsParam = xdMethod.parameters.query(
+                            XdConstructorOrMethodParameter::name eq "attrs"
+                    )
+                            .toList()
+                            .firstOrNull {xdParam -> xdParam.describedType == "int[]"}
+                    ResourceParamContext(
+                            xdStylableResIdParam?.index,
+                            xdAttrResIdsParam?.index
+                    )
+                }
+            }
+            attributeResourceIdParameterIndexes[hashCode] = resourceParamContext
+        }
+        return attributeResourceIdParameterIndexes[hashCode] as ResourceParamContext
     }
 
     private fun getVariable(variableName: String): Variable {
@@ -651,8 +807,20 @@ class AttributeFlow (
     private fun ensureListIsNotEmpty(list: List<String>) {
         if (list.isEmpty()) throw IllegalStateException("At least one attributesToParameters item is required")
     }
+    private data class ResourceParamContext (
+            val styleableResourceIdParamIndex: Int?,
+            val attributesResourceIdParamIndex: Int?
+    )
     companion object {
         private val typedArrayCanonicalName = TypedArray::class.java.canonicalName
+        private val attributeProvidingClasses = mutableMapOf<String /* Type */, ClassInfo>()
+        private val attributeResourceIdParameterIndexes =
+                mutableMapOf<
+                        Int /* accessor hash code */,
+                        ResourceParamContext
+                >()
+
+
     }
 
 }

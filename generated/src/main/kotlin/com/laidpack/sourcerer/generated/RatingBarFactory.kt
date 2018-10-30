@@ -25,10 +25,14 @@ open class RatingBarFactory<TView : RatingBar, TAttributes : RatingBarAttributes
                     }
                 }
                 attributes.rating?.let {
-                    rating = it
+                    if (rating != it) {
+                        rating = it
+                    }
                 }
                 attributes.stepSize?.let {
-                    stepSize = it
+                    if (stepSize != it) {
+                        stepSize = it
+                    }
                 }
                 attributes.isIndicator?.let {
                     if (isIndicator != it) {

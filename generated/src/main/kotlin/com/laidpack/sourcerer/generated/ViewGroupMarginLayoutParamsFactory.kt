@@ -19,24 +19,40 @@ open class ViewGroupMarginLayoutParamsFactory<TLayoutParams : ViewGroup.MarginLa
         super.init(layoutParams, context, attributes)
         if (layoutParams is ViewGroup.MarginLayoutParams) {
             layoutParams.apply {
-                attributes.layout_marginLeft?.let {
-                    if (it != leftMargin) {
-                        leftMargin = it
+                if (attributes.layout_width.hasDimension || attributes.layout_width.hasEnum) {
+                    val localLayoutWidth = when {
+                        attributes.layout_width.hasDimension -> attributes.layout_width.dimension
+                        else -> attributes.layout_width.enum
+                    }
+                    if (localLayoutWidth != width) {
+                        width = localLayoutWidth
                     }
                 }
-                attributes.layout_marginTop?.let {
-                    if (it != topMargin) {
-                        topMargin = it
+                if (attributes.layout_height.hasDimension || attributes.layout_height.hasEnum) {
+                    val localLayoutHeight = when {
+                        attributes.layout_height.hasDimension -> attributes.layout_height.dimension
+                        else -> attributes.layout_height.enum
+                    }
+                    if (localLayoutHeight != height) {
+                        height = localLayoutHeight
                     }
                 }
-                attributes.layout_marginRight?.let {
-                    if (it != rightMargin) {
-                        rightMargin = it
+                if (attributes.layout_marginLeft != null || attributes.layout_marginBottom != null || attributes.layout_marginRight != null || attributes.layout_marginTop != null) {
+                    val localLayoutMarginLeftDimension = attributes.layout_marginLeft ?: leftMargin
+                    if (localLayoutMarginLeftDimension != leftMargin) {
+                        leftMargin = localLayoutMarginLeftDimension
                     }
-                }
-                attributes.layout_marginBottom?.let {
-                    if (it != bottomMargin) {
-                        bottomMargin = it
+                    val localLayoutMarginBottomDimension = attributes.layout_marginBottom ?: bottomMargin
+                    if (localLayoutMarginBottomDimension != bottomMargin) {
+                        bottomMargin = localLayoutMarginBottomDimension
+                    }
+                    val localLayoutMarginRightDimension = attributes.layout_marginRight ?: rightMargin
+                    if (localLayoutMarginRightDimension != rightMargin) {
+                        rightMargin = localLayoutMarginRightDimension
+                    }
+                    val localLayoutMarginTopDimension = attributes.layout_marginTop ?: topMargin
+                    if (localLayoutMarginTopDimension != topMargin) {
+                        topMargin = localLayoutMarginTopDimension
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 17) {

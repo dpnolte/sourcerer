@@ -2,9 +2,8 @@ package com.laidpack.sourcerer.generator
 
 import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.target.Setter
-import com.laidpack.sourcerer.generator.peeker.ClassInfo
-import com.laidpack.sourcerer.generator.peeker.ClassRegistry
-import com.laidpack.sourcerer.generator.peeker.TypedArrayInfo
+import com.laidpack.sourcerer.generator.index.ClassInfo
+import com.laidpack.sourcerer.generator.index.TypedArrayInfo
 
 interface Interpreter {
     fun interpret(earlierIdentifiedSetters: Map<Int, Setter>): InterpretationResult

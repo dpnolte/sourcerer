@@ -27,7 +27,9 @@ open class AppBarLayoutFactory<TView : AppBarLayout, TAttributes : AppBarLayoutA
                     }
                 }
                 attributes.liftOnScroll?.let {
-                    isLiftOnScroll = it
+                    if (isLiftOnScroll != it) {
+                        isLiftOnScroll = it
+                    }
                 }
             }
         }

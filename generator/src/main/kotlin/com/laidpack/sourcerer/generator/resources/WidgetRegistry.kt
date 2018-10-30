@@ -2,9 +2,13 @@ package com.laidpack.sourcerer.generator.resources
 
 import com.laidpack.sourcerer.generator.SourcererResult
 import com.laidpack.sourcerer.generator.Store
-import com.laidpack.sourcerer.generator.peeker.ClassInfo
-import com.laidpack.sourcerer.generator.peeker.XdClass
-import com.laidpack.sourcerer.generator.peeker.XdFile
+import com.laidpack.sourcerer.generator.index.ClassInfo
+import com.laidpack.sourcerer.generator.index.XdDeclaredType
+import com.laidpack.sourcerer.generator.index.XdFile
+import com.laidpack.sourcerer.generator.resources.widgets.AndroidWidgetConnoisseur
+import com.laidpack.sourcerer.generator.resources.widgets.MaterialDesignWidgetConnoisseur
+import com.laidpack.sourcerer.generator.resources.widgets.SupportWidgetConnoisseur
+import com.laidpack.sourcerer.generator.resources.widgets.WidgetConnoisseur
 import com.squareup.kotlinpoet.ClassName
 import kotlinx.dnq.query.*
 import java.lang.IllegalArgumentException
@@ -15,9 +19,12 @@ class WidgetRegistry(
         parsersList: List<WidgetConnoisseur>
 ): Iterable<Widget> {
 
-    val paths = parsersList.map { it.paths }.flatten()
+    private val sortedParsers = parsersList.sortedBy { it.priority }
+    val paths = sortedParsers
+            .map { it.paths }
+            .flatten()
     private val parsers = paths.associate { path ->
-        Pair(path, parsersList.first { it.paths.contains(path) })
+        Pair(path, sortedParsers.first { it.paths.contains(path) })
     }
     private val widgets by lazy {
         Store.transactional {
@@ -41,10 +48,10 @@ class WidgetRegistry(
     fun getPackageName(classInfo: ClassInfo): String {
         val widget = Store.transactional {
             Widget.query(
-                    (Widget::viewClass eq classInfo.xdClass)
+                    (Widget::viewClass eq classInfo.xdDeclaredType)
                             or
-                            (Widget::layoutParamClasses contains classInfo.xdClass)
-            ).firstOrNull() ?: throw  IllegalArgumentException("No widget for ${classInfo.targetClassName} found")
+                            (Widget::layoutParamClasses contains classInfo.xdDeclaredType)
+            ).firstOrNull() ?: throw  IllegalArgumentException("No widget for ${classInfo.xdDeclaredType.targetClassName} found")
         }
         return getPackageName(widget)
     }
@@ -52,9 +59,9 @@ class WidgetRegistry(
     fun getWidget(sourcererResult: SourcererResult): Widget {
         return Store.transactional {
             Widget.query(
-                    (Widget::viewClass eq sourcererResult.xdClass)
+                    (Widget::viewClass eq sourcererResult.xdDeclaredType)
                             or
-                            (Widget::layoutParamClasses contains sourcererResult.xdClass)
+                            (Widget::layoutParamClasses contains sourcererResult.xdDeclaredType)
             ).firstOrNull() ?: throw  IllegalArgumentException("No widget for sourcerer result '${sourcererResult.targetClassName}' found")
         }
     }
@@ -65,9 +72,9 @@ class WidgetRegistry(
     fun getPackageName(sourcererResult: SourcererResult): String {
         val widget = Store.transactional {
             Widget.query(
-                    (Widget::viewClass eq sourcererResult.xdClass)
+                    (Widget::viewClass eq sourcererResult.xdDeclaredType)
                             or
-                            (Widget::layoutParamClasses contains sourcererResult.xdClass)
+                            (Widget::layoutParamClasses contains sourcererResult.xdDeclaredType)
             )
         }.firstOrNull() ?: throw  IllegalArgumentException("No widget for sourcerer result found")
         return getPackageName(widget)
@@ -100,23 +107,23 @@ class WidgetRegistry(
 
     companion object {
         val defaultWidgetConnoisseurs = listOf(
-                AndroidWidgetParser(),
-                MaterialDesignWidgetParser(),
-                SupportWidgetParser()
+                AndroidWidgetConnoisseur(),
+                MaterialDesignWidgetConnoisseur(),
+                SupportWidgetConnoisseur()
         )
         fun create(
                 env: SourcererEnvironment,
                 widgetConnoisseurs: List<WidgetConnoisseur> = defaultWidgetConnoisseurs
         ): WidgetRegistry {
             widgetConnoisseurs.forEach {
-                it.setRootPath(env)
+                it.setScanPaths(env)
             }
             return WidgetRegistry(env, widgetConnoisseurs)
         }
 
         fun getWidgetViewClassName(classInfo: ClassInfo): ClassName {
             return Store.transactional {
-                val viewClass = classInfo.widget.viewClass as XdClass
+                val viewClass = classInfo.xdDeclaredType.widget?.viewClass as XdDeclaredType
                 viewClass.targetClassName
             }
         }

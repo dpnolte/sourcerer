@@ -6,7 +6,7 @@ import android.widget.VideoView
 import java.lang.Class
 import kotlin.String
 
-open class VideoViewFactory<TView : VideoView, TAttributes : VideoViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewFactory<TView, TAttributes>(instanceType, attributesType) {
+open class VideoViewFactory<TView : VideoView, TAttributes : VideoViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : SurfaceViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = VideoView(context)

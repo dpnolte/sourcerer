@@ -48,4 +48,5 @@ dependencies {
 	implementation "androidx.emoji:emoji-appcompat:$androidX"
 	implementation project(":services")
 	implementation project(":generated")
+	implementation project(":generated-appcompat")
 }

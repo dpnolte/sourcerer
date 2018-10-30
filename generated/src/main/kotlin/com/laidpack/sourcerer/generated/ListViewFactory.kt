@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import java.lang.Class
 import kotlin.String
 
-open class ListViewFactory<TView : ListView, TAttributes : ListViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AdapterViewFactory<TView, TAttributes>(instanceType, attributesType) {
+open class ListViewFactory<TView : ListView, TAttributes : ListViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AbsListViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = ListView(context)

@@ -6,7 +6,7 @@ import android.widget.CheckBox
 import java.lang.Class
 import kotlin.String
 
-open class CheckBoxFactory<TView : CheckBox, TAttributes : CheckBoxAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ButtonFactory<TView, TAttributes>(instanceType, attributesType) {
+open class CheckBoxFactory<TView : CheckBox, TAttributes : CheckBoxAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : CompoundButtonFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = CheckBox(context)

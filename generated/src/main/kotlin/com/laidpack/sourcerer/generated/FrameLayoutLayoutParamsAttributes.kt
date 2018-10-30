@@ -15,13 +15,19 @@ import kotlin.String
 @JsonClass(generateAdapter = true)
 @TypeScript
 open class FrameLayoutLayoutParamsAttributes(
-    @field:FlagsQualifier(flagsType = LayoutGravityFlagsEnum_::class) val layout_gravity: FlagsAccumulator? = null,
+    @field:FlagsQualifier(flagsType = LayoutGravityFlagsEnum::class) val layout_gravity: FlagsAccumulator? = null,
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
-    layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum))
-) : ViewGroupLayoutParamsAttributes(layout_width = layout_width, layout_height = layout_height),
+    layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
+    layout_marginLeft: Int? = null,
+    layout_marginBottom: Int? = null,
+    layout_marginRight: Int? = null,
+    layout_marginTop: Int? = null,
+    layout_marginStart: Int? = null,
+    layout_marginEnd: Int? = null
+) : ViewGroupMarginLayoutParamsAttributes(layout_width = layout_width, layout_height = layout_height, layout_marginLeft = layout_marginLeft, layout_marginBottom = layout_marginBottom, layout_marginRight = layout_marginRight, layout_marginTop = layout_marginTop, layout_marginStart = layout_marginStart, layout_marginEnd = layout_marginEnd),
         IAttributes
 
-enum class LayoutGravityFlagsEnum_(override val key: String, override val value: Int) : AttributeEnum {
+enum class LayoutGravityFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "top")
     Top("top", 48),
 

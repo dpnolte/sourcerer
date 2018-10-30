@@ -31,7 +31,9 @@ open class ImageViewFactory<TView : ImageView, TAttributes : ImageViewAttributes
                         attributes.src.hasColor -> ColorDrawable(attributes.src.color)
                         else -> ContextCompat.getDrawable(context, attributes.src.reference) as Drawable
                     }
-                    setImageDrawable(localSrc)
+                    if (drawable != localSrc) {
+                        setImageDrawable(localSrc)
+                    }
                 }
                 attributes.scaleType?.let {
                     val localScaleType = it.value.toScaleType()
@@ -69,9 +71,6 @@ open class ImageViewFactory<TView : ImageView, TAttributes : ImageViewAttributes
                         if (cropToPadding != it) {
                             cropToPadding = it
                         }
-                    }
-                    attributes.drawableAlpha?.let {
-                        imageAlpha = it
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 21) {

@@ -212,11 +212,11 @@ class IndexedClass(
                 Store.transactional {
                     //val scope = canonicalName.replace(xdPackage.packageName + ".", "")
                     cachedNode = JavaParser.parse(file.paths.toFile())
-                            .firstDescendantOfType(ClassOrInterfaceDeclaration::class.java) { classOrInterfaceDeclarationProvider ->
-                                classOrInterfaceDeclarationProvider.name.identifier == simpleName
+                            .firstDescendantOfType(ClassOrInterfaceDeclaration::class.java) { getClassOrInterfaceDeclaration ->
+                                getClassOrInterfaceDeclaration.name.identifier == simpleName
                             }
                     if (cachedNode == null) {
-                        throw IllegalStateException("Indexed class classOrInterfaceDeclarationProvider '$targetClassName' cannot be resolved @ ${file.urlAsString}")
+                        throw IllegalStateException("Indexed class getClassOrInterfaceDeclaration '$targetClassName' cannot be resolved @ ${file.urlAsString}")
                     }
                 }
             }

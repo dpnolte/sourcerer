@@ -4,7 +4,10 @@ import com.laidpack.sourcerer.generator.generators.ClassGeneratorManager
 import com.laidpack.sourcerer.generator.generators.ModuleGeneratorManager
 import com.laidpack.sourcerer.generator.generators.ProjectGeneratorManager
 import com.laidpack.sourcerer.generator.resources.*
+import com.laidpack.sourcerer.generator.resources.widgets.WidgetConnoisseur
 import com.squareup.kotlinpoet.ClassName
+import kotlinx.dnq.query.toList
+import java.lang.IllegalStateException
 
 
 data class ResultsPerModule(
@@ -58,7 +61,21 @@ fun main(args: Array<String>) {
         println("========================================")
         for (sourcererResult in resultsList.results) {
             val superClassPackageName = if(sourcererResult.superClassName != null) {
-                targetClassNameToPackageName[sourcererResult.superClassName]
+                if (targetClassNameToPackageName.containsKey(sourcererResult.superClassName)) {
+                    targetClassNameToPackageName[sourcererResult.superClassName]
+                } else {
+                    Store.transactional {
+                        for (xdSuperClass in sourcererResult.xdDeclaredType.superClasses.toList()) {
+                            val xdResult = xdSuperClass.sourcererResult
+                            if (xdResult != null) {
+                                val widget = widgetRegistry.getWidget(xdResult.toSnapshot(false))
+                                return@transactional widgetRegistry.getPackageName(widget)
+                            }
+                        }
+                    }
+                    throw IllegalStateException("No super class package name found")
+                }
+
             } else null
             val classGenerator = ClassGeneratorManager(
                     moduleDir,
@@ -98,14 +115,20 @@ fun main(args: Array<String>) {
 }
 
 fun getSuperClassResults(sourcererResult: SourcererResult, results: Map<ClassName, SourcererResult>): List<SourcererResult> {
-    var currentResult = sourcererResult
     val superClassResults = mutableListOf<SourcererResult>()
-    while(currentResult.superClassName != null) {
-        val superClassName = currentResult.superClassName as ClassName
-        val superClassResult = results[superClassName] as SourcererResult
-        superClassResults.add(superClassResult)
-        currentResult = superClassResult
+    Store.transactional {
+        for (xdSuperClass in sourcererResult.xdDeclaredType.superClasses.toList()) {
+            if (results.containsKey(xdSuperClass.targetClassName)) {
+                superClassResults.add(results[xdSuperClass.targetClassName] as SourcererResult)
+            } else {
+                val xdResult = xdSuperClass.sourcererResult
+                if (xdResult != null) {
+                    superClassResults.add(xdResult.toSnapshot(false))
+                }
+            }
+        }
     }
+
     return superClassResults
 }
 

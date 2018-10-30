@@ -20,8 +20,14 @@ open class CollapsingToolbarLayoutLayoutParamsAttributes(
     val layout_collapseParallaxMultiplier: Float? = null,
     layout_gravity: FlagsAccumulator? = null,
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
-    layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum))
-) : FrameLayoutLayoutParamsAttributes(layout_gravity = layout_gravity, layout_width = layout_width, layout_height = layout_height),
+    layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
+    layout_marginLeft: Int? = null,
+    layout_marginBottom: Int? = null,
+    layout_marginRight: Int? = null,
+    layout_marginTop: Int? = null,
+    layout_marginStart: Int? = null,
+    layout_marginEnd: Int? = null
+) : FrameLayoutLayoutParamsAttributes(layout_gravity = layout_gravity, layout_width = layout_width, layout_height = layout_height, layout_marginLeft = layout_marginLeft, layout_marginBottom = layout_marginBottom, layout_marginRight = layout_marginRight, layout_marginTop = layout_marginTop, layout_marginStart = layout_marginStart, layout_marginEnd = layout_marginEnd),
         IAttributes
 
 enum class LayoutCollapseModeEnum(override val key: String, override val value: Int) : AttributeEnum {
@@ -32,14 +38,5 @@ enum class LayoutCollapseModeEnum(override val key: String, override val value: 
     Pin("pin", 1),
 
     @Json(name = "parallax")
-    Parallax("parallax", 2),
-
-    @Json(name = "collapse_mode_off")
-    CollapseModeOff("collapse_mode_off", 0),
-
-    @Json(name = "collapse_mode_pin")
-    CollapseModePin("collapse_mode_pin", 1),
-
-    @Json(name = "collapse_mode_parallax")
-    CollapseModeParallax("collapse_mode_parallax", 2);
+    Parallax("parallax", 2);
 }

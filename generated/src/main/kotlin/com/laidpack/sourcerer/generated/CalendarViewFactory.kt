@@ -1,9 +1,11 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
 import android.widget.CalendarView
+import androidx.core.content.ContextCompat
 import java.lang.Class
 import kotlin.String
 
@@ -81,6 +83,12 @@ open class CalendarViewFactory<TView : CalendarView, TAttributes : CalendarViewA
                     attributes.weekSeparatorLineColor?.let {
                         if (weekSeparatorLineColor != it) {
                             weekSeparatorLineColor = it
+                        }
+                    }
+                    attributes.selectedDateVerticalBar?.let {
+                        val localSelectedDateVerticalBar = ContextCompat.getDrawable(context, it) as Drawable
+                        if (selectedDateVerticalBar != localSelectedDateVerticalBar) {
+                            selectedDateVerticalBar = localSelectedDateVerticalBar
                         }
                     }
                 }

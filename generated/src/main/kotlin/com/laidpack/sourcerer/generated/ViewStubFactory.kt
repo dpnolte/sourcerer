@@ -19,6 +19,11 @@ open class ViewStubFactory<TAttributes : ViewStubAttributes>(attributesType: Cla
         super.init(view, context, attributes)
         if (view is ViewStub) {
             view.apply {
+                attributes.id?.let {
+                    if (id != it) {
+                        id = it
+                    }
+                }
                 attributes.layout?.let {
                     if (layoutResource != it) {
                         layoutResource = it

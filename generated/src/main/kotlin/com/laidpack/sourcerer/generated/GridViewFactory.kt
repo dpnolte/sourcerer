@@ -7,7 +7,7 @@ import android.widget.GridView
 import java.lang.Class
 import kotlin.String
 
-open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AdapterViewFactory<TView, TAttributes>(instanceType, attributesType) {
+open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AbsListViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = GridView(context)
@@ -36,7 +36,7 @@ open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(i
                 }
                 if (Build.VERSION.SDK_INT >= 16) {
                     attributes.horizontalSpacing?.let {
-                        if (requestedHorizontalSpacing != it) {
+                        if (horizontalSpacing != it) {
                             horizontalSpacing = it
                         }
                     }
@@ -46,7 +46,7 @@ open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(i
                         }
                     }
                     attributes.columnWidth?.let {
-                        if (requestedColumnWidth != it) {
+                        if (columnWidth != it) {
                             columnWidth = it
                         }
                     }

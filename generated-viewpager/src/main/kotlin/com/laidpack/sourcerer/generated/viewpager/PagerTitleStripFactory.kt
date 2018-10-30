@@ -12,6 +12,22 @@ open class PagerTitleStripFactory<TView : PagerTitleStrip, TAttributes : PagerTi
 
     override fun createInstance(context: Context): View = PagerTitleStrip(context)
 
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is PagerTitleStrip) {
+            view.apply {
+                attributes.gravity?.let {
+                    val localGravity = it.value
+                    setGravity(localGravity)
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "pagerTitleStrip"
 

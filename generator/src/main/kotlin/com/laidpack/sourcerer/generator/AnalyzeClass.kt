@@ -2,19 +2,17 @@
 
 package com.laidpack.sourcerer.generator
 
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.laidpack.sourcerer.generator.flow.BaseNodeHandler
-import com.laidpack.sourcerer.generator.peeker.*
+import com.laidpack.sourcerer.generator.index.*
 import com.laidpack.sourcerer.generator.resources.*
-import com.laidpack.sourcerer.generator.target.XdAttribute
-import kotlinx.dnq.query.inEntities
-import kotlinx.dnq.query.query
-import kotlinx.dnq.query.toList
+import kotlinx.dnq.query.*
 import com.github.javaparser.ast.Node as JavaNode
 
 
 fun main(args: Array<String>) {
     //val input = "TextView" // simple name
-    val input = "androidx.wear.widget.WearableRecyclerView" // canonical name
+    val input = "androidx.drawerlayout.widget.DrawerLayout.LayoutParams" // canonical name
     SourcererEnvironment.printFlowInterpreterTrace = true
     val env = SourcererEnvironment(args)
     initParserAndStore(env)
@@ -25,13 +23,11 @@ fun main(args: Array<String>) {
 
     val indexedClasses = when {
         input.contains(".") ->  {
-            val indexedClass = ClassRegistry[input]
+            val indexedClass = DeclaredTypeRegistry[input]
             if (indexedClass != null) listOf(indexedClass) else listOf()
         }
-        else -> ClassRegistry.findBySimpleName(input)
+        else -> DeclaredTypeRegistry.findBySimpleName(input)
     }
-    var anyDependingDerivedClasses = listOf<XdClass>()
-    val anyDependingDerivedClassNames = mutableListOf<String>()
     when {
         indexedClasses.size > 1 -> {
             val classNames = Store.transactional {
@@ -40,61 +36,48 @@ fun main(args: Array<String>) {
             throw IllegalArgumentException("Multiple classes with (simple) name '$input' indexed.\nClasses:\n$classNames")
         }
         indexedClasses.size == 1 -> {
-            val indexedClass = indexedClasses.first()
+            val xdTargetType= indexedClasses.first()
 
-            val classesInFile = FileRegistry.getClassesInFile(indexedClass)
-            for (classInFile in classesInFile) {
-                println(classInFile.entityId.toString() + ": " + classInFile.targetClassName)
+            val xdTypesInFile = FileRegistry.getClassesInFile(xdTargetType)
+            val xdDerivedTypes = mutableListOf<XdDeclaredType>()
+            println("Following types will be invalidated:")
+            for (xdClassInFile in xdTypesInFile) {
+                println(xdClassInFile.entityId.toString() + ": " + xdClassInFile.targetClassName)
+                xdDerivedTypes.addAll(
+                        Store.transactional {
+                            XdDeclaredType.query(
+                                    XdDeclaredType::superClasses contains xdClassInFile
+                            ).toList().sortedByDescending { xdDerivedClass -> xdDerivedClass.superClasses.size() }
+                        }
+                )
             }
-            // if any attributes used by a derived class, remove cached index from derived class as well
-            Store.transactional {
-                indexedClass.sourcererResult?.let { xdResult ->
-                    val xdAttributesOfThisClass = xdResult.attributes.toList()
-                    anyDependingDerivedClasses = XdAttribute.query(
-                            XdAttribute::attributeDeclaredInSuperClass.inEntities(xdAttributesOfThisClass)
-                    )
-                    .toList()
-                    .map { it.sourcererResult.targetClass }
+            // if any attributes used by a derived class, invalidate these classes as well
+            if (xdDerivedTypes.isNotEmpty()) {
+                println("Following derived types will be invalidated:")
+                for (xdDerivedClass in xdDerivedTypes) {
+                    println(xdDerivedClass.entityId.toString() + ": " + xdDerivedClass.targetClassName)
+                    FileRegistry.deleteFileIndexByClass(xdDerivedClass)
                 }
             }
-            // remove class index to force re-index
-            anyDependingDerivedClasses.forEach { derivedClass ->
-                try {
-                    anyDependingDerivedClassNames.add(derivedClass.targetClassName.canonicalName)
-                    FileRegistry.deleteFileIndexByClass(derivedClass)
-                } catch (e: Exception) {
-                    // continue
-                }
-
-            }
-            FileRegistry.deleteFileIndexByClass(indexedClass)
+            FileRegistry.deleteFileIndexByClass(xdTargetType)
             //Store.deleteSourcererResult(simpleName)
         }
         else -> throw java.lang.IllegalArgumentException("No class found with (simple) name '$input'")
     }
 
-    ClassIndexer.scan(widgetRegistry, reindexAll = false)
-    val targetClass = when {
+    TypeIndexer.scan(widgetRegistry, reindexAll = false)
+    val xdTargetType = when {
         input.contains(".") -> {
-            ClassRegistry[input] ?: throw IllegalStateException("Class '$input' not found")
+            DeclaredTypeRegistry[input] ?: throw IllegalStateException("Class '$input' not found")
         }
-        else -> ClassRegistry.findBySimpleName(input).first()
+        else -> DeclaredTypeRegistry.findBySimpleName(input).first()
     }
-    sourcerer.generateFactoriesForClass(targetClass)
-
-    // process any dependent classes
-    if (anyDependingDerivedClassNames.isNotEmpty()) {
-        SourcererEnvironment.printFlowInterpreterTrace = false
-        println("=======================================")
-        println("=======================================")
-        println("=======================================")
-        println("Processing derived depending classes")
-        anyDependingDerivedClassNames.forEach {
-            val dependingTargetClass = ClassRegistry[it] ?: throw IllegalStateException("Class '$input' not found")
-            sourcerer.generateFactoriesForClass(dependingTargetClass)
-        }
+    val typeDeclaration = xdTargetType.getTypeDeclaration()
+    if (typeDeclaration is ClassOrInterfaceDeclaration) {
+        sourcerer.generateFactoriesForClass(xdTargetType)
+        BaseNodeHandler.printExecutionTimes()
+    } else {
+        TypeBodyPeeker.peek(typeDeclaration, xdTargetType)
     }
-
-    BaseNodeHandler.printExecutionTimes()
 }
 

@@ -5,27 +5,54 @@ import com.github.javaparser.ast.body.*
 import com.github.javaparser.ast.expr.ObjectCreationExpr
 import java.util.function.BiPredicate
 
-// from: https://tomassetti.me/resolve-method-calls-using-java-symbol-solver/
-class SpecificNodeIterator<T>(private val type: Class<T>, private val nodeHandler: (node: T) -> Boolean) {
-
-    fun explore(node: Node) {
+// based on: https://tomassetti.me/resolve-method-calls-using-java-symbol-solver/
+class SpecificNodeIterator<T>(
+        private val type: Class<T>,
+        private val nodeHandler: (node: T) -> Boolean
+) {
+    fun explore(node: Node, path: MutableList<Int> = mutableListOf()) {
         if (type.isInstance(node)) {
             if (!nodeHandler(type.cast(node))) {
                 return
             }
         }
-        for (child in node.childNodes) {
-            explore(child)
+        node.childNodes.forEachIndexed { index, child ->
+            explore(child, path)
+        }
+    }
+}
+class PathAwareNodeIterator<T>(
+        private val type: Class<T>,
+        private val nodeHandler: (node: T, path: List<Int>) -> Boolean
+) {
+    fun explore(node: Node, path: List<Int> = listOf()) {
+        if (type.isInstance(node)) {
+            if (!nodeHandler(type.cast(node), path)) {
+                return
+            }
+        }
+        node.childNodes.forEachIndexed { index, child ->
+            val nextPath = path.toMutableList()
+            nextPath.add(index)
+            explore(child, nextPath)
         }
     }
 }
 
-fun <T> Node.descendantsOfType(type: Class<T>, predicate: (T) -> Boolean = {true}) : List<T> {
+fun <T> Node.descendantsOfType(
+        type: Class<T>,
+        predicate: (T) -> Boolean = {true}
+) : List<T> {
     val descendants = mutableListOf<T>()
-    SpecificNodeIterator(type, fun(node: T): Boolean {
-            descendants.add(node)
-            return true
-    }).explore(this)
+    SpecificNodeIterator(
+            type,
+            nodeHandler =  fun(node: T): Boolean {
+                if (predicate(node)) {
+                    descendants.add(node)
+                }
+                return true
+            }
+    ).explore(this)
     return descendants
 }
 fun <T> Node.firstDescendantOfType(type: Class<T>, predicate: (T) -> Boolean = {true}) : T? {
@@ -40,6 +67,22 @@ fun <T> Node.firstDescendantOfType(type: Class<T>, predicate: (T) -> Boolean = {
     return descendant
 }
 
+fun <T> Node.descendantsAndPatshOfType(
+        type: Class<T>,
+        predicate: (T) -> Boolean = {true}
+) : List<Pair<T, List<Int>>> {
+    val descendants = mutableListOf<Pair<T, List<Int>>>()
+    PathAwareNodeIterator(
+            type,
+            nodeHandler =  fun(node, path): Boolean {
+                if (predicate(node)) {
+                    descendants.add(Pair(node, path))
+                }
+                return true
+            }
+    ).explore(this)
+    return descendants
+}
 
 class ReverseSpecificNodeIterator<T>(private val type: Class<T>, private val nodeHandler: (node: T) -> Boolean) {
     fun explore(node: Node) {

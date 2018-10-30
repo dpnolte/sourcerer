@@ -35,10 +35,14 @@ open class TabLayoutFactory<TView : TabLayout, TAttributes : TabLayoutAttributes
                     }
                 }
                 attributes.tabIndicatorFullWidth?.let {
-                    isTabIndicatorFullWidth = it
+                    if (isTabIndicatorFullWidth != it) {
+                        isTabIndicatorFullWidth = it
+                    }
                 }
                 attributes.tabMode?.let {
-                    tabMode = it.value
+                    if (tabMode != it.value) {
+                        tabMode = it.value
+                    }
                 }
                 attributes.tabGravity?.let {
                     if (tabGravity != it.value) {
@@ -57,7 +61,9 @@ open class TabLayoutFactory<TView : TabLayout, TAttributes : TabLayoutAttributes
                     }
                 }
                 attributes.tabUnboundedRipple?.let {
-                    setUnboundedRipple(it)
+                    if (hasUnboundedRipple() != it) {
+                        setUnboundedRipple(it)
+                    }
                 }
             }
         }

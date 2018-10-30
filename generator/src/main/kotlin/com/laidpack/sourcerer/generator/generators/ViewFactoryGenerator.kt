@@ -1,7 +1,7 @@
 package com.laidpack.sourcerer.generator.generators
 
 import android.view.View
-import com.laidpack.sourcerer.generator.peeker.ViewConstructorExpression
+import com.laidpack.sourcerer.generator.index.ViewConstructorExpression
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.target.CodeBlock
 import com.squareup.kotlinpoet.*

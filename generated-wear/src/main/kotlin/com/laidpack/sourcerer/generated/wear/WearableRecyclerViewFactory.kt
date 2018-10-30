@@ -21,7 +21,9 @@ open class WearableRecyclerViewFactory<TView : WearableRecyclerView, TAttributes
         if (view is WearableRecyclerView) {
             view.apply {
                 attributes.bezelWidth?.let {
-                    bezelFraction = it
+                    if (bezelFraction != it) {
+                        bezelFraction = it
+                    }
                 }
                 attributes.circularScrollingGestureEnabled?.let {
                     if (isCircularScrollingGestureEnabled != it) {
@@ -29,7 +31,9 @@ open class WearableRecyclerViewFactory<TView : WearableRecyclerView, TAttributes
                     }
                 }
                 attributes.scrollDegreesPerScreen?.let {
-                    scrollDegreesPerScreen = it
+                    if (scrollDegreesPerScreen != it) {
+                        scrollDegreesPerScreen = it
+                    }
                 }
             }
         }

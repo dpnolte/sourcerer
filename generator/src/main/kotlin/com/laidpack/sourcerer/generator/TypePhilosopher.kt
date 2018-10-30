@@ -1,13 +1,10 @@
 package com.laidpack.sourcerer.generator
 
-import com.github.javaparser.ast.expr.AnnotationExpr
 import com.laidpack.sourcerer.generator.generators.MultiFormatGenerator
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 import com.laidpack.sourcerer.generator.generators.delegates.DelegateGeneratorBase
-import com.laidpack.sourcerer.generator.peeker.ClassInfo
-import com.laidpack.sourcerer.generator.peeker.MethodInfo
+import com.laidpack.sourcerer.generator.index.ClassInfo
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
-import com.laidpack.sourcerer.generator.resources.StyleableAttribute
 import com.laidpack.sourcerer.generator.target.*
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeName
@@ -190,11 +187,6 @@ class TypePhilosopher(
             attribute.formats.size == 1 -> {
                 val format = attribute.formats.first()
                 when {
-                    (format == StyleableAttributeFormat.Unspecified || format == StyleableAttributeFormat.Integer) && setter.isPropertyCategorizedAsMeasurementInViewDebug ->
-                        AttributeTypeResult(
-                            StyleableAttributeFormat.Dimension.toClass().asTypeName(),
-                            setOf(StyleableAttributeFormat.Dimension)
-                    )
                     format != StyleableAttributeFormat.Unspecified ->
                         AttributeTypeResult(
                             format.toClass().asTypeName(),
@@ -326,9 +318,8 @@ class TypePhilosopher(
                     "InterpolatorRes" -> return StyleableAttributeFormat.Reference
                     "AnyRes" -> return StyleableAttributeFormat.Reference
                 }
-                if (classInfo.intDefinedAnnotations.containsKey(annotation)) {
-                    val annotationExpr = classInfo.intDefinedAnnotations[annotation] as AnnotationExpr
-                    attr.enumValues.addAll(classInfo.convertIntDefinedAnnotationToEnum(annotationExpr))
+                if (classInfo.isIntDefAnnotation(annotation)) {
+                    attr.enumValues.addAll(classInfo.getIntDefAnnotationAsAttributeEnum(annotation))
                     return StyleableAttributeFormat.Enum
                 }
                 // check if annotation defines int

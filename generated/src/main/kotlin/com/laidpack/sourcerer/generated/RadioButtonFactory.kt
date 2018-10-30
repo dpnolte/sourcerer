@@ -6,7 +6,7 @@ import android.widget.RadioButton
 import java.lang.Class
 import kotlin.String
 
-open class RadioButtonFactory<TView : RadioButton, TAttributes : RadioButtonAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ButtonFactory<TView, TAttributes>(instanceType, attributesType) {
+open class RadioButtonFactory<TView : RadioButton, TAttributes : RadioButtonAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : CompoundButtonFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = RadioButton(context)

@@ -1,7 +1,8 @@
 package com.laidpack.sourcerer.generator
 
-import com.laidpack.sourcerer.generator.peeker.*
+import com.laidpack.sourcerer.generator.index.*
 import com.laidpack.sourcerer.generator.resources.*
+import com.laidpack.sourcerer.generator.resources.widgets.XdWidgetSource
 import com.laidpack.sourcerer.generator.target.*
 import jetbrains.exodus.database.TransientEntityStore
 import jetbrains.exodus.database.TransientStoreSession
@@ -18,7 +19,7 @@ object Store {
         XdModel.registerNodes(
                 XdSourcererResult,
                 XdClassCategory,
-                XdClass,
+                XdDeclaredType,
                 XdFile,
                 XdPackage,
                 Widget,
@@ -36,7 +37,14 @@ object Store {
                 XdResolvedStatus,
                 XdCallSignatureMap,
                 XdAttributeToParameterIndex,
-                XdConstructorExpression
+                XdConstructorExpression,
+                XdConstructor,
+                XdField,
+                XdIntDefAnnotation,
+                XdIntDefAnnotationValue,
+                XdMethod,
+                XdConstructorOrMethodParameter,
+                XdEnumEntry
         )
 
         val store = StaticStoreContainer.init(
@@ -74,8 +82,8 @@ object Store {
 
     fun deleteSourcererResult(simpleName: String) {
         instance.transactional {
-            val indexedClasses = XdClass.query(
-                    XdClass::simpleName eq simpleName
+            val indexedClasses = XdDeclaredType.query(
+                    XdDeclaredType::simpleName eq simpleName
             ).toList()
             if (indexedClasses.size == 1) {
                 val xdResult = indexedClasses.first().sourcererResult as XdSourcererResult
@@ -100,8 +108,8 @@ object Store {
 
     fun deleteSourcererResults() {
         instance.transactional {
-            XdClass.query(
-                    XdClass::sourcererResult ne null
+            XdDeclaredType.query(
+                    XdDeclaredType::sourcererResult ne null
             ).asSequence().forEach {
                 it.sourcererResult = null
             }

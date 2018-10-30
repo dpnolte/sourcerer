@@ -6,7 +6,7 @@ import android.widget.MultiAutoCompleteTextView
 import java.lang.Class
 import kotlin.String
 
-open class MultiAutoCompleteTextViewFactory<TView : MultiAutoCompleteTextView, TAttributes : MultiAutoCompleteTextViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : EditTextFactory<TView, TAttributes>(instanceType, attributesType) {
+open class MultiAutoCompleteTextViewFactory<TView : MultiAutoCompleteTextView, TAttributes : MultiAutoCompleteTextViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AutoCompleteTextViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = MultiAutoCompleteTextView(context)

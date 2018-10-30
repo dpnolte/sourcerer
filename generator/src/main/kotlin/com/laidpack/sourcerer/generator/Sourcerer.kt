@@ -5,16 +5,15 @@ import com.laidpack.sourcerer.generator.generators.ClassGeneratorManager
 import com.laidpack.sourcerer.generator.javadoc.JavaDocInterpreter
 import com.laidpack.sourcerer.generator.lint.ApiDetector
 import com.laidpack.sourcerer.generator.lint.ApiRequirementsChecker
-import com.laidpack.sourcerer.generator.peeker.*
+import com.laidpack.sourcerer.generator.index.*
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeManager
 import com.laidpack.sourcerer.generator.resources.Widget
 import com.laidpack.sourcerer.generator.resources.WidgetRegistry
 import com.laidpack.sourcerer.generator.target.*
 import com.squareup.kotlinpoet.ClassName
-import jetbrains.exodus.entitystore.Entity
-import kotlinx.dnq.*
 import kotlinx.dnq.query.*
+import kotlin.system.measureTimeMillis
 
 class Sourcerer(
         private val env: SourcererEnvironment,
@@ -23,35 +22,37 @@ class Sourcerer(
         private val attrsXmlManager: StyleableAttributeManager = StyleableAttributeManager(env)
 ) {
     private val setters = mutableMapOf<Int, Setter>()
-    private val typedArrayInfo = ClassRegistry.getTypedArrayInfo(env.sdkStructure)
+    private val typedArrayInfo = DeclaredTypeRegistry.getTypedArrayInfo(env.sdkStructure)
     private val interpreterFactories = listOf(
             FlowInterpreter,
             JavaDocInterpreter
     )
 
     fun generateFactoriesForAllWidgets() {
-        for(indexedClass in ClassRegistry.getPotentialWidgetClasses()) {
+        for(indexedClass in DeclaredTypeRegistry.getPotentialWidgetClasses()) {
             generateFactoriesForClass(indexedClass)
         }
     }
 
-    fun generateFactoriesForClass(xdClass: XdClass) {
+    fun generateFactoriesForClass(xdDeclaredType: XdDeclaredType) {
         println("=================================")
-        println("Processing ${xdClass.targetClassName.canonicalName}")
-        var result = getSavedResult(xdClass)
-        if (result == null) {
+        println("Processing ${xdDeclaredType.targetClassName.canonicalName}")
+        val savedResult = getSavedResult(xdDeclaredType)
+        val result = if (savedResult == null) {
             println("\t--retrieving class info")
-            val classInfo = ClassRegistry.getClassInfo(xdClass)
+            ensureSuperClassesHaveResolvedAttributes(xdDeclaredType)
+            val classInfo = DeclaredTypeRegistry.getClassInfo(xdDeclaredType)
             if (classInfo != null) {
-                result = analyzeSourceOfClass(classInfo)
+                resolveAttributesInClass(classInfo)
             } else {
                 println("\t--invalid class")
+                null
             }
         } else {
             println("\t--retrieved saved result")
+            savedResult
         }
         if (result != null) {
-
             val generator = ClassGeneratorManager(
                     env.stubModuleDir,
                     SourcererEnvironment.generatedPackageName,
@@ -71,22 +72,25 @@ class Sourcerer(
         println("=================================")
     }
 
-    fun analyzeSourceOfClass(classInfo: ClassInfo, checkIfSuperClassesAreResolved: Boolean = true): SourcererResult {
-        if (checkIfSuperClassesAreResolved) {
-            ensureSuperClassesHaveResolvedAttributes(classInfo)
-        }
-
+    private fun resolveAttributesInClass(classInfo: ClassInfo): SourcererResult {
         val savedResult = getSavedResult(classInfo)
         if (savedResult != null) {
             println("\t--restored saved result")
             return savedResult
         }
 
+        val xdDeclaredType = classInfo.xdDeclaredType
         /** get attributes from attrs.xml **/
-        val attributes = if (attrsXmlManager.hasAttributesDefined(classInfo.targetClassName, classInfo.widget)) {
+        val attributes = if (attrsXmlManager.hasAttributesDefined(xdDeclaredType.targetClassName, xdDeclaredType.widget as Widget)) {
             attrsXmlManager.getAttributesFromXml(classInfo).toMutableMap()
         } else mutableMapOf()
-        val attributeManager = AttributeManager(classInfo, attributes)
+        val attributeManager = AttributeManager(
+                classInfo,
+                attributes,
+                attrsXmlManager.getStyleableNameFromClassName(xdDeclaredType.targetClassName),
+                attrsXmlManager,
+                env.androidResourceManager
+        )
 
         /** interpret interesting methods/constructors and derive setters + attributes **/
         var codeBlocks : List<CodeBlock>
@@ -99,22 +103,25 @@ class Sourcerer(
             println("\t\tNo attributes specified. Try to derive attributes from source code")
         }
         interpreterFactories.forEach { factory ->
-            val interpreter = factory.create(
-                    classInfo,
-                    typedArrayInfo,
-                    attributeManager,
-                    attributesDefinedInXml
-            )
-            val interpretationResult = interpreter.interpret(setters)
-            mergeInterpretations(attributes, interpretationResult)
-            println("\t\t------------")
-            println("\t\t${classInfo.targetClassName.simpleName}'s attributes identified with ${interpretationResult.name} interpretation: ${interpretationResult.identified}/${attributes.size}")
-            println("\t\t-- of which are newly identified: ${interpretationResult.identifiedNew}/${attributes.size}")
-            println("\t\t${classInfo.targetClassName.simpleName}'s attributes resolved with ${interpretationResult.name} interpretation: ${interpretationResult.resolved}/${attributes.size}")
+            val elapsedTime = measureTimeMillis {
+                val interpreter = factory.create(
+                        classInfo,
+                        typedArrayInfo,
+                        attributeManager,
+                        attributesDefinedInXml
+                )
+                val interpretationResult = interpreter.interpret(setters)
+                mergeInterpretations(attributes, interpretationResult)
+                println("\t\t------------")
+                println("\t\t${xdDeclaredType.targetClassName.simpleName}'s attributes identified with ${interpretationResult.name} interpretation: ${interpretationResult.identified}/${attributes.size}")
+                println("\t\t-- of which are newly identified: ${interpretationResult.identifiedNew}/${attributes.size}")
+                println("\t\t${xdDeclaredType.targetClassName.simpleName}'s attributes resolved with ${interpretationResult.name} interpretation: ${interpretationResult.resolved}/${attributes.size}")
+            }
+            println("\t\t\telapsed time: $elapsedTime ms")
         }
-
         println("\t\t------------")
         /** resolve type and group attributes to code blocks **/
+        var startTime = System.currentTimeMillis()
         val codeBlockCollector = CodeBlockCollector(classInfo, attributeManager)
         val potentialResolvedAttributes = attributes.filter { it.value.resolvedStatus == ResolvedStatus.SETTER_DEFINED }
         codeBlocks = codeBlockCollector.reflectOnCodeBlockSociety(potentialResolvedAttributes, setters)
@@ -122,67 +129,92 @@ class Sourcerer(
         codeBlocks = typePhilosopher.contemplateOnTheMeaningOfTypes(codeBlocks)
         resolvedAttributes = codeBlocks.map { it.attributes.values }.flatten().associateBy { it.name }
         resolvedSetters = codeBlocks.map { it.setters.values }.flatten().associateBy { it.hashCode() }
-        println("\t\t${classInfo.targetClassName.simpleName}'s attributes resolved total: ${resolvedAttributes.size}/${attributes.size}")
+        var elapsedTime = System.currentTimeMillis() - startTime
+        println("\t\t${xdDeclaredType.targetClassName.simpleName}'s attributes resolved total: ${resolvedAttributes.size}/${attributes.size}")
+        println("\t\t\tresolved code blocks and types for ${xdDeclaredType.targetClassName.simpleName}  - $elapsedTime ms")
 
         var fallbackClassName: ClassName? = null
         var classMiniApiLevel = ApiDetector.UNKNOWN_OR_VERSION_1
         if (apiRequirementsChecker.canCheckRequirements(classInfo)) {
+            startTime = System.currentTimeMillis()
             println("\t--checking minimum api level requirements")
             val apiRequirements = apiRequirementsChecker.checkMinApiRequirements(classInfo, codeBlocks)
-            println("\t\t------------")
-            println("\t\t${classInfo.targetClassName.simpleName} min api level: ${if (apiRequirements.classMinApiLevel == -1) "unknown or version 1" else apiRequirements.classMinApiLevel.toString()}")
-            println("\t\tFallback class if any?: ${apiRequirements.fallbackClassName ?: "None"}")
-            println("\t\t${apiRequirements.codeBlockMinApiLevelList.count { it > env.minSdkVersion }}/${apiRequirements.codeBlockMinApiLevelList.size} code blocks have min api level requirements (min sdk: ${env.minSdkVersion})")
-            println("\t\t------------")
             apiRequirements.assignMinApiLevelRequirementsToCodeBlocks(codeBlocks)
             fallbackClassName = apiRequirements.fallbackClassName
             classMiniApiLevel = apiRequirements.classMinApiLevel
+            println("\t\t------------")
+            println("\t\t${classInfo.xdDeclaredType.targetClassName.simpleName} min api level: ${if (apiRequirements.classMinApiLevel == -1) "unknown or version 1" else apiRequirements.classMinApiLevel.toString()}")
+            println("\t\t\tFallback class if any?: ${apiRequirements.fallbackClassName ?: "None"}")
+            println("\t\t\t${apiRequirements.codeBlockMinApiLevelList.count { it > env.minSdkVersion }}/${apiRequirements.codeBlockMinApiLevelList.size} code blocks have min api level requirements (min sdk: ${env.minSdkVersion})")
+            elapsedTime = System.currentTimeMillis() - startTime
+            println("\t\t\telapsed time - $elapsedTime ms")
+            println("\t\t------------")
         }
 
         val packageName = widgetRegistry.getPackageName(classInfo)
-        val result = SourcererResult(
-                classInfo.targetClassName,
-                if(classInfo.hasSuperClass) classInfo.superClassNames.first() else null,
-                fallbackClassName,
-                getDefaultLayoutParamClass(classInfo),
-                classInfo.classDeclaration.isAbstract,
-                classInfo.classDeclaration.isFinal,
-                classInfo.constructorExpression,
-                classInfo.classDeclaration.typeParameters.size,
-                classInfo.classCategory,
-                classInfo.isViewGroup,
-                classMiniApiLevel,
-                resolvedAttributes,
-                resolvedSetters,
-                codeBlocks,
-                classInfo.xdClass,
-                packageName
-        )
+        val superClassName = Store.transactional {
+            xdDeclaredType.superClasses.toList()
+                    .sortedByDescending { xdSuperClass -> xdSuperClass.superClasses.size() }
+                    .find { xdSuperClass ->
+                        xdSuperClass.sourcererResult != null
+                    }?.targetClassName
+        }
+        val result = Store.transactional {
+            SourcererResult(
+                    xdDeclaredType.targetClassName,
+                    superClassName,
+                    fallbackClassName,
+                    getDefaultLayoutParamClass(classInfo),
+                    classInfo.classDeclaration.isAbstract,
+                    classInfo.classDeclaration.isFinal,
+                    xdDeclaredType.constructorExpression?.toEnum(false) as ConstructorExpression,
+                    classInfo.classDeclaration.typeParameters.size,
+                    xdDeclaredType.classCategory?.toEnum(false) as ClassCategory,
+                    xdDeclaredType.isViewGroup,
+                    classMiniApiLevel,
+                    resolvedAttributes,
+                    resolvedSetters,
+                    codeBlocks,
+                    classInfo.xdDeclaredType,
+                    packageName
+            )
+        }
         saveResult(result)
 
         return result
     }
 
-    private fun ensureSuperClassesHaveResolvedAttributes(classInfo: ClassInfo) {
-        println("\t--retrieving super classes info")
-        val unresolvedSuperClassNames = mutableSetOf<ClassName>()
+    private fun ensureSuperClassesHaveResolvedAttributes(xdDeclaredType: XdDeclaredType) {
+        println("\t--verifying that super classes are resolved")
+        var areAllSuperClassesResolved = true
         Store.transactional {
-            for (superClass in classInfo.xdClass.superClasses) {
-                if (superClass.sourcererResult == null && superClass.resolvedWidgetSymbol) {
-                    unresolvedSuperClassNames.add(superClass.targetClassName)
+            val xdSuperClasses = xdDeclaredType.superClasses.toList().sortedBy { xdSuperClass -> xdSuperClass.superClasses.size() }
+            for (xdSuperClass in xdSuperClasses) {
+                if (xdSuperClass.sourcererResult == null && xdSuperClass.widget != null) {
+                    val superClassInfo = DeclaredTypeRegistry.getClassInfo(xdSuperClass) as ClassInfo
+                    println("\t- super class ${xdSuperClass.targetClassName.simpleName} not yet resolved")
+                    resolveAttributesInClass(superClassInfo)
+                    areAllSuperClassesResolved = false
                 }
             }
         }
-        if (unresolvedSuperClassNames.isNotEmpty()) {
-            for (superClassInfo in classInfo.superClassesInfo) {
-                if (unresolvedSuperClassNames.contains(superClassInfo.targetClassName)) {
-                    println("\t--super class ${superClassInfo.targetClassName} not yet resolved, analyze source")
-                    analyzeSourceOfClass(superClassInfo, checkIfSuperClassesAreResolved = false)
+        if (areAllSuperClassesResolved) {
+            println("\t--all super classes are resolved")
+        }
+        println("\t--returning to initial target class ${xdDeclaredType.targetClassName}")
+    }
+
+    private fun getSuperClassResults(result: SourcererResult): List<SourcererResult> {
+        val superClassResults = mutableListOf<SourcererResult>()
+        Store.transactional {
+            for (xdSuperClass in result.xdDeclaredType.superClasses.toList()) {
+                if (xdSuperClass.widget != null) {
+                    val xdResult = xdSuperClass.sourcererResult as XdSourcererResult
+                    superClassResults.add(xdResult.toSnapshot())
                 }
             }
-        } else {
-            println("\t- all super classes are resolved")
         }
+        return superClassResults
     }
 
     private fun mergeInterpretations(attributes: Map<String, Attribute>, interpretationResult: InterpretationResult) {
@@ -260,18 +292,6 @@ class Sourcerer(
         }
     }
 
-
-    private fun getSuperClassResults(result: SourcererResult): List<SourcererResult> {
-        val superClassResults = mutableListOf<SourcererResult>()
-        var currentResult = result
-        while (currentResult.superClassName != null) {
-            val superClassResult = Sourcerer[currentResult.superClassName as ClassName] as SourcererResult
-            superClassResults.add(superClassResult)
-            currentResult = superClassResult
-        }
-        return superClassResults
-    }
-
     private fun saveResult(result: SourcererResult) {
         println("\t--saving result for ${result.targetClassName}")
         Store.transactional {
@@ -282,34 +302,28 @@ class Sourcerer(
 
     private fun getSavedResult(classInfo: ClassInfo): SourcererResult? {
         return Store.transactional {
-            classInfo.xdClass.sourcererResult?.toSnapshot()
+            classInfo.xdDeclaredType.sourcererResult?.toSnapshot()
         }
     }
 
-    fun getSavedResult(classSymbolDescription: ClassSymbolDescription): SourcererResult? {
-        return Store.transactional {
-            classSymbolDescription.xdClass.sourcererResult?.toSnapshot()
-        }
-    }
-
-    private fun getSavedResult(xdClass: XdClass): SourcererResult? {
-        return Companion[xdClass]
+    private fun getSavedResult(xdDeclaredType: XdDeclaredType): SourcererResult? {
+        return Companion[xdDeclaredType]
     }
 
     private fun getDefaultLayoutParamClass(classInfo: ClassInfo): ClassName? {
-        return if (classInfo.classCategory == ClassCategory.View) {
-            Store.transactional { classInfo.widget.layoutParamClasses.firstOrNull()?.targetClassName }
-        } else null
+        return if (classInfo.xdDeclaredType.classCategory == XdClassCategory.View) {
+                classInfo.xdDeclaredType.widget?.layoutParamClasses?.firstOrNull()?.targetClassName
+            } else null
     }
 
     companion object {
-        operator fun get(xdClass: XdClass): SourcererResult? {
+        operator fun get(xdDeclaredType: XdDeclaredType): SourcererResult? {
             return Store.transactional {
-                xdClass.sourcererResult?.toSnapshot()
+                xdDeclaredType.sourcererResult?.toSnapshot()
             }
         }
         operator fun get(className: ClassName): SourcererResult? {
-            val indexedClass = ClassRegistry[className] ?: return null
+            val indexedClass = DeclaredTypeRegistry[className] ?: return null
             return this[indexedClass]
         }
         fun getAll(): List<SourcererResult> {
@@ -319,125 +333,7 @@ class Sourcerer(
                 }
             }
         }
-
-        fun getWidget(sourcererResult: SourcererResult): Widget {
-            return Store.transactional {
-                Widget.query(
-                        Widget::file eq sourcererResult.xdClass.file
-                ).firstOrNull() ?: throw IllegalStateException("Widget not found for file ${sourcererResult.xdClass.file.url}")
-            }
-        }
     }
 }
 
 
-data class SourcererResult(
-        val targetClassName: ClassName,
-        val superClassName: ClassName?,
-        val fallbackClassName: ClassName?,
-        val defaultLayoutParamsClassName: ClassName?,
-        val isAbstract: Boolean,
-        val isFinal: Boolean,
-        val constructorExpression: ConstructorExpression,
-        val numberOfTypeVariables: Int,
-        val classCategory: ClassCategory,
-        val isViewGroup: Boolean,
-        val minimumApiLevel: Int,
-        val attributes: Map<String, Attribute>,
-        val setters: Map<Int, Setter>,
-        val codeBlocks: List<CodeBlock>,
-        val xdClass: XdClass,
-        val targetPackageName: String
-) {
-    fun toEntity(): XdSourcererResult {
-        val xdResult = XdSourcererResult.new()
-        xdResult.targetClass = this.xdClass
-        xdResult.targetClassCanonicalName = this.targetClassName.canonicalName
-        if (this.superClassName != null) xdResult.superClassCanonicalName = this.superClassName.canonicalName
-        if (this.fallbackClassName != null) xdResult.fallbackClassCanonicalName = this.fallbackClassName.canonicalName
-        if (this.defaultLayoutParamsClassName != null) xdResult.defaultLayoutParamsClassName = this.defaultLayoutParamsClassName.canonicalName
-        xdResult.isAbstract = this.isAbstract
-        xdResult.isFinal = this.isFinal
-        xdResult.constructorExpression = this.constructorExpression.toEntity()
-        xdResult.numberOfTypeVariables = this.numberOfTypeVariables
-        xdResult.classCategory = this.classCategory.toEntity()
-        xdResult.isViewGroup = this.isViewGroup
-        xdResult.minimumApiLevel = this.minimumApiLevel
-        xdResult.targetPackageName = this.targetPackageName
-
-        val xdSetters = mutableMapOf<Int, XdSetter>()
-        for (setter in this.setters) {
-            val xdSetter = setter.value.toEntity(xdResult)
-            xdSetters[setter.key] = xdSetter
-            xdResult.setters.add(xdSetter)
-        }
-        val xdAttributes = mutableMapOf<String, XdAttribute>()
-        for (attribute in this.attributes) {
-            val xdAttribute = attribute.value.toEntity(xdSetters, xdResult)
-            xdAttributes[attribute.key] = xdAttribute
-            xdResult.attributes.add(xdAttribute)
-        }
-        for (codeBlock in this.codeBlocks) {
-            xdResult.codeBlocks.add(
-                    codeBlock.toEntity(xdResult, xdSetters, xdAttributes)
-            )
-        }
-        return xdResult
-    }
-}
-
-
-class XdSourcererResult(entity: Entity) : XdEntity(entity) {
-    companion object : XdNaturalEntityType<XdSourcererResult>()
-
-    var targetClass : XdClass by xdParent(XdClass::sourcererResult)
-    var targetClassCanonicalName by xdRequiredStringProp()
-    var superClassCanonicalName by xdStringProp()
-    var fallbackClassCanonicalName by xdStringProp()
-    var defaultLayoutParamsClassName by xdStringProp()
-    var isAbstract by xdBooleanProp()
-    var isFinal by xdBooleanProp()
-    var constructorExpression by xdLink1(XdConstructorExpression)
-    var numberOfTypeVariables by xdRequiredIntProp()
-    var classCategory by xdLink1(XdClassCategory)
-    var isViewGroup by xdBooleanProp()
-    var minimumApiLevel by xdRequiredIntProp()
-    val attributes by xdChildren0_N(XdAttribute::sourcererResult)
-    val setters by xdChildren0_N(XdSetter::sourcererResult)
-    val codeBlocks by xdChildren0_N(XdCodeBlock::sourcererResult)
-    var targetPackageName by xdRequiredStringProp()
-
-    fun toSnapshot(transaction: Boolean = true): SourcererResult {
-        val block = {
-            val attributes = this.attributes.toList().associate {
-                Pair(it.name, it.toSnapshot(false))
-            }
-            val setters = this.setters.toList().associate {
-                val setter = it.toSnapshot(false)
-                Pair(setter.hashCode(), setter)
-            }
-            SourcererResult(
-                    this.targetClass.targetClassName,
-                    if (this.superClassCanonicalName != null) ClassName.bestGuess(this.superClassCanonicalName as String) else null,
-                    if (this.fallbackClassCanonicalName != null) ClassName.bestGuess(this.fallbackClassCanonicalName as String) else null,
-                    if (this.defaultLayoutParamsClassName != null) ClassName.bestGuess(this.defaultLayoutParamsClassName as String) else null,
-                    this.isAbstract,
-                    this.isFinal,
-                    this.constructorExpression.toEnum(false),
-                    this.numberOfTypeVariables,
-                    this.classCategory.toEnum(false),
-                    this.isViewGroup,
-                    this.minimumApiLevel,
-                    attributes,
-                    setters,
-                    this.codeBlocks.toList().map {
-                        it.toSnapshot(setters, attributes, transaction = false)
-                    },
-                    this.targetClass,
-                    this.targetPackageName
-            )
-        }
-        return if(transaction) Store.transactional { block() } else block()
-    }
-
-}

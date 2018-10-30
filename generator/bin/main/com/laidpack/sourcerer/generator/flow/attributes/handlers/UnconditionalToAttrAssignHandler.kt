@@ -17,12 +17,12 @@ class UnconditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHand
                 }
                 /*
                 // check if assigned variable value is retrieved from type array getter earlier
-                classOrInterfaceDeclarationProvider.target.isNameExpr && classOrInterfaceDeclarationProvider.value.isNameExpr -> {
-                    variableValueIsAssignedToAnotherVariable(classOrInterfaceDeclarationProvider)
+                getClassOrInterfaceDeclaration.target.isNameExpr && getClassOrInterfaceDeclaration.value.isNameExpr -> {
+                    variableValueIsAssignedToAnotherVariable(getClassOrInterfaceDeclaration)
                 }
                 // check if variable is assigned via binary expression
-                classOrInterfaceDeclarationProvider.target is NameExpr && classOrInterfaceDeclarationProvider.value is BinaryExpr -> {
-                    handleBinaryExpression(classOrInterfaceDeclarationProvider.target as NameExpr, classOrInterfaceDeclarationProvider.value as BinaryExpr)
+                getClassOrInterfaceDeclaration.target is NameExpr && getClassOrInterfaceDeclaration.value is BinaryExpr -> {
+                    handleBinaryExpression(getClassOrInterfaceDeclaration.target as NameExpr, getClassOrInterfaceDeclaration.value as BinaryExpr)
                 }*/
             }
 
@@ -43,11 +43,11 @@ class UnconditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHand
     }
 
     /*
-    private fun variableValueIsAssignedToAnotherVariable(classOrInterfaceDeclarationProvider: AssignExpr) {
-        val targetExpr = classOrInterfaceDeclarationProvider.target.asNameExpr()
+    private fun variableValueIsAssignedToAnotherVariable(getClassOrInterfaceDeclaration: AssignExpr) {
+        val targetExpr = getClassOrInterfaceDeclaration.target.asNameExpr()
         if (flow.isVariableDerivedFromAttribute(targetExpr.nameAsString) || flow.isAttributeConditionalToTrue()) {
             val impact = if(flow.isAttributeConditionalToTrue()) VariableImpact.IF_TRUE else VariableImpact.CHAINED
-            flow.addIndirectVariableAsDerivedFromAttribute(targetExpr.nameAsString, classOrInterfaceDeclarationProvider, impact)
+            flow.addIndirectVariableAsDerivedFromAttribute(targetExpr.nameAsString, getClassOrInterfaceDeclaration, impact)
         }
     }
 

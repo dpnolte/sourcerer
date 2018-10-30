@@ -6,7 +6,7 @@ import android.widget.LinearLayout
 import java.lang.Class
 import kotlin.String
 
-open class LinearLayoutLayoutParamsFactory<TLayoutParams : LinearLayout.LayoutParams, TAttributes : LinearLayoutLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
+open class LinearLayoutLayoutParamsFactory<TLayoutParams : LinearLayout.LayoutParams, TAttributes : LinearLayoutLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupMarginLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)

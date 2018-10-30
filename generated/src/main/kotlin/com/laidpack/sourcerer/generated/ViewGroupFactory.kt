@@ -19,11 +19,10 @@ open class ViewGroupFactory<TView : ViewGroup, TAttributes : ViewGroupAttributes
         super.init(view, context, attributes)
         if (view is ViewGroup) {
             view.apply {
-                attributes.clipChildren?.let {
-                    clipChildren = it
-                }
                 attributes.addStatesFromChildren?.let {
-                    setAddStatesFromChildren(it)
+                    if (addStatesFromChildren() != it) {
+                        setAddStatesFromChildren(it)
+                    }
                 }
                 attributes.animationCache?.let {
                     if (isEnabled != it) {
@@ -37,7 +36,9 @@ open class ViewGroupFactory<TView : ViewGroup, TAttributes : ViewGroupAttributes
                     }
                 }
                 attributes.alwaysDrawnWithCache?.let {
-                    isAlwaysDrawnWithCacheEnabled = it
+                    if (isAlwaysDrawnWithCacheEnabled != it) {
+                        isAlwaysDrawnWithCacheEnabled = it
+                    }
                 }
                 attributes.animateLayoutChanges?.let {
                     val localAnimateLayoutChanges = if (it) LayoutTransition() else null
@@ -46,7 +47,21 @@ open class ViewGroupFactory<TView : ViewGroup, TAttributes : ViewGroupAttributes
                     }
                 }
                 attributes.splitMotionEvents?.let {
-                    isMotionEventSplittingEnabled = it
+                    if (isMotionEventSplittingEnabled != it) {
+                        isMotionEventSplittingEnabled = it
+                    }
+                }
+                if (Build.VERSION.SDK_INT >= 18) {
+                    attributes.clipChildren?.let {
+                        if (clipChildren != it) {
+                            clipChildren = it
+                        }
+                    }
+                    attributes.layoutMode?.let {
+                        if (layoutMode != it.value) {
+                            layoutMode = it.value
+                        }
+                    }
                 }
                 if (Build.VERSION.SDK_INT >= 21) {
                     attributes.clipToPadding?.let {
@@ -55,10 +70,14 @@ open class ViewGroupFactory<TView : ViewGroup, TAttributes : ViewGroupAttributes
                         }
                     }
                     attributes.touchscreenBlocksFocus?.let {
-                        touchscreenBlocksFocus = it
+                        if (touchscreenBlocksFocus != it) {
+                            touchscreenBlocksFocus = it
+                        }
                     }
                     attributes.transitionGroup?.let {
-                        isTransitionGroup = it
+                        if (isTransitionGroup != it) {
+                            isTransitionGroup = it
+                        }
                     }
                 }
             }

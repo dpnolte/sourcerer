@@ -119,7 +119,7 @@ open class JavaDocAttributeToMethodMatcher(
                 content.startsWith("name android:") -> {
                     content.substring(content.lastIndexOf(':'))
                 }
-                else -> throw IllegalStateException("attribute name regex no longer matches attribute name?")
+                else -> throw IllegalStateException("attribute name regex no longer matches attribute name? Content: '$content'")
             }
 
             if (classInfo.classCategory == ClassCategory.LayoutParams) {

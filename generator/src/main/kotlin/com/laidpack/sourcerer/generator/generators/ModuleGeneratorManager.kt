@@ -1,6 +1,6 @@
 package com.laidpack.sourcerer.generator.generators
 
-import com.laidpack.sourcerer.generator.resources.WidgetConnoisseur
+import com.laidpack.sourcerer.generator.resources.widgets.WidgetConnoisseur
 import com.laidpack.sourcerer.generator.toCamelCase
 import com.squareup.kotlinpoet.ClassName
 import java.io.File

@@ -28,7 +28,7 @@ abstract class BaseNodeHandler <T: Node> (
             averageExecutionTimes[this::class] = (executionTimes[this::class] as Long)/(timesExecuted[this::class] as Int)
             return result
         }
-        throw IllegalStateException("Invalid target type $targetType and classOrInterfaceDeclarationProvider type ${node::class}")
+        throw IllegalStateException("Invalid target type $targetType and getClassOrInterfaceDeclaration type ${node::class}")
     }
     abstract val handler : NodeHandler<T>
 

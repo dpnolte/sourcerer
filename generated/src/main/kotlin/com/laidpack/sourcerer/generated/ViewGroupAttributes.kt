@@ -26,17 +26,25 @@ open class ViewGroupAttributes(
     val addStatesFromChildren: Boolean? = null,
     val touchscreenBlocksFocus: Boolean? = null,
     val splitMotionEvents: Boolean? = null,
+    val layoutMode: LayoutModeEnum? = null,
     val transitionGroup: Boolean? = null,
     id: Int? = null,
-    scrollX: Int? = null,
-    scrollY: Int? = null,
     background: MultiFormat = MultiFormat(setOf(Format.Color, Format.Reference)),
+    paddingLeft: Int? = null,
+    paddingBottom: Int? = null,
+    paddingEnd: Int? = null,
+    paddingStart: Int? = null,
+    paddingTop: Int? = null,
+    paddingRight: Int? = null,
     focusable: MultiFormat = MultiFormat(setOf(Format.Boolean, Format.Enum)),
     autofillHints: MultiFormat = MultiFormat(setOf(Format.Reference, Format.String)),
     importantForAutofill: FlagsAccumulator? = null,
+    focusableInTouchMode: Boolean? = null,
     visibility: VisibilityEnum? = null,
     fitsSystemWindows: Boolean? = null,
     scrollbarStyle: ScrollbarStyleEnum? = null,
+    isScrollContainer: Boolean? = null,
+    fadeScrollbars: Boolean? = null,
     scrollbarFadeDuration: Int? = null,
     scrollbarDefaultDelayBeforeFade: Int? = null,
     scrollbarSize: Int? = null,
@@ -45,11 +53,17 @@ open class ViewGroupAttributes(
     nextFocusUp: Int? = null,
     nextFocusDown: Int? = null,
     nextFocusForward: Int? = null,
+    clickable: Boolean? = null,
+    longClickable: Boolean? = null,
+    contextClickable: Boolean? = null,
+    saveEnabled: Boolean? = null,
     filterTouchesWhenObscured: Boolean? = null,
     drawingCacheQuality: DrawingCacheQualityEnum? = null,
     keepScreenOn: Boolean? = null,
     minHeight: Int? = null,
     minWidth: Int? = null,
+    soundEffectsEnabled: Boolean? = null,
+    hapticFeedbackEnabled: Boolean? = null,
     contentDescription: String? = null,
     accessibilityTraversalBefore: Int? = null,
     accessibilityTraversalAfter: Int? = null,
@@ -69,7 +83,7 @@ open class ViewGroupAttributes(
     layerType: LayerTypeEnum? = null,
     layoutDirection: LayoutDirectionEnum? = null,
     textDirection: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
-    textAlignment: TextAlignmentEnum? = null,
+    textAlignment: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
     importantForAccessibility: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
     accessibilityLiveRegion: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
     labelFor: Int? = null,
@@ -81,6 +95,7 @@ open class ViewGroupAttributes(
     foregroundGravity: FlagsAccumulator? = null,
     foregroundTint: Int? = null,
     foregroundTintMode: ForegroundTintModeEnum? = null,
+    scrollIndicators: FlagsAccumulator? = null,
     forceHasOverlappingRendering: Boolean? = null,
     tooltipText: String? = null,
     keyboardNavigationCluster: Boolean? = null,
@@ -92,7 +107,7 @@ open class ViewGroupAttributes(
     accessibilityHeading: Boolean? = null,
     outlineSpotShadowColor: Int? = null,
     outlineAmbientShadowColor: Int? = null
-) : ViewAttributes(id = id, scrollX = scrollX, scrollY = scrollY, background = background, focusable = focusable, autofillHints = autofillHints, importantForAutofill = importantForAutofill, visibility = visibility, fitsSystemWindows = fitsSystemWindows, scrollbarStyle = scrollbarStyle, scrollbarFadeDuration = scrollbarFadeDuration, scrollbarDefaultDelayBeforeFade = scrollbarDefaultDelayBeforeFade, scrollbarSize = scrollbarSize, nextFocusLeft = nextFocusLeft, nextFocusRight = nextFocusRight, nextFocusUp = nextFocusUp, nextFocusDown = nextFocusDown, nextFocusForward = nextFocusForward, filterTouchesWhenObscured = filterTouchesWhenObscured, drawingCacheQuality = drawingCacheQuality, keepScreenOn = keepScreenOn, minHeight = minHeight, minWidth = minWidth, contentDescription = contentDescription, accessibilityTraversalBefore = accessibilityTraversalBefore, accessibilityTraversalAfter = accessibilityTraversalAfter, overScrollMode = overScrollMode, alpha = alpha, elevation = elevation, translationX = translationX, translationY = translationY, translationZ = translationZ, transformPivotX = transformPivotX, transformPivotY = transformPivotY, rotation = rotation, rotationX = rotationX, rotationY = rotationY, scaleX = scaleX, scaleY = scaleY, layerType = layerType, layoutDirection = layoutDirection, textDirection = textDirection, textAlignment = textAlignment, importantForAccessibility = importantForAccessibility, accessibilityLiveRegion = accessibilityLiveRegion, labelFor = labelFor, transitionName = transitionName, nestedScrollingEnabled = nestedScrollingEnabled, backgroundTint = backgroundTint, backgroundTintMode = backgroundTintMode, foreground = foreground, foregroundGravity = foregroundGravity, foregroundTint = foregroundTint, foregroundTintMode = foregroundTintMode, forceHasOverlappingRendering = forceHasOverlappingRendering, tooltipText = tooltipText, keyboardNavigationCluster = keyboardNavigationCluster, nextClusterForward = nextClusterForward, focusedByDefault = focusedByDefault, defaultFocusHighlightEnabled = defaultFocusHighlightEnabled, screenReaderFocusable = screenReaderFocusable, accessibilityPaneTitle = accessibilityPaneTitle, accessibilityHeading = accessibilityHeading, outlineSpotShadowColor = outlineSpotShadowColor, outlineAmbientShadowColor = outlineAmbientShadowColor),
+) : ViewAttributes(id = id, background = background, paddingLeft = paddingLeft, paddingBottom = paddingBottom, paddingEnd = paddingEnd, paddingStart = paddingStart, paddingTop = paddingTop, paddingRight = paddingRight, focusable = focusable, autofillHints = autofillHints, importantForAutofill = importantForAutofill, focusableInTouchMode = focusableInTouchMode, visibility = visibility, fitsSystemWindows = fitsSystemWindows, scrollbarStyle = scrollbarStyle, isScrollContainer = isScrollContainer, fadeScrollbars = fadeScrollbars, scrollbarFadeDuration = scrollbarFadeDuration, scrollbarDefaultDelayBeforeFade = scrollbarDefaultDelayBeforeFade, scrollbarSize = scrollbarSize, nextFocusLeft = nextFocusLeft, nextFocusRight = nextFocusRight, nextFocusUp = nextFocusUp, nextFocusDown = nextFocusDown, nextFocusForward = nextFocusForward, clickable = clickable, longClickable = longClickable, contextClickable = contextClickable, saveEnabled = saveEnabled, filterTouchesWhenObscured = filterTouchesWhenObscured, drawingCacheQuality = drawingCacheQuality, keepScreenOn = keepScreenOn, minHeight = minHeight, minWidth = minWidth, soundEffectsEnabled = soundEffectsEnabled, hapticFeedbackEnabled = hapticFeedbackEnabled, contentDescription = contentDescription, accessibilityTraversalBefore = accessibilityTraversalBefore, accessibilityTraversalAfter = accessibilityTraversalAfter, overScrollMode = overScrollMode, alpha = alpha, elevation = elevation, translationX = translationX, translationY = translationY, translationZ = translationZ, transformPivotX = transformPivotX, transformPivotY = transformPivotY, rotation = rotation, rotationX = rotationX, rotationY = rotationY, scaleX = scaleX, scaleY = scaleY, layerType = layerType, layoutDirection = layoutDirection, textDirection = textDirection, textAlignment = textAlignment, importantForAccessibility = importantForAccessibility, accessibilityLiveRegion = accessibilityLiveRegion, labelFor = labelFor, transitionName = transitionName, nestedScrollingEnabled = nestedScrollingEnabled, backgroundTint = backgroundTint, backgroundTintMode = backgroundTintMode, foreground = foreground, foregroundGravity = foregroundGravity, foregroundTint = foregroundTint, foregroundTintMode = foregroundTintMode, scrollIndicators = scrollIndicators, forceHasOverlappingRendering = forceHasOverlappingRendering, tooltipText = tooltipText, keyboardNavigationCluster = keyboardNavigationCluster, nextClusterForward = nextClusterForward, focusedByDefault = focusedByDefault, defaultFocusHighlightEnabled = defaultFocusHighlightEnabled, screenReaderFocusable = screenReaderFocusable, accessibilityPaneTitle = accessibilityPaneTitle, accessibilityHeading = accessibilityHeading, outlineSpotShadowColor = outlineSpotShadowColor, outlineAmbientShadowColor = outlineAmbientShadowColor),
         IAttributes
 
 enum class PersistentDrawingCacheFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
@@ -107,4 +122,12 @@ enum class PersistentDrawingCacheFlagsEnum(override val key: String, override va
 
     @Json(name = "all")
     All("all", 3);
+}
+
+enum class LayoutModeEnum(override val key: String, override val value: Int) : AttributeEnum {
+    @Json(name = "clipBounds")
+    ClipBounds("clipBounds", 0),
+
+    @Json(name = "opticalBounds")
+    OpticalBounds("opticalBounds", 1);
 }

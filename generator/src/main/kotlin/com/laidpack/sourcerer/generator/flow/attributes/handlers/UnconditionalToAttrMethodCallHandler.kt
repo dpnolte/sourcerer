@@ -1,7 +1,6 @@
 package com.laidpack.sourcerer.generator.flow.attributes.handlers
 
 import android.content.Context
-import android.content.res.Resources
 import android.content.res.TypedArray
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.VariableDeclarator
@@ -12,8 +11,9 @@ import com.laidpack.sourcerer.generator.firstDescendantOfType
 import com.laidpack.sourcerer.generator.flow.attributes.AttributeFlow
 import com.laidpack.sourcerer.generator.flow.attributes.AttributeInSource
 import com.laidpack.sourcerer.generator.flow.attributes.BaseAttributesHandler
-import com.laidpack.sourcerer.generator.peeker.MethodInfo
-import com.laidpack.sourcerer.generator.peeker.describeType
+import com.laidpack.sourcerer.generator.index.XdField
+import com.laidpack.sourcerer.generator.index.XdMethod
+import com.laidpack.sourcerer.generator.index.describeType
 
 internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAttributesHandler<MethodCallExpr>(flow, MethodCallExpr::class) {
     override val handler = ::onCurrentClassMethodCallUnconditionalToAttr
@@ -60,39 +60,64 @@ internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAt
 
     private fun handleAttributeDelegateMethod(node: MethodCallExpr): Boolean {
         // check if other arguments are resource name field access expressions
-        val resourceIds = getResourceIdsFromArguments(node)
+        val resourceIds = getResourceNamesFromArguments(node)
         if (resourceIds.isNotEmpty()) {
             flow.addAttributesFromArguments(node, resourceIds)
         }
         // visit method
-        val methodInfo = flow.classInfo.getMethodInfoByCallExpr(node) as MethodInfo
-        flow.visitNestedMethodWithTypedArrayParameter(null, methodInfo)
+        val method = flow.classInfo.getMethodInfoByCallExpr(node) as XdMethod
+        flow.visitNestedMethodWithTypedArrayParameter(null, method)
         return false
     }
 
-    private fun isAnyResourceIdProvidedAsArgument(node: MethodCallExpr): Boolean {
-        node.arguments.forEachIndexed { index, arg ->
-            if(arg is FieldAccessExpr && arg.scope is FieldAccessExpr) {
-                val argFullString = arg.toString()
-                if (argFullString.contains("styleable.")) {
-                    return true
+    private fun isAnyResourceNameProvidedAsArgument(node: MethodCallExpr): Boolean {
+        val resourceNameFromIndex = getResourceNameFromIndexArgument(node)
+        if (resourceNameFromIndex != null) {
+            return true
+        } else {
+            node.arguments.forEachIndexed { index, arg ->
+                if (arg is FieldAccessExpr && arg.scope is FieldAccessExpr) {
+                    val argFullString = arg.toString()
+                    if (argFullString.contains("styleable.")) {
+                        return true
+                    }
                 }
             }
         }
         return false
     }
 
-    private fun getResourceIdsFromArguments(node: MethodCallExpr): Map<Int, String> {
-        val resourceIds = mutableMapOf<Int, String>()
-        node.arguments.forEachIndexed { index, arg ->
-            if(arg is FieldAccessExpr && arg.scope is FieldAccessExpr) {
-                val argFullString = arg.toString()
-                if (argFullString.contains("styleable.")) {
-                    resourceIds[index] = arg.nameAsString
+    private fun getResourceNamesFromArguments(node: MethodCallExpr): Map<Int, String> {
+        val resourceNames = mutableMapOf<Int, String>()
+        val resourceNameFromIndex = getResourceNameFromIndexArgument(node)
+        if (resourceNameFromIndex != null) {
+            resourceNames[0] = resourceNameFromIndex
+        } else {
+            node.arguments.forEachIndexed { index, arg ->
+                if (arg is FieldAccessExpr && arg.scope is FieldAccessExpr) {
+                    val argFullString = arg.toString()
+                    if (argFullString.contains("styleable.")) {
+                        resourceNames[index] = arg.nameAsString
+                    }
                 }
             }
         }
-        return resourceIds
+        return resourceNames
+    }
+
+    private fun getResourceNameFromIndexArgument(node: MethodCallExpr): String? {
+        if (node.scope.isPresent && node.scope.get() is NameExpr) {
+            val scope = node.scope.get()
+            val variableName = scope.asNameExpr().nameAsString
+            val firstArgument = node.arguments.firstOrNull()
+            if (firstArgument != null && firstArgument.isIntegerLiteralExpr) {
+                val key = Pair(variableName, firstArgument.asIntegerLiteralExpr().asInt())
+                if(flow.typedArrayIndexToResourceName.containsKey(key)) {
+                    return flow.typedArrayIndexToResourceName[key] as String
+                }
+            }
+        }
+        return null
     }
 
     private fun isTypedArrayOneOfTheArguments(node: MethodCallExpr): Boolean {
@@ -111,7 +136,7 @@ internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAt
     private fun handleMethodCallOnTypedArray(node: MethodCallExpr): Boolean {
         when {
             node.nameAsString == "getIndex" -> handleResourceIdRetrieved(node)
-            isAnyResourceIdProvidedAsArgument(node)
+            isAnyResourceNameProvidedAsArgument(node)
                     && flow.isAttributeValueRetrievedWithMethodCall(node, false) -> {
                 handleGetResourceValueCall(node)
             }
@@ -127,7 +152,7 @@ internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAt
     }
 
     private fun handleGetResourceValueCall(node: MethodCallExpr) {
-        val resourceIds = getResourceIdsFromArguments(node)
+        val resourceIds = getResourceNamesFromArguments(node)
         val attributesUsedInCall = mutableListOf<AttributeInSource>()
         resourceIds.values.forEach {
             flow.addAttribute(it)
@@ -143,18 +168,18 @@ internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAt
             for (assignExpr in assignExpressions) {
                 val target = assignExpr.target
                 when {
-                    target is NameExpr && flow.isPublicField(target.nameAsString) -> {
+                    target is NameExpr && flow.classInfo.isPublicFieldFromThisClassOrSuperClass(target.nameAsString) -> {
                         flow.addSetterToAttribute(
-                                flow.getField(target.nameAsString ),
+                                flow.classInfo.getFieldFromThisClassOrSuperClass(target.nameAsString) as XdField,
                                 attribute
                         )
                         attributeIsAssignedToField = true
                     }
                     target is FieldAccessExpr
                             && target.scope.isThisExpr
-                            && flow.isPublicField(target.nameAsString)-> {
+                            && flow.classInfo.isFieldFromThisClassOrSuperClass(target.nameAsString)-> {
                         flow.addSetterToAttribute(
-                                flow.getField(target.nameAsString ),
+                                flow.classInfo.getFieldFromThisClassOrSuperClass(target.nameAsString) as XdField,
                                 attribute
                         )
                         attributeIsAssignedToField = true
@@ -167,7 +192,7 @@ internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAt
                 var identifiedSetterMethod = false
                 when {
                     // call on a public method of current class
-                    parentCall != null && flow.isPublicMethodCall(parentCall) -> {
+                    parentCall != null && flow.classInfo.isPublicMethodCallFromThisClassOrSuperClass(parentCall) -> {
                         val parameterIndex = parentCall.arguments.indexOfFirst { arg ->
                             arg.firstDescendantOfType(MethodCallExpr::class.java) == node
                         }
@@ -183,7 +208,7 @@ internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAt
                         val scopeName = scope.nameAsString
                         when {
                             // call on a field's method
-                            parentCall.arguments.size == 1 && flow.isField(scopeName) -> {
+                            parentCall.arguments.size == 1 && flow.classInfo.isFieldFromThisClassOrSuperClass(scopeName) -> {
                                 flow.addMethodCallOnFieldAsBeingSetByAttribute(parentCall, attribute)
                                 identifiedSetterMethod = true
                             }
@@ -262,6 +287,8 @@ internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAt
             val assignExpr = node.firstAncestorOfType(AssignExpr::class.java) ?: throw  IllegalStateException("obtain style attributed not assigned to variable")
             flow.addTypedArrayVariable(assignExpr.target.asNameExpr().name)
         }
+        // check if any non-default attributes are obtained
+        flow.checkIfAnyNonDefaultAttributeIsObtained(node)
 
         return false // don't go further down the tree
     }
@@ -269,10 +296,7 @@ internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAt
     companion object {
         private const val obtainStyledAttributeMethodName = "obtainStyledAttributes"
         private const val getIndexMethodName = "getIndex"
-        private val  contextCanonicalName = Context::class.java.canonicalName
-        private val themeCanonicalName = Resources.Theme::class.java.canonicalName
         private const val tintTypedArrayCanonicalName = "androidx.appcompat.widget.TintTypedArray"
-        private const val themeEnforcementCanonicalName = "com.google.android.material.internal.ThemeEnforcement"
 
         init {
             ensureMethodsExist()

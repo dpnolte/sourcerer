@@ -6,7 +6,7 @@ import android.widget.StackView
 import java.lang.Class
 import kotlin.String
 
-open class StackViewFactory<TView : StackView, TAttributes : StackViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AdapterViewFactory<TView, TAttributes>(instanceType, attributesType) {
+open class StackViewFactory<TView : StackView, TAttributes : StackViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AdapterViewAnimatorFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = StackView(context)

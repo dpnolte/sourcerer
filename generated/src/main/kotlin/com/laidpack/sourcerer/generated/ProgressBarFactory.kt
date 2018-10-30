@@ -29,6 +29,11 @@ open class ProgressBarFactory<TView : ProgressBar, TAttributes : ProgressBarAttr
                         max = it
                     }
                 }
+                attributes.progress?.let {
+                    if (progress != it) {
+                        progress = it
+                    }
+                }
                 attributes.secondaryProgress?.let {
                     if (secondaryProgress != it) {
                         secondaryProgress = it
@@ -42,14 +47,30 @@ open class ProgressBarFactory<TView : ProgressBar, TAttributes : ProgressBarAttr
                 attributes.interpolator?.let {
                     setInterpolator(context, it)
                 }
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.minWidth?.let {
+                        if (minimumWidth != it) {
+                            minimumWidth = it
+                        }
+                    }
+                    attributes.minHeight?.let {
+                        if (minimumHeight != it) {
+                            minimumHeight = it
+                        }
+                    }
+                }
                 if (Build.VERSION.SDK_INT >= 21) {
                     attributes.indeterminateDrawable?.let {
                         val localIndeterminateDrawable = ContextCompat.getDrawable(context, it) as Drawable
-                        setIndeterminateDrawableTiled(localIndeterminateDrawable)
+                        if (indeterminateDrawable != localIndeterminateDrawable) {
+                            setIndeterminateDrawableTiled(localIndeterminateDrawable)
+                        }
                     }
                     attributes.progressDrawable?.let {
                         val localProgressDrawable = ContextCompat.getDrawable(context, it) as Drawable
-                        setProgressDrawableTiled(localProgressDrawable)
+                        if (progressDrawable != localProgressDrawable) {
+                            setProgressDrawableTiled(localProgressDrawable)
+                        }
                     }
                     attributes.progressTint?.let {
                         val localProgressTint = ColorStateList.valueOf(it)

@@ -28,11 +28,9 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     id = it
                 }
             }
-            if (attributes.scrollX != null || attributes.scrollY != null) {
-                val localScrollX = attributes.scrollX ?: scrollX
-                val localScrollY = attributes.scrollY ?: scrollY
-                if (scrollX != localScrollX || scrollY != localScrollY) {
-                    scrollTo(localScrollX, localScrollY)
+            attributes.focusableInTouchMode?.let {
+                if (isFocusableInTouchMode != it) {
+                    isFocusableInTouchMode = it
                 }
             }
             attributes.visibility?.let {
@@ -65,9 +63,29 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     nextFocusDownId = it
                 }
             }
+            attributes.clickable?.let {
+                if (isClickable != it) {
+                    isClickable = it
+                }
+            }
+            attributes.longClickable?.let {
+                if (isLongClickable != it) {
+                    isLongClickable = it
+                }
+            }
+            attributes.saveEnabled?.let {
+                if (isSaveEnabled != it) {
+                    isSaveEnabled = it
+                }
+            }
             attributes.keepScreenOn?.let {
                 if (keepScreenOn != it) {
                     keepScreenOn = it
+                }
+            }
+            attributes.soundEffectsEnabled?.let {
+                if (isSoundEffectsEnabled != it) {
+                    isSoundEffectsEnabled = it
                 }
             }
             attributes.drawingCacheQuality?.let {
@@ -75,9 +93,19 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     drawingCacheQuality = it.value
                 }
             }
+            attributes.hapticFeedbackEnabled?.let {
+                if (isHapticFeedbackEnabled != it) {
+                    isHapticFeedbackEnabled = it
+                }
+            }
             attributes.contentDescription?.let {
                 if (contentDescription != it) {
                     contentDescription = it
+                }
+            }
+            attributes.fadeScrollbars?.let {
+                if (isScrollbarFadingEnabled != it) {
+                    isScrollbarFadingEnabled = it
                 }
             }
             attributes.filterTouchesWhenObscured?.let {
@@ -96,15 +124,21 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                 }
             }
             attributes.alpha?.let {
-                alpha = it
+                if (alpha != it) {
+                    alpha = it
+                }
             }
             attributes.translationX?.let {
                 val localTranslationX = it.toFloat()
-                translationX = localTranslationX
+                if (translationX != localTranslationX) {
+                    translationX = localTranslationX
+                }
             }
             attributes.translationY?.let {
                 val localTranslationY = it.toFloat()
-                translationY = localTranslationY
+                if (translationY != localTranslationY) {
+                    translationY = localTranslationY
+                }
             }
             attributes.transformPivotX?.let {
                 val localTransformPivotX = it.toFloat()
@@ -119,19 +153,29 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                 }
             }
             attributes.rotation?.let {
-                rotation = it
+                if (rotation != it) {
+                    rotation = it
+                }
             }
             attributes.rotationX?.let {
-                rotationX = it
+                if (rotationX != it) {
+                    rotationX = it
+                }
             }
             attributes.rotationY?.let {
-                rotationY = it
+                if (rotationY != it) {
+                    rotationY = it
+                }
             }
             attributes.scaleX?.let {
-                scaleX = it
+                if (scaleX != it) {
+                    scaleX = it
+                }
             }
             attributes.scaleY?.let {
-                scaleY = it
+                if (scaleY != it) {
+                    scaleY = it
+                }
             }
             attributes.layerType?.let {
                 if (layerType != it.value) {
@@ -151,6 +195,11 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                 attributes.fitsSystemWindows?.let {
                     if (fitsSystemWindows != it) {
                         fitsSystemWindows = it
+                    }
+                }
+                attributes.isScrollContainer?.let {
+                    if (isScrollContainer != it) {
+                        isScrollContainer = it
                     }
                 }
                 attributes.scrollbarFadeDuration?.let {
@@ -189,6 +238,20 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                 }
             }
             if (Build.VERSION.SDK_INT >= 17) {
+                if (attributes.paddingLeft != null || attributes.paddingBottom != null || attributes.paddingEnd != null || attributes.paddingStart != null || attributes.paddingTop != null || attributes.paddingRight != null) {
+                    val localPaddingBottomDimension = attributes.paddingBottom ?: bottom
+                    val localPaddingLeftDimension = attributes.paddingLeft ?: left
+                    val localPaddingRightDimension = attributes.paddingRight ?: right
+                    val localPaddingTopDimension = attributes.paddingTop ?: top
+                    if (bottom != localPaddingBottomDimension || left != localPaddingLeftDimension || right != localPaddingRightDimension || top != localPaddingTopDimension) {
+                        setPadding(localPaddingLeftDimension, localPaddingTopDimension, localPaddingRightDimension, localPaddingBottomDimension)
+                    }
+                    val localPaddingEndDimension = attributes.paddingEnd ?: paddingEnd
+                    val localPaddingStartDimension = attributes.paddingStart ?: paddingStart
+                    if (bottom != localPaddingBottomDimension || paddingEnd != localPaddingEndDimension || paddingStart != localPaddingStartDimension || top != localPaddingTopDimension) {
+                        setPaddingRelative(localPaddingStartDimension, localPaddingTopDimension, localPaddingEndDimension, localPaddingBottomDimension)
+                    }
+                }
                 attributes.layoutDirection?.let {
                     if (layoutDirection != it.value) {
                         layoutDirection = it.value
@@ -203,9 +266,13 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                         textDirection = localTextDirection
                     }
                 }
-                attributes.textAlignment?.let {
-                    if (textAlignment != it.value) {
-                        textAlignment = it.value
+                if (attributes.textAlignment.hasInteger || attributes.textAlignment.hasEnum) {
+                    val localTextAlignment = when {
+                        attributes.textAlignment.hasInteger -> attributes.textAlignment.integer
+                        else -> attributes.textAlignment.enum
+                    }
+                    if (textAlignment != localTextAlignment) {
+                        textAlignment = localTextAlignment
                     }
                 }
                 attributes.labelFor?.let {
@@ -228,11 +295,15 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
             if (Build.VERSION.SDK_INT >= 21) {
                 attributes.elevation?.let {
                     val localElevation = it.toFloat()
-                    elevation = localElevation
+                    if (elevation != localElevation) {
+                        elevation = localElevation
+                    }
                 }
                 attributes.translationZ?.let {
                     val localTranslationZ = it.toFloat()
-                    translationZ = localTranslationZ
+                    if (translationZ != localTranslationZ) {
+                        translationZ = localTranslationZ
+                    }
                 }
                 attributes.transitionName?.let {
                     if (transitionName != it) {
@@ -240,7 +311,9 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     }
                 }
                 attributes.nestedScrollingEnabled?.let {
-                    isNestedScrollingEnabled = it
+                    if (isEnabled != it) {
+                        isNestedScrollingEnabled = it
+                    }
                 }
                 attributes.backgroundTint?.let {
                     val localBackgroundTint = ColorStateList.valueOf(it)
@@ -268,12 +341,19 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                 }
             }
             if (Build.VERSION.SDK_INT >= 23) {
+                attributes.contextClickable?.let {
+                    if (isContextClickable != it) {
+                        isContextClickable = it
+                    }
+                }
                 if (attributes.foreground.hasColor || attributes.foreground.hasReference) {
                     val localForeground = when {
                         attributes.foreground.hasColor -> ColorDrawable(attributes.foreground.color)
                         else -> ContextCompat.getDrawable(context, attributes.foreground.reference) as Drawable
                     }
-                    foreground = localForeground
+                    if (foreground != localForeground) {
+                        foreground = localForeground
+                    }
                 }
                 attributes.foregroundGravity?.let {
                     val localForegroundGravity = it.value
@@ -293,10 +373,18 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                         foregroundTintMode = localForegroundTintMode
                     }
                 }
+                attributes.scrollIndicators?.let {
+                    val localScrollIndicators = it.value
+                    if (scrollIndicators != localScrollIndicators) {
+                        scrollIndicators = localScrollIndicators
+                    }
+                }
             }
             if (Build.VERSION.SDK_INT >= 24) {
                 attributes.forceHasOverlappingRendering?.let {
-                    forceHasOverlappingRendering(it)
+                    if (hasOverlappingRendering != it) {
+                        forceHasOverlappingRendering(it)
+                    }
                 }
             }
             if (Build.VERSION.SDK_INT >= 26) {
@@ -329,7 +417,9 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     }
                 }
                 attributes.keyboardNavigationCluster?.let {
-                    isKeyboardNavigationCluster = it
+                    if (isKeyboardNavigationCluster != it) {
+                        isKeyboardNavigationCluster = it
+                    }
                 }
                 attributes.nextClusterForward?.let {
                     if (nextClusterForwardId != it) {
@@ -337,7 +427,9 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     }
                 }
                 attributes.focusedByDefault?.let {
-                    isFocusedByDefault = it
+                    if (isFocusedByDefault != it) {
+                        isFocusedByDefault = it
+                    }
                 }
                 attributes.defaultFocusHighlightEnabled?.let {
                     if (defaultFocusHighlightEnabled != it) {
@@ -347,7 +439,9 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
             }
             if (Build.VERSION.SDK_INT >= 28) {
                 attributes.screenReaderFocusable?.let {
-                    isScreenReaderFocusable = it
+                    if (isScreenReaderFocusable != it) {
+                        isScreenReaderFocusable = it
+                    }
                 }
                 attributes.accessibilityPaneTitle?.let {
                     if (accessibilityPaneTitle != it) {
@@ -355,13 +449,19 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     }
                 }
                 attributes.accessibilityHeading?.let {
-                    isAccessibilityHeading = it
+                    if (isAccessibilityHeading != it) {
+                        isAccessibilityHeading = it
+                    }
                 }
                 attributes.outlineSpotShadowColor?.let {
-                    outlineSpotShadowColor = it
+                    if (outlineSpotShadowColor != it) {
+                        outlineSpotShadowColor = it
+                    }
                 }
                 attributes.outlineAmbientShadowColor?.let {
-                    outlineAmbientShadowColor = it
+                    if (outlineAmbientShadowColor != it) {
+                        outlineAmbientShadowColor = it
+                    }
                 }
             }
         }

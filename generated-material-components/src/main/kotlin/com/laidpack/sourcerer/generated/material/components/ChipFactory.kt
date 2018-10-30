@@ -3,11 +3,11 @@ package com.laidpack.sourcerer.generated.material.components
 import android.content.Context
 import android.view.View
 import com.google.android.material.chip.Chip
-import com.laidpack.sourcerer.generated.ButtonFactory
+import com.laidpack.sourcerer.generated.appcompat.AppCompatCheckBoxFactory
 import java.lang.Class
 import kotlin.String
 
-open class ChipFactory<TView : Chip, TAttributes : ChipAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ButtonFactory<TView, TAttributes>(instanceType, attributesType) {
+open class ChipFactory<TView : Chip, TAttributes : ChipAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AppCompatCheckBoxFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = Chip(context)

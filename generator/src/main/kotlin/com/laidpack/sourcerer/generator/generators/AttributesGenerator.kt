@@ -2,7 +2,7 @@ package com.laidpack.sourcerer.generator.generators
 
 import com.laidpack.annotation.TypeScript
 import com.laidpack.sourcerer.generator.target.Attribute
-import com.laidpack.sourcerer.generator.peeker.ClassCategory
+import com.laidpack.sourcerer.generator.index.ClassCategory
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 import com.laidpack.sourcerer.generator.target.AttributeTypesForSetter

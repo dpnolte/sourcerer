@@ -12,9 +12,9 @@ import kotlin.Int
 @TypeScript
 open class ViewGroupMarginLayoutParamsAttributes(
     @field:DimensionQualifier val layout_marginLeft: Int? = null,
-    @field:DimensionQualifier val layout_marginTop: Int? = null,
-    @field:DimensionQualifier val layout_marginRight: Int? = null,
     @field:DimensionQualifier val layout_marginBottom: Int? = null,
+    @field:DimensionQualifier val layout_marginRight: Int? = null,
+    @field:DimensionQualifier val layout_marginTop: Int? = null,
     @field:DimensionQualifier val layout_marginStart: Int? = null,
     @field:DimensionQualifier val layout_marginEnd: Int? = null,
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),

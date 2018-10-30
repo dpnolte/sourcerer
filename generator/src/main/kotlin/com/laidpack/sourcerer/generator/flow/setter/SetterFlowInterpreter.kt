@@ -1,13 +1,13 @@
 package com.laidpack.sourcerer.generator.flow.setter
 
 import com.github.javaparser.ast.body.FieldDeclaration
+import com.github.javaparser.ast.body.MethodDeclaration
 import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.target.Setter
 import com.laidpack.sourcerer.generator.flow.BaseFlowInterpreter
 import com.laidpack.sourcerer.generator.flow.FlowVisitor
 import com.laidpack.sourcerer.generator.flow.setter.handlers.AssignHandler
-import com.laidpack.sourcerer.generator.peeker.ClassInfo
-import com.laidpack.sourcerer.generator.peeker.MethodInfo
+import com.laidpack.sourcerer.generator.index.ClassInfo
 
 data class GetterRequirements(
         val fields: Map<String /* var name */, FieldDeclaration>,
@@ -15,7 +15,7 @@ data class GetterRequirements(
 )
 
 class SetterFlowInterpreter(
-        private val setterInfo: MethodInfo,
+        private val setterMethodDeclaration: MethodDeclaration,
         setter: Setter,
         attribute: Attribute,
         classInfo: ClassInfo,
@@ -25,14 +25,14 @@ class SetterFlowInterpreter(
     private val visitor = FlowVisitor(this::onNodeIteration)
     private val parameterIndex = providedParameterIndex ?: setter.callSignatureMaps[attribute.name]
     private val parameter = setter.parameters[parameterIndex]
-    private val flow = SetterFlow(this, setterInfo, setter, parameter, attribute, classInfo)
+    private val flow = SetterFlow(parameter, classInfo)
 
     override val handlers = listOf(
             AssignHandler(flow)
     )
 
     fun resolveGetterRequirements() : GetterRequirements {
-        visitor.explore(setterInfo.methodDeclaration)
+        visitor.explore(setterMethodDeclaration)
         return flow.getGetterRequirements()
     }
 }

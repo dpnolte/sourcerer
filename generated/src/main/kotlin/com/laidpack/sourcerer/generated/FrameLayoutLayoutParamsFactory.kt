@@ -6,7 +6,7 @@ import android.widget.FrameLayout
 import java.lang.Class
 import kotlin.String
 
-open class FrameLayoutLayoutParamsFactory<TLayoutParams : FrameLayout.LayoutParams, TAttributes : FrameLayoutLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
+open class FrameLayoutLayoutParamsFactory<TLayoutParams : FrameLayout.LayoutParams, TAttributes : FrameLayoutLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupMarginLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)

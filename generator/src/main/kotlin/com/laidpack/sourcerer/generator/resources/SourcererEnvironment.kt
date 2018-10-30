@@ -53,6 +53,8 @@ class SourcererEnvironment(args: Array<String>) {
     val servicesPath = rootPath.resolve("services/src/main/kotlin")
     val servicesDir = servicesPath.toFile()
 
+    val androidResourceManager = AndroidResourceManager(this)
+
     companion object {
         var printFlowInterpreterTrace = false
         const val rootPackageName = "com.laidpack.sourcerer"

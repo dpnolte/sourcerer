@@ -48,4 +48,5 @@ dependencies {
 	implementation "androidx.car:car:$androidXcar"
 	implementation project(":services")
 	implementation project(":generated")
+	implementation project(":generated-cardview")
 }

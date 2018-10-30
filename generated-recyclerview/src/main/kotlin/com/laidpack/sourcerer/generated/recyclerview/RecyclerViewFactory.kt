@@ -12,6 +12,23 @@ open class RecyclerViewFactory<TView : RecyclerView, TAttributes : RecyclerViewA
 
     override fun createInstance(context: Context): View = RecyclerView(context)
 
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is RecyclerView) {
+            view.apply {
+                attributes.clipToPadding?.let {
+                    if (clipToPadding != it) {
+                        isNestedScrollingEnabled = it
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "recyclerView"
 

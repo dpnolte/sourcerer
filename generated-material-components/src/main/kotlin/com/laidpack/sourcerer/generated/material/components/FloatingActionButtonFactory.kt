@@ -2,14 +2,14 @@ package com.laidpack.sourcerer.generated.material.components
 
 import android.content.Context
 import android.view.View
-import androidx.core.content.res.ResourcesCompat
+import com.google.android.material.animation.MotionSpec
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.laidpack.sourcerer.generated.ImageViewFactory
+import com.laidpack.sourcerer.generated.ImageButtonFactory
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
-open class FloatingActionButtonFactory<TView : FloatingActionButton, TAttributes : FloatingActionButtonAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ImageViewFactory<TView, TAttributes>(instanceType, attributesType) {
+open class FloatingActionButtonFactory<TView : FloatingActionButton, TAttributes : FloatingActionButtonAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ImageButtonFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = FloatingActionButton(context)
@@ -29,16 +29,17 @@ open class FloatingActionButtonFactory<TView : FloatingActionButton, TAttributes
                     }
                 }
                 attributes.rippleColor?.let {
-                    val localRippleColor = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (rippleColorStateList != localRippleColor) {
-                        setRippleColor(localRippleColor)
+                    if (rippleColor != it) {
+                        rippleColor = it
                     }
                 }
                 attributes.fabSize?.let {
-                    size = it.value
+                    if (size != it.value) {
+                        size = it.value
+                    }
                 }
                 attributes.fabCustomSize?.let {
-                    if (customSize != it) {
+                    if (size != it) {
                         customSize = it
                     }
                 }
@@ -66,13 +67,15 @@ open class FloatingActionButtonFactory<TView : FloatingActionButton, TAttributes
                     }
                 }
                 attributes.showMotionSpec?.let {
-                    if (id != it) {
-                        setShowMotionSpecResource(it)
+                    val localShowMotionSpec = MotionSpec.createFromResource(context, it)
+                    if (showMotionSpec != localShowMotionSpec) {
+                        showMotionSpec = localShowMotionSpec
                     }
                 }
                 attributes.hideMotionSpec?.let {
-                    if (id != it) {
-                        setHideMotionSpecResource(it)
+                    val localHideMotionSpec = MotionSpec.createFromResource(context, it)
+                    if (hideMotionSpec != localHideMotionSpec) {
+                        hideMotionSpec = localHideMotionSpec
                     }
                 }
             }

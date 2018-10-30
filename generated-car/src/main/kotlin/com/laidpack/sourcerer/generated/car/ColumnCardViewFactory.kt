@@ -3,11 +3,11 @@ package com.laidpack.sourcerer.generated.car
 import android.content.Context
 import android.view.View
 import androidx.car.widget.ColumnCardView
-import com.laidpack.sourcerer.generated.FrameLayoutFactory
+import com.laidpack.sourcerer.generated.cardview.CardViewFactory
 import java.lang.Class
 import kotlin.String
 
-open class ColumnCardViewFactory<TAttributes : ColumnCardViewAttributes>(attributesType: Class<TAttributes>) : FrameLayoutFactory<ColumnCardView, TAttributes>(ColumnCardView::class.java, attributesType) {
+open class ColumnCardViewFactory<TAttributes : ColumnCardViewAttributes>(attributesType: Class<TAttributes>) : CardViewFactory<ColumnCardView, TAttributes>(ColumnCardView::class.java, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = ColumnCardView(context)

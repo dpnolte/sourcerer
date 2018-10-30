@@ -27,7 +27,9 @@ open class BottomNavigationViewFactory<TView : BottomNavigationView, TAttributes
                     }
                 }
                 attributes.itemBackground?.let {
-                    itemBackgroundResource = it
+                    if (itemBackgroundResource != it) {
+                        itemBackgroundResource = it
+                    }
                 }
                 attributes.itemIconSize?.let {
                     if (itemIconSize != it) {

@@ -23,8 +23,14 @@ open class AppBarLayoutLayoutParamsAttributes(
     layout_weight: Float? = null,
     layout_gravity: FlagsAccumulator? = null,
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
-    layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum))
-) : LinearLayoutLayoutParamsAttributes(layout_weight = layout_weight, layout_gravity = layout_gravity, layout_width = layout_width, layout_height = layout_height),
+    layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
+    layout_marginLeft: Int? = null,
+    layout_marginBottom: Int? = null,
+    layout_marginRight: Int? = null,
+    layout_marginTop: Int? = null,
+    layout_marginStart: Int? = null,
+    layout_marginEnd: Int? = null
+) : LinearLayoutLayoutParamsAttributes(layout_weight = layout_weight, layout_gravity = layout_gravity, layout_width = layout_width, layout_height = layout_height, layout_marginLeft = layout_marginLeft, layout_marginBottom = layout_marginBottom, layout_marginRight = layout_marginRight, layout_marginTop = layout_marginTop, layout_marginStart = layout_marginStart, layout_marginEnd = layout_marginEnd),
         IAttributes
 
 enum class LayoutScrollFlagsFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {

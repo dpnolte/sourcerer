@@ -54,7 +54,7 @@ open class AbsListViewFactory<TView : AbsListView, TAttributes : AbsListViewAttr
                     }
                 }
                 attributes.cacheColorHint?.let {
-                    if (solidColor != it) {
+                    if (cacheColorHint != it) {
                         cacheColorHint = it
                     }
                 }

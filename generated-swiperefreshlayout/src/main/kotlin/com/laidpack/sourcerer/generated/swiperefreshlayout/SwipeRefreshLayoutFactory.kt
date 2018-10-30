@@ -12,6 +12,23 @@ open class SwipeRefreshLayoutFactory<TView : SwipeRefreshLayout, TAttributes : S
 
     override fun createInstance(context: Context): View = SwipeRefreshLayout(context)
 
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is SwipeRefreshLayout) {
+            view.apply {
+                attributes.enabled?.let {
+                    if (isEnabled != it) {
+                        isEnabled = it
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "swipeRefreshLayout"
 

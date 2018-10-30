@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import java.lang.Class
 import kotlin.String
 
-open class SpinnerFactory<TView : Spinner, TAttributes : SpinnerAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AdapterViewFactory<TView, TAttributes>(instanceType, attributesType) {
+open class SpinnerFactory<TView : Spinner, TAttributes : SpinnerAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AbsSpinnerFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = Spinner(context)

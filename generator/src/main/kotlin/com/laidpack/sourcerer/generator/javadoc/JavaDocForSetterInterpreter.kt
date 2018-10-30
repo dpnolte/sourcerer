@@ -2,25 +2,25 @@ package com.laidpack.sourcerer.generator.javadoc
 
 import com.laidpack.sourcerer.generator.AttributeManager
 import com.laidpack.sourcerer.generator.Interpretation
-import com.laidpack.sourcerer.generator.peeker.ClassInfo
-import com.laidpack.sourcerer.generator.peeker.MethodInfo
+import com.laidpack.sourcerer.generator.index.ClassInfo
+import com.laidpack.sourcerer.generator.index.XdMethod
 import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.target.AttributeTypesForSetter
 import com.laidpack.sourcerer.generator.target.Parameter
 import com.laidpack.sourcerer.generator.target.Setter
 
 class JavaDocForSetterInterpreter(
-        methodInfo: MethodInfo,
+        xdMethod: XdMethod,
         classInfo: ClassInfo,
         attrManager: AttributeManager
-) : JavaDocAttributeToMethodMatcher(methodInfo, classInfo, attrManager::isAttributeDefined, attrManager) {
+) : JavaDocAttributeToMethodMatcher(xdMethod, classInfo, attrManager::isAttributeDefined, attrManager) {
     private val attributes = mutableMapOf<String, Attribute>()
     private val setters = mutableMapOf<Int, Setter>()
 
     fun interpret(earlierIdentifiedSetters: Map<Int, Setter>): Interpretation {
         val result = match()
         if (result.success) {
-            val setter = attrManager.getSetter(earlierIdentifiedSetters, methodInfo)
+            val setter = attrManager.getSetter(earlierIdentifiedSetters, xdMethod)
             val attributesToParameters = mutableMapOf<Attribute, Int>()
             for (match in result.matches) {
                 val attribute = handleMatch(setter, match.attributeName, match.parameter) ?: continue
@@ -39,7 +39,7 @@ class JavaDocForSetterInterpreter(
     }
 
     private fun handleMatch(setter: Setter, attributeName: String, parameter: Parameter): Attribute? {
-        val attribute = Attribute(classInfo.targetClassName, attributeName)
+        val attribute = Attribute(classInfo.xdDeclaredType.targetClassName, attributeName)
         attribute.typesPerSetter[setter.hashCode()] = AttributeTypesForSetter(listOf(parameter.describedType))
         return if (ensureGetterCanBeResolved(attribute, setter, parameter.index)) {
             attributes[attribute.name] = attribute

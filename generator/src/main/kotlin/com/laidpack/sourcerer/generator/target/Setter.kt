@@ -6,8 +6,8 @@ import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.MethodDeclaration
 import com.laidpack.sourcerer.generator.Store
 import com.laidpack.sourcerer.generator.XdSourcererResult
-import com.laidpack.sourcerer.generator.peeker.MethodInfo
-import com.laidpack.sourcerer.generator.peeker.describeType
+import com.laidpack.sourcerer.generator.index.XdMethod
+import com.laidpack.sourcerer.generator.index.describeType
 import com.squareup.kotlinpoet.ClassName
 import jetbrains.exodus.entitystore.Entity
 import kotlinx.dnq.*
@@ -21,7 +21,6 @@ data class Setter(
         val line: Int,
         val isField: Boolean = false,
         val isStaticSetter: Boolean = false,
-        val isPropertyCategorizedAsMeasurementInViewDebug: Boolean = false,
         val scopeClassName: ClassName? = null /* only used for static calls */
 ) {
     var mutablePropertyName : String? = null
@@ -110,7 +109,6 @@ data class Setter(
         })
         xdSetter.line = this.line
         xdSetter.isField = this.isField
-        xdSetter.isPropertyCategorizedAsMeasurementInViewDebug = this.isPropertyCategorizedAsMeasurementInViewDebug
         if (this.hasPropertyName) xdSetter.propertyName = this.propertyName
         xdSetter.sourcererResult = sourcererResult
         for (callSignatureMap in this.callSignatureMaps.attributesToParameters) {
@@ -132,15 +130,8 @@ data class Setter(
     companion object {
         private val contextCanonicalName = Context::class.java.canonicalName
         private val viewCanonicalName = View::class.java.canonicalName
-        fun getHashCodeFromMethodInfo(method: MethodInfo): Int {
-            return Objects.hash(
-                    method.methodDeclaration.nameAsString,
-                    method.line,
-                    /*isField*/ false,
-                    *method.methodDeclaration.parameters.map {
-                        it.describeType()
-                    }.toTypedArray()
-            )
+        fun getHashCodeFromMethodInfo(method: XdMethod): Int {
+            return Store.transactional { method.accessorHashCode }
         }
         fun getHashCodeFromMethodDeclaration(methodDeclaration: MethodDeclaration): Int {
             return Objects.hash(
@@ -150,6 +141,14 @@ data class Setter(
                     *methodDeclaration.parameters.map {
                         it.describeType()
                     }.toTypedArray()
+            )
+        }
+        fun getHashCode(name: String, line: Int, parameterTypes: List<String>): Int {
+            return Objects.hash(
+                    name,
+                    line,
+                    /*isField*/ false,
+                    *parameterTypes.toTypedArray()
             )
         }
         fun getHashCodeFromField(field: FieldDeclaration): Int {
@@ -251,7 +250,6 @@ class XdSetter (entity: Entity) : XdEntity(entity) {
     val parameters by xdChildren0_N(XdParameter::setter)
     var line by xdRequiredIntProp()
     var isField by xdBooleanProp()
-    var isPropertyCategorizedAsMeasurementInViewDebug by xdBooleanProp()
     var propertyName by xdStringProp()
     var sourcererResult : XdSourcererResult by xdParent(XdSourcererResult::setters)
     val callSignatureMaps
@@ -265,8 +263,7 @@ class XdSetter (entity: Entity) : XdEntity(entity) {
                         xdParam.toSnapshot(false)
                     },
                     this.line,
-                    this.isField,
-                    this.isPropertyCategorizedAsMeasurementInViewDebug
+                    this.isField
             )
             setter.mutablePropertyName = this.propertyName
             for (a2pList in callSignatureMaps.toList()) {

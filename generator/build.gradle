@@ -1,5 +1,6 @@
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
+apply plugin: 'idea'
 
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin/'
@@ -13,25 +14,38 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.squareup:kotlinpoet:1.0.0-RC1'
     implementation "com.squareup.moshi:moshi:$moshi"
-    implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.6.26'
-    //implementation 'com.github.javaparser:javaparser-core-serialization:3.6.26'
-    //implementation 'com.github.dpnolte:javaparser:1b1a4a2a61'
+
+    // java parser
+    implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.6.27'
+    implementation 'com.github.javaparser:javaparser-core-serialization:3.6.27'
+    // serializing java parser nodes
+    implementation group: 'javax.json', name: 'javax.json-api', version: '1.1.3'
+    implementation group: 'org.glassfish', name: 'javax.json', version: '1.1.3'
+
+    // xodus date persistency
     implementation 'org.jetbrains.xodus:xodus-openAPI:1.2.3'
     implementation 'org.jetbrains.xodus:xodus-entity-store:1.2.3'
     implementation 'org.jetbrains.xodus:dnq:1.1.325'
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
+    // typescript generator
     api 'com.github.dpnolte.ts-rhymer:annotation:0.1'
     // lint
     implementation "com.android.tools.lint:lint:$lintVersion"
     // colored print
     implementation 'com.github.ajalt:mordant:1.2.0'
-    // serializing java parser nodes
-    implementation group: 'javax.json', name: 'javax.json-api', version: '1.1.3'
-    implementation group: 'org.glassfish', name: 'javax.json', version: '1.1.3'
 
-
+    testImplementation "com.nhaarman:mockito-kotlin:1.6.0"
+    testImplementation 'org.amshove.kluent:kluent:1.37'
+    testImplementation 'org.amshove.kluent:kluent-android:1.37'
+    testImplementation 'junit:junit:4.12'
 }
 
+idea {
+    module {
+        excludeDirs += file("bin")
+        excludeDirs += file("indexed")
+    }
+}
 
 evaluationDependsOn(':stub-module')
 def componentIds = project(":stub-module").configurations.debugCompileClasspath.incoming.resolutionResult.allDependencies

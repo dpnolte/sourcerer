@@ -3,11 +3,10 @@ package com.laidpack.sourcerer.generated.recyclerview
 import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
-import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsFactory
 import java.lang.Class
 import kotlin.String
 
-open class GridLayoutManagerLayoutParamsFactory<TLayoutParams : GridLayoutManager.LayoutParams, TAttributes : GridLayoutManagerLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
+open class GridLayoutManagerLayoutParamsFactory<TLayoutParams : GridLayoutManager.LayoutParams, TAttributes : GridLayoutManagerLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : RecyclerViewLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = GridLayoutManager.LayoutParams(GridLayoutManager.LayoutParams.MATCH_PARENT, GridLayoutManager.LayoutParams.MATCH_PARENT)

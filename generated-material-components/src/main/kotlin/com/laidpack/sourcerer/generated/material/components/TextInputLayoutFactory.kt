@@ -21,27 +21,27 @@ open class TextInputLayoutFactory<TView : TextInputLayout, TAttributes : TextInp
         if (view is TextInputLayout) {
             view.apply {
                 attributes.hintEnabled?.let {
-                    if (isEnabled != it) {
+                    if (isHintEnabled != it) {
                         isHintEnabled = it
                     }
                 }
                 attributes.hintAnimationEnabled?.let {
-                    if (isEnabled != it) {
+                    if (isHintAnimationEnabled != it) {
                         isHintAnimationEnabled = it
                     }
                 }
                 attributes.helperTextEnabled?.let {
-                    if (isEnabled != it) {
+                    if (isHelperTextEnabled != it) {
                         isHelperTextEnabled = it
                     }
                 }
                 attributes.errorEnabled?.let {
-                    if (isEnabled != it) {
+                    if (isErrorEnabled != it) {
                         isErrorEnabled = it
                     }
                 }
                 attributes.counterEnabled?.let {
-                    if (isEnabled != it) {
+                    if (isCounterEnabled != it) {
                         isCounterEnabled = it
                     }
                 }

@@ -12,6 +12,24 @@ open class ViewPagerLayoutParamsFactory<TLayoutParams : ViewPager.LayoutParams, 
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = ViewPager.LayoutParams()
 
+    override fun init(
+        layoutParams: ViewGroup.LayoutParams,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(layoutParams, context, attributes)
+        if (layoutParams is ViewPager.LayoutParams) {
+            layoutParams.apply {
+                attributes.layout_gravity?.let {
+                    val localLayoutGravity = it.value
+                    if (localLayoutGravity != gravity) {
+                        gravity = localLayoutGravity
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "androidx.viewpager.widget.ViewPager.LayoutParams"
 

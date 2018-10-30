@@ -2,8 +2,7 @@ package com.laidpack.sourcerer.generator.generators
 
 import com.laidpack.sourcerer.generator.generators.templates.BehaviorUtilsTemplateProvider
 import com.laidpack.sourcerer.generator.generators.templates.CodeTemplateProvider
-import com.laidpack.sourcerer.generator.resources.Widget
-import com.laidpack.sourcerer.generator.resources.WidgetConnoisseur
+import com.laidpack.sourcerer.generator.resources.widgets.WidgetConnoisseur
 import java.io.File
 
 class TemplateGenerator() {

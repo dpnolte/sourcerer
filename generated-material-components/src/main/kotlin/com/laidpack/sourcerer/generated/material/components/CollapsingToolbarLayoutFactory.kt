@@ -83,7 +83,7 @@ open class CollapsingToolbarLayoutFactory<TView : CollapsingToolbarLayout, TAttr
                     }
                 }
                 attributes.titleEnabled?.let {
-                    if (isEnabled != it) {
+                    if (isTitleEnabled != it) {
                         isTitleEnabled = it
                     }
                 }

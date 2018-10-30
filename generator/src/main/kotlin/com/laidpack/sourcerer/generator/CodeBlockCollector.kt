@@ -1,6 +1,6 @@
 package com.laidpack.sourcerer.generator
 
-import com.laidpack.sourcerer.generator.peeker.ClassInfo
+import com.laidpack.sourcerer.generator.index.ClassInfo
 import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.target.CodeBlock
 import com.laidpack.sourcerer.generator.target.Setter

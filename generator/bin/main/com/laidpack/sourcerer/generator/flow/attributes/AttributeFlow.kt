@@ -55,7 +55,7 @@ class AttributeInSource(className: ClassName, name: String, val resourceName: St
     val transformingCodes = mutableListOf<TransformingCode>()
 }
 
-/** essentially state holder for classOrInterfaceDeclarationProvider handlers **/
+/** essentially state holder for getClassOrInterfaceDeclaration handlers **/
 class AttributeFlow (
         val attributeSetVariableName: SimpleName,
         private val manager: AttributeManager,

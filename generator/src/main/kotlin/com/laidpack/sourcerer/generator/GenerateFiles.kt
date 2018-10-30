@@ -1,6 +1,6 @@
 package com.laidpack.sourcerer.generator
 
-import com.laidpack.sourcerer.generator.peeker.*
+import com.laidpack.sourcerer.generator.index.*
 import com.laidpack.sourcerer.generator.resources.*
 import com.github.javaparser.ast.Node as JavaNode
 
@@ -11,7 +11,7 @@ fun main(args: Array<String>) {
     initParserAndStore(env)
 
     val sourcerer = Sourcerer(env)
-    sourcerer.generateFactoriesForClass(ClassRegistry.findBySimpleName(simpleName).first())
+    sourcerer.generateFactoriesForClass(DeclaredTypeRegistry.findBySimpleName(simpleName).first())
 
 }
 

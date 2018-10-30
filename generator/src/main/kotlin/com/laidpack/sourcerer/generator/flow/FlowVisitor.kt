@@ -42,7 +42,7 @@ class FlowVisitor(
             val levelIndicator = if (level < 10) "0$level" else level.toString() // 65
 
             val nodeInfo = levelIndicator + s.repeat(level) + "'${node::class.simpleName}' ${c("-> '$shortName'")}"
-            val padding = " ".repeat( 120 - nodeInfo.length )
+            val padding = " ".repeat( 122 - nodeInfo.length )
             val handled = if (result.isHandled) "true  " else "false "
             val canContinue = if (result.canContinue) "true  " else "false "
             val columns = "$padding|handled?: $handled|continue?: $canContinue|conditional to attr?: ${isConditionalToAttr()} |${result.handlerNames.joinToString()}"

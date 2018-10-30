@@ -48,4 +48,5 @@ dependencies {
 	implementation "androidx.wear:wear:$androidX"
 	implementation project(":services")
 	implementation project(":generated")
+	implementation project(":generated-recyclerview")
 }

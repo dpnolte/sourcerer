@@ -3,11 +3,10 @@ package com.laidpack.sourcerer.generated.leanback
 import android.content.Context
 import android.view.View
 import androidx.leanback.widget.VerticalGridView
-import com.laidpack.sourcerer.generated.ViewGroupFactory
 import java.lang.Class
 import kotlin.String
 
-open class VerticalGridViewFactory<TView : VerticalGridView, TAttributes : VerticalGridViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
+open class VerticalGridViewFactory<TView : VerticalGridView, TAttributes : VerticalGridViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : BaseGridViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = VerticalGridView(context)

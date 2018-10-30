@@ -77,7 +77,9 @@ open class ToolbarFactory<TView : Toolbar, TAttributes : ToolbarAttributes>(inst
                     }
                 }
                 attributes.popupTheme?.let {
-                    popupTheme = it
+                    if (popupTheme != it) {
+                        popupTheme = it
+                    }
                 }
                 attributes.navigationIcon?.let {
                     val localNavigationIcon = ContextCompat.getDrawable(context, it) as Drawable
@@ -92,10 +94,14 @@ open class ToolbarFactory<TView : Toolbar, TAttributes : ToolbarAttributes>(inst
                 }
                 attributes.logo?.let {
                     val localLogo = ContextCompat.getDrawable(context, it) as Drawable
-                    logo = localLogo
+                    if (logo != localLogo) {
+                        logo = localLogo
+                    }
                 }
                 attributes.logoDescription?.let {
-                    logoDescription = it
+                    if (logoDescription != it) {
+                        logoDescription = it
+                    }
                 }
                 attributes.titleTextColor?.let {
                     setTitleTextColor(it)

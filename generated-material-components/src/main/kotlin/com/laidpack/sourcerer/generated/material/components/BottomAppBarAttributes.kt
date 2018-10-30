@@ -6,11 +6,11 @@ import com.laidpack.sourcerer.generated.DrawingCacheQualityEnum
 import com.laidpack.sourcerer.generated.ForegroundTintModeEnum
 import com.laidpack.sourcerer.generated.LayerTypeEnum
 import com.laidpack.sourcerer.generated.LayoutDirectionEnum
+import com.laidpack.sourcerer.generated.LayoutModeEnum
 import com.laidpack.sourcerer.generated.OverScrollModeEnum
 import com.laidpack.sourcerer.generated.ScrollbarStyleEnum
-import com.laidpack.sourcerer.generated.TextAlignmentEnum
-import com.laidpack.sourcerer.generated.ViewGroupAttributes
 import com.laidpack.sourcerer.generated.VisibilityEnum
+import com.laidpack.sourcerer.generated.appcompat.ToolbarAttributes
 import com.laidpack.sourcerer.services.api.AttributeEnum
 import com.laidpack.sourcerer.services.api.FlagsAccumulator
 import com.laidpack.sourcerer.services.api.Format
@@ -28,6 +28,25 @@ import kotlin.String
 open class BottomAppBarAttributes(
     val fabAlignmentMode: FabAlignmentModeEnum? = null,
     val hideOnScroll: Boolean? = null,
+    title: String? = null,
+    subtitle: String? = null,
+    titleMarginStart: Int? = null,
+    titleMarginEnd: Int? = null,
+    titleMarginTop: Int? = null,
+    titleMarginBottom: Int? = null,
+    contentInsetStart: Int? = null,
+    contentInsetEnd: Int? = null,
+    contentInsetLeft: Int? = null,
+    contentInsetRight: Int? = null,
+    contentInsetStartWithNavigation: Int? = null,
+    contentInsetEndWithActions: Int? = null,
+    popupTheme: Int? = null,
+    navigationIcon: Int? = null,
+    navigationContentDescription: String? = null,
+    logo: Int? = null,
+    logoDescription: String? = null,
+    titleTextColor: Int? = null,
+    subtitleTextColor: Int? = null,
     animateLayoutChanges: Boolean? = null,
     clipChildren: Boolean? = null,
     clipToPadding: Boolean? = null,
@@ -37,17 +56,25 @@ open class BottomAppBarAttributes(
     addStatesFromChildren: Boolean? = null,
     touchscreenBlocksFocus: Boolean? = null,
     splitMotionEvents: Boolean? = null,
+    layoutMode: LayoutModeEnum? = null,
     transitionGroup: Boolean? = null,
     id: Int? = null,
-    scrollX: Int? = null,
-    scrollY: Int? = null,
     background: MultiFormat = MultiFormat(setOf(Format.Color, Format.Reference)),
+    paddingLeft: Int? = null,
+    paddingBottom: Int? = null,
+    paddingEnd: Int? = null,
+    paddingStart: Int? = null,
+    paddingTop: Int? = null,
+    paddingRight: Int? = null,
     focusable: MultiFormat = MultiFormat(setOf(Format.Boolean, Format.Enum)),
     autofillHints: MultiFormat = MultiFormat(setOf(Format.Reference, Format.String)),
     importantForAutofill: FlagsAccumulator? = null,
+    focusableInTouchMode: Boolean? = null,
     visibility: VisibilityEnum? = null,
     fitsSystemWindows: Boolean? = null,
     scrollbarStyle: ScrollbarStyleEnum? = null,
+    isScrollContainer: Boolean? = null,
+    fadeScrollbars: Boolean? = null,
     scrollbarFadeDuration: Int? = null,
     scrollbarDefaultDelayBeforeFade: Int? = null,
     scrollbarSize: Int? = null,
@@ -56,11 +83,17 @@ open class BottomAppBarAttributes(
     nextFocusUp: Int? = null,
     nextFocusDown: Int? = null,
     nextFocusForward: Int? = null,
+    clickable: Boolean? = null,
+    longClickable: Boolean? = null,
+    contextClickable: Boolean? = null,
+    saveEnabled: Boolean? = null,
     filterTouchesWhenObscured: Boolean? = null,
     drawingCacheQuality: DrawingCacheQualityEnum? = null,
     keepScreenOn: Boolean? = null,
     minHeight: Int? = null,
     minWidth: Int? = null,
+    soundEffectsEnabled: Boolean? = null,
+    hapticFeedbackEnabled: Boolean? = null,
     contentDescription: String? = null,
     accessibilityTraversalBefore: Int? = null,
     accessibilityTraversalAfter: Int? = null,
@@ -80,7 +113,7 @@ open class BottomAppBarAttributes(
     layerType: LayerTypeEnum? = null,
     layoutDirection: LayoutDirectionEnum? = null,
     textDirection: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
-    textAlignment: TextAlignmentEnum? = null,
+    textAlignment: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
     importantForAccessibility: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
     accessibilityLiveRegion: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
     labelFor: Int? = null,
@@ -92,6 +125,7 @@ open class BottomAppBarAttributes(
     foregroundGravity: FlagsAccumulator? = null,
     foregroundTint: Int? = null,
     foregroundTintMode: ForegroundTintModeEnum? = null,
+    scrollIndicators: FlagsAccumulator? = null,
     forceHasOverlappingRendering: Boolean? = null,
     tooltipText: String? = null,
     keyboardNavigationCluster: Boolean? = null,
@@ -103,7 +137,7 @@ open class BottomAppBarAttributes(
     accessibilityHeading: Boolean? = null,
     outlineSpotShadowColor: Int? = null,
     outlineAmbientShadowColor: Int? = null
-) : ViewGroupAttributes(animateLayoutChanges = animateLayoutChanges, clipChildren = clipChildren, clipToPadding = clipToPadding, animationCache = animationCache, persistentDrawingCache = persistentDrawingCache, alwaysDrawnWithCache = alwaysDrawnWithCache, addStatesFromChildren = addStatesFromChildren, touchscreenBlocksFocus = touchscreenBlocksFocus, splitMotionEvents = splitMotionEvents, transitionGroup = transitionGroup, id = id, scrollX = scrollX, scrollY = scrollY, background = background, focusable = focusable, autofillHints = autofillHints, importantForAutofill = importantForAutofill, visibility = visibility, fitsSystemWindows = fitsSystemWindows, scrollbarStyle = scrollbarStyle, scrollbarFadeDuration = scrollbarFadeDuration, scrollbarDefaultDelayBeforeFade = scrollbarDefaultDelayBeforeFade, scrollbarSize = scrollbarSize, nextFocusLeft = nextFocusLeft, nextFocusRight = nextFocusRight, nextFocusUp = nextFocusUp, nextFocusDown = nextFocusDown, nextFocusForward = nextFocusForward, filterTouchesWhenObscured = filterTouchesWhenObscured, drawingCacheQuality = drawingCacheQuality, keepScreenOn = keepScreenOn, minHeight = minHeight, minWidth = minWidth, contentDescription = contentDescription, accessibilityTraversalBefore = accessibilityTraversalBefore, accessibilityTraversalAfter = accessibilityTraversalAfter, overScrollMode = overScrollMode, alpha = alpha, elevation = elevation, translationX = translationX, translationY = translationY, translationZ = translationZ, transformPivotX = transformPivotX, transformPivotY = transformPivotY, rotation = rotation, rotationX = rotationX, rotationY = rotationY, scaleX = scaleX, scaleY = scaleY, layerType = layerType, layoutDirection = layoutDirection, textDirection = textDirection, textAlignment = textAlignment, importantForAccessibility = importantForAccessibility, accessibilityLiveRegion = accessibilityLiveRegion, labelFor = labelFor, transitionName = transitionName, nestedScrollingEnabled = nestedScrollingEnabled, backgroundTint = backgroundTint, backgroundTintMode = backgroundTintMode, foreground = foreground, foregroundGravity = foregroundGravity, foregroundTint = foregroundTint, foregroundTintMode = foregroundTintMode, forceHasOverlappingRendering = forceHasOverlappingRendering, tooltipText = tooltipText, keyboardNavigationCluster = keyboardNavigationCluster, nextClusterForward = nextClusterForward, focusedByDefault = focusedByDefault, defaultFocusHighlightEnabled = defaultFocusHighlightEnabled, screenReaderFocusable = screenReaderFocusable, accessibilityPaneTitle = accessibilityPaneTitle, accessibilityHeading = accessibilityHeading, outlineSpotShadowColor = outlineSpotShadowColor, outlineAmbientShadowColor = outlineAmbientShadowColor),
+) : ToolbarAttributes(title = title, subtitle = subtitle, titleMarginStart = titleMarginStart, titleMarginEnd = titleMarginEnd, titleMarginTop = titleMarginTop, titleMarginBottom = titleMarginBottom, contentInsetStart = contentInsetStart, contentInsetEnd = contentInsetEnd, contentInsetLeft = contentInsetLeft, contentInsetRight = contentInsetRight, contentInsetStartWithNavigation = contentInsetStartWithNavigation, contentInsetEndWithActions = contentInsetEndWithActions, popupTheme = popupTheme, navigationIcon = navigationIcon, navigationContentDescription = navigationContentDescription, logo = logo, logoDescription = logoDescription, titleTextColor = titleTextColor, subtitleTextColor = subtitleTextColor, animateLayoutChanges = animateLayoutChanges, clipChildren = clipChildren, clipToPadding = clipToPadding, animationCache = animationCache, persistentDrawingCache = persistentDrawingCache, alwaysDrawnWithCache = alwaysDrawnWithCache, addStatesFromChildren = addStatesFromChildren, touchscreenBlocksFocus = touchscreenBlocksFocus, splitMotionEvents = splitMotionEvents, layoutMode = layoutMode, transitionGroup = transitionGroup, id = id, background = background, paddingLeft = paddingLeft, paddingBottom = paddingBottom, paddingEnd = paddingEnd, paddingStart = paddingStart, paddingTop = paddingTop, paddingRight = paddingRight, focusable = focusable, autofillHints = autofillHints, importantForAutofill = importantForAutofill, focusableInTouchMode = focusableInTouchMode, visibility = visibility, fitsSystemWindows = fitsSystemWindows, scrollbarStyle = scrollbarStyle, isScrollContainer = isScrollContainer, fadeScrollbars = fadeScrollbars, scrollbarFadeDuration = scrollbarFadeDuration, scrollbarDefaultDelayBeforeFade = scrollbarDefaultDelayBeforeFade, scrollbarSize = scrollbarSize, nextFocusLeft = nextFocusLeft, nextFocusRight = nextFocusRight, nextFocusUp = nextFocusUp, nextFocusDown = nextFocusDown, nextFocusForward = nextFocusForward, clickable = clickable, longClickable = longClickable, contextClickable = contextClickable, saveEnabled = saveEnabled, filterTouchesWhenObscured = filterTouchesWhenObscured, drawingCacheQuality = drawingCacheQuality, keepScreenOn = keepScreenOn, minHeight = minHeight, minWidth = minWidth, soundEffectsEnabled = soundEffectsEnabled, hapticFeedbackEnabled = hapticFeedbackEnabled, contentDescription = contentDescription, accessibilityTraversalBefore = accessibilityTraversalBefore, accessibilityTraversalAfter = accessibilityTraversalAfter, overScrollMode = overScrollMode, alpha = alpha, elevation = elevation, translationX = translationX, translationY = translationY, translationZ = translationZ, transformPivotX = transformPivotX, transformPivotY = transformPivotY, rotation = rotation, rotationX = rotationX, rotationY = rotationY, scaleX = scaleX, scaleY = scaleY, layerType = layerType, layoutDirection = layoutDirection, textDirection = textDirection, textAlignment = textAlignment, importantForAccessibility = importantForAccessibility, accessibilityLiveRegion = accessibilityLiveRegion, labelFor = labelFor, transitionName = transitionName, nestedScrollingEnabled = nestedScrollingEnabled, backgroundTint = backgroundTint, backgroundTintMode = backgroundTintMode, foreground = foreground, foregroundGravity = foregroundGravity, foregroundTint = foregroundTint, foregroundTintMode = foregroundTintMode, scrollIndicators = scrollIndicators, forceHasOverlappingRendering = forceHasOverlappingRendering, tooltipText = tooltipText, keyboardNavigationCluster = keyboardNavigationCluster, nextClusterForward = nextClusterForward, focusedByDefault = focusedByDefault, defaultFocusHighlightEnabled = defaultFocusHighlightEnabled, screenReaderFocusable = screenReaderFocusable, accessibilityPaneTitle = accessibilityPaneTitle, accessibilityHeading = accessibilityHeading, outlineSpotShadowColor = outlineSpotShadowColor, outlineAmbientShadowColor = outlineAmbientShadowColor),
         IAttributes
 
 enum class FabAlignmentModeEnum(override val key: String, override val value: Int) : AttributeEnum {
@@ -111,11 +145,5 @@ enum class FabAlignmentModeEnum(override val key: String, override val value: In
     Center("center", 0),
 
     @Json(name = "end")
-    End("end", 1),
-
-    @Json(name = "fab_alignment_mode_center")
-    FabAlignmentModeCenter("fab_alignment_mode_center", 0),
-
-    @Json(name = "fab_alignment_mode_end")
-    FabAlignmentModeEnd("fab_alignment_mode_end", 1);
+    End("end", 1);
 }

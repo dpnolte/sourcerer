@@ -22,15 +22,22 @@ import kotlin.String
 @TypeScript
 open class ViewAttributes(
     @field:ReferenceQualifier val id: Int? = null,
-    @field:DimensionQualifier val scrollX: Int? = null,
-    @field:DimensionQualifier val scrollY: Int? = null,
     @field:MultiFormatQualifier(formats = [Format.Color, Format.Reference]) val background: MultiFormat = MultiFormat(setOf(Format.Color, Format.Reference)),
+    @field:DimensionQualifier val paddingLeft: Int? = null,
+    @field:DimensionQualifier val paddingBottom: Int? = null,
+    @field:DimensionQualifier val paddingEnd: Int? = null,
+    @field:DimensionQualifier val paddingStart: Int? = null,
+    @field:DimensionQualifier val paddingTop: Int? = null,
+    @field:DimensionQualifier val paddingRight: Int? = null,
     @field:MultiFormatQualifier(formats = [Format.Boolean, Format.Enum], enumType = FocusableEnum::class) val focusable: MultiFormat = MultiFormat(setOf(Format.Boolean, Format.Enum)),
     @field:MultiFormatQualifier(formats = [Format.Reference, Format.String]) val autofillHints: MultiFormat = MultiFormat(setOf(Format.Reference, Format.String)),
     @field:FlagsQualifier(flagsType = ImportantForAutofillFlagsEnum::class) val importantForAutofill: FlagsAccumulator? = null,
+    val focusableInTouchMode: Boolean? = null,
     val visibility: VisibilityEnum? = null,
     val fitsSystemWindows: Boolean? = null,
     val scrollbarStyle: ScrollbarStyleEnum? = null,
+    val isScrollContainer: Boolean? = null,
+    val fadeScrollbars: Boolean? = null,
     val scrollbarFadeDuration: Int? = null,
     val scrollbarDefaultDelayBeforeFade: Int? = null,
     @field:DimensionQualifier val scrollbarSize: Int? = null,
@@ -39,11 +46,17 @@ open class ViewAttributes(
     @field:ReferenceQualifier val nextFocusUp: Int? = null,
     @field:ReferenceQualifier val nextFocusDown: Int? = null,
     @field:ReferenceQualifier val nextFocusForward: Int? = null,
+    val clickable: Boolean? = null,
+    val longClickable: Boolean? = null,
+    val contextClickable: Boolean? = null,
+    val saveEnabled: Boolean? = null,
     val filterTouchesWhenObscured: Boolean? = null,
     val drawingCacheQuality: DrawingCacheQualityEnum? = null,
     val keepScreenOn: Boolean? = null,
-    @field:DimensionQualifier val minHeight: Int? = null,
-    @field:DimensionQualifier val minWidth: Int? = null,
+    val minHeight: Int? = null,
+    val minWidth: Int? = null,
+    val soundEffectsEnabled: Boolean? = null,
+    val hapticFeedbackEnabled: Boolean? = null,
     val contentDescription: String? = null,
     val accessibilityTraversalBefore: Int? = null,
     val accessibilityTraversalAfter: Int? = null,
@@ -63,7 +76,7 @@ open class ViewAttributes(
     val layerType: LayerTypeEnum? = null,
     val layoutDirection: LayoutDirectionEnum? = null,
     @field:MultiFormatQualifier(formats = [Format.Integer, Format.Enum], enumType = TextDirectionEnum::class) val textDirection: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
-    val textAlignment: TextAlignmentEnum? = null,
+    @field:MultiFormatQualifier(formats = [Format.Integer, Format.Enum], enumType = TextAlignmentEnum::class) val textAlignment: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
     @field:MultiFormatQualifier(formats = [Format.Integer, Format.Enum], enumType = ImportantForAccessibilityEnum::class) val importantForAccessibility: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
     @field:MultiFormatQualifier(formats = [Format.Integer, Format.Enum], enumType = AccessibilityLiveRegionEnum::class) val accessibilityLiveRegion: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
     @field:ReferenceQualifier val labelFor: Int? = null,
@@ -75,6 +88,7 @@ open class ViewAttributes(
     @field:FlagsQualifier(flagsType = ForegroundGravityFlagsEnum::class) val foregroundGravity: FlagsAccumulator? = null,
     @field:ColorQualifier val foregroundTint: Int? = null,
     val foregroundTintMode: ForegroundTintModeEnum? = null,
+    @field:FlagsQualifier(flagsType = ScrollIndicatorsFlagsEnum::class) val scrollIndicators: FlagsAccumulator? = null,
     val forceHasOverlappingRendering: Boolean? = null,
     val tooltipText: String? = null,
     val keyboardNavigationCluster: Boolean? = null,
@@ -90,16 +104,7 @@ open class ViewAttributes(
 
 enum class FocusableEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "auto")
-    Auto("auto", 16),
-
-    @Json(name = "not_focusable")
-    NotFocusable("not_focusable", 0),
-
-    @Json(name = "focusable")
-    Focusable("focusable", 1),
-
-    @Json(name = "focusable_auto")
-    FocusableAuto("focusable_auto", 16);
+    Auto("auto", 16);
 }
 
 enum class ImportantForAutofillFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
@@ -124,10 +129,10 @@ enum class VisibilityEnum(override val key: String, override val value: Int) : A
     Visible("visible", 0),
 
     @Json(name = "invisible")
-    Invisible("invisible", 4),
+    Invisible("invisible", 1),
 
     @Json(name = "gone")
-    Gone("gone", 8);
+    Gone("gone", 2);
 }
 
 enum class ScrollbarStyleEnum(override val key: String, override val value: Int) : AttributeEnum {
@@ -141,19 +146,7 @@ enum class ScrollbarStyleEnum(override val key: String, override val value: Int)
     OutsideOverlay("outsideOverlay", 33554432),
 
     @Json(name = "outsideInset")
-    OutsideInset("outsideInset", 50331648),
-
-    @Json(name = "scrollbars_inside_overlay")
-    ScrollbarsInsideOverlay("scrollbars_inside_overlay", 0),
-
-    @Json(name = "scrollbars_inside_inset")
-    ScrollbarsInsideInset("scrollbars_inside_inset", 16777216),
-
-    @Json(name = "scrollbars_outside_overlay")
-    ScrollbarsOutsideOverlay("scrollbars_outside_overlay", 33554432),
-
-    @Json(name = "scrollbars_outside_inset")
-    ScrollbarsOutsideInset("scrollbars_outside_inset", 50331648);
+    OutsideInset("outsideInset", 50331648);
 }
 
 enum class DrawingCacheQualityEnum(override val key: String, override val value: Int) : AttributeEnum {
@@ -164,16 +157,7 @@ enum class DrawingCacheQualityEnum(override val key: String, override val value:
     Low("low", 1),
 
     @Json(name = "high")
-    High("high", 2),
-
-    @Json(name = "drawing_cache_quality_low")
-    DrawingCacheQualityLow("drawing_cache_quality_low", 524288),
-
-    @Json(name = "drawing_cache_quality_high")
-    DrawingCacheQualityHigh("drawing_cache_quality_high", 1048576),
-
-    @Json(name = "drawing_cache_quality_auto")
-    DrawingCacheQualityAuto("drawing_cache_quality_auto", 0);
+    High("high", 2);
 }
 
 enum class OverScrollModeEnum(override val key: String, override val value: Int) : AttributeEnum {
@@ -209,19 +193,7 @@ enum class LayoutDirectionEnum(override val key: String, override val value: Int
     Inherit("inherit", 2),
 
     @Json(name = "locale")
-    Locale("locale", 3),
-
-    @Json(name = "layout_direction_ltr")
-    LayoutDirectionLtr("layout_direction_ltr", 0),
-
-    @Json(name = "layout_direction_rtl")
-    LayoutDirectionRtl("layout_direction_rtl", 1),
-
-    @Json(name = "layout_direction_inherit")
-    LayoutDirectionInherit("layout_direction_inherit", 2),
-
-    @Json(name = "layout_direction_locale")
-    LayoutDirectionLocale("layout_direction_locale", 3);
+    Locale("locale", 3);
 }
 
 enum class TextDirectionEnum(override val key: String, override val value: Int) : AttributeEnum {
@@ -270,28 +242,7 @@ enum class TextAlignmentEnum(override val key: String, override val value: Int) 
     ViewStart("viewStart", 5),
 
     @Json(name = "viewEnd")
-    ViewEnd("viewEnd", 6),
-
-    @Json(name = "text_alignment_inherit")
-    TextAlignmentInherit("text_alignment_inherit", 0),
-
-    @Json(name = "text_alignment_gravity")
-    TextAlignmentGravity("text_alignment_gravity", 1),
-
-    @Json(name = "text_alignment_center")
-    TextAlignmentCenter("text_alignment_center", 4),
-
-    @Json(name = "text_alignment_text_start")
-    TextAlignmentTextStart("text_alignment_text_start", 2),
-
-    @Json(name = "text_alignment_text_end")
-    TextAlignmentTextEnd("text_alignment_text_end", 3),
-
-    @Json(name = "text_alignment_view_start")
-    TextAlignmentViewStart("text_alignment_view_start", 5),
-
-    @Json(name = "text_alignment_view_end")
-    TextAlignmentViewEnd("text_alignment_view_end", 6);
+    ViewEnd("viewEnd", 6);
 }
 
 enum class ImportantForAccessibilityEnum(override val key: String, override val value: Int) : AttributeEnum {
@@ -395,4 +346,27 @@ enum class ForegroundTintModeEnum(override val key: String, override val value: 
 
     @Json(name = "add")
     Add("add", 16);
+}
+
+enum class ScrollIndicatorsFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
+    @Json(name = "none")
+    None("none", 0),
+
+    @Json(name = "top")
+    Top("top", 1),
+
+    @Json(name = "bottom")
+    Bottom("bottom", 2),
+
+    @Json(name = "left")
+    Left("left", 4),
+
+    @Json(name = "right")
+    Right("right", 8),
+
+    @Json(name = "start")
+    Start("start", 16),
+
+    @Json(name = "end")
+    End("end", 32);
 }

@@ -7,12 +7,12 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.button.MaterialButton
-import com.laidpack.sourcerer.generated.ButtonFactory
+import com.laidpack.sourcerer.generated.appcompat.AppCompatButtonFactory
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
-open class MaterialButtonFactory<TView : MaterialButton, TAttributes : MaterialButtonAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ButtonFactory<TView, TAttributes>(instanceType, attributesType) {
+open class MaterialButtonFactory<TView : MaterialButton, TAttributes : MaterialButtonAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AppCompatButtonFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = MaterialButton(context)

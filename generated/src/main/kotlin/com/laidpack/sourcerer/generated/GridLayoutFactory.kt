@@ -44,6 +44,16 @@ open class GridLayoutFactory<TView : GridLayout, TAttributes : GridLayoutAttribu
                         alignmentMode = it.value
                     }
                 }
+                attributes.rowOrderPreserved?.let {
+                    if (isRowOrderPreserved != it) {
+                        isRowOrderPreserved = it
+                    }
+                }
+                attributes.columnOrderPreserved?.let {
+                    if (isColumnOrderPreserved != it) {
+                        isColumnOrderPreserved = it
+                    }
+                }
             }
         }
     }
