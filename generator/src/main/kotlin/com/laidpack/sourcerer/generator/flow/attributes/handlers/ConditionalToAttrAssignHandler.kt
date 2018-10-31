@@ -36,8 +36,7 @@ class ConditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHandle
     private fun methodCallIsAssignedToVariable(node: AssignExpr) {
         val targetExpr = node.target.asNameExpr()
         val valueExpr = node.value.asMethodCallExpr()
-        if (!flow.classInfo.isFieldFromThisClassOrSuperClass(targetExpr.nameAsString)
-                && flow.isAttributeValueRetrievedWithMethodCall(valueExpr)) {
+        if (flow.isAttributeValueRetrievedWithMethodCall(valueExpr)) {
             flow.setTypedArrayGetterForAttribute(valueExpr)
             flow.addVariableAsDerivedFromAttribute(targetExpr.nameAsString, valueExpr)
         }

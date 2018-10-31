@@ -51,9 +51,8 @@ open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(i
                         }
                     }
                     attributes.gravity?.let {
-                        val localGravity = it.value
-                        if (gravity != localGravity) {
-                            gravity = localGravity
+                        if (gravity != it.value) {
+                            gravity = it.value
                         }
                     }
                 }

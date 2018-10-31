@@ -64,6 +64,16 @@ open class CardViewFactory<TView : CardView, TAttributes : CardViewAttributes>(i
                         setContentPadding(localContentPaddingLeft, localContentPaddingTop, localContentPaddingRight, localContentPaddingBottom)
                     }
                 }
+                attributes.android_minWidth?.let {
+                    if (minimumWidth != it) {
+                        minimumWidth = it
+                    }
+                }
+                attributes.android_minHeight?.let {
+                    if (minimumHeight != it) {
+                        minimumHeight = it
+                    }
+                }
             }
         }
     }

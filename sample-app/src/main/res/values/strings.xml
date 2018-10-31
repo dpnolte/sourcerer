@@ -5,4 +5,5 @@
     <string name="connection_status_disconnected">connection status: DISCONNECTED</string>
     <string name="start_the_sample_server_by_gradlew_sample_server_run">Start the sample-server by ./gradlew :sample-server:run</string>
     <string name="edit_json_remotely_http_0_0_0_0_9000">Edit json remotely @ http://0.0.0.0:9000/</string>
+    <string name="tap_status_bar">Tap status bar below to reconnect/</string>
 </resources>

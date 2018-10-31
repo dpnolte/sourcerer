@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
     ProjectGeneratorManager.deleteTempFiles(env)
 
     val sourcerer = Sourcerer(env, widgetRegistry = widgetRegistry)
-    //Store.deleteSourcererResults()
+    Store.deleteSourcererResults()
     sourcerer.generateFactoriesForAllWidgets()
     BaseNodeHandler.printExecutionTimes()
 }

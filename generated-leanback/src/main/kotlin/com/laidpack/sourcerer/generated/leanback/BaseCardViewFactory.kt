@@ -12,6 +12,33 @@ open class BaseCardViewFactory<TView : BaseCardView, TAttributes : BaseCardViewA
 
     override fun createInstance(context: Context): View = BaseCardView(context)
 
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is BaseCardView) {
+            view.apply {
+                attributes.lbcardType?.let {
+                    if (cardType != it) {
+                        cardType = it
+                    }
+                }
+                attributes.lbinfoVisibility?.let {
+                    if (visibility != it) {
+                        infoVisibility = it
+                    }
+                }
+                attributes.lbextraVisibility?.let {
+                    if (visibility != it) {
+                        extraVisibility = it
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "baseCardView"
 

@@ -22,6 +22,7 @@ import kotlin.String
 @TypeScript
 open class ViewAttributes(
     @field:ReferenceQualifier val id: Int? = null,
+    val tag: String? = null,
     @field:MultiFormatQualifier(formats = [Format.Color, Format.Reference]) val background: MultiFormat = MultiFormat(setOf(Format.Color, Format.Reference)),
     @field:DimensionQualifier val paddingLeft: Int? = null,
     @field:DimensionQualifier val paddingBottom: Int? = null,
@@ -53,8 +54,8 @@ open class ViewAttributes(
     val filterTouchesWhenObscured: Boolean? = null,
     val drawingCacheQuality: DrawingCacheQualityEnum? = null,
     val keepScreenOn: Boolean? = null,
-    val minHeight: Int? = null,
-    val minWidth: Int? = null,
+    @field:DimensionQualifier val minHeight: Int? = null,
+    @field:DimensionQualifier val minWidth: Int? = null,
     val soundEffectsEnabled: Boolean? = null,
     val hapticFeedbackEnabled: Boolean? = null,
     val contentDescription: String? = null,
@@ -73,6 +74,7 @@ open class ViewAttributes(
     val rotationY: Float? = null,
     val scaleX: Float? = null,
     val scaleY: Float? = null,
+    val verticalScrollbarPosition: VerticalScrollbarPositionEnum? = null,
     val layerType: LayerTypeEnum? = null,
     val layoutDirection: LayoutDirectionEnum? = null,
     @field:MultiFormatQualifier(formats = [Format.Integer, Format.Enum], enumType = TextDirectionEnum::class) val textDirection: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Enum)),
@@ -169,6 +171,17 @@ enum class OverScrollModeEnum(override val key: String, override val value: Int)
 
     @Json(name = "never")
     Never("never", 2);
+}
+
+enum class VerticalScrollbarPositionEnum(override val key: String, override val value: Int) : AttributeEnum {
+    @Json(name = "defaultPosition")
+    DefaultPosition("defaultPosition", 0),
+
+    @Json(name = "left")
+    Left("left", 1),
+
+    @Json(name = "right")
+    Right("right", 2);
 }
 
 enum class LayerTypeEnum(override val key: String, override val value: Int) : AttributeEnum {

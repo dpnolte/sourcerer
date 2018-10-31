@@ -8,6 +8,7 @@ import com.laidpack.sourcerer.services.api.FlagsQualifier
 import com.laidpack.sourcerer.services.api.Format
 import com.laidpack.sourcerer.services.api.IAttributes
 import com.laidpack.sourcerer.services.api.MultiFormat
+import com.laidpack.sourcerer.services.api.MultiFormatQualifier
 import com.laidpack.sourcerer.services.api.ReferenceQualifier
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -20,9 +21,10 @@ open class CoordinatorLayoutLayoutParamsAttributes(
     val layout_behavior: String? = null,
     @field:ReferenceQualifier val layout_anchor: Int? = null,
     val layout_keyline: Int? = null,
-    @field:FlagsQualifier(flagsType = LayoutAnchorGravityFlagsEnum::class) val layout_anchorGravity: FlagsAccumulator? = null,
+    @field:MultiFormatQualifier(formats = [Format.Integer, Format.Flags], flagsType = LayoutAnchorGravityFlagsEnum::class) val layout_anchorGravity: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Flags)),
     val layout_insetEdge: LayoutInsetEdgeEnum? = null,
     @field:FlagsQualifier(flagsType = LayoutDodgeInsetEdgesFlagsEnum::class) val layout_dodgeInsetEdges: FlagsAccumulator? = null,
+    val android_layout_gravity: Int? = null,
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_marginLeft: Int? = null,

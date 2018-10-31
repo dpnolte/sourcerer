@@ -8,6 +8,7 @@ import android.os.Build
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import com.laidpack.sourcerer.services.api.toTruncateAt
 import java.lang.Class
@@ -36,19 +37,28 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                         hint = it
                     }
                 }
-                attributes.textColor?.let {
-                    if (textColors.defaultColor != it) {
-                        setTextColor(it)
+                if (attributes.textColor.hasColor || attributes.textColor.hasReference) {
+                    val localTextColor = when {
+                        attributes.textColor.hasColor -> ColorStateList.valueOf(attributes.textColor.color)
+                        else -> ResourcesCompat.getColorStateList(context.resources, attributes.textColor.reference, null)
+                    }
+                    if (textColors != localTextColor) {
+                        setTextColor(localTextColor)
                     }
                 }
-                attributes.textColorHint?.let {
-                    if (hintTextColors.defaultColor != it) {
-                        setHintTextColor(it)
+                if (attributes.textColorHint.hasColor || attributes.textColorHint.hasReference) {
+                    val localTextColorHint = when {
+                        attributes.textColorHint.hasColor -> ColorStateList.valueOf(attributes.textColorHint.color)
+                        else -> ResourcesCompat.getColorStateList(context.resources, attributes.textColorHint.reference, null)
+                    }
+                    if (hintTextColors != localTextColorHint) {
+                        setHintTextColor(localTextColorHint)
                     }
                 }
                 attributes.textSize?.let {
-                    if (textSize != it) {
-                        textSize = it
+                    val localTextSize = it.toFloat()
+                    if (textSize != localTextSize) {
+                        textSize = localTextSize
                     }
                 }
                 attributes.textScaleX?.let {
@@ -56,9 +66,13 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                         textScaleX = it
                     }
                 }
-                attributes.textColorLink?.let {
-                    if (linkTextColors.defaultColor != it) {
-                        setLinkTextColor(it)
+                if (attributes.textColorLink.hasColor || attributes.textColorLink.hasReference) {
+                    val localTextColorLink = when {
+                        attributes.textColorLink.hasColor -> ColorStateList.valueOf(attributes.textColorLink.color)
+                        else -> ResourcesCompat.getColorStateList(context.resources, attributes.textColorLink.reference, null)
+                    }
+                    if (linkTextColors != localTextColorLink) {
+                        setLinkTextColor(localTextColorLink)
                     }
                 }
                 attributes.lines?.let {
@@ -137,6 +151,11 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                 attributes.drawablePadding?.let {
                     if (compoundDrawablePadding != it) {
                         compoundDrawablePadding = it
+                    }
+                }
+                attributes.View_longClickable?.let {
+                    if (isLongClickable != it) {
+                        isLongClickable = it
                     }
                 }
                 attributes.inputType?.let {
@@ -284,6 +303,11 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                     attributes.autoSizeTextType?.let {
                         if (autoSizeTextType != it.value) {
                             setAutoSizeTextTypeWithDefaults(it.value)
+                        }
+                    }
+                    attributes.justificationMode?.let {
+                        if (justificationMode != it.value) {
+                            justificationMode = it.value
                         }
                     }
                 }

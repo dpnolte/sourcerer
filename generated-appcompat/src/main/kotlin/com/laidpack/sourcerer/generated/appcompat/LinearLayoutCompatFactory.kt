@@ -44,6 +44,11 @@ open class LinearLayoutCompatFactory<TView : LinearLayoutCompat, TAttributes : L
                         dividerPadding = it
                     }
                 }
+                attributes.android_baselineAligned?.let {
+                    if (isBaselineAligned != it) {
+                        isBaselineAligned = it
+                    }
+                }
             }
         }
     }

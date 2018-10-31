@@ -36,8 +36,11 @@ open class CoordinatorLayoutLayoutParamsFactory<TLayoutParams : CoordinatorLayou
                         keyline = it
                     }
                 }
-                attributes.layout_anchorGravity?.let {
-                    val localLayoutAnchorGravity = it.value
+                if (attributes.layout_anchorGravity.hasInteger || attributes.layout_anchorGravity.hasFlags) {
+                    val localLayoutAnchorGravity = when {
+                        attributes.layout_anchorGravity.hasInteger -> attributes.layout_anchorGravity.integer
+                        else -> attributes.layout_anchorGravity.flags
+                    }
                     if (localLayoutAnchorGravity != anchorGravity) {
                         anchorGravity = localLayoutAnchorGravity
                     }
@@ -51,6 +54,11 @@ open class CoordinatorLayoutLayoutParamsFactory<TLayoutParams : CoordinatorLayou
                     val localLayoutDodgeInsetEdges = it.value
                     if (localLayoutDodgeInsetEdges != dodgeInsetEdges) {
                         dodgeInsetEdges = localLayoutDodgeInsetEdges
+                    }
+                }
+                attributes.android_layout_gravity?.let {
+                    if (it != gravity) {
+                        gravity = it
                     }
                 }
             }

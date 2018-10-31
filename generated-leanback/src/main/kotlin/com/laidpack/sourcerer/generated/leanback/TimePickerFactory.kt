@@ -11,6 +11,23 @@ open class TimePickerFactory<TView : TimePicker, TAttributes : TimePickerAttribu
 
     override fun createInstance(context: Context): View = TimePicker(context, null)
 
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is TimePicker) {
+            view.apply {
+                attributes.lbis24HourFormat?.let {
+                    if (is24Hour != it) {
+                        setIs24Hour(it)
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "leanback.timePicker"
 

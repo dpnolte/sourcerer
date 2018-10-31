@@ -26,6 +26,15 @@
             android:layout_marginTop="10dp"
             android:text="@string/edit_json_remotely_http_0_0_0_0_9000"
             android:textSize="14sp" />
+
+        <TextView
+                android:id="@+id/explain2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="50dp"
+                android:text="@string/tap_status_bar"
+                android:textSize="10sp" />
     </FrameLayout>
 
     <TextView

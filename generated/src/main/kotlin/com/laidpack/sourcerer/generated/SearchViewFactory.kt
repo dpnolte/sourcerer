@@ -31,6 +31,11 @@ open class SearchViewFactory<TView : SearchView, TAttributes : SearchViewAttribu
                             queryHint = it
                         }
                     }
+                    attributes.maxWidth?.let {
+                        if (maxWidth != it) {
+                            maxWidth = it
+                        }
+                    }
                 }
             }
         }

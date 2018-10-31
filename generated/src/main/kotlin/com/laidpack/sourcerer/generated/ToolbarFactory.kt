@@ -88,6 +88,11 @@ open class ToolbarFactory<TView : Toolbar, TAttributes : ToolbarAttributes>(inst
                         setSubtitleTextColor(it)
                     }
                     if (Build.VERSION.SDK_INT >= 24) {
+                        attributes.titleMargin?.let {
+                            if (titleMarginBottom != it) {
+                                titleMarginBottom = it
+                            }
+                        }
                         attributes.titleMarginStart?.let {
                             if (titleMarginStart != it) {
                                 titleMarginStart = it

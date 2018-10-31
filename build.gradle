@@ -54,6 +54,7 @@ allprojects {
         moshi = "1.7.0"
         lintVersion = '26.0.0-beta5'
         ktorVersion = '0.9.5'
+        tsRhymerVersion = '0.1.1'
     }
 }
 

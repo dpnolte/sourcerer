@@ -84,14 +84,17 @@ class FlowInMethodInterpreter (
                     fieldDescribedType,
                     attrName
             )
-            for (potentialSetter in potentialSetters) {
-                if (interpretPotentialSetterForPrivateField(
-                                potentialSetter,
-                                variableName,
-                                fieldDescribedType,
-                                attrName
-                        )) {
-                    break
+            val attribute = flow.getAttribute(attrName)
+            if (attribute.setterHashCodes.isEmpty()) {
+                for (potentialSetter in potentialSetters) {
+                    if (interpretPotentialSetterForPrivateField(
+                                    potentialSetter,
+                                    variableName,
+                                    fieldDescribedType,
+                                    attribute
+                            )) {
+                        break
+                    }
                 }
             }
 
@@ -102,13 +105,12 @@ class FlowInMethodInterpreter (
             setterMethod: XdMethod,
             variableName: String,
             variableDescribedType: String,
-            attrName: String
+            attribute: AttributeInSource
     ): Boolean {
         // find if any assignment is done to variable
         val setterDeclaration = classInfo.getResolvedMethodDeclarationFromThisClassOrSuperClass(setterMethod)
         val assignExpressions = setterDeclaration.descendantsOfType(AssignExpr::class.java)
         val parameterName = setterDeclaration.parameters.first().nameAsString
-        val attribute = flow.getAttribute(attrName)
         for (assignExpression in assignExpressions) {
             val target = assignExpression.target
             val value = assignExpression.value
@@ -117,7 +119,7 @@ class FlowInMethodInterpreter (
                     && value is NameExpr && value.nameAsString == parameterName
                 ) {
                 attribute.targetClassNames.add(0, variableDescribedType)
-                flow.addSetterToAttribute(setterMethod, 0, listOf(attrName), attribute)
+                flow.addSetterToAttribute(setterMethod, 0, listOf(attribute.name), attribute)
                 return true
             }
         }

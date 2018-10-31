@@ -10,12 +10,12 @@ class TypeValueResolver(private val ifStmt: IfStmt, private val flow: AttributeF
     fun resolveTypeValueConditions() {
         //TODO: findOrCreate support for switch statements and
         if (ifStmt.hasElseBlock()) {
-            val returnStmts = ifStmt.elseStmt.get().descendantsOfType(ReturnStmt::class.java)
-            if (returnStmts.isNotEmpty() && returnStmts.size == 1) {
-                val returnStmt = returnStmts.first()
+            val returnStatements = ifStmt.elseStmt.get().descendantsOfType(ReturnStmt::class.java)
+            if (returnStatements.isNotEmpty() && returnStatements.size == 1) {
+                val returnStmt = returnStatements.first()
                 val hasNoValueCondition = Condition(ConditionType.HasValue, "false")
                 addConditionalImpact(setOf(hasNoValueCondition), returnStmt)
-            } else if (returnStmts.size > 1) throw TODO("not yet implemented: multiple return statements in case of no value")
+            } else if (returnStatements.size > 1) throw TODO("not yet implemented: multiple return statements in case of no value")
         }
         val hasValueCondition = Condition(ConditionType.HasValue, "true")
         val returnStmts = ifStmt.thenStmt.descendantsOfType(ReturnStmt::class.java)
@@ -32,8 +32,8 @@ class TypeValueResolver(private val ifStmt: IfStmt, private val flow: AttributeF
     }
 
     private fun resolveCondition(condition: Expression, inThenBlock: Boolean, otherConditions: Set<Condition>): Condition {
-        return when {
-            condition is BinaryExpr -> resolveBinaryCondition(condition, inThenBlock, otherConditions)
+        return when (condition) {
+            is BinaryExpr -> resolveBinaryCondition(condition, inThenBlock, otherConditions)
             else -> throw IllegalStateException("Condition '$condition' could not be resolved")
         }
     }

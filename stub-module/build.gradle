@@ -42,7 +42,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.squareup.moshi:moshi:$moshi"
     //kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
-    implementation 'com.github.dpnolte.ts-rhymer:annotation:0.1'
+    api "com.github.dpnolte.ts-rhymer:annotation:$tsRhymerVersion"
     implementation "com.google.android.material:material:$materialDesign"
     implementation "androidx.appcompat:appcompat:$androidX"
     implementation "androidx.car:car:$androidXcar"

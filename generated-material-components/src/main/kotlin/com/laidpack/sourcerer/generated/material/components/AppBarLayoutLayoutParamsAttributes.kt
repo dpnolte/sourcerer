@@ -21,7 +21,7 @@ open class AppBarLayoutLayoutParamsAttributes(
     @field:FlagsQualifier(flagsType = LayoutScrollFlagsFlagsEnum::class) val layout_scrollFlags: FlagsAccumulator? = null,
     @field:ReferenceQualifier val layout_scrollInterpolator: Int? = null,
     layout_weight: Float? = null,
-    layout_gravity: FlagsAccumulator? = null,
+    layout_gravity: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Flags)),
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_marginLeft: Int? = null,

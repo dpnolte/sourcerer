@@ -1,4 +1,3 @@
-@file:Suppress("SENSELESS_COMPARISON")
 
 package com.laidpack.sourcerer.generator
 
@@ -12,7 +11,7 @@ import com.github.javaparser.ast.Node as JavaNode
 
 fun main(args: Array<String>) {
     //val input = "TextView" // simple name
-    val input = "androidx.drawerlayout.widget.DrawerLayout.LayoutParams" // canonical name
+    val input = "android.view.View" // canonical name
     SourcererEnvironment.printFlowInterpreterTrace = true
     val env = SourcererEnvironment(args)
     initParserAndStore(env)
@@ -62,7 +61,13 @@ fun main(args: Array<String>) {
             FileRegistry.deleteFileIndexByClass(xdTargetType)
             //Store.deleteSourcererResult(simpleName)
         }
-        else -> throw java.lang.IllegalArgumentException("No class found with (simple) name '$input'")
+        else -> {
+            // check if all files are deleted
+            val allFilesRemoved = Store.transactional { XdFile.all().size() } == 0
+            if (!allFilesRemoved) {
+                throw java.lang.IllegalArgumentException("No class found with (simple) name '$input'")
+            }
+        }
     }
 
     TypeIndexer.scan(widgetRegistry, reindexAll = false)

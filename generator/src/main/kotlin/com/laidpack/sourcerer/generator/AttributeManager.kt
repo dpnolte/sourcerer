@@ -426,7 +426,7 @@ class AttributeManager(
         )
     }
 
-    fun getNameFromResourceId(resourceId: String): String {
+    fun getAttributeNameFromResourceName(resourceId: String): String {
         val subject = if (resourceId.contains('.')) {
             resourceId.substring(resourceId.indexOfLast { c -> c == '.' } + 1)
         } else resourceId
@@ -540,8 +540,24 @@ class AttributeManager(
         }
         return attributes
     }
-    fun addNonDefaultAttribute(attribute: Attribute) {
-        attributesFromXml[attribute.name] = attribute
+    fun addNonDefaultAttributeIfNew(attribute: Attribute): Boolean {
+        return if (attributesFromXml.containsKey(attribute.name)) {
+            val existingAttribute = attributesFromXml[attribute.name] as Attribute
+            var hasAddedFormat = false
+            for (newFormat in attribute.formats) {
+                if (newFormat != StyleableAttributeFormat.Unspecified && !existingAttribute.formats.contains(newFormat)) {
+                    existingAttribute.formats.add(newFormat)
+                    hasAddedFormat = true
+                }
+            }
+            if (existingAttribute.formats.size > 1 && existingAttribute.formats.contains(StyleableAttributeFormat.Unspecified)) {
+                existingAttribute.formats.remove(StyleableAttributeFormat.Unspecified)
+            }
+            hasAddedFormat
+        } else {
+            attributesFromXml[attribute.name] = attribute
+            true
+        }
     }
 
 

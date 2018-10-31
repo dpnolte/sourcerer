@@ -9,9 +9,11 @@ sourceSets {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    // bug -> https://youtrack.jetbrains.com/issue/KT-23744
     implementation files("$sdkDir/platforms/android-$compileSdkVersion/android.jar")
+    // bug -> https://youtrack.jetbrains.com/issue/KT-23744
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'com.squareup:kotlinpoet:1.0.0-RC1'
     implementation "com.squareup.moshi:moshi:$moshi"
 
@@ -28,7 +30,7 @@ dependencies {
     implementation 'org.jetbrains.xodus:dnq:1.1.325'
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
     // typescript generator
-    api 'com.github.dpnolte.ts-rhymer:annotation:0.1'
+    api "com.github.dpnolte.ts-rhymer:annotation:$tsRhymerVersion"
     // lint
     implementation "com.android.tools.lint:lint:$lintVersion"
     // colored print
@@ -94,6 +96,11 @@ task analyzeSource(type: JavaExec) {
 }
 task analyzeClass(type: JavaExec) {
     main = 'com.laidpack.sourcerer.generator.AnalyzeClassKt'
+    classpath = sourceSets.main.runtimeClasspath
+    args = taskArgs
+}
+task analyzeClassWithoutIndexing(type: JavaExec) {
+    main = 'com.laidpack.sourcerer.generator.AnalyzeClassWithoutIndexingKt'
     classpath = sourceSets.main.runtimeClasspath
     args = taskArgs
 }

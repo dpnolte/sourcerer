@@ -24,8 +24,11 @@ open class LinearLayoutLayoutParamsFactory<TLayoutParams : LinearLayout.LayoutPa
                         weight = it
                     }
                 }
-                attributes.layout_gravity?.let {
-                    val localLayoutGravity = it.value
+                if (attributes.layout_gravity.hasInteger || attributes.layout_gravity.hasFlags) {
+                    val localLayoutGravity = when {
+                        attributes.layout_gravity.hasInteger -> attributes.layout_gravity.integer
+                        else -> attributes.layout_gravity.flags
+                    }
                     if (localLayoutGravity != gravity) {
                         gravity = localLayoutGravity
                     }

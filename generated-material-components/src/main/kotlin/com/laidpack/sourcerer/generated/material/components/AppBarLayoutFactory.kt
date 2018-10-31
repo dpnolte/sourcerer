@@ -31,6 +31,16 @@ open class AppBarLayoutFactory<TView : AppBarLayout, TAttributes : AppBarLayoutA
                         isLiftOnScroll = it
                     }
                 }
+                attributes.android_keyboardNavigationCluster?.let {
+                    if (isKeyboardNavigationCluster != it) {
+                        isKeyboardNavigationCluster = it
+                    }
+                }
+                attributes.android_touchscreenBlocksFocus?.let {
+                    if (touchscreenBlocksFocus != it) {
+                        touchscreenBlocksFocus = it
+                    }
+                }
             }
         }
     }

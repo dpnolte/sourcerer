@@ -28,6 +28,12 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     id = it
                 }
             }
+            attributes.tag?.let {
+                val localTag = it
+                if (tag != localTag) {
+                    tag = localTag
+                }
+            }
             attributes.focusableInTouchMode?.let {
                 if (isFocusableInTouchMode != it) {
                     isFocusableInTouchMode = it
@@ -175,6 +181,11 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
             attributes.scaleY?.let {
                 if (scaleY != it) {
                     scaleY = it
+                }
+            }
+            attributes.verticalScrollbarPosition?.let {
+                if (verticalScrollbarPosition != it.value) {
+                    verticalScrollbarPosition = it.value
                 }
             }
             attributes.layerType?.let {

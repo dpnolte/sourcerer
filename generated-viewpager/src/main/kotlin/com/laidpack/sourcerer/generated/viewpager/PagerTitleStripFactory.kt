@@ -21,8 +21,7 @@ open class PagerTitleStripFactory<TView : PagerTitleStrip, TAttributes : PagerTi
         if (view is PagerTitleStrip) {
             view.apply {
                 attributes.gravity?.let {
-                    val localGravity = it.value
-                    setGravity(localGravity)
+                    setGravity(it.value)
                 }
             }
         }

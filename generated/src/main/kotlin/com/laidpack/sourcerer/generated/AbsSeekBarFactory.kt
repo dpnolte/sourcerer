@@ -20,6 +20,11 @@ open class AbsSeekBarFactory<TView : AbsSeekBar, TAttributes : AbsSeekBarAttribu
         super.init(view, context, attributes)
         if (view is AbsSeekBar) {
             view.apply {
+                attributes.SeekBar_thumbOffset?.let {
+                    if (thumbOffset != it) {
+                        thumbOffset = it
+                    }
+                }
                 if (Build.VERSION.SDK_INT >= 21) {
                     attributes.thumbTint?.let {
                         val localThumbTint = ColorStateList.valueOf(it)
@@ -31,6 +36,17 @@ open class AbsSeekBarFactory<TView : AbsSeekBar, TAttributes : AbsSeekBarAttribu
                         val localThumbTintMode = it.value.toPorterDuffMode()
                         if (thumbTintMode != localThumbTintMode) {
                             thumbTintMode = localThumbTintMode
+                        }
+                    }
+                    attributes.SeekBar_thumbTint?.let {
+                        val localSeekBarThumbTint = ColorStateList.valueOf(it)
+                        if (thumbTintList != localSeekBarThumbTint) {
+                            thumbTintList = localSeekBarThumbTint
+                        }
+                    }
+                    attributes.SeekBar_splitTrack?.let {
+                        if (splitTrack != it) {
+                            splitTrack = it
                         }
                     }
                 }
@@ -45,6 +61,12 @@ open class AbsSeekBarFactory<TView : AbsSeekBar, TAttributes : AbsSeekBarAttribu
                         val localTickMarkTintMode = it.value.toPorterDuffMode()
                         if (tickMarkTintMode != localTickMarkTintMode) {
                             tickMarkTintMode = localTickMarkTintMode
+                        }
+                    }
+                    attributes.SeekBar_tickMarkTint?.let {
+                        val localSeekBarTickMarkTint = ColorStateList.valueOf(it)
+                        if (tickMarkTintList != localSeekBarTickMarkTint) {
+                            tickMarkTintList = localSeekBarTickMarkTint
                         }
                     }
                 }

@@ -314,10 +314,12 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
                 Pair(StyleableAttributeFormat.Unspecified, Interpolator::class.asTypeName()) to referenceToInterpolator,
                 Pair(StyleableAttributeFormat.Reference, motionSpecClassName) to referenceToMotionSpec,
                 Pair(StyleableAttributeFormat.Unspecified, motionSpecClassName) to referenceToMotionSpec,
-                Pair(StyleableAttributeFormat.String, ClassName.bestGuess("java.lang.String[]")) to anyToList,
+                Pair(StyleableAttributeFormat.String, ClassName("java.lang", "String[]")) to anyToList,
+                Pair(StyleableAttributeFormat.String, ClassName("java.lang", "Object")) to noTransform,
                 Pair(StyleableAttributeFormat.Reference, String::class.asTypeName()) to referenceToString,
                 Pair(StyleableAttributeFormat.Integer, String::class.asTypeName()) to referenceToString,
                 Pair(StyleableAttributeFormat.String, ClassName("androidx.coordinatorlayout.widget.CoordinatorLayout", "Behavior")) to stringToBehavior
+
         )
         val transformTypeToFormatMap = mapOf(
                 Pair(Float::class.asTypeName(), StyleableAttributeFormat.Integer) to floatToInt,
@@ -328,7 +330,7 @@ abstract class DelegateGeneratorBase(val attributesParam: ParameterSpec, private
                 Pair(ColorStateList::class.asTypeName(), StyleableAttributeFormat.Color) to colorStateListToColor,
                 Pair(ColorStateList::class.asTypeName(), StyleableAttributeFormat.Integer) to colorStateListToColor,
                 Pair(ColorStateList::class.asTypeName(), StyleableAttributeFormat.Unspecified) to colorStateListToColor,
-                Pair(ClassName.bestGuess("java.lang.String[]"), StyleableAttributeFormat.String) to listToFirstValue
+                Pair(ClassName("java.lang", "String[]"), StyleableAttributeFormat.String) to listToFirstValue
         )
         private const val wildcard = "*"
         val transformArrayAccessorMap = mapOf(

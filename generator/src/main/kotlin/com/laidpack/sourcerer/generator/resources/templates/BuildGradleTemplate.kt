@@ -48,7 +48,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${'$'}androidX"
     implementation "com.squareup.moshi:moshi:${'$'}moshi"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:${'$'}moshi"
-    api 'com.github.dpnolte.ts-rhymer:annotation:0.1'
+    api "com.github.dpnolte.ts-rhymer:annotation:${'$'}tsRhymerVersion"
 $extraDependencies
 }
 """.trimIndent()

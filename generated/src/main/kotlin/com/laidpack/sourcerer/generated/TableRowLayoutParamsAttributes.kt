@@ -1,7 +1,6 @@
 package com.laidpack.sourcerer.generated
 
 import com.laidpack.annotation.TypeScript
-import com.laidpack.sourcerer.services.api.FlagsAccumulator
 import com.laidpack.sourcerer.services.api.Format
 import com.laidpack.sourcerer.services.api.IAttributes
 import com.laidpack.sourcerer.services.api.MultiFormat
@@ -13,7 +12,7 @@ import kotlin.Int
 @TypeScript
 open class TableRowLayoutParamsAttributes(
     layout_weight: Float? = null,
-    layout_gravity: FlagsAccumulator? = null,
+    layout_gravity: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Flags)),
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_marginLeft: Int? = null,

@@ -209,7 +209,8 @@ class Sourcerer(
         Store.transactional {
             for (xdSuperClass in result.xdDeclaredType.superClasses.toList()) {
                 if (xdSuperClass.widget != null) {
-                    val xdResult = xdSuperClass.sourcererResult as XdSourcererResult
+                    val xdResult = xdSuperClass.sourcererResult
+                        ?: throw NullPointerException("Sourcerer result for super class ${xdSuperClass.targetClassName} is null. Super class results for ${result.targetClassName} must be resolved first")
                     superClassResults.add(xdResult.toSnapshot())
                 }
             }

@@ -25,6 +25,9 @@ open class WearableDrawerViewFactory<TView : WearableDrawerView, TAttributes : W
                         setIsAutoPeekEnabled(it)
                     }
                 }
+                attributes.android_elevation?.let {
+                    elevation = it
+                }
             }
         }
     }

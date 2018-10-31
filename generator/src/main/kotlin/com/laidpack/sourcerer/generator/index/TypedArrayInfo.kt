@@ -2,6 +2,7 @@ package com.laidpack.sourcerer.generator.index
 
 import com.github.javaparser.ast.body.MethodDeclaration
 import com.github.javaparser.ast.expr.MethodCallExpr
+import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 
 data class TypedArrayInfo(val methods: Map<String, TypedArrayMethodInfo>) {
 
@@ -49,5 +50,6 @@ data class TypedArrayMethodInfo (
         val hasDefaultValueParam: Boolean,
         val defaultValueParamIndex: Int = -1,
         val valueUnit: String = "",
-        val returnTypeClassName: String = ""
+        val returnTypeClassName: String = "",
+        val returnsGuessedFormat: StyleableAttributeFormat
 )

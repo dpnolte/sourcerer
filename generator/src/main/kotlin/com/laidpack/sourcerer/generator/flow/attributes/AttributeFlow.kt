@@ -12,6 +12,7 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.type.Type
 import com.laidpack.sourcerer.generator.*
 import com.laidpack.sourcerer.generator.index.*
+import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.target.Parameter
 import com.laidpack.sourcerer.generator.target.Setter
@@ -181,7 +182,7 @@ class AttributeFlow (
     }
 
     fun addAttribute(resourceName: String) {
-        val name = manager.getNameFromResourceId(resourceName)
+        val name = manager.getAttributeNameFromResourceName(resourceName)
         val attribute = AttributeInSource(classInfo.xdDeclaredType.targetClassName, name, resourceName)
         attributes[attribute.name] = attribute
     }
@@ -286,7 +287,7 @@ class AttributeFlow (
                 arg is NameExpr && arg.nameAsString == resourceNameToParamName.value
             }
             if (isArgumentInCall) {
-                val name = manager.getNameFromResourceId(resourceNameToParamName.key)
+                val name = manager.getAttributeNameFromResourceName(resourceNameToParamName.key)
                 return attributes[name] as AttributeInSource
             }
         }
@@ -294,7 +295,7 @@ class AttributeFlow (
     }
 
     fun getAttributeByResourceId(resourceId: String): AttributeInSource {
-        val name = manager.getNameFromResourceId(resourceId)
+        val name = manager.getAttributeNameFromResourceName(resourceId)
         return attributes[name] as AttributeInSource
     }
 
@@ -396,6 +397,15 @@ class AttributeFlow (
                 defaultValue += "f"
             }
             attribute.defaultValue = defaultValue
+        }
+        // if format is unspecified and typed array getter indicates format type, set that format type
+        if (typedArrayMethod.returnsGuessedFormat != StyleableAttributeFormat.Unspecified
+                && ((attribute.formats.size == 1 && attribute.formats.first() == StyleableAttributeFormat.Unspecified)
+                || attribute.formats.isEmpty())
+        ) {
+            attribute.formats.clear()
+            attribute.formats.add(typedArrayMethod.returnsGuessedFormat)
+            manager.addNonDefaultAttributeIfNew(attribute)
         }
     }
 
@@ -650,14 +660,15 @@ class AttributeFlow (
         }
         val attrs = manager.getAnyNonDefaultAttributeObtained(arrayInitializerExpr.values)
         attrs.forEachIndexed { index, attr ->
-            val methodCallInfo = if (methodCallExpr != null) {
-                " based on $methodCallExpr call"
-            } else ""
-            println("\t\t\tY - added attribute ${attr.name} to ${classInfo.xdDeclaredType.targetClassName}$methodCallInfo")
             typedArrayVariable?.let {
                 typedArrayIndexToResourceName[Pair(it.name.asString(), index)] = attr.name
             }
-            manager.addNonDefaultAttribute(attr)
+            if (manager.addNonDefaultAttributeIfNew(attr)) {
+                val methodCallInfo = if (methodCallExpr != null) {
+                    " based on $methodCallExpr call"
+                } else ""
+                println("\t\t\tY - added attribute ${attr.name} to ${classInfo.xdDeclaredType.targetClassName}$methodCallInfo")
+            }
         }
     }
 
@@ -670,14 +681,15 @@ class AttributeFlow (
                 listOf(fieldAccessExpr)
         )
         attrs.forEachIndexed { index, attr ->
-            val methodCallInfo = if (methodCallExpr != null) {
-                " based on $methodCallExpr call"
-            } else ""
-            println("\t\t\tY - added attribute ${attr.name} to ${classInfo.xdDeclaredType.targetClassName}$methodCallInfo")
             typedArrayVariable?.let {
                 typedArrayIndexToResourceName[Pair(it.name.asString(), index)] = fieldAccessExpr.nameAsString
             }
-            manager.addNonDefaultAttribute(attr)
+            if (manager.addNonDefaultAttributeIfNew(attr)) {
+                val methodCallInfo = if (methodCallExpr != null) {
+                    " based on $methodCallExpr call"
+                } else ""
+                println("\t\t\tY - added attribute ${attr.name} to ${classInfo.xdDeclaredType.targetClassName}$methodCallInfo")
+            }
         }
     }
 

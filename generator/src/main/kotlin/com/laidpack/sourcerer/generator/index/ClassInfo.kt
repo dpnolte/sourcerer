@@ -12,12 +12,15 @@ import com.laidpack.sourcerer.generator.target.Getter
 import com.squareup.kotlinpoet.ClassName
 import kotlinx.dnq.query.*
 
-data class ClassInfo(
+/**
+ * Class wrapper that functions as intermediate between Xodus queries and class details
+ * @note String properties in xodus are case insensitive
+ */
+class ClassInfo(
         val xdDeclaredType: XdDeclaredType,
         val classDeclaration: ClassOrInterfaceDeclaration
 ) {
-    val compilationUnit by lazy {classDeclaration.findCompilationUnit().get()}
-    val classCategory = Store.transactional { xdDeclaredType.classCategory?.toEnum() }
+    val classCategory = Store.transactional(readonly = true) { xdDeclaredType.classCategory?.toEnum() }
     private val superClassDeclarations by lazy {
         Store.transactional {
             xdDeclaredType.superClasses.toList().associate { xdSuperClass ->
@@ -68,20 +71,23 @@ data class ClassInfo(
         }
     }
 
-    fun getPotentialGettersForAnyOfTheseNames(names: List<String>): List<XdMember> {
+    fun getPotentialGettersForAnyOfTheseNames(names: Collection<String>): List<XdMember> {
         val list = mutableListOf<XdMember>()
+        val nameSet = names.toSet()
         Store.transactional {
             val methods = xdDeclaredType.methods.query(
                     (XdMethod::canBeGetter eq true)
-                    and
-                    (XdMethod::name.inValues(names))
-            )
+                        and (XdMethod::name.inValues(names))
+                    )
+                    .toList()
+                    .filter {m -> nameSet.contains(m.name) /* case-sensitive check */  }
             list.addAll(methods.toList())
             val fields = xdDeclaredType.fields.query(
                     (XdField::canBeGetter eq true)
-                            and
-                            (XdField::name.inValues(names))
-            )
+                            and (XdField::name.inValues(names))
+                    )
+                    .toList()
+                    .filter { f -> nameSet.contains(f.name) /* case-sensitive check */ }
             list.addAll(fields.toList())
         }
         return list
@@ -95,7 +101,10 @@ data class ClassInfo(
                             (XdMethod::canBeGetter eq true)
                     )
                     .asSequence()
-                    .firstOrNull { m -> desiredNumberOfAttributes.contains(m.attributeNamesFromBlockTags.size) }
+                    .firstOrNull { m ->
+                        m.name == attribute.name // do case sensitive check
+                            && desiredNumberOfAttributes.contains(m.attributeNamesFromBlockTags.size)
+                    }
             if (xdMethod != null) {
                 return@transactional xdMethod
             }
@@ -105,7 +114,10 @@ data class ClassInfo(
                             (XdField::canBeGetter eq true)
                     )
                     .toList()
-                    .filter {f -> desiredNumberOfAttributes.contains(f.attributeNamesFromBlockTags.size) }
+                    .filter {f ->
+                        f.name == attribute.name // do case sensitive check
+                            && desiredNumberOfAttributes.contains(f.attributeNamesFromBlockTags.size)
+                    }
             return@transactional if (xdFields.size == 1) xdFields.first() else null
         }
     }
@@ -148,20 +160,26 @@ data class ClassInfo(
             return Store.transactional {
                 var xdMethods = xdDeclaredType.methods.query(
                         XdMethod::name eq methodCallExpr.nameAsString
-                ).toList()
+                        )
+                        .toList()
+                        .filter { m -> m.name == methodCallExpr.nameAsString /* case-sensitive filter*/ }
                 // if no result, check if it is a static method of parent
                 if (xdMethods.isEmpty() && xdDeclaredType.isNestedType) {
                     val parentCanonicalName = xdDeclaredType.canonicalName.substring(0, xdDeclaredType.canonicalName.lastIndexOf('.'))
                     val xdParentClass = XdDeclaredType.query(
                             XdDeclaredType::canonicalName eq parentCanonicalName
-                    ).first()
+                            )
+                            .asSequence()
+                            .first { t -> t.canonicalName == parentCanonicalName /* case-sensitive check */  }
                     if (!xdParentClass.resolvedBody) {
                         TypeBodyPeeker.peek(xdParentClass.getClassOrInterfaceDeclaration(), xdParentClass)
                     }
                     xdMethods = xdParentClass.methods.query(
                             (XdMethod::name eq methodCallExpr.nameAsString)
-                            and (XdMethod::isStatic eq true)
-                    ).toList()
+                                and (XdMethod::isStatic eq true)
+                            )
+                            .toList()
+                            .filter { m -> m.name == methodCallExpr.nameAsString /* case-sensitive check */  }
                 }
                 return@transactional if (xdMethods.size == 1) {
                     xdMethods.first()
@@ -226,20 +244,30 @@ data class ClassInfo(
                         }
                         xdClass.methods.query(
                                 XdMethod::name eq methodCallExpr.nameAsString
-                        ).first().describedReturnType
+                                )
+                                .asSequence()
+                                .first { m -> m.name == methodCallExpr.nameAsString /* case-sensitive check */ }
+                                .describedReturnType
                     }
                 } else {
                     val xdField = getFieldFromThisClassOrSuperClass(scopeNameExpr.nameAsString)
                     if (xdField != null) {
                         val canonicalName = xdField.describedType
                         Store.transactional {
-                            val xdClass = XdDeclaredType.query(XdDeclaredType::canonicalName eq canonicalName).first()
-                            if (!xdClass.resolvedBody) {
-                                TypeBodyPeeker.peek(xdClass.getClassOrInterfaceDeclaration(), xdClass)
+                            val xdDeclaredType = XdDeclaredType.query(
+                                    XdDeclaredType::canonicalName eq canonicalName
+                                    )
+                                    .asSequence()
+                                    .first { t -> t.canonicalName == canonicalName /* case-sensitive check */ }
+                            if (!xdDeclaredType.resolvedBody) {
+                                TypeBodyPeeker.peek(xdDeclaredType.getClassOrInterfaceDeclaration(), xdDeclaredType)
                             }
-                            xdClass.methods.query(
+                            xdDeclaredType.methods.query(
                                     XdMethod::name eq methodCallExpr.nameAsString
-                            ).first().describedReturnType
+                                    )
+                                    .asSequence()
+                                    .first { m -> m.name == methodCallExpr.nameAsString /* case-sensitive check */ }
+                                    .describedReturnType
                         }
                     } else {
                         val xdClass = DeclaredSymbolResolver.resolveDeclaredType(scopeNameExpr)
@@ -249,8 +277,10 @@ data class ClassInfo(
                             }
                             val xdMethod = xdClass.methods.query(
                                     XdMethod::name eq methodCallExpr.nameAsString
-                            ).firstOrNull()
-                                    ?: throw IllegalStateException("Cannot resolve return type for method call '$methodCallExpr' with scope name '$scopeNameExpr'")
+                                    )
+                                    .asSequence()
+                                    .firstOrNull { m -> m.name == methodCallExpr.nameAsString /* case-sensitive check */ }
+                                        ?: throw IllegalStateException("Cannot resolve return type for method call '$methodCallExpr' with scope name '$scopeNameExpr'")
                             xdMethod.describedReturnType
                         }
                     }
@@ -264,24 +294,29 @@ data class ClassInfo(
         return Store.transactional {
             xdDeclaredType.methods.query(
                     XdMethod::name eq methodCallExpr.nameAsString
-            ).any()
+                    )
+                    .asSequence()
+                    .any { m -> m.name == methodCallExpr.nameAsString /* case-sensitive check */ }
         }
     }
 
     fun isPublicMethodCallFromThisClassOrSuperClass(methodCallExpr: MethodCallExpr): Boolean {
         val xdMethod = this.getMethodInfoByCallExpr(methodCallExpr)
-        return xdMethod != null && Store.transactional { xdMethod.isPublic }
+        return xdMethod != null && Store.transactional(readonly = true) { xdMethod.isPublic }
     }
     fun isPublicFieldFromThisClassOrSuperClass(methodCallExpr: MethodCallExpr): Boolean {
         val xdMethod = this.getMethodInfoByCallExpr(methodCallExpr)
-        return xdMethod != null && Store.transactional { xdMethod.isPublic }
+        return xdMethod != null && Store.transactional(readonly = true) { xdMethod.isPublic }
     }
 
     fun getFieldFromThisClassOrSuperClass(variableName: String): XdField? {
         return Store.transactional {
             xdDeclaredType.fields.query(
                     XdField::name eq variableName
-            ).firstOrNull() ?: return@transactional null
+                    )
+                    .asSequence()
+                    .firstOrNull { f -> f.name == variableName /* case-sensitive check */ }
+                    ?: return@transactional null
         }
     }
     fun getFieldDeclarationFromThisClassOrSuperClass(variableName: String): FieldDeclaration? {
@@ -322,7 +357,10 @@ data class ClassInfo(
         return Store.transactional {
             val field = xdDeclaredType.fields.query(
                     XdField::name eq variableName
-            ).firstOrNull() ?: return@transactional false
+                    )
+                    .asSequence()
+                    .firstOrNull { f -> f.name == variableName /* case-sensitive check */ }
+                    ?: return@transactional false
 
             return@transactional field.isPublic
         }
@@ -331,7 +369,9 @@ data class ClassInfo(
         return Store.transactional {
             xdDeclaredType.fields.query(
                     XdField::name eq variableName
-            ).any()
+                    )
+                    .asSequence()
+                    .any { f -> f.name == variableName /* case-sensitive check */ }
         }
     }
     fun isFieldFromParentClass(variableName: String): Boolean {
@@ -342,14 +382,18 @@ data class ClassInfo(
                 )
                 val xdAncestorClass = XdDeclaredType.query(
                         XdDeclaredType::canonicalName eq ancestorClassName
-                ).firstOrNull()
+                        )
+                        .asSequence()
+                        .firstOrNull { t -> t.canonicalName == ancestorClassName /* case-sensitive check */ }
                         ?: throw java.lang.IllegalArgumentException("No ancestor class found with name $ancestorClassName")
                 if (!xdAncestorClass.resolvedBody) {
                     TypeBodyPeeker.peek(xdAncestorClass.getClassOrInterfaceDeclaration(), xdAncestorClass)
                 }
                 xdAncestorClass.fields.query(
                         XdField::name eq variableName
-                ).any()
+                        )
+                        .asSequence()
+                        .any{ f -> f.name == variableName /* case-sensitive check */ }
             }
         }
         return false
@@ -363,14 +407,18 @@ data class ClassInfo(
             )
             val xdAncestorClass = XdDeclaredType.query(
                     XdDeclaredType::canonicalName eq ancestorClassName
-            ).firstOrNull()
+                    )
+                    .asSequence()
+                    .firstOrNull { t -> t.canonicalName == ancestorClassName /* case-sensitive check */}
                     ?: throw java.lang.IllegalArgumentException("No ancestor class found with name $ancestorClassName")
             if (!xdAncestorClass.resolvedBody) {
                 TypeBodyPeeker.peek(xdAncestorClass.getClassOrInterfaceDeclaration(), xdAncestorClass)
             }
             val xdField = xdAncestorClass.fields.query(
                     XdField::name eq variableName
-            ).firstOrNull()
+                    )
+                    .asSequence()
+                    .firstOrNull{ f -> f.name == variableName /* case-sensitive check */}
                     ?: throw java.lang.IllegalArgumentException("Ancestor $ancestorClassName class has no field with name $variableName")
             return@transactional xdAncestorClass.getClassOrInterfaceDeclaration().members[xdField.memberIndex] as FieldDeclaration
         }
@@ -381,7 +429,9 @@ data class ClassInfo(
         return Store.transactional {
             val xdMethods = xdDeclaredType.methods.query(
                     XdMethod::name eq setter.name
-            ).toList()
+                    )
+                    .asIterable()
+                    .filter { m -> m.name == setter.name /* case-sensitive check */ }
             return@transactional when {
                 xdMethods.size == 1 -> xdMethods[0]
                 xdMethods.size > 1 -> xdMethods.first { xdMethod -> xdMethod.accessorHashCode == setterHashCode }
@@ -399,7 +449,9 @@ data class ClassInfo(
         return Store.transactional {
             val xdMethods = xdDeclaredType.methods.query(
                     XdMethod::name eq getter.name
-            ).toList()
+                    )
+                    .asIterable()
+                    .filter { m -> m.name == getter.name /* case-sensitive check */ }
             return@transactional when {
                 xdMethods.size == 1 -> xdMethods[0]
                 xdMethods.size > 1 -> xdMethods.first { xdMethod -> xdMethod.accessorHashCode == getterHashCode }
@@ -417,7 +469,9 @@ data class ClassInfo(
         return Store.transactional {
             xdDeclaredType.intDefAnnotations.query(
                     XdIntDefAnnotation::name eq annotationName
-            ).any()
+                    )
+                    .asSequence()
+                    .any { i -> i.name == annotationName /* case-sensitive check */ }
         }
     }
 
@@ -425,7 +479,9 @@ data class ClassInfo(
         return Store.transactional {
             val intDefAnnotation = xdDeclaredType.intDefAnnotations.query(
                     XdIntDefAnnotation::name eq annotationName
-            ).first()
+                    )
+                    .asSequence()
+                    .first { i -> i.name == annotationName /* case-sensitive check */ }
             return@transactional intDefAnnotation.values.toList().map {xdIntDefValue ->
                 StyleableAttributeEnumValue(xdIntDefValue.name, xdIntDefValue.value)
             }

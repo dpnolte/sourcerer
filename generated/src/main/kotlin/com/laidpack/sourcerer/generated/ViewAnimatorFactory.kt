@@ -26,6 +26,11 @@ open class ViewAnimatorFactory<TView : ViewAnimator, TAttributes : ViewAnimatorA
                 attributes.outAnimation?.let {
                     setOutAnimation(context, it)
                 }
+                attributes.FrameLayout_measureAllChildren?.let {
+                    if (measureAllChildren != it) {
+                        measureAllChildren = it
+                    }
+                }
                 if (Build.VERSION.SDK_INT >= 17) {
                     attributes.animateFirstView?.let {
                         if (animateFirstView != it) {

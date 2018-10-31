@@ -152,9 +152,9 @@ internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAt
     }
 
     private fun handleGetResourceValueCall(node: MethodCallExpr) {
-        val resourceIds = getResourceNamesFromArguments(node)
+        val resourceNames = getResourceNamesFromArguments(node)
         val attributesUsedInCall = mutableListOf<AttributeInSource>()
-        resourceIds.values.forEach {
+        resourceNames.values.forEach {
             flow.addAttribute(it)
             val attribute = flow.getAttributeByResourceId(it)
             flow.setTypedArrayGetterForAttribute(node, attribute)

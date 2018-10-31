@@ -12,6 +12,23 @@ open class LinearLayoutCompatLayoutParamsFactory<TLayoutParams : LinearLayoutCom
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = LinearLayoutCompat.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.MATCH_PARENT)
 
+    override fun init(
+        layoutParams: ViewGroup.LayoutParams,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(layoutParams, context, attributes)
+        if (layoutParams is LinearLayoutCompat.LayoutParams) {
+            layoutParams.apply {
+                attributes.android_layout_weight?.let {
+                    if (it != weight) {
+                        weight = it
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "androidx.appcompat.widget.LinearLayoutCompat.LayoutParams"
 

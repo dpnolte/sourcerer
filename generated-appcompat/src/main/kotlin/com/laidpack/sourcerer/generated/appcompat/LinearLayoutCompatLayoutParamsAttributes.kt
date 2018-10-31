@@ -6,11 +6,13 @@ import com.laidpack.sourcerer.services.api.Format
 import com.laidpack.sourcerer.services.api.IAttributes
 import com.laidpack.sourcerer.services.api.MultiFormat
 import com.squareup.moshi.JsonClass
+import kotlin.Float
 import kotlin.Int
 
 @JsonClass(generateAdapter = true)
 @TypeScript
 open class LinearLayoutCompatLayoutParamsAttributes(
+    val android_layout_weight: Float? = null,
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_marginLeft: Int? = null,

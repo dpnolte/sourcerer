@@ -20,13 +20,23 @@ open class SearchViewFactory<TView : SearchView, TAttributes : SearchViewAttribu
         if (view is SearchView) {
             view.apply {
                 attributes.iconifiedByDefault?.let {
-                    if (isIconfiedByDefault != it) {
+                    if (isIconified != it) {
                         setIconifiedByDefault(it)
                     }
                 }
                 attributes.queryHint?.let {
                     if (queryHint != it) {
                         queryHint = it
+                    }
+                }
+                attributes.android_maxWidth?.let {
+                    if (maxWidth != it) {
+                        maxWidth = it
+                    }
+                }
+                attributes.android_focusable?.let {
+                    if (isFocusable != it) {
+                        isFocusable = it
                     }
                 }
             }

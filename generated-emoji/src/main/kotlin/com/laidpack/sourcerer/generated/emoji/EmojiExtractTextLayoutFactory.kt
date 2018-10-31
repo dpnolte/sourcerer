@@ -20,9 +20,13 @@ open class EmojiExtractTextLayoutFactory<TView : EmojiExtractTextLayout, TAttrib
         super.init(view, context, attributes)
         if (view is EmojiExtractTextLayout) {
             view.apply {
-                attributes.emojiReplaceStrategy?.let {
-                    if (emojiReplaceStrategy != it.value) {
-                        emojiReplaceStrategy = it.value
+                if (attributes.emojiReplaceStrategy.hasInteger || attributes.emojiReplaceStrategy.hasEnum) {
+                    val localEmojiReplaceStrategy = when {
+                        attributes.emojiReplaceStrategy.hasInteger -> attributes.emojiReplaceStrategy.integer
+                        else -> attributes.emojiReplaceStrategy.enum
+                    }
+                    if (emojiReplaceStrategy != localEmojiReplaceStrategy) {
+                        emojiReplaceStrategy = localEmojiReplaceStrategy
                     }
                 }
             }
