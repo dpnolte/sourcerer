@@ -180,11 +180,12 @@ class JsonEditorServer {
     "type": "appcompat.toolbar",
     "attributes": {
       "src": "@drawable/ic_launcher_background",
-      "titleMarginStart": "10dp",
-      "titleMarginTop": "25dp",
+      "titleMarginStart": "25dp",
+      "titleMarginTop": "10dp",
       "titleTextColor": "white",
+      "paddingTop": "20dp",
       "title": "Sourcerer Playground 1223",
-      "layout_height": "60dp",
+      "layout_height": "70dp",
       "layout_width": "match_parent",
       "layout_collapseMode": "pin"
     },
@@ -220,7 +221,7 @@ class JsonEditorServer {
     "id": "firstText",
     "type": "textView",
     "attributes": {
-      "text": "< Swipe from left edge to show drawer",
+      "text": "< Swipe from left edge to right to show drawer",
       "background": "#EFEFEF",
       "textColor": "gray",
       "paddingTop": "40dp",
@@ -233,7 +234,7 @@ class JsonEditorServer {
     "id": "secondText",
     "type": "textView",
     "attributes": {
-      "text": "Scroll down to collapse toolbar",
+      "text": "v Scroll down to collapse toolbar",
       "background": "white",
       "textColor": "gray",
       "paddingTop": "60dp",
@@ -273,7 +274,7 @@ class JsonEditorServer {
       "background": "white",
       "textColor": "gray",
       "paddingTop": "60dp",
-      "paddingRight": "20dp",
+      "paddingLeft": "40dp",
       "paddingBottom": "60dp",
       "layout_height": "wrap_content"
     },

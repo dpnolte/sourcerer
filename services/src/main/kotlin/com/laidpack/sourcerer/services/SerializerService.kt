@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.ViewGroup
 import com.laidpack.sourcerer.services.adapters.*
 import com.laidpack.sourcerer.services.api.FlagsAccumulator
+import com.laidpack.sourcerer.services.layout.LayoutMap
+import com.laidpack.sourcerer.services.layout.LayoutProperties
 import com.squareup.moshi.*
 import java.lang.Exception
 import java.lang.NullPointerException

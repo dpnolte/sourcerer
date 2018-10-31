@@ -1,11 +1,12 @@
 package com.laidpack.sourcerer.services
 
 import android.app.Activity
-import android.os.Build
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toolbar
 import com.laidpack.sourcerer.services.api.LayoutElement
+import com.laidpack.sourcerer.services.layout.InflatedLayoutMap
+import com.laidpack.sourcerer.services.layout.LayoutMap
+import com.laidpack.sourcerer.services.layout.LayoutProperties
 import java.lang.IllegalStateException
 import java.lang.ref.WeakReference
 
@@ -25,7 +26,11 @@ interface InflaterComponent {
     }
 }
 
-class InflaterModule : InflaterComponent {
+/**
+ * Service that inflates json or LayoutMap to Android's View
+ * @param enableViewRecycling experimental recycling of views
+ */
+class InflaterModule(private val enableViewRecycling: Boolean = false) : InflaterComponent {
     private val factories = mutableMapOf<String, LayoutElement.Factory>()
     private val viewTypeToElementType = mutableMapOf<Class<*>, String>()
     private var layoutMapReference: WeakReference<InflatedLayoutMap>? = null
@@ -45,7 +50,9 @@ class InflaterModule : InflaterComponent {
             parentView: ViewGroup?
     ): InflatedLayoutMap {
         val oldLayoutMap = layoutMapReference?.get()
-        val recyclableViews = getRecyclableViews(parentView, layoutMap, oldLayoutMap)
+        val recyclableViews = if (enableViewRecycling) {
+            getRecyclableViews(parentView, layoutMap, oldLayoutMap)
+        } else mapOf()
         parentView?.removeAllViews()
 
         inflateNode(
@@ -82,7 +89,6 @@ class InflaterModule : InflaterComponent {
             layoutParams = layoutParamsFactory.create(activity, it)
         }
         addViewToParent(view, layoutParams, parentView, activity)
-        postprocessing(view, activity)
         if (node.children.isNotEmpty()) {
             val viewGroup = view as? ViewGroup
                     ?: throw IllegalStateException("element '${node.type}/${node.id}' has children but the view is not a view group")
@@ -98,7 +104,7 @@ class InflaterModule : InflaterComponent {
             recyclableViews: Map<Int, View>
     ): View {
         val factory = getViewFactory(node)
-        return if (recyclableViews.contains(node.hashedId)) {
+        return if (enableViewRecycling && recyclableViews.contains(node.hashedId)) {
             val view = recyclableViews[node.hashedId] as View
             val parent = view.parent
             if (parent != null && parent is ViewGroup) {
@@ -130,14 +136,6 @@ class InflaterModule : InflaterComponent {
                             ViewGroup.LayoutParams.MATCH_PARENT
                     )
             )
-        }
-    }
-
-    private fun postprocessing(view: View, activity: Activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            when {
-                activity.actionBar == null && view is Toolbar -> activity.setActionBar(view)
-            }
         }
     }
 

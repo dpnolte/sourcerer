@@ -1,11 +1,7 @@
-package com.laidpack.sourcerer.services
+package com.laidpack.sourcerer.services.layout
 
-import android.app.Activity
-import android.view.View
-import com.laidpack.sourcerer.services.api.IAttributes
 import java.lang.IllegalStateException
 import kotlin.IllegalArgumentException
-
 
 open class LayoutMap(
         val elements : Map<String, LayoutProperties>,
@@ -17,6 +13,9 @@ open class LayoutMap(
     }
     fun firstTypeOf(type: String): LayoutProperties {
         return this[type, 0]
+    }
+    fun findFirstTypeOf(type: String): LayoutProperties? {
+        return findByTypeAndIndex(type, 0)
     }
     fun typeOf(type: String): List<LayoutProperties> {
         val elementIds = typeToElements[type] ?: throw IllegalArgumentException("Layout map contains no element of type '$type'")
@@ -36,6 +35,11 @@ open class LayoutMap(
     operator fun get(elementId: String): LayoutProperties {
         return elements[elementId] ?: throw IllegalArgumentException("Layout map contains no element with id '$elementId'")
     }
+    fun findByTypeAndIndex(type: String, index: Int): LayoutProperties? {
+        val elementIds = typeToElements[type] ?: return null
+        val elementId = elementIds[index]
+        return elements[elementId] ?: return null
+    }
     override operator fun iterator(): Iterator<LayoutProperties> {
         return elements.values.iterator()
     }
@@ -45,49 +49,5 @@ open class LayoutMap(
         get() = elements.size
     fun first(): LayoutProperties {
         return elements.values.first()
-    }
-}
-
-data class LayoutProperties(
-        val id: String,
-        val type: String,
-        val attributes: IAttributes,
-        val children: Set<String>
-) {
-    val hashedId: Int = id.hashCode()
-    var parentId: String? = null
-    var layoutAttributes: IAttributes? = null
-    var layoutParamsType: String? = null
-}
-
-class InflatedLayoutMap (
-        val viewTypeToElementType: Map<Class<*>, String>,
-        elements : Map<String, LayoutProperties>,
-        typeToElements: Map<String /* elementType */, List<String> /* element ids */>,
-        rootElementId: String
-)  : LayoutMap (elements, typeToElements, rootElementId) {
-
-    inline fun <reified TView: View> viewsOfType(activity: Activity): List<TView> {
-        val elementType = viewTypeToElementType[TView::class.java]
-                ?: throw IllegalArgumentException("View ${TView::class.java} is not mapped to an element type")
-        val elements = typeOf(elementType)
-        val views = mutableListOf<TView>()
-        for (element in elements) {
-            val view = activity.findViewById<TView>(element.hashedId)
-            views.add(view)
-        }
-        return views
-    }
-
-    inline fun <reified TView: View> firstViewOfType(activity: Activity): TView {
-        val elementType = viewTypeToElementType[TView::class.java]
-                ?: throw IllegalArgumentException("View ${TView::class.java} is not mapped to an element type")
-        val element = firstTypeOf(elementType)
-        return activity.findViewById(element.hashedId)
-    }
-
-    fun <TView: View> findViewById(activity: Activity, id: String): TView {
-        val element = this[id]
-        return activity.findViewById(element.hashedId)
     }
 }

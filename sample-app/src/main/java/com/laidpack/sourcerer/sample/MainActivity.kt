@@ -2,9 +2,12 @@ package com.laidpack.sourcerer.sample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
+import android.view.MenuItem
+import androidx.appcompat.widget.Toolbar
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import com.laidpack.sourcerer.services.SourcererComponent
 
 class MainActivity : AppCompatActivity() {
@@ -13,6 +16,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var serverConnection: ServerConnection
     private lateinit var services : SourcererComponent
     private var connectionStatus = ServerConnection.ConnectionStatus.DISCONNECTED
+    private var drawerLayout: DrawerLayout? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,9 +52,29 @@ class MainActivity : AppCompatActivity() {
     private fun onJsonChange(json: String) {
         val container = this.findViewById<ViewGroup>(R.id.container)
         try {
-            services.inflater.inflate(this, json, container)
+            val inflatedLayoutMap = services.inflater.inflate(this, json, container)
+            drawerLayout = inflatedLayoutMap.findFirstViewOfType(this)
+            inflatedLayoutMap.findFirstViewOfType<Toolbar>(this)?.let {toolbar ->
+                setSupportActionBar(toolbar)
+                val actionbar = supportActionBar
+                actionbar?.apply {
+                    setDisplayHomeAsUpEnabled(true)
+                    setHomeAsUpIndicator(R.drawable.baseline_menu_white_24)
+                }
+
+            }
         } catch (e: Exception) {
             services.inflater.inflate(this, errorJson(e), container)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                drawerLayout?.openDrawer(GravityCompat.START)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

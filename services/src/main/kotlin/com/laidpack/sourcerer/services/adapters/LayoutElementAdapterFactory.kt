@@ -1,6 +1,6 @@
 package com.laidpack.sourcerer.services.adapters
 
-import com.laidpack.sourcerer.services.LayoutProperties
+import com.laidpack.sourcerer.services.layout.LayoutProperties
 import com.laidpack.sourcerer.services.api.IAttributes
 import com.squareup.moshi.*
 import java.lang.reflect.Type
@@ -59,10 +59,12 @@ internal class LayoutElementAdapter(private val moshi: Moshi, private val elemen
         val subjectType = elementNameToType[type] ?: throw JsonDataException("Element type '$type' has no registered json adapter")
         val attributesDelegate = moshi.adapter(subjectType.java)
         return LayoutProperties(
-                id = id ?: throw JsonDataException("Required property 'id' missing at ${reader.path}"),
+                id = id
+                        ?: throw JsonDataException("Required property 'id' missing at ${reader.path}"),
                 type = type,
-                attributes =  attributesDelegate.fromJsonValue(attributesAsJson) as IAttributes,
-                children = children?.toSet() ?: throw JsonDataException("Required property 'children' missing at ${reader.path}")
+                attributes = attributesDelegate.fromJsonValue(attributesAsJson) as IAttributes,
+                children = children?.toSet()
+                        ?: throw JsonDataException("Required property 'children' missing at ${reader.path}")
         )
     }
 

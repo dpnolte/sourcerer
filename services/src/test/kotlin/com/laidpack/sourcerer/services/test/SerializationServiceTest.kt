@@ -3,8 +3,8 @@ package com.laidpack.sourcerer.services.test
 import android.content.Context
 import android.util.DisplayMetrics
 import android.util.TypedValue
-import com.laidpack.sourcerer.services.LayoutMap
-import com.laidpack.sourcerer.services.LayoutProperties
+import com.laidpack.sourcerer.services.layout.LayoutMap
+import com.laidpack.sourcerer.services.layout.LayoutProperties
 import com.laidpack.sourcerer.services.SerializerModule
 import com.laidpack.sourcerer.services.adapters.*
 import com.laidpack.sourcerer.services.api.*
@@ -40,7 +40,8 @@ class SerializationServiceTest {
                 }
             }
         )
-        referenceAdapter.context = WeakReference(Mockito.mock(Context::class.java))
+        val mockedContext = Mockito.mock(Context::class.java)
+        referenceAdapter.context = WeakReference(mockedContext)
         val colorAdapter = ColorAdapter {
             it.substring(1).toInt()
         }
@@ -236,54 +237,6 @@ class SerializationServiceTest {
     }
 
     @Test
-    fun `success - fallback to default layout params attributes`() {
-        serializerService.registerAdapter(DummyMultiFormatElement::class, DummyElementAdapter(), "dummyElement2")
-                .registerAdapter(DummyMultiFormatElement::class, DummyElementAdapter(), "dummyElementWithoutLinkedLP")
-                .registerAdapter(LayoutParamsAttributes::class, LayoutParamsAdapter(), "layoutParams")
-                .associateViewGroupWithLayoutParams("dummyElement2", "layoutParams")
-                .buildAdapters()
-        val json = """
-            |[
-            |   { "id": "lpTest1", "children": ["lpTest2", "lpTest3"], "type": "dummyElement2", "attributes":{ "referenceColorOrDimension": "@style/R.TextAppearance_DeviceDefault_Small" }},
-            |   { "id": "lpTest2", "children": [], "type": "dummyElement2", "attributes":{ "referenceColorOrDimension": "#123", "layout_height": 300, "layout_width": 200  }},
-            |   { "id": "lpTest3", "children": ["lpTest4"], "type": "dummyElementWithoutLinkedLP", "attributes":{ "referenceColorOrDimension": "@style/R.TextAppearance_DeviceDefault_Small" }},
-            |   { "id": "lpTest4", "children": [], "type": "dummyElementWithoutLinkedLP", "attributes":{ "referenceColorOrDimension": "#123", "layout_default": true }}
-            |]""".trimMargin()
-        val result = serializerService.deserialize(LayoutMap::class, json)
-
-        result shouldBeInstanceOf LayoutMap::class
-        val map = result as LayoutMap
-        map.size shouldEqualTo 4
-        map.forEachIndexed { index, element ->
-            element.attributes shouldBeInstanceOf DummyMultiFormatElement::class
-            val attrs = element.attributes as DummyMultiFormatElement
-            when (index) {
-                0 -> {
-                    attrs.referenceColorOrDimension.reference `should be equal to` 999
-                } // see setup
-                1 -> {
-                    attrs.referenceColorOrDimension.color `should be equal to` 112233
-                    element.layoutParamsType shouldBe "layoutParams"
-                    element.layoutAttributes shouldBeInstanceOf LayoutParamsAttributes::class
-                    val layoutAttrs = element.layoutAttributes as LayoutParamsAttributes
-                    layoutAttrs.height shouldEqualTo 300
-                    layoutAttrs.width shouldEqualTo 200
-                }
-                2 -> {
-                    attrs.referenceColorOrDimension.reference `should be equal to` 999
-                }
-                3 -> {
-                    attrs.referenceColorOrDimension.color `should be equal to` 112233
-                    (element.layoutParamsType as String) shouldBeEqualTo DefaultLayoutParamsAttributes::class.java.canonicalName as String
-                    element.layoutAttributes shouldBeInstanceOf DefaultLayoutParamsAttributes::class
-                    val layoutAttrs = element.layoutAttributes as DefaultLayoutParamsAttributes
-                    layoutAttrs.default shouldBe true
-                }
-            }
-        }
-    }
-
-    @Test
     fun `success - layout map tracks elements per type`() {
         serializerService.registerAdapter(DummyColorElement::class, DummyElementAdapter(), "dummyElement3").buildAdapters()
         serializerService.registerAdapter(DummyColorElement::class, DummyElementAdapter(), "dummyElement2").buildAdapters()
@@ -452,7 +405,7 @@ class SerializationServiceTest {
                 }
             }
             reader.endObject()
-            return LayoutParamsAttributes(width as Int, height as Int)
+            return LayoutParamsAttributes(width ?: 0, height ?: 0)
         }
 
         @ToJson

@@ -2,8 +2,8 @@ package com.laidpack.sourcerer.services.adapters
 
 import android.util.Log
 import com.laidpack.sourcerer.services.BuildConfig
-import com.laidpack.sourcerer.services.LayoutProperties
-import com.laidpack.sourcerer.services.LayoutMap
+import com.laidpack.sourcerer.services.layout.LayoutProperties
+import com.laidpack.sourcerer.services.layout.LayoutMap
 import com.laidpack.sourcerer.services.api.IAttributes
 import com.squareup.moshi.*
 import java.lang.reflect.Type
@@ -90,7 +90,7 @@ internal class LayoutMapAdapter(
             }
         }
 
-        return LayoutMap(elements,typeToElements, rootElement)
+        return LayoutMap(elements, typeToElements, rootElement)
     }
 
     private fun assignParentIdsAndReturnRootId(
@@ -110,7 +110,7 @@ internal class LayoutMapAdapter(
 
     private fun getLayoutParamsDelegate(
             element: LayoutProperties,
-            elements: Map<String,LayoutProperties>
+            elements: Map<String, LayoutProperties>
     ): LayoutParamsDelegateWrapper? {
         var parentElement = if (element.parentId != null) elements[element.parentId as String] else null
         var depth = 0
