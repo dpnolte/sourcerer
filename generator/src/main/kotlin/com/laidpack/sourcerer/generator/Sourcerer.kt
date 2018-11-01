@@ -6,10 +6,7 @@ import com.laidpack.sourcerer.generator.javadoc.JavaDocInterpreter
 import com.laidpack.sourcerer.generator.lint.ApiDetector
 import com.laidpack.sourcerer.generator.lint.ApiRequirementsChecker
 import com.laidpack.sourcerer.generator.index.*
-import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
-import com.laidpack.sourcerer.generator.resources.StyleableAttributeManager
-import com.laidpack.sourcerer.generator.resources.Widget
-import com.laidpack.sourcerer.generator.resources.WidgetRegistry
+import com.laidpack.sourcerer.generator.resources.*
 import com.laidpack.sourcerer.generator.target.*
 import com.squareup.kotlinpoet.ClassName
 import kotlinx.dnq.query.*
@@ -187,9 +184,11 @@ class Sourcerer(
     private fun ensureSuperClassesHaveResolvedAttributes(xdDeclaredType: XdDeclaredType) {
         println("\t--verifying that super classes are resolved")
         var areAllSuperClassesResolved = true
+        val xdSuperClasses = DeclaredTypeRegistry.getSuperClasses(xdDeclaredType)
         Store.transactional {
-            val xdSuperClasses = xdDeclaredType.superClasses.toList().sortedBy { xdSuperClass -> xdSuperClass.superClasses.size() }
-            for (xdSuperClass in xdSuperClasses) {
+            val xdFromBaseToDerivedClass = xdSuperClasses
+                    .sortedBy { xdSuperClass -> xdSuperClass.superClasses.size() }
+            for (xdSuperClass in xdFromBaseToDerivedClass) {
                 if (xdSuperClass.sourcererResult == null && xdSuperClass.widget != null) {
                     val superClassInfo = DeclaredTypeRegistry.getClassInfo(xdSuperClass) as ClassInfo
                     println("\t- super class ${xdSuperClass.targetClassName.simpleName} not yet resolved")
@@ -218,7 +217,7 @@ class Sourcerer(
         return superClassResults
     }
 
-    private fun mergeInterpretations(attributes: Map<String, Attribute>, interpretationResult: InterpretationResult) {
+    private fun mergeInterpretations(attributes: MutableMap<String, Attribute>, interpretationResult: InterpretationResult) {
         interpretationResult.interpretations.forEach {
             if (it.attributes.isNotEmpty()) {
                 mergeAttributesAndSetters(attributes, it.attributes, it.setters, interpretationResult)
@@ -227,7 +226,7 @@ class Sourcerer(
     }
 
     private fun mergeAttributesAndSetters(
-            attributes: Map<String, Attribute>,
+            attributes: MutableMap<String, Attribute>,
             attributesFoundInSource: Map<String, Attribute>,
             settersFoundInSource: Map<Int, Setter>,
             interpretationResult: InterpretationResult
@@ -235,8 +234,12 @@ class Sourcerer(
         for (attrInSource in attributesFoundInSource.values) {
             if (!attributes.containsKey(attrInSource.name)) {
                 //throw IllegalStateException("Attribute ${attrInSource.name} does not exist in attrs.xml")
-                println("\t\t\t! - Attribute ${attrInSource.name} does not exist in attrs.xml.. Skipping it")
-                continue
+                //println("\t\t\t! - Attribute ${attrInSource.name} does not exist in attrs.xml.. Skipping it")
+                //continue
+                if (attrInSource.formats.isEmpty()) {
+                    attrInSource.formats.add(StyleableAttributeFormat.Unspecified)
+                }
+                attributes[attrInSource.name] = attrInSource
             }
             // if (attrInSource.hasSetter && !processedSetters.contains(attrInSource.resolvedSetter.name)) processedSetters.findOrCreate(attrInSource.resolvedSetter.name)
 

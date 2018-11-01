@@ -61,9 +61,7 @@ open class TabLayoutFactory<TView : TabLayout, TAttributes : TabLayoutAttributes
                     }
                 }
                 attributes.tabUnboundedRipple?.let {
-                    if (hasUnboundedRipple() != it) {
-                        setUnboundedRipple(it)
-                    }
+                    setUnboundedRipple(it)
                 }
             }
         }

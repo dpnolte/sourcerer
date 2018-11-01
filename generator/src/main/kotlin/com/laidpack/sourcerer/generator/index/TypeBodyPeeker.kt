@@ -9,6 +9,7 @@ import com.github.javaparser.ast.expr.AnnotationExpr
 import com.github.javaparser.resolution.UnsolvedSymbolException
 import com.laidpack.sourcerer.generator.*
 import kotlinx.dnq.query.any
+import kotlinx.dnq.query.size
 import kotlinx.dnq.query.toList
 import kotlin.system.measureTimeMillis
 
@@ -23,7 +24,20 @@ object TypeBodyPeeker {
             "int"
     )
 
-    fun peek(typeDeclaration: TypeDeclaration<*>, xdDeclaredType: XdDeclaredType, abortOnClassNotFound: Boolean = true) {
+    fun peek(
+            typeDeclaration: TypeDeclaration<*>,
+            xdDeclaredType: XdDeclaredType,
+            abortOnClassNotFound: Boolean = true
+        ) {
+        ensureSuperClassBodiesAreResolvedFirst(xdDeclaredType)
+        resolveBody(typeDeclaration, xdDeclaredType, abortOnClassNotFound)
+    }
+
+    private fun resolveBody(
+            typeDeclaration: TypeDeclaration<*>,
+            xdDeclaredType: XdDeclaredType,
+            abortOnClassNotFound: Boolean = true
+    ) {
         var methodsCount = 0
         var constructorsCount = 0
         var fieldsCount = 0
@@ -237,6 +251,21 @@ object TypeBodyPeeker {
                     xdConstructor.parameters.clear()
                 }
                 xdDeclaredType.constructors.clear()
+            }
+        }
+    }
+
+    private fun ensureSuperClassBodiesAreResolvedFirst(xdDeclaredType: XdDeclaredType) {
+        // ensure class bodies are resolved (base class first, derived class last)
+        val fromBaseToDerivedXdClasses = Store.transactional {
+            xdDeclaredType.superClasses.toList().sortedBy { xdSuperClass -> xdSuperClass.superClasses.size() }
+        }
+        for (xdSuperClass in fromBaseToDerivedXdClasses) {
+            if (!DeclaredTypeRegistry.isBodyResolved(xdSuperClass)) {
+                resolveBody(
+                        xdSuperClass.getClassOrInterfaceDeclaration(),
+                        xdSuperClass
+                )
             }
         }
     }

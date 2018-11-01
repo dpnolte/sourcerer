@@ -14,7 +14,7 @@ class AndroidResourceManager(private val env: SourcererEnvironment) {
         )
     }
 
-    private fun ensureResourceClassIsIndexed() {
+    fun ensureResourceClassIsIndexed() {
         val indexed = Store.transactional {
             XdDeclaredType.query(
                     XdDeclaredType::canonicalName eq resourceCanonicalName
@@ -26,6 +26,8 @@ class AndroidResourceManager(private val env: SourcererEnvironment) {
     }
 
     private fun indexResourceClass() {
+        println("Indexing android.R.class:")
+        println("-------------------------")
         val resourceClassContent = decompileResourceClass()
         val cu = JavaParser.parse(resourceClassContent)
         TypeIndexer.scanCompilationUnit(

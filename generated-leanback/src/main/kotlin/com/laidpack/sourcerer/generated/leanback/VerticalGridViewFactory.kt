@@ -11,6 +11,26 @@ open class VerticalGridViewFactory<TView : VerticalGridView, TAttributes : Verti
 
     override fun createInstance(context: Context): View = VerticalGridView(context)
 
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is VerticalGridView) {
+            view.apply {
+                attributes.lbcolumnWidth?.let {
+                    if (width != it) {
+                        setColumnWidth(it)
+                    }
+                }
+                attributes.lbnumberOfColumns?.let {
+                    setNumColumns(it)
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "verticalGridView"
 

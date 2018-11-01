@@ -12,6 +12,23 @@ open class BaseCardViewLayoutParamsFactory<TLayoutParams : BaseCardView.LayoutPa
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = BaseCardView.LayoutParams(BaseCardView.LayoutParams.MATCH_PARENT, BaseCardView.LayoutParams.MATCH_PARENT)
 
+    override fun init(
+        layoutParams: ViewGroup.LayoutParams,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(layoutParams, context, attributes)
+        if (layoutParams is BaseCardView.LayoutParams) {
+            layoutParams.apply {
+                attributes.lblayout_viewType?.let {
+                    if (it != viewType) {
+                        viewType = it
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "androidx.leanback.widget.BaseCardView.LayoutParams"
 

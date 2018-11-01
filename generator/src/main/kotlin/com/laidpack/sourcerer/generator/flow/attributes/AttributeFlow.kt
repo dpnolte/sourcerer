@@ -54,7 +54,7 @@ enum class VariableImpact {
 
 class AttributeInSource(className: ClassName, name: String, val resourceName: String) : Attribute(className, name) {
     val derivedVariables = mutableMapOf<String, VariableImpact>()
-    val targetClassNames = mutableListOf<String>()
+    var typedArrayReturnTypeCanonicalName: String = ""
     var defaultValue: String = ""
     val transformingCodes = mutableListOf<TransformingCode>()
 }
@@ -388,11 +388,10 @@ class AttributeFlow (
             currentAttribute
         }
         val typedArrayMethod = typedArrayInfo.getTypedArrayGetter(methodCallExpr)
-        attribute.targetClassNames.clear()
-        attribute.targetClassNames.add(typedArrayMethod.returnTypeClassName)
+        attribute.typedArrayReturnTypeCanonicalName = typedArrayMethod.returnTypeCanonicalName
         var defaultValue = typedArrayInfo.getDefaultValueFromTypedArrayGetterCall(methodCallExpr)
         if (defaultValue != null) {
-            if (typedArrayMethod.returnTypeClassName.toLowerCase().contains("float")
+            if (typedArrayMethod.returnTypeCanonicalName.toLowerCase().contains("float")
                     && !defaultValue.endsWith("f")) {
                 defaultValue += "f"
             }
@@ -437,7 +436,11 @@ class AttributeFlow (
         val setterHashCode = setter.hashCode()
         setters[setterHashCode] = setter
         manager.linkAttributeAndSetter(attribute, setter, parameterIndex, otherAttributeNames)
-        val typesForThisSetter = manager.getAttributeTypesForSetter(attribute.targetClassNames, attribute.defaultValue, parameterIndex)
+        val typesForThisSetter = manager.getAttributeTypesForSetter(
+                setter.parameters[parameterIndex].describedType,
+                attribute.defaultValue,
+                parameterIndex
+        )
         attribute.typesPerSetter[setterHashCode] = typesForThisSetter
     }
 
@@ -460,7 +463,7 @@ class AttributeFlow (
                 listOf(attribute.name)
         )
         val typesForThisSetter = manager.getAttributeTypesForSetter(
-                attribute.targetClassNames,
+                xdField.describedType,
                 attribute.defaultValue,
                 Parameter.UNASSOCIATED_TO_PARAMETER,
                 isField = true
@@ -498,7 +501,11 @@ class AttributeFlow (
                 parameterIndex,
                 otherAttributeNames
         )
-        val typesForThisSetter = manager.getAttributeTypesForSetter(attribute.targetClassNames, attribute.defaultValue, parameterIndex)
+        val typesForThisSetter = manager.getAttributeTypesForSetter(
+                methodDeclaration.parameters[parameterIndex].describeType(),
+                attribute.defaultValue,
+                parameterIndex
+        )
         attribute.typesPerSetter[setterHashCode] = typesForThisSetter
     }
 

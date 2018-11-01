@@ -11,8 +11,10 @@ import com.github.javaparser.ast.expr.ObjectCreationExpr
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName
 import com.github.javaparser.resolution.UnsolvedSymbolException
 import com.laidpack.sourcerer.generator.Store
+import com.laidpack.sourcerer.generator.resources.AndroidResourceManager
 import kotlinx.dnq.query.eq
 import kotlinx.dnq.query.first
+import kotlinx.dnq.query.firstOrNull
 import kotlinx.dnq.query.query
 
 fun FieldDeclaration.describeType(variableName: String): String {
@@ -72,22 +74,29 @@ fun Expression.describeType(): String {
                     selectedScope = selectedScope.scope
                 }
                 fields.add(0, (selectedScope as NodeWithSimpleName<*>).nameAsString)
-                // TODO: include R.styleable into indexing.
-                // This generated class is still used in support and materials design (but not in Android.jar)
+                // TODO: include widget R.* into indexing.
                 val indexForR = fields.indexOfFirst { fieldName -> fieldName == "R" }
                 val indexForStylable = fields.indexOfFirst { fieldName -> fieldName == "styleable" }
-                if (indexForR != -1 && (indexForR + 1) == indexForStylable) {
-                    "int[]"
-                } else {
-                    val xdDeclaredType = DeclaredSymbolResolver.resolveDeclaredType(this.scope as NodeWithSimpleName<*>)
-                    Store.transactional {
-                        if (xdDeclaredType.isEnum) {
-                            xdDeclaredType.canonicalName
-                        } else {
-                            if (!xdDeclaredType.resolvedBody) {
-                                TypeBodyPeeker.peek(xdDeclaredType.getTypeDeclaration(), xdDeclaredType)
+                val indexForId = fields.indexOfFirst { fieldName -> fieldName == "id" }
+                when {
+                    indexForR != -1 && (indexForR + 1) == indexForStylable -> "int[]"
+                    indexForR != -1 && (indexForR + 1) == indexForId -> "int"
+                    else -> {
+                        val xdDeclaredType = DeclaredSymbolResolver.resolveDeclaredType(this.scope as NodeWithSimpleName<*>)
+                        Store.transactional {
+                            if (xdDeclaredType.isEnum) {
+                                xdDeclaredType.canonicalName
+                            } else {
+                                if (!xdDeclaredType.resolvedBody) {
+                                    TypeBodyPeeker.peek(xdDeclaredType.getTypeDeclaration(), xdDeclaredType)
+                                }
+                                val xdField = xdDeclaredType.fields.query(
+                                        XdField::name eq this.nameAsString
+                                        )
+                                        .firstOrNull()
+                                        ?: throw IllegalStateException("Field ${this.nameAsString} not found in class ${xdDeclaredType.targetClassName} from field access expression $this")
+                                xdField.describedType
                             }
-                            xdDeclaredType.fields.query(XdField::name eq this.nameAsString).first().describedType
                         }
                     }
                 }

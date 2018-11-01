@@ -39,6 +39,16 @@ open class SearchViewFactory<TView : SearchView, TAttributes : SearchViewAttribu
                         isFocusable = it
                     }
                 }
+                attributes.android_imeOptions?.let {
+                    if (imeOptions != it) {
+                        imeOptions = it
+                    }
+                }
+                attributes.android_inputType?.let {
+                    if (inputType != it) {
+                        inputType = it
+                    }
+                }
             }
         }
     }

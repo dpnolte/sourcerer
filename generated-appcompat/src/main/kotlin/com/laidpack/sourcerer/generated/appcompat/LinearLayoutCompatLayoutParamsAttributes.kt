@@ -13,6 +13,7 @@ import kotlin.Int
 @TypeScript
 open class LinearLayoutCompatLayoutParamsAttributes(
     val android_layout_weight: Float? = null,
+    val android_layout_gravity: Int? = null,
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_marginLeft: Int? = null,

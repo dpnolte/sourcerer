@@ -1,7 +1,9 @@
 package com.laidpack.sourcerer.generated.leanback
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.leanback.widget.BaseCardView
 import com.laidpack.sourcerer.generated.FrameLayoutFactory
 import java.lang.Class
@@ -33,6 +35,18 @@ open class BaseCardViewFactory<TView : BaseCardView, TAttributes : BaseCardViewA
                 attributes.lbextraVisibility?.let {
                     if (visibility != it) {
                         extraVisibility = it
+                    }
+                }
+                attributes.lbcardForeground?.let {
+                    val localLbcardForeground = ContextCompat.getDrawable(context, it) as Drawable
+                    if (foreground != localLbcardForeground) {
+                        foreground = localLbcardForeground
+                    }
+                }
+                attributes.lbcardBackground?.let {
+                    val localLbcardBackground = ContextCompat.getDrawable(context, it) as Drawable
+                    if (background != localLbcardBackground) {
+                        background = localLbcardBackground
                     }
                 }
             }

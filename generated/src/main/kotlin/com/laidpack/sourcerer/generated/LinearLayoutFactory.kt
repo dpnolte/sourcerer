@@ -38,7 +38,7 @@ open class LinearLayoutFactory<TView : LinearLayout, TAttributes : LinearLayoutA
                     }
                 }
                 attributes.measureWithLargestChild?.let {
-                    if (isMeasureWithLargestChildEnabled != it) {
+                    if (isEnabled != it) {
                         isMeasureWithLargestChildEnabled = it
                     }
                 }

@@ -28,6 +28,9 @@ open class BaseGridViewFactory<TView : BaseGridView, TAttributes : BaseGridViewA
                         horizontalSpacing = it
                     }
                 }
+                attributes.lbandroid_gravity?.let {
+                    setGravity(it)
+                }
             }
         }
     }

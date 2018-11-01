@@ -20,8 +20,11 @@ open class DrawerLayoutLayoutParamsFactory<TLayoutParams : DrawerLayout.LayoutPa
         super.init(layoutParams, context, attributes)
         if (layoutParams is DrawerLayout.LayoutParams) {
             layoutParams.apply {
-                attributes.layout_gravity?.let {
-                    val localLayoutGravity = it.value
+                if (attributes.layout_gravity.hasInteger || attributes.layout_gravity.hasFlags) {
+                    val localLayoutGravity = when {
+                        attributes.layout_gravity.hasInteger -> attributes.layout_gravity.integer
+                        else -> attributes.layout_gravity.flags
+                    }
                     if (localLayoutGravity != gravity) {
                         gravity = localLayoutGravity
                     }

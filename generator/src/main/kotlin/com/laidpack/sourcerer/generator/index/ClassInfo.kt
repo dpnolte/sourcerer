@@ -14,7 +14,7 @@ import kotlinx.dnq.query.*
 
 /**
  * Class wrapper that functions as intermediate between Xodus queries and class details
- * @note String properties in xodus are case insensitive
+ * @note in Xodus, stored String properties values are case insensitive
  */
 class ClassInfo(
         val xdDeclaredType: XdDeclaredType,
@@ -286,6 +286,24 @@ class ClassInfo(
                     }
                 }
             }
+            methodCallExpr.scope.get() is MethodCallExpr -> {
+                val scopeExpr = methodCallExpr.scope.get() as MethodCallExpr
+                val scopeReturnDescribedType = getReturnTypeFromMethodCall(scopeExpr)
+                val xdClass = DeclaredTypeRegistry.findByCanonicalName(scopeReturnDescribedType)
+                        ?: throw IllegalStateException("Could not find returning class $scopeReturnDescribedType from scope $scopeExpr from original call $methodCallExpr")
+                Store.transactional {
+                    if (!xdClass.resolvedBody) {
+                        TypeBodyPeeker.peek(xdClass.getTypeDeclaration(), xdClass)
+                    }
+                    val xdMethod = xdClass.methods.query(
+                            XdMethod::name eq methodCallExpr.nameAsString
+                    )
+                            .asSequence()
+                            .firstOrNull { m -> m.name == methodCallExpr.nameAsString /* case-sensitive check */ }
+                            ?: throw IllegalStateException("Cannot resolve return type for method call '${methodCallExpr.nameAsString}' with for class '$xdClass', original method call $methodCallExpr")
+                    xdMethod.describedReturnType
+                }
+            }
             else -> throw IllegalStateException("Cannot resolve return type for method call '$methodCallExpr'")
         }
     }
@@ -302,11 +320,7 @@ class ClassInfo(
 
     fun isPublicMethodCallFromThisClassOrSuperClass(methodCallExpr: MethodCallExpr): Boolean {
         val xdMethod = this.getMethodInfoByCallExpr(methodCallExpr)
-        return xdMethod != null && Store.transactional(readonly = true) { xdMethod.isPublic }
-    }
-    fun isPublicFieldFromThisClassOrSuperClass(methodCallExpr: MethodCallExpr): Boolean {
-        val xdMethod = this.getMethodInfoByCallExpr(methodCallExpr)
-        return xdMethod != null && Store.transactional(readonly = true) { xdMethod.isPublic }
+        return xdMethod != null && Store.transactional { xdMethod.isPublic }
     }
 
     fun getFieldFromThisClassOrSuperClass(variableName: String): XdField? {
@@ -353,16 +367,16 @@ class ClassInfo(
     }
 
 
-    fun isPublicFieldFromThisClassOrSuperClass(variableName: String): Boolean {
+    fun isSettableFieldFromThisClassOrSuperClass(variableName: String): Boolean {
         return Store.transactional {
-            val field = xdDeclaredType.fields.query(
+            val xdField = xdDeclaredType.fields.query(
                     XdField::name eq variableName
                     )
                     .asSequence()
                     .firstOrNull { f -> f.name == variableName /* case-sensitive check */ }
                     ?: return@transactional false
 
-            return@transactional field.isPublic
+            return@transactional xdField.isPublic && !xdField.isFinal
         }
     }
     fun isFieldFromThisClassOrSuperClass(variableName: String): Boolean {

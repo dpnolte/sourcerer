@@ -50,6 +50,6 @@ data class TypedArrayMethodInfo (
         val hasDefaultValueParam: Boolean,
         val defaultValueParamIndex: Int = -1,
         val valueUnit: String = "",
-        val returnTypeClassName: String = "",
+        val returnTypeCanonicalName: String = "",
         val returnsGuessedFormat: StyleableAttributeFormat
 )

@@ -25,6 +25,11 @@ open class LinearLayoutCompatLayoutParamsFactory<TLayoutParams : LinearLayoutCom
                         weight = it
                     }
                 }
+                attributes.android_layout_gravity?.let {
+                    if (it != gravity) {
+                        gravity = it
+                    }
+                }
             }
         }
     }

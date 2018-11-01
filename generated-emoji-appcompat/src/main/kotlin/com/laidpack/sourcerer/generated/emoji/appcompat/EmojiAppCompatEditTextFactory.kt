@@ -12,6 +12,23 @@ open class EmojiAppCompatEditTextFactory<TView : EmojiAppCompatEditText, TAttrib
 
     override fun createInstance(context: Context): View = EmojiAppCompatEditText(context)
 
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is EmojiAppCompatEditText) {
+            view.apply {
+                attributes.maxEmojiCount?.let {
+                    if (maxEmojiCount != it) {
+                        maxEmojiCount = it
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "emojiAppCompatEditText"
 

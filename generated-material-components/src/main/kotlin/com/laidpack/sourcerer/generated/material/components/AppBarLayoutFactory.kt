@@ -1,7 +1,10 @@
 package com.laidpack.sourcerer.generated.material.components
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import com.google.android.material.appbar.AppBarLayout
 import com.laidpack.sourcerer.generated.LinearLayoutFactory
 import java.lang.Class
@@ -39,6 +42,12 @@ open class AppBarLayoutFactory<TView : AppBarLayout, TAttributes : AppBarLayoutA
                 attributes.android_touchscreenBlocksFocus?.let {
                     if (touchscreenBlocksFocus != it) {
                         touchscreenBlocksFocus = it
+                    }
+                }
+                attributes.android_background?.let {
+                    val localAndroidBackground = ContextCompat.getDrawable(context, it) as Drawable
+                    if (background != localAndroidBackground) {
+                        ViewCompat.setBackground(this, localAndroidBackground)
                     }
                 }
             }

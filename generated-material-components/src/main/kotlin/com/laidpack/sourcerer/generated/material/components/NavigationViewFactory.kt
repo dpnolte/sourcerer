@@ -2,7 +2,9 @@ package com.laidpack.sourcerer.generated.material.components
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.google.android.material.navigation.NavigationView
 import com.laidpack.sourcerer.generated.FrameLayoutFactory
 import java.lang.Class
@@ -34,7 +36,10 @@ open class NavigationViewFactory<TView : NavigationView, TAttributes : Navigatio
                     }
                 }
                 attributes.itemBackground?.let {
-                    setItemBackgroundResource(it)
+                    val localItemBackground = ContextCompat.getDrawable(context, it) as Drawable
+                    if (itemBackground != localItemBackground) {
+                        itemBackground = localItemBackground
+                    }
                 }
                 attributes.itemHorizontalPadding?.let {
                     if (itemHorizontalPadding != it) {

@@ -118,7 +118,6 @@ class FlowInMethodInterpreter (
                     || target is FieldAccessExpr && target.scope is ThisExpr && target.nameAsString == variableName)
                     && value is NameExpr && value.nameAsString == parameterName
                 ) {
-                attribute.targetClassNames.add(0, variableDescribedType)
                 flow.addSetterToAttribute(setterMethod, 0, listOf(attribute.name), attribute)
                 return true
             }
@@ -130,7 +129,7 @@ class FlowInMethodInterpreter (
         // find setters with matching signatures
         for ((methodCallExpr, attrName) in methodCallsOnFieldsToAttributes) {
             val attribute = flow.getAttribute(attrName)
-            val requiredParameterType = attribute.targetClassNames.first()
+            val requiredParameterType = attribute.typedArrayReturnTypeCanonicalName
             val fieldName = methodCallExpr.scope.get().asNameExpr().nameAsString
             val methodOnFieldName = methodCallExpr.nameAsString
 

@@ -34,6 +34,13 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     tag = localTag
                 }
             }
+            if (attributes.scrollX != null || attributes.scrollY != null) {
+                val localScrollX = attributes.scrollX ?: scrollX
+                val localScrollY = attributes.scrollY ?: scrollY
+                if (scrollX != localScrollX || scrollY != localScrollY) {
+                    scrollTo(localScrollX, localScrollY)
+                }
+            }
             attributes.focusableInTouchMode?.let {
                 if (isFocusableInTouchMode != it) {
                     isFocusableInTouchMode = it
@@ -80,7 +87,7 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                 }
             }
             attributes.saveEnabled?.let {
-                if (isSaveEnabled != it) {
+                if (isEnabled != it) {
                     isSaveEnabled = it
                 }
             }
@@ -115,7 +122,7 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                 }
             }
             attributes.filterTouchesWhenObscured?.let {
-                if (filterTouchesWhenObscured != it) {
+                if (isEnabled != it) {
                     filterTouchesWhenObscured = it
                 }
             }

@@ -10,8 +10,8 @@ import com.github.javaparser.ast.Node as JavaNode
 
 
 fun main(args: Array<String>) {
-    //val input = "TextView" // simple name
-    val input = "android.view.View" // canonical name
+    //val input = "WearableDrawerView" // simple name
+    val input = "com.google.android.material.chip.ChipGroup" // canonical name
     SourcererEnvironment.printFlowInterpreterTrace = true
     val env = SourcererEnvironment(args)
     initParserAndStore(env)

@@ -53,8 +53,8 @@ object Store {
         )
 
         initMetaData(XdModel.hierarchy, store)
-
         instance = store
+        AndroidResourceManager(env).ensureResourceClassIsIndexed()
     }
 
     operator fun invoke(): TransientEntityStore {

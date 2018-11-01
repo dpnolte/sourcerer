@@ -11,6 +11,8 @@ import kotlin.Int
 @JsonClass(generateAdapter = true)
 @TypeScript
 open class TableRowLayoutParamsAttributes(
+    val TableRow_Cell_layout_column: Int? = null,
+    val TableRow_Cell_layout_span: Int? = null,
     layout_weight: Float? = null,
     layout_gravity: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Flags)),
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),

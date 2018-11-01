@@ -11,6 +11,26 @@ open class HorizontalGridViewFactory<TView : HorizontalGridView, TAttributes : H
 
     override fun createInstance(context: Context): View = HorizontalGridView(context)
 
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is HorizontalGridView) {
+            view.apply {
+                attributes.lbrowHeight?.let {
+                    if (height != it) {
+                        setRowHeight(it)
+                    }
+                }
+                attributes.lbnumberOfRows?.let {
+                    setNumRows(it)
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "horizontalGridView"
 

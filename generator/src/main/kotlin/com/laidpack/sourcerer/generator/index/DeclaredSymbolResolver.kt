@@ -57,33 +57,33 @@ class DeclaredSymbolResolver(private val useCachedSuperClasses : Boolean = true)
             return listOf()
         }
 
-        val superClassNames = resolveSuperClasses(xdDeclaredType, useCachedSuperClasses)
+        val xdSuperClasses = resolveSuperClasses(xdDeclaredType, useCachedSuperClasses)
         val resolvedClasses = mutableListOf<ClassSymbolDescription>()
-        val isAssignableByView = isAssignableByView(xdDeclaredType.targetClassName, superClassNames)
-        if (isAssignableByView || isAssignableByLayoutParams(xdDeclaredType.targetClassName, superClassNames)) {
+        val isAssignableByView = isAssignableByView(xdDeclaredType.targetClassName, xdSuperClasses)
+        if (isAssignableByView || isAssignableByLayoutParams(xdDeclaredType.targetClassName, xdSuperClasses)) {
             val classCategory = if (isAssignableByView) ClassCategory.View else ClassCategory.LayoutParams
             val isViewGroup = if (classCategory == ClassCategory.View) {
-                isAssignableByViewGroup(xdDeclaredType.targetClassName, superClassNames)
+                isAssignableByViewGroup(xdDeclaredType.targetClassName, xdSuperClasses)
             } else false
-            val mutableClassList = superClassNames.toMutableList()
-            mutableClassList.add(0, xdDeclaredType)
-            while (mutableClassList.isNotEmpty()) {
-                val selectedClass = mutableClassList.first()
+            val mutableXdClassList = xdSuperClasses.toMutableList()
+            mutableXdClassList.add(0, xdDeclaredType)
+            while (mutableXdClassList.isNotEmpty()) {
+                val selectedClass = mutableXdClassList.first()
                 if (processedClasses.containsKey(selectedClass.targetClassName)) break
 
-                mutableClassList.removeAt(0)
+                mutableXdClassList.removeAt(0)
                 resolvedClasses.add(ClassSymbolDescription(
                         selectedClass.targetClassName,
                         selectedClass.widget,
                         classCategory,
                         isViewGroup,
-                        mutableClassList.map {
+                        mutableXdClassList.map {
                             it.targetClassName
                         },
                         selectedClass
                 ))
-                if (mutableClassList.isNotEmpty()) {
-                    DeclaredTypeRegistry.assignSuperClasses(selectedClass, mutableClassList.first(), mutableClassList)
+                if (mutableXdClassList.isNotEmpty()) {
+                    DeclaredTypeRegistry.assignSuperClasses(selectedClass, mutableXdClassList.first(), mutableXdClassList)
                 }
                 DeclaredTypeRegistry.assignClassCategory(selectedClass, classCategory)
                 DeclaredTypeRegistry.assignViewGroupFlag(selectedClass, isViewGroup)

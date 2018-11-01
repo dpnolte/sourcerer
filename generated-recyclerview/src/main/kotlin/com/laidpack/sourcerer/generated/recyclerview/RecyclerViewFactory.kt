@@ -21,7 +21,7 @@ open class RecyclerViewFactory<TView : RecyclerView, TAttributes : RecyclerViewA
         if (view is RecyclerView) {
             view.apply {
                 attributes.clipToPadding?.let {
-                    if (clipToPadding != it) {
+                    if (isEnabled != it) {
                         isNestedScrollingEnabled = it
                     }
                 }

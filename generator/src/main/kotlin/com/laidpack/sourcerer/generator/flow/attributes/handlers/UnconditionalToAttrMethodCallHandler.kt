@@ -168,7 +168,7 @@ internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAt
             for (assignExpr in assignExpressions) {
                 val target = assignExpr.target
                 when {
-                    target is NameExpr && flow.classInfo.isPublicFieldFromThisClassOrSuperClass(target.nameAsString) -> {
+                    target is NameExpr && flow.classInfo.isSettableFieldFromThisClassOrSuperClass(target.nameAsString) -> {
                         flow.addSetterToAttribute(
                                 flow.classInfo.getFieldFromThisClassOrSuperClass(target.nameAsString) as XdField,
                                 attribute

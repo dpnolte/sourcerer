@@ -11,6 +11,28 @@ open class TableRowLayoutParamsFactory<TLayoutParams : TableRow.LayoutParams, TA
 
     override fun createInstance(context: Context): ViewGroup.LayoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT)
 
+    override fun init(
+        layoutParams: ViewGroup.LayoutParams,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(layoutParams, context, attributes)
+        if (layoutParams is TableRow.LayoutParams) {
+            layoutParams.apply {
+                attributes.TableRow_Cell_layout_column?.let {
+                    if (it != column) {
+                        column = it
+                    }
+                }
+                attributes.TableRow_Cell_layout_span?.let {
+                    if (it != span) {
+                        span = it
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "android.widget.TableRow.LayoutParams"
 

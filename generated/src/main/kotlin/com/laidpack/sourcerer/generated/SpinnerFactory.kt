@@ -25,7 +25,7 @@ open class SpinnerFactory<TView : Spinner, TAttributes : SpinnerAttributes>(inst
                 if (Build.VERSION.SDK_INT >= 16) {
                     attributes.popupBackground?.let {
                         val localPopupBackground = ContextCompat.getDrawable(context, it) as Drawable
-                        if (popupBackground != localPopupBackground) {
+                        if (background != localPopupBackground) {
                             setPopupBackgroundDrawable(localPopupBackground)
                         }
                     }

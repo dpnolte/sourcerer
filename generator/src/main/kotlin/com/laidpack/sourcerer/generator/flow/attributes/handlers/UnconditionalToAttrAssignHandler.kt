@@ -26,7 +26,7 @@ class UnconditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHand
     private fun methodCallIsAssignedToVariable(node: AssignExpr) {
         val targetExpr = node.target.asNameExpr()
         val valueExpr = node.value.asMethodCallExpr()
-        if (flow.classInfo.isPublicFieldFromThisClassOrSuperClass(targetExpr.nameAsString)
+        if (flow.classInfo.isSettableFieldFromThisClassOrSuperClass(targetExpr.nameAsString)
                 && flow.isAttributeValueRetrievedWithMethodCall(valueExpr)) {
             val attribute = flow.getAttributeFromResourceNameArgument(valueExpr)
             val field = flow.classInfo.getFieldFromThisClassOrSuperClass(targetExpr.nameAsString) as XdField

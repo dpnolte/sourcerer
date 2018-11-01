@@ -1,14 +1,13 @@
 package com.laidpack.sourcerer.generator.generators.delegates.statements
 
 import android.content.Context
+import android.view.View
 import com.laidpack.sourcerer.generator.generators.delegates.DelegateGeneratorBase
-import com.laidpack.sourcerer.generator.generators.delegates.SingleAttributeAndSingleSetterGenerator
 import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.target.Setter
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.ParameterSpec
-import javax.swing.text.View
 
 class InvokeSetter(private val delegate: DelegateGeneratorBase, private val contextParam: ParameterSpec) {
 

@@ -72,6 +72,11 @@ open class ImageViewFactory<TView : ImageView, TAttributes : ImageViewAttributes
                             cropToPadding = it
                         }
                     }
+                    attributes.drawableAlpha?.let {
+                        if (imageAlpha != it) {
+                            imageAlpha = it
+                        }
+                    }
                 }
                 if (Build.VERSION.SDK_INT >= 21) {
                     attributes.tint?.let {

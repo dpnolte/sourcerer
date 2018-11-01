@@ -7,6 +7,7 @@ import android.os.Build
 import android.view.View
 import android.widget.Switch
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
@@ -80,7 +81,7 @@ open class SwitchFactory<TView : Switch, TAttributes : SwitchAttributes>(instanc
                 }
                 if (Build.VERSION.SDK_INT >= 23) {
                     attributes.thumbTint?.let {
-                        val localThumbTint = ColorStateList.valueOf(it)
+                        val localThumbTint = ResourcesCompat.getColorStateList(context.resources, it, null)
                         if (thumbTintList != localThumbTint) {
                             thumbTintList = localThumbTint
                         }

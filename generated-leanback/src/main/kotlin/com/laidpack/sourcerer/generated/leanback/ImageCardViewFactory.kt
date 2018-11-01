@@ -1,7 +1,9 @@
 package com.laidpack.sourcerer.generated.leanback
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.leanback.widget.ImageCardView
 import java.lang.Class
 import kotlin.String
@@ -10,6 +12,24 @@ open class ImageCardViewFactory<TView : ImageCardView, TAttributes : ImageCardVi
     override val elementType: String = Companion.elementType
 
     override fun createInstance(context: Context): View = ImageCardView(context)
+
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is ImageCardView) {
+            view.apply {
+                attributes.lbinfoAreaBackground?.let {
+                    val localLbinfoAreaBackground = ContextCompat.getDrawable(context, it) as Drawable
+                    if (infoAreaBackground != localLbinfoAreaBackground) {
+                        infoAreaBackground = localLbinfoAreaBackground
+                    }
+                }
+            }
+        }
+    }
 
     companion object {
         const val elementType: String = "imageCardView"

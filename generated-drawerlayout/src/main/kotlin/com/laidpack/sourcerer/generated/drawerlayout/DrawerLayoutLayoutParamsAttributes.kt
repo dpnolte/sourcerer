@@ -3,11 +3,10 @@ package com.laidpack.sourcerer.generated.drawerlayout
 import com.laidpack.annotation.TypeScript
 import com.laidpack.sourcerer.generated.ViewGroupMarginLayoutParamsAttributes
 import com.laidpack.sourcerer.services.api.AttributeEnum
-import com.laidpack.sourcerer.services.api.FlagsAccumulator
-import com.laidpack.sourcerer.services.api.FlagsQualifier
 import com.laidpack.sourcerer.services.api.Format
 import com.laidpack.sourcerer.services.api.IAttributes
 import com.laidpack.sourcerer.services.api.MultiFormat
+import com.laidpack.sourcerer.services.api.MultiFormatQualifier
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.Int
@@ -16,7 +15,7 @@ import kotlin.String
 @JsonClass(generateAdapter = true)
 @TypeScript
 open class DrawerLayoutLayoutParamsAttributes(
-    @field:FlagsQualifier(flagsType = LayoutGravityFlagsEnum::class) val layout_gravity: FlagsAccumulator? = null,
+    @field:MultiFormatQualifier(formats = [Format.Integer, Format.Flags], flagsType = LayoutGravityFlagsEnum::class) val layout_gravity: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Flags)),
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_marginLeft: Int? = null,

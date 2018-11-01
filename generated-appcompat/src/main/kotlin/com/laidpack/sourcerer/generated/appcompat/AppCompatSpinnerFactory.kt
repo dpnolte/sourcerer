@@ -12,6 +12,23 @@ open class AppCompatSpinnerFactory<TView : AppCompatSpinner, TAttributes : AppCo
 
     override fun createInstance(context: Context): View = AppCompatSpinner(context)
 
+    override fun init(
+        view: View,
+        context: Context,
+        attributes: TAttributes
+    ) {
+        super.init(view, context, attributes)
+        if (view is AppCompatSpinner) {
+            view.apply {
+                attributes.Spinner_android_dropDownWidth?.let {
+                    if (dropDownWidth != it) {
+                        dropDownWidth = it
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         const val elementType: String = "appCompatSpinner"
 

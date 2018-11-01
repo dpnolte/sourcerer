@@ -49,6 +49,21 @@ open class LinearLayoutCompatFactory<TView : LinearLayoutCompat, TAttributes : L
                         isBaselineAligned = it
                     }
                 }
+                attributes.android_orientation?.let {
+                    if (orientation != it) {
+                        orientation = it
+                    }
+                }
+                attributes.android_gravity?.let {
+                    if (gravity != it) {
+                        gravity = it
+                    }
+                }
+                attributes.android_baselineAlignedChildIndex?.let {
+                    if (baselineAlignedChildIndex != it) {
+                        baselineAlignedChildIndex = it
+                    }
+                }
             }
         }
     }

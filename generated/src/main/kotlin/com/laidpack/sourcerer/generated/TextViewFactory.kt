@@ -3,11 +3,9 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import com.laidpack.sourcerer.services.api.toTruncateAt
@@ -123,40 +121,34 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                         ellipsize = localEllipsize
                     }
                 }
-                if (attributes.drawableTop.hasColor || attributes.drawableTop.hasReference || attributes.drawableLeft.hasColor || attributes.drawableLeft.hasReference || attributes.drawableBottom.hasColor || attributes.drawableBottom.hasReference || attributes.drawableRight.hasColor || attributes.drawableRight.hasReference) {
-                    val localDrawableTop = when {
-                        attributes.drawableTop.hasColor -> ColorDrawable(attributes.drawableTop.color)
-                        attributes.drawableTop.hasReference -> ContextCompat.getDrawable(context, attributes.drawableTop.reference) as Drawable
-                        else -> compoundDrawables[1]
-                    }
-                    val localDrawableLeft = when {
-                        attributes.drawableLeft.hasColor -> ColorDrawable(attributes.drawableLeft.color)
-                        attributes.drawableLeft.hasReference -> ContextCompat.getDrawable(context, attributes.drawableLeft.reference) as Drawable
-                        else -> compoundDrawables[0]
-                    }
-                    val localDrawableBottom = when {
-                        attributes.drawableBottom.hasColor -> ColorDrawable(attributes.drawableBottom.color)
-                        attributes.drawableBottom.hasReference -> ContextCompat.getDrawable(context, attributes.drawableBottom.reference) as Drawable
-                        else -> compoundDrawables[3]
-                    }
-                    val localDrawableRight = when {
-                        attributes.drawableRight.hasColor -> ColorDrawable(attributes.drawableRight.color)
-                        attributes.drawableRight.hasReference -> ContextCompat.getDrawable(context, attributes.drawableRight.reference) as Drawable
-                        else -> compoundDrawables[2]
-                    }
-                    if (compoundDrawables[1] != localDrawableTop || compoundDrawables[0] != localDrawableLeft || compoundDrawables[3] != localDrawableBottom || compoundDrawables[2] != localDrawableRight) {
-                        setCompoundDrawablesWithIntrinsicBounds(localDrawableLeft, localDrawableTop, localDrawableRight, localDrawableBottom)
-                    }
-                }
                 attributes.drawablePadding?.let {
                     if (compoundDrawablePadding != it) {
                         compoundDrawablePadding = it
+                    }
+                }
+                attributes.View_clickable?.let {
+                    if (isClickable != it) {
+                        isClickable = it
                     }
                 }
                 attributes.View_longClickable?.let {
                     if (isLongClickable != it) {
                         isLongClickable = it
                     }
+                }
+                if (attributes.drawableTop.hasColor || attributes.drawableTop.hasReference || attributes.drawableLeft.hasColor || attributes.drawableLeft.hasReference || attributes.drawableBottom.hasColor || attributes.drawableBottom.hasReference || attributes.drawableRight.hasColor || attributes.drawableRight.hasReference) {
+                    val localDrawableBottomReference = if (attributes.drawableBottom.hasReference) attributes.drawableBottom.reference else bottom
+                    val localDrawableLeftReference = if (attributes.drawableLeft.hasReference) attributes.drawableLeft.reference else left
+                    val localDrawableRightReference = if (attributes.drawableRight.hasReference) attributes.drawableRight.reference else right
+                    val localDrawableTopReference = if (attributes.drawableTop.hasReference) attributes.drawableTop.reference else top
+                    if (bottom != localDrawableBottomReference || left != localDrawableLeftReference || right != localDrawableRightReference || top != localDrawableTopReference) {
+                        setCompoundDrawablesWithIntrinsicBounds(localDrawableLeftReference, localDrawableTopReference, localDrawableRightReference, localDrawableBottomReference)
+                    }
+                    val localDrawableLeftColor = ColorDrawable(attributes.drawableLeft.color)
+                    val localDrawableTopColor = ColorDrawable(attributes.drawableTop.color)
+                    val localDrawableRightColor = ColorDrawable(attributes.drawableRight.color)
+                    val localDrawableBottomColor = ColorDrawable(attributes.drawableBottom.color)
+                    setCompoundDrawablesWithIntrinsicBounds(localDrawableLeftColor, localDrawableTopColor, localDrawableRightColor, localDrawableBottomColor)
                 }
                 attributes.inputType?.let {
                     val localInputType = it.value
@@ -179,9 +171,7 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                     setInputExtras(it)
                 }
                 attributes.textIsSelectable?.let {
-                    if (isTextSelectable != it) {
-                        setTextIsSelectable(it)
-                    }
+                    setTextIsSelectable(it)
                 }
                 if (Build.VERSION.SDK_INT >= 16) {
                     attributes.textColorHighlight?.let {
@@ -210,7 +200,7 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                         }
                     }
                     attributes.minHeight?.let {
-                        if (minimumHeight != it) {
+                        if (minHeight != it) {
                             minHeight = it
                         }
                     }
@@ -235,7 +225,7 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                         }
                     }
                     attributes.minWidth?.let {
-                        if (minimumWidth != it) {
+                        if (minWidth != it) {
                             minWidth = it
                         }
                     }
@@ -338,7 +328,7 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                         }
                     }
                     attributes.fallbackLineSpacing?.let {
-                        if (isFallbackLineSpacing != it) {
+                        if (isEnabled != it) {
                             isFallbackLineSpacing = it
                         }
                     }

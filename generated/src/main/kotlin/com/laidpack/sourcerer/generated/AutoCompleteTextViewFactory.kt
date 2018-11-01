@@ -1,7 +1,6 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
-import android.os.Build
 import android.view.View
 import android.widget.AutoCompleteTextView
 import java.lang.Class
@@ -20,13 +19,18 @@ open class AutoCompleteTextViewFactory<TView : AutoCompleteTextView, TAttributes
         super.init(view, context, attributes)
         if (view is AutoCompleteTextView) {
             view.apply {
+                attributes.completionHint?.let {
+                    if (hint != it) {
+                        completionHint = it
+                    }
+                }
                 attributes.completionThreshold?.let {
                     if (threshold != it) {
                         threshold = it
                     }
                 }
                 attributes.dropDownAnchor?.let {
-                    if (dropDownAnchor != it) {
+                    if (id != it) {
                         dropDownAnchor = it
                     }
                 }
@@ -35,7 +39,7 @@ open class AutoCompleteTextViewFactory<TView : AutoCompleteTextView, TAttributes
                         attributes.dropDownWidth.hasDimension -> attributes.dropDownWidth.dimension
                         else -> attributes.dropDownWidth.enum
                     }
-                    if (dropDownWidth != localDropDownWidth) {
+                    if (width != localDropDownWidth) {
                         dropDownWidth = localDropDownWidth
                     }
                 }
@@ -44,15 +48,18 @@ open class AutoCompleteTextViewFactory<TView : AutoCompleteTextView, TAttributes
                         attributes.dropDownHeight.hasDimension -> attributes.dropDownHeight.dimension
                         else -> attributes.dropDownHeight.enum
                     }
-                    if (dropDownHeight != localDropDownHeight) {
+                    if (height != localDropDownHeight) {
                         dropDownHeight = localDropDownHeight
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 16) {
-                    attributes.completionHint?.let {
-                        if (completionHint != it) {
-                            completionHint = it
-                        }
+                attributes.dropDownVerticalOffset?.let {
+                    if (dropDownVerticalOffset != it) {
+                        dropDownVerticalOffset = it
+                    }
+                }
+                attributes.dropDownHorizontalOffset?.let {
+                    if (dropDownHorizontalOffset != it) {
+                        dropDownHorizontalOffset = it
                     }
                 }
             }

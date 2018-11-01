@@ -26,7 +26,10 @@ open class WearableDrawerViewFactory<TView : WearableDrawerView, TAttributes : W
                     }
                 }
                 attributes.android_elevation?.let {
-                    elevation = it
+                    val localAndroidElevation = it.toFloat()
+                    if (elevation != localAndroidElevation) {
+                        elevation = localAndroidElevation
+                    }
                 }
             }
         }

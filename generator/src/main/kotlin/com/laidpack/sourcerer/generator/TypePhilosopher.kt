@@ -92,10 +92,10 @@ class TypePhilosopher(
     }
 
     private fun assignSetterType(typesForThisSetter: AttributeTypesForSetter) {
-        typesForThisSetter.mutableSetterType = considerWhatTypeReallyIsAtTheRudimentaryLevel(typesForThisSetter.setterClassName)
+        typesForThisSetter.mutableSetterType = considerWhatTypeReallyIsAtTheRudimentaryLevel(typesForThisSetter.setterCanonicalName)
         typesForThisSetter.mutableResolvedSetterType = typesForThisSetter.setterType
-        if (typesForThisSetter.setterClassName.endsWith("[]")) {
-            typesForThisSetter.mutableSetterCompoundType = considerWhatTypeReallyIsAtTheRudimentaryLevel(typesForThisSetter.setterClassName.substring(0, typesForThisSetter.setterClassName.length - 2))
+        if (typesForThisSetter.setterCanonicalName.endsWith("[]")) {
+            typesForThisSetter.mutableSetterCompoundType = considerWhatTypeReallyIsAtTheRudimentaryLevel(typesForThisSetter.setterCanonicalName.substring(0, typesForThisSetter.setterCanonicalName.length - 2))
             typesForThisSetter.mutableResolvedSetterType = typesForThisSetter.setterCompoundType
         }
     }
@@ -103,7 +103,6 @@ class TypePhilosopher(
     private fun assignAttributeType(attribute: Attribute, setter: Setter, typesForThisSetter: AttributeTypesForSetter, codeBlock: CodeBlock) {
         val result = thinkAboutHowThisAttributeTypeIsUnlikeOthers(attribute, setter, typesForThisSetter, codeBlock)
         typesForThisSetter.mutableAttributeType = result.typeName
-        typesForThisSetter.attributeCanonicalNames.addAll(result.canonicalNames)
         typesForThisSetter.formats.addAll(result.formats)
         if (attribute.enumValues.isNotEmpty() || attribute.flags.isNotEmpty()) {
             if (attribute.flags.isNotEmpty()) {
@@ -158,9 +157,7 @@ class TypePhilosopher(
         }
     }
 
-    private data class AttributeTypeResult(val typeName: TypeName, val formats: Set<StyleableAttributeFormat>, val enumClassName : TypeName? = null ) {
-        val canonicalNames: List<String> = formats.map { it.toClass().java.canonicalName }
-    }
+    private data class AttributeTypeResult(val typeName: TypeName, val formats: Set<StyleableAttributeFormat>, val enumClassName : TypeName? = null )
     private fun thinkAboutHowThisAttributeTypeIsUnlikeOthers(
             attribute: Attribute,
             setter: Setter,
@@ -193,7 +190,7 @@ class TypePhilosopher(
                             setOf(format)
                     )
                     else -> {
-                        val setterType = considerWhatTypeReallyIsAtTheRudimentaryLevel(typesForThisSetter.setterClassName)
+                        val setterType = considerWhatTypeReallyIsAtTheRudimentaryLevel(typesForThisSetter.setterCanonicalName)
                         var result : AttributeTypeResult? = null
                         if (!setter.isField) {
                             // try to specify formats by setter parameter type
@@ -213,7 +210,7 @@ class TypePhilosopher(
             attribute.formats.size > 1 -> {
                 handleMultiFormatAttributeForSetter(attribute, setter, typesForThisSetter, codeBlock)
             }
-            else -> throw IllegalStateException("Could not convert attribute to type")
+            else -> throw IllegalStateException("Could not convert attribute to type. No formats sets for attribute ${attribute.name}")
         }
     }
 
@@ -442,7 +439,7 @@ class TypePhilosopher(
         private val allowedFormatToTypeTransformations = DelegateGeneratorBase.transformFormatToTypeMap.keys
         private val allowedTypeToFormatTransformations = DelegateGeneratorBase.transformTypeToFormatMap.keys
         private val allowedArrayAccessorTransformations = DelegateGeneratorBase.transformArrayAccessorMap.keys
-
+        private val formatCanonicalNames = enumValues<StyleableAttributeFormat>().map { it.toClass().java.canonicalName }.toSet()
 
         fun isFormatToTypeConversionAvailable(format: StyleableAttributeFormat, typeName: TypeName): Boolean {
             return allowedFormatToTypeTransformations.contains(Pair(format,typeName))

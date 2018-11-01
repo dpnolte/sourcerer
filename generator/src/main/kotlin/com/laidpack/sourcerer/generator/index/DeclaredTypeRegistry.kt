@@ -201,18 +201,6 @@ object DeclaredTypeRegistry {
             xdDeclaredType.resolvedWidgetSymbol
         }
     }
-    fun getClassSymbolDescription(xdDeclaredType: XdDeclaredType): ClassSymbolDescription? {
-        return if (Store.transactional { xdDeclaredType.resolvedWidgetSymbol }) {
-            getResolvedClassSymbolDescription(xdDeclaredType)
-        } else {
-            val resolvedClassAndSuperClasses = superClassResolver.resolve(xdDeclaredType)
-            if (resolvedClassAndSuperClasses.isNotEmpty()) {
-                resolvedClassAndSuperClasses.first()
-            } else {
-                null
-            }
-        }
-    }
     fun getResolvedClassSymbolDescription(xdDeclaredType: XdDeclaredType): ClassSymbolDescription {
         return Store.transactional {
             if (!xdDeclaredType.resolvedClassSymbol)
@@ -266,7 +254,6 @@ object DeclaredTypeRegistry {
 
         return null
     }
-
     fun resolveAnyNewIdentifiedWidgetClasses() {
         superClassResolver.resolve(
                 DeclaredTypeRegistry.getUnresolvedPotentialWidgetClasses()

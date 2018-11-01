@@ -82,6 +82,22 @@ open class SwitchCompatFactory<TView : SwitchCompat, TAttributes : SwitchCompatA
                         showText = it
                     }
                 }
+                attributes.android_thumb?.let {
+                    val localAndroidThumb = ContextCompat.getDrawable(context, it) as Drawable
+                    if (thumbDrawable != localAndroidThumb) {
+                        thumbDrawable = localAndroidThumb
+                    }
+                }
+                attributes.android_textOn?.let {
+                    if (textOn != it) {
+                        textOn = it
+                    }
+                }
+                attributes.android_textOff?.let {
+                    if (textOff != it) {
+                        textOff = it
+                    }
+                }
             }
         }
     }

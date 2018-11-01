@@ -1,7 +1,9 @@
 package com.laidpack.sourcerer.generated.material.components
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.google.android.material.textfield.TextInputLayout
 import com.laidpack.sourcerer.generated.LinearLayoutFactory
 import java.lang.Class
@@ -21,27 +23,27 @@ open class TextInputLayoutFactory<TView : TextInputLayout, TAttributes : TextInp
         if (view is TextInputLayout) {
             view.apply {
                 attributes.hintEnabled?.let {
-                    if (isHintEnabled != it) {
+                    if (isEnabled != it) {
                         isHintEnabled = it
                     }
                 }
                 attributes.hintAnimationEnabled?.let {
-                    if (isHintAnimationEnabled != it) {
+                    if (isEnabled != it) {
                         isHintAnimationEnabled = it
                     }
                 }
                 attributes.helperTextEnabled?.let {
-                    if (isHelperTextEnabled != it) {
+                    if (isEnabled != it) {
                         isHelperTextEnabled = it
                     }
                 }
                 attributes.errorEnabled?.let {
-                    if (isErrorEnabled != it) {
+                    if (isEnabled != it) {
                         isErrorEnabled = it
                     }
                 }
                 attributes.counterEnabled?.let {
-                    if (isCounterEnabled != it) {
+                    if (isEnabled != it) {
                         isCounterEnabled = it
                     }
                 }
@@ -56,7 +58,10 @@ open class TextInputLayoutFactory<TView : TextInputLayout, TAttributes : TextInp
                     }
                 }
                 attributes.passwordToggleDrawable?.let {
-                    setPasswordVisibilityToggleDrawable(it)
+                    val localPasswordToggleDrawable = ContextCompat.getDrawable(context, it) as Drawable
+                    if (passwordVisibilityToggleDrawable != localPasswordToggleDrawable) {
+                        passwordVisibilityToggleDrawable = localPasswordToggleDrawable
+                    }
                 }
                 attributes.passwordToggleContentDescription?.let {
                     if (passwordVisibilityToggleContentDescription != it) {

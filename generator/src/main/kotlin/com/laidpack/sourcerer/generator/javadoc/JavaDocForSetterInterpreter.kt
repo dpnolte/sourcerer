@@ -40,7 +40,7 @@ class JavaDocForSetterInterpreter(
 
     private fun handleMatch(setter: Setter, attributeName: String, parameter: Parameter): Attribute? {
         val attribute = Attribute(classInfo.xdDeclaredType.targetClassName, attributeName)
-        attribute.typesPerSetter[setter.hashCode()] = AttributeTypesForSetter(listOf(parameter.describedType))
+        attribute.typesPerSetter[setter.hashCode()] = AttributeTypesForSetter(parameter.describedType)
         return if (ensureGetterCanBeResolved(attribute, setter, parameter.index)) {
             attributes[attribute.name] = attribute
             setters[setter.hashCode()] = setter

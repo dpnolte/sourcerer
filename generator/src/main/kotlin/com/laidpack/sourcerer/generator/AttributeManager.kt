@@ -197,11 +197,11 @@ class AttributeManager(
         val typesForThisSetter = attribute.typesPerSetter[setter.hashCode()] as AttributeTypesForSetter
 
         // let's do simple name matching first.. getter can be set->get or set->is
-        val getterTargetClassNames = if(typesForThisSetter.unassociatedToParameter) {
-            typesForThisSetter.attributeCanonicalNames
-        } else listOf(typesForThisSetter.setterClassName)
+        val getterTargetCanonicalNames = if(typesForThisSetter.unassociatedToParameter) {
+            typesForThisSetter.formats.map { it.toClass().java.canonicalName }.toSet()
+        } else setOf(typesForThisSetter.setterCanonicalName)
 
-        val targetsBoolean = getterTargetClassNames.any { it.toLowerCase().contains("boolean") }
+        val targetsBoolean = getterTargetCanonicalNames.any { it.toLowerCase().contains("boolean") }
         val guesses = mutableListOf<String>()
         val setterMethodNameBase = setter.name.substring(setter.name.indexOfFirstCapitalChar())
         guesses.addAll(getGuessesForBase(setterMethodNameBase, targetsBoolean))
@@ -221,13 +221,13 @@ class AttributeManager(
             when (potentialGetter) {
                 is XdMethod  -> {
                     val describedReturnType = Store.transactional { potentialGetter.describedReturnType }
-                    if (getterTargetClassNames.any { isAttributeAssignableToGetter(it, describedReturnType) }) {
+                    if (getterTargetCanonicalNames.any { isAttributeAssignableToGetter(it, describedReturnType) }) {
                         return MatchGetterResult(true, GetterType.METHOD, listOf(potentialGetter), null)
                     }
                 }
                 is XdField -> {
                     val describedType = Store.transactional { potentialGetter.describedType }
-                    if (getterTargetClassNames.any { isAttributeAssignableToGetter(it, describedType) }) {
+                    if (getterTargetCanonicalNames.any { isAttributeAssignableToGetter(it, describedType) }) {
                         return MatchGetterResult(true, GetterType.FIELD, listOf(), potentialGetter)
                     }
                 }
@@ -416,10 +416,10 @@ class AttributeManager(
         return parameters
     }
 
-    fun getAttributeTypesForSetter(targetClassNames: List<String>, defaultValue: String, parameterIndex: Int, isField: Boolean = false): AttributeTypesForSetter {
+    fun getAttributeTypesForSetter(targetCanonicalName: String, defaultValue: String, parameterIndex: Int, isField: Boolean = false): AttributeTypesForSetter {
 
         return AttributeTypesForSetter(
-                targetClassNames,
+                targetCanonicalName,
                 defaultValue,
                 parameterIndex == Parameter.UNASSOCIATED_TO_PARAMETER,
                 isField

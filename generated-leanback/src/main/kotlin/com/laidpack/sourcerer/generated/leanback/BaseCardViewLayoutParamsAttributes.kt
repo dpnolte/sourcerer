@@ -12,6 +12,7 @@ import kotlin.Int
 @JsonClass(generateAdapter = true)
 @TypeScript
 open class BaseCardViewLayoutParamsAttributes(
+    val lblayout_viewType: Int? = null,
     layout_gravity: FlagsAccumulator? = null,
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),

@@ -12,6 +12,7 @@ import kotlin.Int
 @TypeScript
 open class ActionMenuViewLayoutParamsAttributes(
     android_layout_weight: Float? = null,
+    android_layout_gravity: Int? = null,
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_marginLeft: Int? = null,
@@ -20,5 +21,5 @@ open class ActionMenuViewLayoutParamsAttributes(
     layout_marginTop: Int? = null,
     layout_marginStart: Int? = null,
     layout_marginEnd: Int? = null
-) : LinearLayoutCompatLayoutParamsAttributes(android_layout_weight = android_layout_weight, layout_width = layout_width, layout_height = layout_height, layout_marginLeft = layout_marginLeft, layout_marginBottom = layout_marginBottom, layout_marginRight = layout_marginRight, layout_marginTop = layout_marginTop, layout_marginStart = layout_marginStart, layout_marginEnd = layout_marginEnd),
+) : LinearLayoutCompatLayoutParamsAttributes(android_layout_weight = android_layout_weight, android_layout_gravity = android_layout_gravity, layout_width = layout_width, layout_height = layout_height, layout_marginLeft = layout_marginLeft, layout_marginBottom = layout_marginBottom, layout_marginRight = layout_marginRight, layout_marginTop = layout_marginTop, layout_marginStart = layout_marginStart, layout_marginEnd = layout_marginEnd),
         IAttributes

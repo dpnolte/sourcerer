@@ -23,6 +23,8 @@ import kotlin.String
 open class ViewAttributes(
     @field:ReferenceQualifier val id: Int? = null,
     val tag: String? = null,
+    @field:DimensionQualifier val scrollX: Int? = null,
+    @field:DimensionQualifier val scrollY: Int? = null,
     @field:MultiFormatQualifier(formats = [Format.Color, Format.Reference]) val background: MultiFormat = MultiFormat(setOf(Format.Color, Format.Reference)),
     @field:DimensionQualifier val paddingLeft: Int? = null,
     @field:DimensionQualifier val paddingBottom: Int? = null,

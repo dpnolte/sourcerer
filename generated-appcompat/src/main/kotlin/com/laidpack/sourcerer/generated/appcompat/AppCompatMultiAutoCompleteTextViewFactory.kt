@@ -24,9 +24,7 @@ open class AppCompatMultiAutoCompleteTextViewFactory<TView : AppCompatMultiAutoC
             view.apply {
                 attributes.popupBackground?.let {
                     val localPopupBackground = ContextCompat.getDrawable(context, it) as Drawable
-                    if (dropDownBackground != localPopupBackground) {
-                        setDropDownBackgroundDrawable(localPopupBackground)
-                    }
+                    setDropDownBackgroundDrawable(localPopupBackground)
                 }
             }
         }

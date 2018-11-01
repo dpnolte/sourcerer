@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.os.Build
 import android.view.View
 import android.widget.FrameLayout
 import java.lang.Class
@@ -22,6 +23,14 @@ open class FrameLayoutFactory<TView : FrameLayout, TAttributes : FrameLayoutAttr
                 attributes.measureAllChildren?.let {
                     if (measureAllChildren != it) {
                         measureAllChildren = it
+                    }
+                }
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.foregroundGravity?.let {
+                        val localForegroundGravity = it.value
+                        if (foregroundGravity != localForegroundGravity) {
+                            foregroundGravity = localForegroundGravity
+                        }
                     }
                 }
             }

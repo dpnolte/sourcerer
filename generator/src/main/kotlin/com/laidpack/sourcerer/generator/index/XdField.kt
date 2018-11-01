@@ -22,6 +22,7 @@ class XdField(entity: Entity) : XdEntity(entity), XdMember {
     override var line by xdRequiredIntProp()
     override var isPublic by xdBooleanProp()
     override var isStatic by xdBooleanProp()
+    var isFinal by xdBooleanProp()
     override var canBeSetter by xdBooleanProp()
     override var canBeGetter by xdBooleanProp()
     override var memberIndex by xdRequiredIntProp()
@@ -91,6 +92,7 @@ class XdField(entity: Entity) : XdEntity(entity), XdMember {
                     } else -1
                     this.isPublic = fieldDeclaration.isPublic
                     this.isStatic = fieldDeclaration.isStatic
+                    this.isFinal = fieldDeclaration.isFinal
                     this.canBeGetter = classCategory != null && this.isPublic
                     this.canBeSetter = classCategory != null && this.isPublic
                     this.accessorHashCode = Setter.getHashCodeFromField(fieldDeclaration)
