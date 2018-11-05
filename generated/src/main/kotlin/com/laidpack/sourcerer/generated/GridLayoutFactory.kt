@@ -3,9 +3,15 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.View
 import android.widget.GridLayout
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = GridLayoutFactory.elementType,
+        attributesClazz = GridLayoutAttributes::class,
+        layoutParamAttributesClazz = GridLayoutLayoutParamsAttributes::class
+)
 open class GridLayoutFactory<TView : GridLayout, TAttributes : GridLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

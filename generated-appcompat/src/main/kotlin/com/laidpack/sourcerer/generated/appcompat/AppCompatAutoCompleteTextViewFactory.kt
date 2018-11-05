@@ -5,10 +5,15 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.core.content.ContextCompat
+import com.laidpack.generator.api.ViewElement
 import com.laidpack.sourcerer.generated.AutoCompleteTextViewFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = AppCompatAutoCompleteTextViewFactory.elementType,
+        attributesClazz = AppCompatAutoCompleteTextViewAttributes::class
+)
 open class AppCompatAutoCompleteTextViewFactory<TView : AppCompatAutoCompleteTextView, TAttributes : AppCompatAutoCompleteTextViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AutoCompleteTextViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

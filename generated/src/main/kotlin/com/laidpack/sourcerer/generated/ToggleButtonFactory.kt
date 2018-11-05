@@ -3,9 +3,14 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.View
 import android.widget.ToggleButton
+import com.laidpack.generator.api.ViewElement
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = ToggleButtonFactory.elementType,
+        attributesClazz = ToggleButtonAttributes::class
+)
 open class ToggleButtonFactory<TView : ToggleButton, TAttributes : ToggleButtonAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : CompoundButtonFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

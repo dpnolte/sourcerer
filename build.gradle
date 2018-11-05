@@ -41,7 +41,7 @@ allprojects {
     }
     ext {
         // defined in build script --> kotlin_version
-        minSdkVersion = 15
+        minSdkVersion = 24
         targetSdkVersion = 28
         compileSdkVersion = 28
         sdkDir = definedSdkDir
@@ -54,7 +54,7 @@ allprojects {
         moshi = "1.7.0"
         lintVersion = '26.0.0-beta5'
         ktorVersion = '0.9.5'
-        tsRhymerVersion = '0.1.1'
+        tsRhymerVersion = '3a4933635b'
     }
 }
 

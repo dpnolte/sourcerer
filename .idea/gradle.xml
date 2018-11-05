@@ -7,6 +7,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
+            <option value="$USER_HOME$/javaProjects/ts-rhymer/annotation" />
+            <option value="$USER_HOME$/javaProjects/ts-rhymer/codegen-impl" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/generated" />
             <option value="$PROJECT_DIR$/generated-appcompat" />
@@ -28,6 +30,8 @@
             <option value="$PROJECT_DIR$/generated-viewpager" />
             <option value="$PROJECT_DIR$/generated-wear" />
             <option value="$PROJECT_DIR$/generator" />
+            <option value="$PROJECT_DIR$/generator-api" />
+            <option value="$PROJECT_DIR$/generator-kapt" />
             <option value="$PROJECT_DIR$/sample-app" />
             <option value="$PROJECT_DIR$/sample-server" />
             <option value="$PROJECT_DIR$/services" />

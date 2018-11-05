@@ -1,12 +1,17 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
-import android.os.Build
 import android.view.View
 import android.widget.ViewAnimator
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = ViewAnimatorFactory.elementType,
+        attributesClazz = ViewAnimatorAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class ViewAnimatorFactory<TView : ViewAnimator, TAttributes : ViewAnimatorAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -31,11 +36,9 @@ open class ViewAnimatorFactory<TView : ViewAnimator, TAttributes : ViewAnimatorA
                         measureAllChildren = it
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 17) {
-                    attributes.animateFirstView?.let {
-                        if (animateFirstView != it) {
-                            animateFirstView = it
-                        }
+                attributes.animateFirstView?.let {
+                    if (animateFirstView != it) {
+                        animateFirstView = it
                     }
                 }
             }

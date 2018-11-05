@@ -7,7 +7,7 @@ import java.io.File
 
 class ModuleGeneratorManager(
         private val targetDir: File,
-        private val moduleName: String,
+        val moduleName: String,
         private val targetPackageName: String,
         private val widgetConnoisseur: WidgetConnoisseur,
         private val classGenerators: List<ClassGeneratorManager>

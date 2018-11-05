@@ -4,11 +4,16 @@ import android.content.Context
 import android.view.View
 import com.google.android.material.animation.MotionSpec
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.laidpack.generator.api.ViewElement
 import com.laidpack.sourcerer.generated.ImageButtonFactory
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = FloatingActionButtonFactory.elementType,
+        attributesClazz = FloatingActionButtonAttributes::class
+)
 open class FloatingActionButtonFactory<TView : FloatingActionButton, TAttributes : FloatingActionButtonAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ImageButtonFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

@@ -2,10 +2,15 @@ package com.laidpack.sourcerer.generated
 
 import android.content.Context
 import android.view.ViewGroup
+import com.laidpack.generator.api.LayoutParamsElement
 import com.laidpack.sourcerer.services.api.BaseLayoutParamsFactory
 import java.lang.Class
 import kotlin.String
 
+@LayoutParamsElement(
+        elementType = ViewGroupLayoutParamsFactory.elementType,
+        attributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class ViewGroupLayoutParamsFactory<TLayoutParams : ViewGroup.LayoutParams, TAttributes : ViewGroupLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : BaseLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

@@ -1,12 +1,16 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
-import android.os.Build
 import android.view.View
 import android.widget.Chronometer
+import com.laidpack.generator.api.ViewElement
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = ChronometerFactory.elementType,
+        attributesClazz = ChronometerAttributes::class
+)
 open class ChronometerFactory<TView : Chronometer, TAttributes : ChronometerAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : TextViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -25,11 +29,9 @@ open class ChronometerFactory<TView : Chronometer, TAttributes : ChronometerAttr
                         format = it
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 24) {
-                    attributes.countDown?.let {
-                        if (isCountDown != it) {
-                            isCountDown = it
-                        }
+                attributes.countDown?.let {
+                    if (isCountDown != it) {
+                        isCountDown = it
                     }
                 }
             }

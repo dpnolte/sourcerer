@@ -3,9 +3,15 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.View
 import android.widget.HorizontalScrollView
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = HorizontalScrollViewFactory.elementType,
+        attributesClazz = HorizontalScrollViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class HorizontalScrollViewFactory<TView : HorizontalScrollView, TAttributes : HorizontalScrollViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

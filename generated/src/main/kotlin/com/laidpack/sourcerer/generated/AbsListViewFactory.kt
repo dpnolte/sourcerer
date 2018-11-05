@@ -3,13 +3,18 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.view.View
 import android.widget.AbsListView
 import androidx.core.content.ContextCompat
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = AbsListViewFactory.elementType,
+        attributesClazz = AbsListViewAttributes::class,
+        layoutParamAttributesClazz = AbsListViewLayoutParamsAttributes::class
+)
 open class AbsListViewFactory<TView : AbsListView, TAttributes : AbsListViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AdapterViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -78,10 +83,8 @@ open class AbsListViewFactory<TView : AbsListView, TAttributes : AbsListViewAttr
                         isFastScrollAlwaysVisible = it
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 21) {
-                    attributes.fastScrollStyle?.let {
-                        setFastScrollStyle(it)
-                    }
+                attributes.fastScrollStyle?.let {
+                    setFastScrollStyle(it)
                 }
             }
         }

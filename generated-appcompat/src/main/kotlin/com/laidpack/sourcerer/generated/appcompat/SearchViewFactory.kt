@@ -3,9 +3,16 @@ package com.laidpack.sourcerer.generated.appcompat
 import android.content.Context
 import android.view.View
 import androidx.appcompat.widget.SearchView
+import com.laidpack.generator.api.ViewGroupElement
+import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = SearchViewFactory.elementType,
+        attributesClazz = SearchViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class SearchViewFactory<TView : SearchView, TAttributes : SearchViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : LinearLayoutCompatFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

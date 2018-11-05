@@ -3,10 +3,17 @@ package com.laidpack.sourcerer.generated.viewpager
 import android.content.Context
 import android.view.View
 import androidx.viewpager.widget.PagerTitleStrip
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.ViewGroupFactory
+import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = PagerTitleStripFactory.elementType,
+        attributesClazz = PagerTitleStripAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class PagerTitleStripFactory<TView : PagerTitleStrip, TAttributes : PagerTitleStripAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

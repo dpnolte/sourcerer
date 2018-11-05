@@ -3,10 +3,17 @@ package com.laidpack.sourcerer.generated.material.components
 import android.content.Context
 import android.view.View
 import com.google.android.material.bottomappbar.BottomAppBar
+import com.laidpack.generator.api.ViewGroupElement
+import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
 import com.laidpack.sourcerer.generated.appcompat.ToolbarFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = BottomAppBarFactory.elementType,
+        attributesClazz = BottomAppBarAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class BottomAppBarFactory<TView : BottomAppBar, TAttributes : BottomAppBarAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ToolbarFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

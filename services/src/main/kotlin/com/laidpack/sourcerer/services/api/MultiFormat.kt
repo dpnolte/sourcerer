@@ -1,7 +1,6 @@
 // do not edit, auto-generated
 package com.laidpack.sourcerer.services.api
 
-import com.laidpack.annotation.TypeScript
 import com.laidpack.sourcerer.services.adapters.FlagsAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -15,7 +14,6 @@ import kotlin.collections.Set
 import kotlin.jvm.Transient
 import kotlin.reflect.KClass
 
-@TypeScript
 open class MultiFormat(@Transient private val allowedFormats: Set<Format> = setOf()) {
     var mutableBoolean: Boolean? = null
 

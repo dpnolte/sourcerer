@@ -4,10 +4,17 @@ import android.content.Context
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.FrameLayoutFactory
+import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = BottomNavigationViewFactory.elementType,
+        attributesClazz = BottomNavigationViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class BottomNavigationViewFactory<TView : BottomNavigationView, TAttributes : BottomNavigationViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

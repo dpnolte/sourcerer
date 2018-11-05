@@ -5,10 +5,16 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.content.ContextCompat
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.ViewGroupFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = LinearLayoutCompatFactory.elementType,
+        attributesClazz = LinearLayoutCompatAttributes::class,
+        layoutParamAttributesClazz = LinearLayoutCompatLayoutParamsAttributes::class
+)
 open class LinearLayoutCompatFactory<TView : LinearLayoutCompat, TAttributes : LinearLayoutCompatAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

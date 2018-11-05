@@ -1,4 +1,9 @@
-include ':generator', ':sample-server',
+include ':codegen-impl', ':generator-api'
+project(":codegen-impl").projectDir = file("/Users/derk/javaProjects/ts-rhymer/codegen-impl")
+include ':annotation'
+project(":annotation").projectDir = file("/Users/derk/javaProjects/ts-rhymer/annotation")
+
+include ':generator', ':sample-server', ':generator-kapt',
 		':sample-app',
         ':stub-module',
 		':services',
@@ -21,3 +26,4 @@ include ':generator', ':sample-server',
         ':generated-swiperefreshlayout',
         ':generated-viewpager',
         ':generated-wear'
+		

@@ -5,10 +5,17 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.android.material.textfield.TextInputLayout
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.LinearLayoutFactory
+import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = TextInputLayoutFactory.elementType,
+        attributesClazz = TextInputLayoutAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class TextInputLayoutFactory<TView : TextInputLayout, TAttributes : TextInputLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : LinearLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

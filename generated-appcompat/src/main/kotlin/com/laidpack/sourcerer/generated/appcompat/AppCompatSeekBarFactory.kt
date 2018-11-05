@@ -3,10 +3,15 @@ package com.laidpack.sourcerer.generated.appcompat
 import android.content.Context
 import android.view.View
 import androidx.appcompat.widget.AppCompatSeekBar
+import com.laidpack.generator.api.ViewElement
 import com.laidpack.sourcerer.generated.SeekBarFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = AppCompatSeekBarFactory.elementType,
+        attributesClazz = AppCompatSeekBarAttributes::class
+)
 open class AppCompatSeekBarFactory<TView : AppCompatSeekBar, TAttributes : AppCompatSeekBarAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : SeekBarFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

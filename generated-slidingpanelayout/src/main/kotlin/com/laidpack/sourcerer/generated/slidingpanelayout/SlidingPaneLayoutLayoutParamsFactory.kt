@@ -3,10 +3,15 @@ package com.laidpack.sourcerer.generated.slidingpanelayout
 import android.content.Context
 import android.view.ViewGroup
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
+import com.laidpack.generator.api.LayoutParamsElement
 import com.laidpack.sourcerer.generated.ViewGroupMarginLayoutParamsFactory
 import java.lang.Class
 import kotlin.String
 
+@LayoutParamsElement(
+        elementType = SlidingPaneLayoutLayoutParamsFactory.elementType,
+        attributesClazz = SlidingPaneLayoutLayoutParamsAttributes::class
+)
 open class SlidingPaneLayoutLayoutParamsFactory<TLayoutParams : SlidingPaneLayout.LayoutParams, TAttributes : SlidingPaneLayoutLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupMarginLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

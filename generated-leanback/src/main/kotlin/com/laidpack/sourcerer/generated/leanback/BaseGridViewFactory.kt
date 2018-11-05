@@ -3,10 +3,17 @@ package com.laidpack.sourcerer.generated.leanback
 import android.content.Context
 import android.view.View
 import androidx.leanback.widget.BaseGridView
+import com.laidpack.generator.api.ViewGroupElement
+import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
 import com.laidpack.sourcerer.generated.recyclerview.RecyclerViewFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = BaseGridViewFactory.elementType,
+        attributesClazz = BaseGridViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class BaseGridViewFactory<TView : BaseGridView, TAttributes : BaseGridViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : RecyclerViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

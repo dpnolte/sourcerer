@@ -3,9 +3,14 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.View
 import android.widget.AutoCompleteTextView
+import com.laidpack.generator.api.ViewElement
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = AutoCompleteTextViewFactory.elementType,
+        attributesClazz = AutoCompleteTextViewAttributes::class
+)
 open class AutoCompleteTextViewFactory<TView : AutoCompleteTextView, TAttributes : AutoCompleteTextViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : EditTextFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

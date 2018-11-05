@@ -1,3 +1,3 @@
 package com.laidpack.sourcerer.services.api
 
-interface IAttributes {}
+interface IAttributes

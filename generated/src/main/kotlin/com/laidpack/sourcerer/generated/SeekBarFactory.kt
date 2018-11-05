@@ -3,9 +3,14 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.View
 import android.widget.SeekBar
+import com.laidpack.generator.api.ViewElement
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = SeekBarFactory.elementType,
+        attributesClazz = SeekBarAttributes::class
+)
 open class SeekBarFactory<TView : SeekBar, TAttributes : SeekBarAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AbsSeekBarFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

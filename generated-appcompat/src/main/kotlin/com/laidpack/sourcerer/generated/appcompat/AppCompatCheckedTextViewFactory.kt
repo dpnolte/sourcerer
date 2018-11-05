@@ -5,10 +5,15 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.appcompat.widget.AppCompatCheckedTextView
 import androidx.core.content.ContextCompat
+import com.laidpack.generator.api.ViewElement
 import com.laidpack.sourcerer.generated.CheckedTextViewFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = AppCompatCheckedTextViewFactory.elementType,
+        attributesClazz = AppCompatCheckedTextViewAttributes::class
+)
 open class AppCompatCheckedTextViewFactory<TView : AppCompatCheckedTextView, TAttributes : AppCompatCheckedTextViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : CheckedTextViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

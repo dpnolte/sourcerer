@@ -5,10 +5,17 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.car.widget.PagedListView
 import androidx.core.content.ContextCompat
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.FrameLayoutFactory
+import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = PagedListViewFactory.elementType,
+        attributesClazz = PagedListViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class PagedListViewFactory<TView : PagedListView, TAttributes : PagedListViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

@@ -3,10 +3,16 @@ package com.laidpack.sourcerer.generated.coordinatorlayout
 import android.content.Context
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.ViewGroupFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = CoordinatorLayoutFactory.elementType,
+        attributesClazz = CoordinatorLayoutAttributes::class,
+        layoutParamAttributesClazz = CoordinatorLayoutLayoutParamsAttributes::class
+)
 open class CoordinatorLayoutFactory<TView : CoordinatorLayout, TAttributes : CoordinatorLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

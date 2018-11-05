@@ -1,12 +1,17 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
-import android.os.Build
 import android.view.View
 import android.widget.DatePicker
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = DatePickerFactory.elementType,
+        attributesClazz = DatePickerAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class DatePickerFactory<TView : DatePicker, TAttributes : DatePickerAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -20,11 +25,9 @@ open class DatePickerFactory<TView : DatePicker, TAttributes : DatePickerAttribu
         super.init(view, context, attributes)
         if (view is DatePicker) {
             view.apply {
-                if (Build.VERSION.SDK_INT >= 21) {
-                    attributes.firstDayOfWeek?.let {
-                        if (firstDayOfWeek != it) {
-                            firstDayOfWeek = it
-                        }
+                attributes.firstDayOfWeek?.let {
+                    if (firstDayOfWeek != it) {
+                        firstDayOfWeek = it
                     }
                 }
             }

@@ -3,9 +3,14 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.View
 import android.widget.QuickContactBadge
+import com.laidpack.generator.api.ViewElement
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = QuickContactBadgeFactory.elementType,
+        attributesClazz = QuickContactBadgeAttributes::class
+)
 open class QuickContactBadgeFactory<TView : QuickContactBadge, TAttributes : QuickContactBadgeAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ImageViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

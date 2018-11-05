@@ -3,9 +3,14 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.SurfaceView
 import android.view.View
+import com.laidpack.generator.api.ViewElement
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = SurfaceViewFactory.elementType,
+        attributesClazz = SurfaceViewAttributes::class
+)
 open class SurfaceViewFactory<TView : SurfaceView, TAttributes : SurfaceViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

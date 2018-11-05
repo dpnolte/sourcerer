@@ -1,6 +1,6 @@
 package com.laidpack.sourcerer.generator.generators
 
-import com.laidpack.annotation.TypeScript
+import com.laidpack.typescript.annotation.TypeScript
 import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.index.ClassCategory
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
@@ -206,6 +206,7 @@ class AttributesGenerator(
         return this
     }
 
+    /** we want unique enum class simple names for typescript **/
     private fun getEnumClassName(
             attributeClassName: ClassName,
             attribute: Attribute,
@@ -216,10 +217,10 @@ class AttributesGenerator(
             return enumClassNameRegistry[key] as ClassName
         }
         var className = ClassName(attributeClassName.packageName, (typesForThisSetter.enumClassName as ClassName).simpleName)
-        while (usedEnumClassNames.contains(className)) {
+        while (usedEnumClassNames.contains(className.simpleName)) {
             className = ClassName(attributeClassName.packageName, className.simpleName + "_")
         }
-        usedEnumClassNames.add(className)
+        usedEnumClassNames.add(className.simpleName)
         enumClassNameRegistry[key] = className
         return className
     }
@@ -307,7 +308,7 @@ class AttributesGenerator(
         }
 
         private val enumClassNameRegistry = mutableMapOf<String/* target class name + attribute name */, ClassName /* class name with new package and check for dupes*/>()
-        private val usedEnumClassNames = mutableSetOf<ClassName>()
+        private val usedEnumClassNames = mutableSetOf<String /* class simple names */>()
         private val attributesInterfaceName = ClassName(SourcererEnvironment.servicesApiPackageName, "IAttributes")
         private val flagsAccumulatorClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "FlagsAccumulator")
         val enumInterfaceName = ClassName(SourcererEnvironment.servicesApiPackageName, "AttributeEnum")

@@ -4,10 +4,16 @@ import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.view.View
 import com.google.android.material.appbar.CollapsingToolbarLayout
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.FrameLayoutFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = CollapsingToolbarLayoutFactory.elementType,
+        attributesClazz = CollapsingToolbarLayoutAttributes::class,
+        layoutParamAttributesClazz = CollapsingToolbarLayoutLayoutParamsAttributes::class
+)
 open class CollapsingToolbarLayoutFactory<TView : CollapsingToolbarLayout, TAttributes : CollapsingToolbarLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

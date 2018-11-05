@@ -1,11 +1,15 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
-import android.os.Build
 import android.view.ViewGroup
+import com.laidpack.generator.api.LayoutParamsElement
 import java.lang.Class
 import kotlin.String
 
+@LayoutParamsElement(
+        elementType = ViewGroupMarginLayoutParamsFactory.elementType,
+        attributesClazz = ViewGroupMarginLayoutParamsAttributes::class
+)
 open class ViewGroupMarginLayoutParamsFactory<TLayoutParams : ViewGroup.MarginLayoutParams, TAttributes : ViewGroupMarginLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -55,16 +59,14 @@ open class ViewGroupMarginLayoutParamsFactory<TLayoutParams : ViewGroup.MarginLa
                         topMargin = localLayoutMarginTopDimension
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 17) {
-                    attributes.layout_marginStart?.let {
-                        if (marginStart != it) {
-                            marginStart = it
-                        }
+                attributes.layout_marginStart?.let {
+                    if (marginStart != it) {
+                        marginStart = it
                     }
-                    attributes.layout_marginEnd?.let {
-                        if (marginEnd != it) {
-                            marginEnd = it
-                        }
+                }
+                attributes.layout_marginEnd?.let {
+                    if (marginEnd != it) {
+                        marginEnd = it
                     }
                 }
             }

@@ -3,10 +3,17 @@ package com.laidpack.sourcerer.generated.swiperefreshlayout
 import android.content.Context
 import android.view.View
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.ViewGroupFactory
+import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = SwipeRefreshLayoutFactory.elementType,
+        attributesClazz = SwipeRefreshLayoutAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class SwipeRefreshLayoutFactory<TView : SwipeRefreshLayout, TAttributes : SwipeRefreshLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

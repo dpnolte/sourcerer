@@ -5,10 +5,17 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.leanback.widget.SearchOrbView
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.FrameLayoutFactory
+import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = SearchOrbViewFactory.elementType,
+        attributesClazz = SearchOrbViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class SearchOrbViewFactory<TView : SearchOrbView, TAttributes : SearchOrbViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

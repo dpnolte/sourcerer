@@ -1,9 +1,15 @@
 package com.laidpack.sourcerer.generated
 
 import android.widget.AbsSpinner
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = AbsSpinnerFactory.elementType,
+        attributesClazz = AbsSpinnerAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class AbsSpinnerFactory<TView : AbsSpinner, TAttributes : AbsSpinnerAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AdapterViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

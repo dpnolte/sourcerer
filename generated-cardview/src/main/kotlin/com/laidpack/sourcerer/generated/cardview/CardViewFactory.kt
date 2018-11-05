@@ -4,10 +4,17 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.view.View
 import androidx.cardview.widget.CardView
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.FrameLayoutFactory
+import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = CardViewFactory.elementType,
+        attributesClazz = CardViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class CardViewFactory<TView : CardView, TAttributes : CardViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

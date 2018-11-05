@@ -1,12 +1,17 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
-import android.os.Build
 import android.view.View
 import android.widget.SearchView
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = SearchViewFactory.elementType,
+        attributesClazz = SearchViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class SearchViewFactory<TView : SearchView, TAttributes : SearchViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : LinearLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -25,26 +30,24 @@ open class SearchViewFactory<TView : SearchView, TAttributes : SearchViewAttribu
                         setIconifiedByDefault(it)
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 16) {
-                    attributes.queryHint?.let {
-                        if (queryHint != it) {
-                            queryHint = it
-                        }
+                attributes.queryHint?.let {
+                    if (queryHint != it) {
+                        queryHint = it
                     }
-                    attributes.maxWidth?.let {
-                        if (maxWidth != it) {
-                            maxWidth = it
-                        }
+                }
+                attributes.maxWidth?.let {
+                    if (maxWidth != it) {
+                        maxWidth = it
                     }
-                    attributes.imeOptions?.let {
-                        if (imeOptions != it) {
-                            imeOptions = it
-                        }
+                }
+                attributes.imeOptions?.let {
+                    if (imeOptions != it) {
+                        imeOptions = it
                     }
-                    attributes.inputType?.let {
-                        if (inputType != it) {
-                            inputType = it
-                        }
+                }
+                attributes.inputType?.let {
+                    if (inputType != it) {
+                        inputType = it
                     }
                 }
             }

@@ -5,9 +5,16 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.leanback.widget.ImageCardView
+import com.laidpack.generator.api.ViewGroupElement
+import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = ImageCardViewFactory.elementType,
+        attributesClazz = ImageCardViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class ImageCardViewFactory<TView : ImageCardView, TAttributes : ImageCardViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : BaseCardViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

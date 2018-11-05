@@ -37,7 +37,7 @@
 # The name of @JsonClass types is used to look up the generated adapter.
 -keepnames @com.squareup.moshi.JsonClass class *
 
-# Retain generated JsonAdapters if annotated type is retained.
+# Retain generated JsonAdapters if annotated bodyType is retained.
 -if @com.squareup.moshi.JsonClass class *
 -keep class <1>JsonAdapter {
     <init>(...);

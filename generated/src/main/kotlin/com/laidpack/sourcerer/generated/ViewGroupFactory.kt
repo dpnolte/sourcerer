@@ -2,12 +2,17 @@ package com.laidpack.sourcerer.generated
 
 import android.animation.LayoutTransition
 import android.content.Context
-import android.os.Build
 import android.view.View
 import android.view.ViewGroup
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = ViewGroupFactory.elementType,
+        attributesClazz = ViewGroupAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class ViewGroupFactory<TView : ViewGroup, TAttributes : ViewGroupAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -51,33 +56,29 @@ open class ViewGroupFactory<TView : ViewGroup, TAttributes : ViewGroupAttributes
                         isMotionEventSplittingEnabled = it
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 18) {
-                    attributes.clipChildren?.let {
-                        if (clipChildren != it) {
-                            clipChildren = it
-                        }
-                    }
-                    attributes.layoutMode?.let {
-                        if (layoutMode != it.value) {
-                            layoutMode = it.value
-                        }
+                attributes.clipChildren?.let {
+                    if (clipChildren != it) {
+                        clipChildren = it
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 21) {
-                    attributes.clipToPadding?.let {
-                        if (clipToPadding != it) {
-                            clipToPadding = it
-                        }
+                attributes.layoutMode?.let {
+                    if (layoutMode != it.value) {
+                        layoutMode = it.value
                     }
-                    attributes.touchscreenBlocksFocus?.let {
-                        if (touchscreenBlocksFocus != it) {
-                            touchscreenBlocksFocus = it
-                        }
+                }
+                attributes.clipToPadding?.let {
+                    if (clipToPadding != it) {
+                        clipToPadding = it
                     }
-                    attributes.transitionGroup?.let {
-                        if (isTransitionGroup != it) {
-                            isTransitionGroup = it
-                        }
+                }
+                attributes.touchscreenBlocksFocus?.let {
+                    if (touchscreenBlocksFocus != it) {
+                        touchscreenBlocksFocus = it
+                    }
+                }
+                attributes.transitionGroup?.let {
+                    if (isTransitionGroup != it) {
+                        isTransitionGroup = it
                     }
                 }
             }

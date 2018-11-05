@@ -3,14 +3,18 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.view.View
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
+import com.laidpack.generator.api.ViewElement
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = CompoundButtonFactory.elementType,
+        attributesClazz = CompoundButtonAttributes::class
+)
 open class CompoundButtonFactory<TView : CompoundButton, TAttributes : CompoundButtonAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ButtonFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -27,26 +31,22 @@ open class CompoundButtonFactory<TView : CompoundButton, TAttributes : CompoundB
                         isChecked = it
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 21) {
-                    attributes.buttonTint?.let {
-                        val localButtonTint = ColorStateList.valueOf(it)
-                        if (buttonTintList != localButtonTint) {
-                            buttonTintList = localButtonTint
-                        }
-                    }
-                    attributes.buttonTintMode?.let {
-                        val localButtonTintMode = it.value.toPorterDuffMode()
-                        if (buttonTintMode != localButtonTintMode) {
-                            buttonTintMode = localButtonTintMode
-                        }
+                attributes.buttonTint?.let {
+                    val localButtonTint = ColorStateList.valueOf(it)
+                    if (buttonTintList != localButtonTint) {
+                        buttonTintList = localButtonTint
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 23) {
-                    attributes.button?.let {
-                        val localButton = ContextCompat.getDrawable(context, it) as Drawable
-                        if (buttonDrawable != localButton) {
-                            buttonDrawable = localButton
-                        }
+                attributes.buttonTintMode?.let {
+                    val localButtonTintMode = it.value.toPorterDuffMode()
+                    if (buttonTintMode != localButtonTintMode) {
+                        buttonTintMode = localButtonTintMode
+                    }
+                }
+                attributes.button?.let {
+                    val localButton = ContextCompat.getDrawable(context, it) as Drawable
+                    if (buttonDrawable != localButton) {
+                        buttonDrawable = localButton
                     }
                 }
             }

@@ -3,9 +3,14 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.View
 import android.view.ViewStub
+import com.laidpack.generator.api.ViewElement
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = ViewStubFactory.elementType,
+        attributesClazz = ViewStubAttributes::class
+)
 open class ViewStubFactory<TAttributes : ViewStubAttributes>(attributesType: Class<TAttributes>) : ViewFactory<ViewStub, TAttributes>(ViewStub::class.java, attributesType) {
     override val elementType: String = Companion.elementType
 

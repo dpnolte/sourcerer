@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generator.generators
 
 import android.view.ViewGroup
+import com.laidpack.generator.api.LayoutParamsElement
 import com.laidpack.sourcerer.generator.target.CodeBlock
 import com.laidpack.sourcerer.generator.index.LayoutParamsConstructorExpression
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
@@ -10,9 +11,9 @@ class LayoutParamsFactoryGenerator(
         targetPackageName: String,
         private val targetClassName: ClassName,
         private val viewClassName: TypeName,
-        factoryClassName: ClassName,
+        private val factoryClassName: ClassName,
         private val superFactoryClassName: ClassName?,
-        attributesClassName: ClassName,
+        private val attributesClassName: ClassName,
         private val constructorExpression: LayoutParamsConstructorExpression,
         codeBlocks: List<CodeBlock>,
         private val minimumApiLevel: Int,
@@ -72,6 +73,13 @@ class LayoutParamsFactoryGenerator(
         }
 
         return null
+    }
+
+    override fun getElementAnnotationSpec(): AnnotationSpec {
+        return AnnotationSpec.builder(LayoutParamsElement::class)
+                .addMember("%N = %T.%N", "elementType", factoryClassName, "elementType")
+                .addMember("%N = %T::class", "attributesClazz",  attributesClassName)
+                .build()
     }
 
     companion object {

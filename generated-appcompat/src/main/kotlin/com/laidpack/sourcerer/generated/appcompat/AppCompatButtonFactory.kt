@@ -3,10 +3,15 @@ package com.laidpack.sourcerer.generated.appcompat
 import android.content.Context
 import android.view.View
 import androidx.appcompat.widget.AppCompatButton
+import com.laidpack.generator.api.ViewElement
 import com.laidpack.sourcerer.generated.ButtonFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = AppCompatButtonFactory.elementType,
+        attributesClazz = AppCompatButtonAttributes::class
+)
 open class AppCompatButtonFactory<TView : AppCompatButton, TAttributes : AppCompatButtonAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ButtonFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

@@ -3,9 +3,15 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.View
 import android.widget.RadioGroup
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = RadioGroupFactory.elementType,
+        attributesClazz = RadioGroupAttributes::class,
+        layoutParamAttributesClazz = RadioGroupLayoutParamsAttributes::class
+)
 open class RadioGroupFactory<TView : RadioGroup, TAttributes : RadioGroupAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : LinearLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

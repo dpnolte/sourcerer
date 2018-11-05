@@ -1,6 +1,5 @@
 package com.laidpack.sourcerer.generator.generators
 
-import com.laidpack.annotation.TypeScript
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 import com.squareup.kotlinpoet.*
@@ -23,7 +22,6 @@ class MultiFormatGenerator {
         val formatSet = Set::class.asClassName()
                 .parameterizedBy(FormatEnumGenerator.formatEnumClassName)
         val classTypeSpec = TypeSpec.classBuilder(multiFormatClassName)
-                .addAnnotation(TypeScript::class.java)
                 .addModifiers(KModifier.OPEN)
                 .primaryConstructor(
                         FunSpec.constructorBuilder()

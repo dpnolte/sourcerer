@@ -65,6 +65,7 @@ abstract class BaseFactoryGenerator(
 
     open fun getClassSpec(): TypeSpec.Builder {
         return TypeSpec.classBuilder(factoryClassName)
+                .addAnnotation(getElementAnnotationSpec())
                 .addModifiers(KModifier.OPEN)
                 .primaryConstructor(getPrimaryConstructor())
                 .addSuperClassParameters()
@@ -111,6 +112,8 @@ abstract class BaseFactoryGenerator(
                 )
                 .build()
     }
+
+    abstract fun getElementAnnotationSpec(): AnnotationSpec
 
     open fun getPrimaryConstructor(): FunSpec {
         val funSpec =FunSpec.constructorBuilder()

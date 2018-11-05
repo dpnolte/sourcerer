@@ -3,10 +3,15 @@ package com.laidpack.sourcerer.generated.appcompat
 import android.content.Context
 import android.view.View
 import androidx.appcompat.widget.AppCompatRatingBar
+import com.laidpack.generator.api.ViewElement
 import com.laidpack.sourcerer.generated.RatingBarFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = AppCompatRatingBarFactory.elementType,
+        attributesClazz = AppCompatRatingBarAttributes::class
+)
 open class AppCompatRatingBarFactory<TView : AppCompatRatingBar, TAttributes : AppCompatRatingBarAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : RatingBarFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

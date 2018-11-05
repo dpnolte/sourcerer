@@ -5,10 +5,16 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.ViewGroupFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = ToolbarFactory.elementType,
+        attributesClazz = ToolbarAttributes::class,
+        layoutParamAttributesClazz = ToolbarLayoutParamsAttributes::class
+)
 open class ToolbarFactory<TView : Toolbar, TAttributes : ToolbarAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

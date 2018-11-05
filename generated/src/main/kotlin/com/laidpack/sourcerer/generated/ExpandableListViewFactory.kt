@@ -6,9 +6,15 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ExpandableListView
 import androidx.core.content.ContextCompat
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = ExpandableListViewFactory.elementType,
+        attributesClazz = ExpandableListViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class ExpandableListViewFactory<TView : ExpandableListView, TAttributes : ExpandableListViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ListViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

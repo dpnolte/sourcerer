@@ -10,6 +10,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.WildcardTypeName
+import com.squareup.kotlinpoet.asClassName
 import java.io.File
 
 class ClassGeneratorManager(
@@ -75,6 +76,15 @@ class ClassGeneratorManager(
     private val associatedLayoutElementType = if (result.isViewGroup) {
         result.defaultLayoutParamsClassName?.canonicalName ?: viewGroupLayoutParamsElementType
     } else null
+    private val associatedLayoutParamsAttributeClassName: ClassName? = when {
+        result.isViewGroup && result.defaultLayoutParamsClassName != null -> AttributesGenerator.getAttributesClassName(
+                targetPackageName,
+                result.defaultLayoutParamsClassName,
+                ClassCategory.LayoutParams
+        )
+        result.isViewGroup -> viewGroupLayoutParamAttributesClassName
+        else -> null
+    }
 
     // attributes adapter class name
     private val adapterClassName = ClassName(targetPackageName, attributesClassName.simpleName + "JsonAdapter")
@@ -139,7 +149,10 @@ class ClassGeneratorManager(
                     result.minimumApiLevel,
                     minSdkVersion,
                     result.isFinal,
-                    elementType
+                    elementType,
+                    result.isViewGroup,
+                    associatedLayoutParamsAttributeClassName
+
             ).generateFile()
             fileSpec.writeTo(targetDir)
         } else {
@@ -162,6 +175,11 @@ class ClassGeneratorManager(
     }
 
     companion object {
+        private val viewGroupLayoutParamAttributesClassName = AttributesGenerator.getAttributesClassName(
+                SourcererEnvironment.generatedPackageName,
+                ViewGroup.LayoutParams::class.asClassName(),
+                ClassCategory.LayoutParams
+        )
         private val viewGroupLayoutParamsElementType = ViewGroup.LayoutParams::class.java.canonicalName
     }
 }

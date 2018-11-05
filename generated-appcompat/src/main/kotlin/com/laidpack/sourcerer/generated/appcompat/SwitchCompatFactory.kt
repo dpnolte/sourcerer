@@ -6,11 +6,16 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
+import com.laidpack.generator.api.ViewElement
 import com.laidpack.sourcerer.generated.CompoundButtonFactory
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = SwitchCompatFactory.elementType,
+        attributesClazz = SwitchCompatAttributes::class
+)
 open class SwitchCompatFactory<TView : SwitchCompat, TAttributes : SwitchCompatAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : CompoundButtonFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

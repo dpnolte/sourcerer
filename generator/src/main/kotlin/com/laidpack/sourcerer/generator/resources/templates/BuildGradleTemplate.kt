@@ -1,6 +1,8 @@
 package com.laidpack.sourcerer.generator.resources.templates
 
-fun getBuildGradleContent(extraDependencies: String): String {
+import com.laidpack.generator.api.TypeScriptFileNameProvider
+
+fun getBuildGradleContent(packageName: String, extraDependencies: String): String {
     return """
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
@@ -37,9 +39,12 @@ android {
 
 }
 
-task sourceJar(type: Jar) {
+task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    classifier "source"
+    classifier = 'sources'
+}
+artifacts {
+    archives sourcesJar
 }
 
 dependencies {
@@ -48,8 +53,19 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${'$'}androidX"
     implementation "com.squareup.moshi:moshi:${'$'}moshi"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:${'$'}moshi"
-    api "com.github.dpnolte.ts-rhymer:annotation:${'$'}tsRhymerVersion"
+    compileOnly project(":generator-api")
+    compileOnly "com.github.dpnolte.ts-rhymer:annotation:${'$'}tsRhymerVersion"
+    kapt project(":generator-kapt")
 $extraDependencies
+}
+
+kapt {
+    arguments {
+        arg("typescript.module", "LayoutTypes") // becomes: declare module "Types"
+        arg("typescript.outputDir", "${'$'}{rootDir}/js") // where the file will be saved
+        arg("typescript.filename", "${TypeScriptFileNameProvider.getAttributesFileName(packageName)}") // where the file will be saved
+        arg("typescript.indent", "  ") // indentation (defaults to 2 spaces)
+    }
 }
 """.trimIndent()
 }

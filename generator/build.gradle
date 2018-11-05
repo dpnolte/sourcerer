@@ -24,13 +24,14 @@ dependencies {
     implementation group: 'javax.json', name: 'javax.json-api', version: '1.1.3'
     implementation group: 'org.glassfish', name: 'javax.json', version: '1.1.3'
 
-    // xodus date persistency
+    // xodus data persistency
     implementation 'org.jetbrains.xodus:xodus-openAPI:1.2.3'
     implementation 'org.jetbrains.xodus:xodus-entity-store:1.2.3'
     implementation 'org.jetbrains.xodus:dnq:1.1.325'
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
-    // typescript generator
+    // typescript annotation
     api "com.github.dpnolte.ts-rhymer:annotation:$tsRhymerVersion"
+    api project(":generator-kapt")
     // lint
     implementation "com.android.tools.lint:lint:$lintVersion"
     // colored print

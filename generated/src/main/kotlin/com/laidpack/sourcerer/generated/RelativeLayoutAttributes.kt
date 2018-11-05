@@ -1,6 +1,5 @@
 package com.laidpack.sourcerer.generated
 
-import com.laidpack.annotation.TypeScript
 import com.laidpack.sourcerer.services.api.AttributeEnum
 import com.laidpack.sourcerer.services.api.FlagsAccumulator
 import com.laidpack.sourcerer.services.api.FlagsQualifier
@@ -8,6 +7,7 @@ import com.laidpack.sourcerer.services.api.Format
 import com.laidpack.sourcerer.services.api.IAttributes
 import com.laidpack.sourcerer.services.api.MultiFormat
 import com.laidpack.sourcerer.services.api.ReferenceQualifier
+import com.laidpack.typescript.annotation.TypeScript
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.Boolean

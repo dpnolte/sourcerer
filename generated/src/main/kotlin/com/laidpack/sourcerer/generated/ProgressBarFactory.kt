@@ -7,10 +7,15 @@ import android.os.Build
 import android.view.View
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
+import com.laidpack.generator.api.ViewElement
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = ProgressBarFactory.elementType,
+        attributesClazz = ProgressBarAttributes::class
+)
 open class ProgressBarFactory<TView : ProgressBar, TAttributes : ProgressBarAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -47,78 +52,74 @@ open class ProgressBarFactory<TView : ProgressBar, TAttributes : ProgressBarAttr
                 attributes.interpolator?.let {
                     setInterpolator(context, it)
                 }
-                if (Build.VERSION.SDK_INT >= 16) {
-                    attributes.minWidth?.let {
-                        if (minimumWidth != it) {
-                            minimumWidth = it
-                        }
-                    }
-                    attributes.minHeight?.let {
-                        if (minimumHeight != it) {
-                            minimumHeight = it
-                        }
+                attributes.minWidth?.let {
+                    if (minimumWidth != it) {
+                        minimumWidth = it
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 21) {
-                    attributes.indeterminateDrawable?.let {
-                        val localIndeterminateDrawable = ContextCompat.getDrawable(context, it) as Drawable
-                        if (indeterminateDrawable != localIndeterminateDrawable) {
-                            setIndeterminateDrawableTiled(localIndeterminateDrawable)
-                        }
+                attributes.minHeight?.let {
+                    if (minimumHeight != it) {
+                        minimumHeight = it
                     }
-                    attributes.progressDrawable?.let {
-                        val localProgressDrawable = ContextCompat.getDrawable(context, it) as Drawable
-                        if (progressDrawable != localProgressDrawable) {
-                            setProgressDrawableTiled(localProgressDrawable)
-                        }
+                }
+                attributes.indeterminateDrawable?.let {
+                    val localIndeterminateDrawable = ContextCompat.getDrawable(context, it) as Drawable
+                    if (indeterminateDrawable != localIndeterminateDrawable) {
+                        setIndeterminateDrawableTiled(localIndeterminateDrawable)
                     }
-                    attributes.progressTint?.let {
-                        val localProgressTint = ColorStateList.valueOf(it)
-                        if (progressTintList != localProgressTint) {
-                            progressTintList = localProgressTint
-                        }
+                }
+                attributes.progressDrawable?.let {
+                    val localProgressDrawable = ContextCompat.getDrawable(context, it) as Drawable
+                    if (progressDrawable != localProgressDrawable) {
+                        setProgressDrawableTiled(localProgressDrawable)
                     }
-                    attributes.progressTintMode?.let {
-                        val localProgressTintMode = it.value.toPorterDuffMode()
-                        if (progressTintMode != localProgressTintMode) {
-                            progressTintMode = localProgressTintMode
-                        }
+                }
+                attributes.progressTint?.let {
+                    val localProgressTint = ColorStateList.valueOf(it)
+                    if (progressTintList != localProgressTint) {
+                        progressTintList = localProgressTint
                     }
-                    attributes.progressBackgroundTint?.let {
-                        val localProgressBackgroundTint = ColorStateList.valueOf(it)
-                        if (progressBackgroundTintList != localProgressBackgroundTint) {
-                            progressBackgroundTintList = localProgressBackgroundTint
-                        }
+                }
+                attributes.progressTintMode?.let {
+                    val localProgressTintMode = it.value.toPorterDuffMode()
+                    if (progressTintMode != localProgressTintMode) {
+                        progressTintMode = localProgressTintMode
                     }
-                    attributes.progressBackgroundTintMode?.let {
-                        val localProgressBackgroundTintMode = it.value.toPorterDuffMode()
-                        if (progressBackgroundTintMode != localProgressBackgroundTintMode) {
-                            progressBackgroundTintMode = localProgressBackgroundTintMode
-                        }
+                }
+                attributes.progressBackgroundTint?.let {
+                    val localProgressBackgroundTint = ColorStateList.valueOf(it)
+                    if (progressBackgroundTintList != localProgressBackgroundTint) {
+                        progressBackgroundTintList = localProgressBackgroundTint
                     }
-                    attributes.secondaryProgressTint?.let {
-                        val localSecondaryProgressTint = ColorStateList.valueOf(it)
-                        if (secondaryProgressTintList != localSecondaryProgressTint) {
-                            secondaryProgressTintList = localSecondaryProgressTint
-                        }
+                }
+                attributes.progressBackgroundTintMode?.let {
+                    val localProgressBackgroundTintMode = it.value.toPorterDuffMode()
+                    if (progressBackgroundTintMode != localProgressBackgroundTintMode) {
+                        progressBackgroundTintMode = localProgressBackgroundTintMode
                     }
-                    attributes.secondaryProgressTintMode?.let {
-                        val localSecondaryProgressTintMode = it.value.toPorterDuffMode()
-                        if (secondaryProgressTintMode != localSecondaryProgressTintMode) {
-                            secondaryProgressTintMode = localSecondaryProgressTintMode
-                        }
+                }
+                attributes.secondaryProgressTint?.let {
+                    val localSecondaryProgressTint = ColorStateList.valueOf(it)
+                    if (secondaryProgressTintList != localSecondaryProgressTint) {
+                        secondaryProgressTintList = localSecondaryProgressTint
                     }
-                    attributes.indeterminateTint?.let {
-                        val localIndeterminateTint = ColorStateList.valueOf(it)
-                        if (indeterminateTintList != localIndeterminateTint) {
-                            indeterminateTintList = localIndeterminateTint
-                        }
+                }
+                attributes.secondaryProgressTintMode?.let {
+                    val localSecondaryProgressTintMode = it.value.toPorterDuffMode()
+                    if (secondaryProgressTintMode != localSecondaryProgressTintMode) {
+                        secondaryProgressTintMode = localSecondaryProgressTintMode
                     }
-                    attributes.indeterminateTintMode?.let {
-                        val localIndeterminateTintMode = it.value.toPorterDuffMode()
-                        if (indeterminateTintMode != localIndeterminateTintMode) {
-                            indeterminateTintMode = localIndeterminateTintMode
-                        }
+                }
+                attributes.indeterminateTint?.let {
+                    val localIndeterminateTint = ColorStateList.valueOf(it)
+                    if (indeterminateTintList != localIndeterminateTint) {
+                        indeterminateTintList = localIndeterminateTint
+                    }
+                }
+                attributes.indeterminateTintMode?.let {
+                    val localIndeterminateTintMode = it.value.toPorterDuffMode()
+                    if (indeterminateTintMode != localIndeterminateTintMode) {
+                        indeterminateTintMode = localIndeterminateTintMode
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 26) {

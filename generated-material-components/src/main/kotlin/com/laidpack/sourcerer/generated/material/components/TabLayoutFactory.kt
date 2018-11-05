@@ -4,10 +4,17 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.view.View
 import com.google.android.material.tabs.TabLayout
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.HorizontalScrollViewFactory
+import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = TabLayoutFactory.elementType,
+        attributesClazz = TabLayoutAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class TabLayoutFactory<TView : TabLayout, TAttributes : TabLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : HorizontalScrollViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

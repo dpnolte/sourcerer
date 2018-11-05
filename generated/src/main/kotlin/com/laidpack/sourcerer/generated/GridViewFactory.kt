@@ -1,12 +1,17 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
-import android.os.Build
 import android.view.View
 import android.widget.GridView
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = GridViewFactory.elementType,
+        attributesClazz = GridViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AbsListViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -34,26 +39,25 @@ open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(i
                         numColumns = localNumColumns
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 16) {
-                    attributes.horizontalSpacing?.let {
-                        if (horizontalSpacing != it) {
-                            horizontalSpacing = it
-                        }
+                attributes.horizontalSpacing?.let {
+                    if (horizontalSpacing != it) {
+                        horizontalSpacing = it
                     }
-                    attributes.verticalSpacing?.let {
-                        if (verticalSpacing != it) {
-                            verticalSpacing = it
-                        }
+                }
+                attributes.verticalSpacing?.let {
+                    if (verticalSpacing != it) {
+                        verticalSpacing = it
                     }
-                    attributes.columnWidth?.let {
-                        if (columnWidth != it) {
-                            columnWidth = it
-                        }
+                }
+                attributes.columnWidth?.let {
+                    if (columnWidth != it) {
+                        columnWidth = it
                     }
-                    attributes.gravity?.let {
-                        if (gravity != it.value) {
-                            gravity = it.value
-                        }
+                }
+                attributes.gravity?.let {
+                    val localGravity = it.value
+                    if (gravity != localGravity) {
+                        gravity = localGravity
                     }
                 }
             }

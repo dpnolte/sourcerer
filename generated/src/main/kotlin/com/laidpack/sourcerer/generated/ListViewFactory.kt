@@ -3,13 +3,18 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.view.View
 import android.widget.ListView
 import androidx.core.content.ContextCompat
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = ListViewFactory.elementType,
+        attributesClazz = ListViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class ListViewFactory<TView : ListView, TAttributes : ListViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AbsListViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -55,16 +60,14 @@ open class ListViewFactory<TView : ListView, TAttributes : ListViewAttributes>(i
                         overscrollFooter = localOverScrollFooter
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 19) {
-                    attributes.headerDividersEnabled?.let {
-                        if (areHeaderDividersEnabled() != it) {
-                            setHeaderDividersEnabled(it)
-                        }
+                attributes.headerDividersEnabled?.let {
+                    if (areHeaderDividersEnabled() != it) {
+                        setHeaderDividersEnabled(it)
                     }
-                    attributes.footerDividersEnabled?.let {
-                        if (areFooterDividersEnabled() != it) {
-                            setFooterDividersEnabled(it)
-                        }
+                }
+                attributes.footerDividersEnabled?.let {
+                    if (areFooterDividersEnabled() != it) {
+                        setFooterDividersEnabled(it)
                     }
                 }
             }

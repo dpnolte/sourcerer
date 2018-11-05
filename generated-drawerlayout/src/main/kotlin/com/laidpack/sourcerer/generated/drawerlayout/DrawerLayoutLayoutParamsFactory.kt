@@ -3,10 +3,15 @@ package com.laidpack.sourcerer.generated.drawerlayout
 import android.content.Context
 import android.view.ViewGroup
 import androidx.drawerlayout.widget.DrawerLayout
+import com.laidpack.generator.api.LayoutParamsElement
 import com.laidpack.sourcerer.generated.ViewGroupMarginLayoutParamsFactory
 import java.lang.Class
 import kotlin.String
 
+@LayoutParamsElement(
+        elementType = DrawerLayoutLayoutParamsFactory.elementType,
+        attributesClazz = DrawerLayoutLayoutParamsAttributes::class
+)
 open class DrawerLayoutLayoutParamsFactory<TLayoutParams : DrawerLayout.LayoutParams, TAttributes : DrawerLayoutLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupMarginLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

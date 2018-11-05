@@ -1,12 +1,17 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
-import android.os.Build
 import android.view.View
 import android.widget.RelativeLayout
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = RelativeLayoutFactory.elementType,
+        attributesClazz = RelativeLayoutAttributes::class,
+        layoutParamAttributesClazz = RelativeLayoutLayoutParamsAttributes::class
+)
 open class RelativeLayoutFactory<TView : RelativeLayout, TAttributes : RelativeLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -23,12 +28,10 @@ open class RelativeLayoutFactory<TView : RelativeLayout, TAttributes : RelativeL
                 attributes.ignoreGravity?.let {
                     setIgnoreGravity(it)
                 }
-                if (Build.VERSION.SDK_INT >= 16) {
-                    attributes.gravity?.let {
-                        val localGravity = it.value
-                        if (gravity != localGravity) {
-                            gravity = localGravity
-                        }
+                attributes.gravity?.let {
+                    val localGravity = it.value
+                    if (gravity != localGravity) {
+                        gravity = localGravity
                     }
                 }
             }

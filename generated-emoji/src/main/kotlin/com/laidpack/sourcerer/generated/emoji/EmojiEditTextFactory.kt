@@ -3,10 +3,15 @@ package com.laidpack.sourcerer.generated.emoji
 import android.content.Context
 import android.view.View
 import androidx.emoji.widget.EmojiEditText
+import com.laidpack.generator.api.ViewElement
 import com.laidpack.sourcerer.generated.EditTextFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewElement(
+        elementType = EmojiEditTextFactory.elementType,
+        attributesClazz = EmojiEditTextAttributes::class
+)
 open class EmojiEditTextFactory<TView : EmojiEditText, TAttributes : EmojiEditTextAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : EditTextFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

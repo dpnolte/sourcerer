@@ -3,10 +3,17 @@ package com.laidpack.sourcerer.generated.core
 import android.content.Context
 import android.view.View
 import androidx.core.widget.NestedScrollView
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.FrameLayoutFactory
+import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsAttributes
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = NestedScrollViewFactory.elementType,
+        attributesClazz = NestedScrollViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class NestedScrollViewFactory<TView : NestedScrollView, TAttributes : NestedScrollViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : FrameLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

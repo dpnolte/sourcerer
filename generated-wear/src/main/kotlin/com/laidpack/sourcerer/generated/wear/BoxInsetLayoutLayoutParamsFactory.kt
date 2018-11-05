@@ -3,10 +3,15 @@ package com.laidpack.sourcerer.generated.wear
 import android.content.Context
 import android.view.ViewGroup
 import androidx.wear.widget.BoxInsetLayout
+import com.laidpack.generator.api.LayoutParamsElement
 import com.laidpack.sourcerer.generated.ViewGroupLayoutParamsFactory
 import java.lang.Class
 import kotlin.String
 
+@LayoutParamsElement(
+        elementType = BoxInsetLayoutLayoutParamsFactory.elementType,
+        attributesClazz = BoxInsetLayoutLayoutParamsAttributes::class
+)
 open class BoxInsetLayoutLayoutParamsFactory<TLayoutParams : BoxInsetLayout.LayoutParams, TAttributes : BoxInsetLayoutLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

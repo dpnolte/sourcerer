@@ -3,10 +3,16 @@ package com.laidpack.sourcerer.generated.material.components
 import android.content.Context
 import android.view.View
 import com.google.android.material.chip.ChipGroup
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.ViewGroupFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = ChipGroupFactory.elementType,
+        attributesClazz = ChipGroupAttributes::class,
+        layoutParamAttributesClazz = ChipGroupLayoutParamsAttributes::class
+)
 open class ChipGroupFactory<TView : ChipGroup, TAttributes : ChipGroupAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

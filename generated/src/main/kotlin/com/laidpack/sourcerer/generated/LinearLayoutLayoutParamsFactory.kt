@@ -3,9 +3,14 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import com.laidpack.generator.api.LayoutParamsElement
 import java.lang.Class
 import kotlin.String
 
+@LayoutParamsElement(
+        elementType = LinearLayoutLayoutParamsFactory.elementType,
+        attributesClazz = LinearLayoutLayoutParamsAttributes::class
+)
 open class LinearLayoutLayoutParamsFactory<TLayoutParams : LinearLayout.LayoutParams, TAttributes : LinearLayoutLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : ViewGroupMarginLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

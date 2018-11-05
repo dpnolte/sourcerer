@@ -1,6 +1,5 @@
 package com.laidpack.sourcerer.generated.car
 
-import com.laidpack.annotation.TypeScript
 import com.laidpack.sourcerer.generated.BackgroundTintModeEnum
 import com.laidpack.sourcerer.generated.DrawingCacheQualityEnum
 import com.laidpack.sourcerer.generated.ForegroundTintModeEnum
@@ -16,6 +15,7 @@ import com.laidpack.sourcerer.services.api.FlagsAccumulator
 import com.laidpack.sourcerer.services.api.Format
 import com.laidpack.sourcerer.services.api.IAttributes
 import com.laidpack.sourcerer.services.api.MultiFormat
+import com.laidpack.typescript.annotation.TypeScript
 import com.squareup.moshi.JsonClass
 import kotlin.Boolean
 import kotlin.Float

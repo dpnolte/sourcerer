@@ -9,7 +9,7 @@ import com.github.javaparser.ast.Node as JavaNode
 
 
 fun main(args: Array<String>) {
-    val input = "TabItem" // simple name
+    val input = "GridView" // simple name
     //val input = "com.google.android.material.chip.ChipGroup" // canonical name
     SourcererEnvironment.printFlowInterpreterTrace = true
     val env = SourcererEnvironment(args)

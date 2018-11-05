@@ -2,13 +2,18 @@ package com.laidpack.sourcerer.generated
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = LinearLayoutFactory.elementType,
+        attributesClazz = LinearLayoutAttributes::class,
+        layoutParamAttributesClazz = LinearLayoutLayoutParamsAttributes::class
+)
 open class LinearLayoutFactory<TView : LinearLayout, TAttributes : LinearLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : ViewGroupFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -53,20 +58,16 @@ open class LinearLayoutFactory<TView : LinearLayout, TAttributes : LinearLayoutA
                         dividerPadding = it
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 16) {
-                    attributes.divider?.let {
-                        val localDivider = ContextCompat.getDrawable(context, it) as Drawable
-                        if (dividerDrawable != localDivider) {
-                            dividerDrawable = localDivider
-                        }
+                attributes.divider?.let {
+                    val localDivider = ContextCompat.getDrawable(context, it) as Drawable
+                    if (dividerDrawable != localDivider) {
+                        dividerDrawable = localDivider
                     }
                 }
-                if (Build.VERSION.SDK_INT >= 24) {
-                    attributes.gravity?.let {
-                        val localGravity = it.value
-                        if (gravity != localGravity) {
-                            gravity = localGravity
-                        }
+                attributes.gravity?.let {
+                    val localGravity = it.value
+                    if (gravity != localGravity) {
+                        gravity = localGravity
                     }
                 }
             }

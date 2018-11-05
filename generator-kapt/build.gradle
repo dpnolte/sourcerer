@@ -1,0 +1,22 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    kapt "com.google.auto.service:auto-service:1.0-rc2"
+    //implementation "com.github.dpnolte.ts-rhymer:codegen-impl:$tsRhymerVersion"
+    api project(":generator-api")
+    implementation project(":codegen-impl")
+    //implementation project(":generator")
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin/'
+    test.java.srcDirs += 'src/test/kotlin/'
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"

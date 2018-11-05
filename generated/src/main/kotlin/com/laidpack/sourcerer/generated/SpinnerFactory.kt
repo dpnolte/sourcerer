@@ -2,13 +2,18 @@ package com.laidpack.sourcerer.generated
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.view.View
 import android.widget.Spinner
 import androidx.core.content.ContextCompat
+import com.laidpack.generator.api.ViewGroupElement
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = SpinnerFactory.elementType,
+        attributesClazz = SpinnerAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
+)
 open class SpinnerFactory<TView : Spinner, TAttributes : SpinnerAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : AbsSpinnerFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 
@@ -22,23 +27,21 @@ open class SpinnerFactory<TView : Spinner, TAttributes : SpinnerAttributes>(inst
         super.init(view, context, attributes)
         if (view is Spinner) {
             view.apply {
-                if (Build.VERSION.SDK_INT >= 16) {
-                    attributes.popupBackground?.let {
-                        val localPopupBackground = ContextCompat.getDrawable(context, it) as Drawable
-                        if (background != localPopupBackground) {
-                            setPopupBackgroundDrawable(localPopupBackground)
-                        }
+                attributes.popupBackground?.let {
+                    val localPopupBackground = ContextCompat.getDrawable(context, it) as Drawable
+                    if (background != localPopupBackground) {
+                        setPopupBackgroundDrawable(localPopupBackground)
                     }
-                    attributes.dropDownWidth?.let {
-                        if (dropDownWidth != it) {
-                            dropDownWidth = it
-                        }
+                }
+                attributes.dropDownWidth?.let {
+                    if (dropDownWidth != it) {
+                        dropDownWidth = it
                     }
-                    attributes.gravity?.let {
-                        val localGravity = it.value
-                        if (gravity != localGravity) {
-                            gravity = localGravity
-                        }
+                }
+                attributes.gravity?.let {
+                    val localGravity = it.value
+                    if (gravity != localGravity) {
+                        gravity = localGravity
                     }
                 }
             }

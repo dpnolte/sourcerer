@@ -6,10 +6,16 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import com.google.android.material.appbar.AppBarLayout
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generated.LinearLayoutFactory
 import java.lang.Class
 import kotlin.String
 
+@ViewGroupElement(
+        elementType = AppBarLayoutFactory.elementType,
+        attributesClazz = AppBarLayoutAttributes::class,
+        layoutParamAttributesClazz = AppBarLayoutLayoutParamsAttributes::class
+)
 open class AppBarLayoutFactory<TView : AppBarLayout, TAttributes : AppBarLayoutAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : LinearLayoutFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

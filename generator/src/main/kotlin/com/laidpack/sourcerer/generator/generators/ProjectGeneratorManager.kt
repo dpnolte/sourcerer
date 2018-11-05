@@ -1,7 +1,9 @@
 package com.laidpack.sourcerer.generator.generators
 
+import com.laidpack.sourcerer.generator.getExistingOrCreateFile
 import com.laidpack.sourcerer.generator.resources.GradleModuleManager
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
+import com.laidpack.sourcerer.generator.resources.templates.getBuildGradleContentForTypeScript
 import com.squareup.kotlinpoet.ClassName
 import java.io.File
 
@@ -60,5 +62,28 @@ class ProjectGeneratorManager(private val targetDir: File, moduleGenerators: Lis
             println("Deleted temp classes in stub module @ $dir")
             println("=================================")
         }
+
+        /*
+        fun createTypeScriptStubModule(
+                gradleModuleManager: GradleModuleManager,
+                moduleGenerators: List<ModuleGeneratorManager>
+        ) {
+            println("=================================")
+            val otherModuleDependencies = moduleGenerators.map {
+                "\timplementation project(\":${it.moduleName}\")"
+            }
+            gradleModuleManager.generateModule(
+                    "stub-typescript",
+                    otherModuleDependencies,
+                    "com.laidpack.sourcerer.stub.typescript"
+            ) { _, modulePath, extraDependencies ->
+                val path = modulePath.resolve("build.gradle")
+                val file = path.getExistingOrCreateFile()
+                val content = getBuildGradleContentForTypeScript(extraDependencies.joinToString("\n"))
+                file.writeText(content)
+            }
+            println("Generated stub-typescript module")
+            println("=================================")
+        }*/
     }
 }

@@ -3,10 +3,15 @@ package com.laidpack.sourcerer.generated.leanback
 import android.content.Context
 import android.view.ViewGroup
 import androidx.leanback.widget.BaseCardView
+import com.laidpack.generator.api.LayoutParamsElement
 import com.laidpack.sourcerer.generated.FrameLayoutLayoutParamsFactory
 import java.lang.Class
 import kotlin.String
 
+@LayoutParamsElement(
+        elementType = BaseCardViewLayoutParamsFactory.elementType,
+        attributesClazz = BaseCardViewLayoutParamsAttributes::class
+)
 open class BaseCardViewLayoutParamsFactory<TLayoutParams : BaseCardView.LayoutParams, TAttributes : BaseCardViewLayoutParamsAttributes>(instanceType: Class<TLayoutParams>, attributesType: Class<TAttributes>) : FrameLayoutLayoutParamsFactory<TLayoutParams, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType
 

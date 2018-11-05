@@ -1,6 +1,8 @@
 package com.laidpack.sourcerer.generator.generators
 
 import android.view.View
+import com.laidpack.generator.api.ViewElement
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.generator.index.ViewConstructorExpression
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.target.CodeBlock
@@ -11,15 +13,17 @@ class ViewFactoryGenerator(
         targetPackageName: String,
         private val targetClassName: ClassName,
         private val viewClassName: TypeName,
-        factoryClassName: ClassName,
+        private val factoryClassName: ClassName,
         private val superFactoryClassName: ClassName?,
-        attributesClassName: ClassName,
+        private val attributesClassName: ClassName,
         private val constructorExpression: ViewConstructorExpression,
         codeBlocks: List<CodeBlock>,
         private val minimumApiLevel: Int,
         minSdkVersion: Int,
         isFinal: Boolean,
-        elementType: String
+        elementType: String,
+        private val isViewGroup: Boolean,
+        private val associatedLayoutParamsAttributesClassName: ClassName?
 ) : BaseFactoryGenerator(
         targetPackageName,
         targetClassName,
@@ -73,6 +77,22 @@ class ViewFactoryGenerator(
         }
 
         return null
+    }
+
+    override fun getElementAnnotationSpec(): AnnotationSpec {
+        return if (isViewGroup) {
+            val className = associatedLayoutParamsAttributesClassName as ClassName
+            AnnotationSpec.builder(ViewGroupElement::class)
+                    .addMember("%N = %T.%N", "elementType", factoryClassName, "elementType")
+                    .addMember("%N = %T::class", "attributesClazz",  attributesClassName)
+                    .addMember("%N = %T::class", "layoutParamAttributesClazz", className)
+                    .build()
+        } else {
+            AnnotationSpec.builder(ViewElement::class)
+                    .addMember("%N = %T.%N", "elementType", factoryClassName, "elementType")
+                    .addMember("%N = %T::class", "attributesClazz",  attributesClassName)
+                    .build()
+        }
     }
 
     companion object {
