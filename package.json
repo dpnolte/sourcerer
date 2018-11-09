@@ -1,5 +1,5 @@
 {
-  "name": "sourcerer-js",
+  "name": "sourcerer-android",
   "version": "0.0.1",
   "description": "data objects and typescript definitions for the generated android json adapters",
   "main": "./js/index.ts",
