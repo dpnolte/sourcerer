@@ -1,12 +1,10 @@
 package com.laidpack.sourcerer.generator.resources
 
 import com.laidpack.sourcerer.generator.Store
-import com.laidpack.sourcerer.generator.TypePhilosopher
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asTypeName
 import jetbrains.exodus.entitystore.Entity
-import kotlinx.dnq.XdEntity
 import kotlinx.dnq.XdEnumEntity
 import kotlinx.dnq.enum.XdEnumEntityType
 import kotlinx.dnq.query.eq
@@ -24,6 +22,7 @@ enum class StyleableAttributeFormat(val value: kotlin.String, val requiresQualif
     Dimension("dimension", true),
     Integer("integer", false),
     String("string", false),
+    Flags("flag", true),
     Enum("enum", false),
     Fraction("fraction", false),
     Unspecified( "", false);
@@ -38,6 +37,7 @@ enum class StyleableAttributeFormat(val value: kotlin.String, val requiresQualif
             Integer -> kotlin.Int::class
             String -> kotlin.String::class
             Enum -> kotlin.Int::class
+            Flags -> kotlin.Int::class
             Fraction -> kotlin.Float::class
             Unspecified -> kotlin.Int::class // assuming unspecified is integer (TBC)
         }
@@ -49,6 +49,7 @@ enum class StyleableAttributeFormat(val value: kotlin.String, val requiresQualif
             Color -> colorQualifierClassName
             Reference -> referenceQualifierClassName
             Dimension -> dimensionQualifierClassName
+            Flags -> flagsQualifierClassName
             else -> throw IllegalStateException("Format $this has no required qualifier")
         }
     }
@@ -60,9 +61,10 @@ enum class StyleableAttributeFormat(val value: kotlin.String, val requiresQualif
     }
 
     companion object {
-        val colorQualifierClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "ColorQualifier")
-        val referenceQualifierClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "ReferenceQualifier")
-        val dimensionQualifierClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "DimensionQualifier")
+        val colorQualifierClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "ColorQualifier")
+        val referenceQualifierClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "ReferenceQualifier")
+        val dimensionQualifierClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "DimensionQualifier")
+        val flagsQualifierClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "FlagsQualifier")
 
         fun fromString(formatString: kotlin.String): List<StyleableAttributeFormat> {
             return formatString.split("|").map {
@@ -99,6 +101,7 @@ class XdFormat(entity: Entity) : XdEnumEntity(entity) {
         val Integer by enumField { presentation = StyleableAttributeFormat.Integer.name }
         val String by enumField { presentation = StyleableAttributeFormat.String.name }
         val Enum by enumField { presentation = StyleableAttributeFormat.Enum.name }
+        val Flags by enumField { presentation = StyleableAttributeFormat.Flags.name }
         val Fraction by enumField { presentation = StyleableAttributeFormat.Fraction.name }
         val Unspecified by enumField { presentation = StyleableAttributeFormat.Unspecified.name }
     }

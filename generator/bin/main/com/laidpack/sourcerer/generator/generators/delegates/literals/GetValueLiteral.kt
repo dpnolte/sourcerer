@@ -24,7 +24,7 @@ class GetValueLiteral(private val delegate: DelegateGeneratorBase, private val a
 
     fun asSingleFormattedValue(attribute: Attribute, typesForThisSetter: AttributeTypesForSetter, format: StyleableAttributeFormat): ValueLiteralWrapper {
         val valueProvider = {a: MutableList<Any> ->
-            if (typesForThisSetter.hasEnumAsAttributeType) {
+            if (typesForThisSetter.hasEnumAsAttributeType || typesForThisSetter.hasFlagsAsAttributeType) {
                 a.add(attributesParam.name)
                 a.add(attribute.name)
                 "%L.%L.value"
@@ -50,22 +50,6 @@ class GetValueLiteral(private val delegate: DelegateGeneratorBase, private val a
                 attribute,
                 typesForThisSetter,
                 typesForThisSetter.formats.first(),
-                args
-        )
-        return ValueLiteralWrapper(expression, args)
-    }
-
-    fun asValuePerLiteral(valueLiteral: String, attribute: Attribute, getter: Getter, typesForThisSetter: AttributeTypesForSetter): ValueLiteralWrapper {
-        val valueProvider = {a: MutableList<Any> ->
-            a.add(valueLiteral)
-            "%L"
-        }
-        val args = mutableListOf<Any>()
-        val expression = delegate.addTransformingMethodIfNeeded(
-                valueProvider,
-                attribute,
-                getter,
-                typesForThisSetter,
                 args
         )
         return ValueLiteralWrapper(expression, args)

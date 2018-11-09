@@ -2,29 +2,33 @@ package com.laidpack.sourcerer.generator.lint
 
 import com.laidpack.sourcerer.generator.Store
 import com.laidpack.sourcerer.generator.XdSourcererResult
-import com.laidpack.sourcerer.generator.peeker.ClassInfo
-import com.laidpack.sourcerer.generator.peeker.ClassRegistry
+import com.laidpack.sourcerer.generator.index.ClassInfo
+import com.laidpack.sourcerer.generator.index.XdDeclaredType
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.target.CodeBlock
 import com.squareup.kotlinpoet.ClassName
-import kotlinx.dnq.query.eq
-import kotlinx.dnq.query.firstOrNull
-import kotlinx.dnq.query.query
+import kotlinx.dnq.query.*
 
-class ApiRequirementsChecker(env: SourcererEnvironment, private val classRegistry: ClassRegistry) {
-    private val apiDetector = ApiDetector(env.stubAppProjectDir, classRegistry)
+class ApiRequirementsChecker(env: SourcererEnvironment) {
+    private val apiDetector = ApiDetector(env.stubModuleProjectDir)
     private val minSdkVersion = env.minSdkVersion
 
     fun canCheckRequirements(classInfo: ClassInfo): Boolean {
         return try {
-            apiDetector.getClassVersion(classInfo)
+            apiDetector.getClassVersion(
+                    classInfo.xdDeclaredType.targetClassName,
+                    classInfo.xdDeclaredType.getClassOrInterfaceDeclaration()
+            )
             true
         } catch (e: IllegalArgumentException) {
             false
         }
     }
     fun checkMinApiRequirements(classInfo: ClassInfo, codeBlocks : List<CodeBlock>): ClassApiRequirements {
-        val classMinApiLevel = apiDetector.getClassVersion(classInfo)
+        val classMinApiLevel = apiDetector.getClassVersion(
+                classInfo.xdDeclaredType.targetClassName,
+                classInfo.xdDeclaredType.getClassOrInterfaceDeclaration()
+        )
         val fallbackClassName = getFallbackClassNameIfNeeded(classInfo, classMinApiLevel)
         val codeBlockMinApiLevelList = mutableListOf<Int>()
         for (codeBlock in codeBlocks) {
@@ -47,7 +51,7 @@ class ApiRequirementsChecker(env: SourcererEnvironment, private val classRegistr
         }
 
         return ClassApiRequirements(
-                classInfo.targetClassName,
+                classInfo.xdDeclaredType.targetClassName,
                 fallbackClassName,
                 classMinApiLevel,
                 codeBlockMinApiLevelList
@@ -73,9 +77,25 @@ class ApiRequirementsChecker(env: SourcererEnvironment, private val classRegistr
 
     private fun getFallbackClassNameIfNeeded(classInfo: ClassInfo, classMinApiLevel: Int): ClassName? {
         if (classMinApiLevel > minSdkVersion) {
-            for (superClassName in classInfo.superClassNames) {
-                val superClassMinApiLevel = getSavedMinApiLevelIfAvailable(superClassName)
-                        ?: apiDetector.getClassVersion(classRegistry[superClassName] as ClassInfo)
+            val superClassNames = Store.transactional {
+                classInfo.xdDeclaredType.superClasses.toList().map { xdSuperClass -> xdSuperClass.targetClassName }
+            }
+            loop@ for (superClassName in superClassNames) {
+                val savedSuperClassMinApiLevel = getSavedMinApiLevelIfAvailable(superClassName)
+                val superClassMinApiLevel = when {
+                    savedSuperClassMinApiLevel != null -> savedSuperClassMinApiLevel
+                    else -> {
+                        val superClass = Store.transactional {
+                            classInfo.xdDeclaredType.superClasses.query(XdDeclaredType::canonicalName eq  superClassName)
+                                    .firstOrNull()
+                        } ?: continue@loop
+
+                        apiDetector.getClassVersion(
+                                superClassName,
+                                superClass.getClassOrInterfaceDeclaration()
+                        )
+                    }
+                }
                 if (superClassMinApiLevel <= minSdkVersion) {
                     return superClassName
                 }

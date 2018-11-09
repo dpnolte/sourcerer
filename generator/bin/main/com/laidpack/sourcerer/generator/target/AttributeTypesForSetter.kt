@@ -15,22 +15,21 @@ import kotlinx.dnq.query.toList
 // setter parameter described type can come from 2 sources (TypedArray getter or parameter type from setter).
 // That's why it is declared here not @ setter
 data class AttributeTypesForSetter (
-        val targetClassNames: List<String>,
+        val targetCanonicalName: String,
         val defaultValue: String = "",
         val unassociatedToParameter: Boolean = false,
         val isField: Boolean = false
 ) {
     var hasEnumAsAttributeType = false
+    var hasFlagsAsAttributeType = false
     var enumClassName : TypeName? = null
-    val setterClassName : String = if (!unassociatedToParameter || isField) targetClassNames.first() else ""
+    val setterCanonicalName : String = if (!unassociatedToParameter || isField) targetCanonicalName else ""
 
     var mutableAttributeType : TypeName? = null
     val hasAttributeType : Boolean
         get() = mutableAttributeType != null
     val attributeType : TypeName
         get() = mutableAttributeType as TypeName
-
-    val attributeCanonicalNames = mutableListOf<String>()
 
     var mutableSetterType : TypeName? = null
     val hasSetterType : Boolean
@@ -50,6 +49,8 @@ data class AttributeTypesForSetter (
     val resolvedSetterType : TypeName
         get() = mutableResolvedSetterType as TypeName
     val formats = mutableSetOf<StyleableAttributeFormat>()
+
+    var hasMatchedGetter : Boolean = false
 
     val requiresTransformMethod : Boolean
         get() {
@@ -72,13 +73,13 @@ data class AttributeTypesForSetter (
             setter: XdSetter
     ): XdAttributeTypesForSetter {
         val type = XdAttributeTypesForSetter.new()
-        type.targetClassNames = this.targetClassNames.toSet()
+        type.targetCanonicalName = this.targetCanonicalName
         if (this.defaultValue.isNotBlank()) type.defaultValue = this.defaultValue
         type.unassociatedToParameter = this.unassociatedToParameter
         type.isField = this.isField
         type.hasEnumAsAttributeType = this.hasEnumAsAttributeType
+        type.hasFlagsAsAttributeType = this.hasFlagsAsAttributeType
 
-        type.attributeCanonicalNames = this.attributeCanonicalNames.toSet()
         if (this.enumClassName != null) type.enumClassNameAsString = (this.enumClassName as ClassName).canonicalName
         if (this.hasAttributeType) type.attributeTypeAsString = this.attributeType.toString()
         if (this.hasSetterType) type.setterTypeAsString = this.setterType.toString()
@@ -87,6 +88,7 @@ data class AttributeTypesForSetter (
         type.formats.addAll(this.formats.map { it.toEntity() })
         type.attribute = attribute
         type.setter = setter
+        type.hasMatchedGetter = this.hasMatchedGetter
 
         return type
     }
@@ -95,14 +97,15 @@ data class AttributeTypesForSetter (
 class XdAttributeTypesForSetter(entity: Entity) : XdEntity(entity) {
     companion object : XdNaturalEntityType<XdAttributeTypesForSetter>()
 
-    var targetClassNames by xdSetProp<XdAttributeTypesForSetter, String>()
+    var targetCanonicalName by xdRequiredStringProp()
     var defaultValue by xdStringProp()
     var unassociatedToParameter by xdBooleanProp()
     var isField: Boolean by xdBooleanProp()
     var hasEnumAsAttributeType by xdBooleanProp()
+    var hasFlagsAsAttributeType by xdBooleanProp()
+    var hasMatchedGetter by xdBooleanProp()
     var enumClassNameAsString by xdStringProp()
     var attributeTypeAsString by xdStringProp()
-    var attributeCanonicalNames by xdSetProp<XdAttributeTypesForSetter, String>()
     var setterTypeAsString by xdStringProp()
     var setterCompoundTypeAsString by xdStringProp()
     var resolvedSetterTypeAsString by xdStringProp()
@@ -115,19 +118,19 @@ class XdAttributeTypesForSetter(entity: Entity) : XdEntity(entity) {
     fun toSnapshot(transaction: Boolean = true): AttributeTypesForSetter {
         val block = {
             val types = AttributeTypesForSetter(
-                    this.targetClassNames.toList(),
+                    this.targetCanonicalName,
                     this.defaultValue ?: "",
                     this.unassociatedToParameter,
                     this.isField
             )
             types.hasEnumAsAttributeType = this.hasEnumAsAttributeType
+            types.hasFlagsAsAttributeType = this.hasFlagsAsAttributeType
             this.enumClassNameAsString?.let {s ->
                 types.enumClassName = ClassName.bestGuess(s)
             }
             this.attributeTypeAsString?.let {s ->
                 types.mutableAttributeType = ClassName.bestGuess(s)
             }
-            types.attributeCanonicalNames.addAll(this.attributeCanonicalNames)
             this.setterTypeAsString?.let {s ->
                 types.mutableSetterType = ClassName.bestGuess(s)
             }
@@ -140,6 +143,7 @@ class XdAttributeTypesForSetter(entity: Entity) : XdEntity(entity) {
             types.formats.addAll(this.formats.toList().map { xdFormat ->
                 xdFormat.toEnum(false)
             })
+            types.hasMatchedGetter = this.hasMatchedGetter
             types
         }
         return if(transaction) Store.transactional { block() } else block()

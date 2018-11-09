@@ -57,9 +57,9 @@ dependencies {
 
 kapt {
     arguments {
-        arg("typescript.module", "LayoutTypes") // becomes: declare module "Types"
+        arg("typescript.namespace", "AppcompatTypes") // becomes: declare namespace "..."
         arg("typescript.outputDir", "${rootDir}/js") // where the file will be saved
-        arg("typescript.filename", "generated-appcompat.attributes.d.ts") // where the file will be saved
+        arg("typescript.filename", "appcompat.types.d.ts") // where the file will be saved
         arg("typescript.indent", "  ") // indentation (defaults to 2 spaces)
     }
 }

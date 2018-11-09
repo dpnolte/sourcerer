@@ -17,19 +17,21 @@ abstract class BaseFlowInterpreter {
 
     open fun beforeInvokingHandlers() {}
 
-    data class NodeIterationResult (val canContinue: Boolean, val isHandled: Boolean)
+    data class NodeIterationResult (val canContinue: Boolean, val isHandled: Boolean, val handlerNames: List<String> = listOf())
     fun onNodeIteration(node: Node, level: Int): NodeIterationResult {
         currentLevel = level
         beforeInvokingHandlers()
         // activate listeners based on type
         if (mappedHandlers.containsKey(node::class)) {
             val handlers = mappedHandlers[node::class] as List<INodeHandler>
+            val handlerNames = mutableListOf<String>()
             var canContinue = true
             for (handler in handlers) {
                 val result = handler.nodeHandler(node)
+                handlerNames.add(handler::class.java.simpleName)
                 if (!result) canContinue = false
             }
-            NodeIterationResult(canContinue, true)
+            return NodeIterationResult(canContinue, true, handlerNames)
         }
 
         return NodeIterationResult(true, false)

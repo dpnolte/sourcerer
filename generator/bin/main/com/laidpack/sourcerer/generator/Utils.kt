@@ -1,97 +1,39 @@
 package com.laidpack.sourcerer.generator
 
-import com.laidpack.sourcerer.generator.generators.*
-import com.laidpack.sourcerer.generator.peeker.ClassCategory
-import com.laidpack.sourcerer.generator.peeker.ClassRegistry
-import com.laidpack.sourcerer.generator.peeker.LayoutParamsConstructorExpression
-import com.laidpack.sourcerer.generator.peeker.ViewConstructorExpression
-import com.laidpack.sourcerer.generator.resources.AndroidSdkStructure
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import java.io.File
 import java.nio.file.Path
 
 fun initParserAndStore(env: SourcererEnvironment) {
-    setUpJavaParser(env)
+    JavaParserContext.init(env)
     Store.init(env)
 }
 
-fun generateMultiFormatFiles(targetPath: Path) {
-    val targetDir = targetPath.toFile()
 
-    println("=================================")
-    val file = MultiFormatGenerator().generateFile()
-    file.writeTo(targetDir)
-
-    val file2 = FormatEnumGenerator().generateFile()
-    file2.writeTo(targetDir)
-
-    //TemplateGenerator(targetPath, env.apiSourcePath).writeFiles()
-    println("Created multi-formats class and formats enum...")
-    println("=================================")
+fun String.toCamelCase(): String {
+    return this.split('_').joinToString("") {
+        it.capitalize() }
 }
-
-fun generateAttributeFile(targetDir: File, result: SourcererResult) {
-    val file = AttributesGenerator(
-            result.targetClassName,
-            result.superClassName,
-            result.attributes,
-            result.classCategory,
-            result.isViewGroup,
-            result.defaultLayoutParamsClassName
-    ).generateFile()
-    file.writeTo(targetDir)
-}
-
-
-fun generateFactoryFiles(targetDir: File, result: SourcererResult, minSdkVersion: Int) {
-    if (result.classCategory == ClassCategory.View) {
-        val fileSpec = ViewFactoryGenerator(
-                result.targetClassName,
-                result.superClassName,
-                result.constructorExpression as ViewConstructorExpression,
-                result.numberOfTypeVariables,
-                result.codeBlocks,
-                result.minimumApiLevel,
-                minSdkVersion,
-                result.isFinal
-        ).generateFile()
-        fileSpec.writeTo(targetDir)
-    } else {
-        val fileSpec = LayoutParamsFactoryGenerator(
-                result.targetClassName,
-                result.superClassName,
-                result.constructorExpression as LayoutParamsConstructorExpression,
-                result.numberOfTypeVariables,
-                result.codeBlocks,
-                result.minimumApiLevel,
-                minSdkVersion,
-                result.isFinal
-        ).generateFile()
-        fileSpec.writeTo(targetDir)
-    }
-}
-
-fun deleteOldGeneratedFiles(env: SourcererEnvironment) {
-    println("=================================")
-    for (file in env.rootPath.toFile().listFiles()) {
-        if (file.isDirectory && file.name.startsWith("generated")) {
-            val sourceDir = file.toPath().resolve("src/main/kotlin").toFile()
-            if (sourceDir.exists() && sourceDir.isDirectory) {
-                for (generatedFile in sourceDir.listFiles()) {
-                    file.deleteRecursively()
-                }
-            }
+fun String.indexOfFirstCapitalChar(): Int {
+    for (index in 0 until this.length) {
+        if (this[index].isUpperCase()) {
+            return index
         }
     }
-    println("Deleted old generated files")
-    println("=================================")
+    return 0
 }
-
-fun deleteTempFiles(env: SourcererEnvironment) {
-    println("=================================")
-    for (file in env.stubAppGeneratedPackageDir.listFiles()) {
-        file.deleteRecursively()
+fun String.splitByCapitalChar(): List<String> {
+    return Regex("[A-Z]+[a-z0-9]*").findAll(this).map {
+        it.value
+    }.toList()
+}
+fun Path.getExistingOrCreateFile(): File {
+    val file = this.toFile()
+    return if (file.exists()) {
+        file
+    } else {
+        val created = file.createNewFile()
+        if (!created) throw IllegalStateException("Failed to create file $this")
+        file
     }
-    println("Deleted temp classes in stub app @ ${env.stubAppGeneratedPackageDir}")
-    println("=================================")
 }

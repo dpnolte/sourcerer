@@ -13,6 +13,10 @@ class BeginIfAnyFormatIsSet (private val delegate: DelegateGeneratorBase, privat
         val condition = getCondition(attribute, typesForThisSetter)
         builder.beginControlFlow("if (${condition.expression})", *condition.args.toTypedArray())
     }
+    fun addAsIf(builder: FunSpec.Builder, attribute: Attribute) {
+        val condition = getCondition(attribute, null)
+        builder.beginControlFlow("if (${condition.expression})", *condition.args.toTypedArray())
+    }
 
     fun addAsWhenEntry(builder: FunSpec.Builder, attribute: Attribute, typesForThisSetter: AttributeTypesForSetter) {
         val condition = getCondition(attribute, typesForThisSetter)

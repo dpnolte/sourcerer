@@ -1,21 +1,15 @@
 package com.laidpack.sourcerer.generator.flow.getter
 
 
-import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.expr.*
 import com.github.javaparser.ast.stmt.Statement
-import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.ancestorsOfType
 import com.laidpack.sourcerer.generator.descendantsOfType
-import com.laidpack.sourcerer.generator.peeker.ClassInfo
-import com.laidpack.sourcerer.generator.peeker.MethodInfo
+import com.laidpack.sourcerer.generator.index.ClassInfo
 
 class GetterFlow (
-        private val interpreter: GetterFlowInterpreter,
-        private val potentialGetter: MethodInfo,
-        private val field: FieldDeclaration,
+        private val variableName: String,
         private val conditions: Map<String, String>,
-        private val attribute: Attribute,
         val classInfo: ClassInfo
 ) {
     var isGetterEligible = false
@@ -23,7 +17,7 @@ class GetterFlow (
     var conditionCount = 0
         private set
 
-    private val variableName = field.variables.first().nameAsString
+
 
     fun getFieldFromStatement(statement: Statement): NameExpr? {
         val nameExpressions = statement.descendantsOfType(NameExpr::class.java)
@@ -69,8 +63,8 @@ class GetterFlow (
         if (binaryExpr.right is NameExpr) {
             val name = getVariableName(binaryExpr)
             if (name != null) {
-                if (classInfo.isFieldFromThisClass(name)) {
-                    val variable = classInfo.getFieldFromThisClass(name).variables.first()
+                if (classInfo.isFieldFromThisClassOrSuperClass(name)) {
+                    val variable = classInfo.getResolvedFieldFromThisClassOrSuperClass(name).variables.first()
                     if (variable.initializer.isPresent && variable.initializer.get() is LiteralStringValueExpr) {
                         return variable.initializer.get().asLiteralStringValueExpr().value
                     }

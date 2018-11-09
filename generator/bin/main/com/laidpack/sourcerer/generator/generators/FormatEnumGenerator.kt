@@ -1,6 +1,5 @@
 package com.laidpack.sourcerer.generator.generators
 
-import com.laidpack.sourcerer.generator.TypePhilosopher
 import com.laidpack.sourcerer.generator.resources.SourcererEnvironment
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
 import com.squareup.kotlinpoet.*
@@ -41,7 +40,7 @@ class FormatEnumGenerator() {
     }
 
     companion object {
-        private val stringAliasClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "StringAlias")
-        val formatEnumClassName = ClassName(SourcererEnvironment.serviceApiPackageName, "Format")
+        private val stringAliasClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "StringAlias")
+        val formatEnumClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "Format")
     }
 }

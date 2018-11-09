@@ -1,6 +1,6 @@
 package com.laidpack.sourcerer.generator.resources.templates
 
-import com.laidpack.generator.api.TypeScriptFileNameProvider
+import com.laidpack.generator.api.TypeScriptNameProvider
 
 fun getBuildGradleContent(packageName: String, extraDependencies: String): String {
     return """
@@ -61,9 +61,9 @@ $extraDependencies
 
 kapt {
     arguments {
-        arg("typescript.module", "LayoutTypes") // becomes: declare module "Types"
+        arg("typescript.namespace", "${TypeScriptNameProvider.getModuleName(packageName)}") // becomes: declare namespace "..."
         arg("typescript.outputDir", "${'$'}{rootDir}/js") // where the file will be saved
-        arg("typescript.filename", "${TypeScriptFileNameProvider.getAttributesFileName(packageName)}") // where the file will be saved
+        arg("typescript.filename", "${TypeScriptNameProvider.getAttributesFileName(packageName)}") // where the file will be saved
         arg("typescript.indent", "  ") // indentation (defaults to 2 spaces)
     }
 }

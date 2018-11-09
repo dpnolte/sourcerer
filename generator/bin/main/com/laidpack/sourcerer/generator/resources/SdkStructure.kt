@@ -2,6 +2,8 @@ package com.laidpack.sourcerer.generator.resources
 
 import java.io.File
 import java.io.FileNotFoundException
+import java.net.URI
+import java.net.URL
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.reflect.KClass
@@ -17,6 +19,10 @@ class AndroidSdkStructure private constructor (
     val widgetFilePath = dataPath.resolve("widgets.txt")
     val valuesPath = resourcePath.resolve("values")
     val attributesFilePath = valuesPath.resolve("attrs.xml")
+    val androidJarPath = platformPath.resolve("android.jar")
+    val androidJarUri = URI("jar", androidJarPath.toUri().toString(), null)
+    val androidResourceClassUrl = URL("$androidJarUri!/android/R.class")
+
 
     fun getSourceFileContent(classType: KClass<*>): String {
         val file = getSourceFile(classType)

@@ -6,7 +6,7 @@ import com.laidpack.sourcerer.generator.flow.NodeHandler
 import com.laidpack.sourcerer.generator.flow.attributes.AttributeFlow
 import com.laidpack.sourcerer.generator.flow.attributes.BaseAttributesHandler
 import com.laidpack.sourcerer.generator.flow.attributes.VariableImpact
-import com.laidpack.sourcerer.generator.peeker.MethodInfo
+import com.laidpack.sourcerer.generator.index.XdMethod
 
 class ConditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHandler<AssignExpr>(flow, AssignExpr::class) {
     override val handler: NodeHandler<AssignExpr> = ::onAssignExpressionConditionalToAttribute
@@ -36,7 +36,7 @@ class ConditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHandle
     private fun methodCallIsAssignedToVariable(node: AssignExpr) {
         val targetExpr = node.target.asNameExpr()
         val valueExpr = node.value.asMethodCallExpr()
-        if (!flow.classInfo.isFieldFromThisClass(targetExpr.nameAsString) && flow.isAttributeValueRetrievedWithMethodCall(valueExpr)) {
+        if (flow.isAttributeValueRetrievedWithMethodCall(valueExpr)) {
             flow.setTypedArrayGetterForAttribute(valueExpr)
             flow.addVariableAsDerivedFromAttribute(targetExpr.nameAsString, valueExpr)
         }
@@ -53,7 +53,7 @@ class ConditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHandle
     private fun handleBinaryExpression(targetExpr: NameExpr, valueExpr: BinaryExpr) {
         // check if there are any method calls within binary expression
         val methodCallExpressions = valueExpr.descendantsOfType(MethodCallExpr::class.java)
-        val isMemberVariableFromThisClass = flow.classInfo.isFieldFromThisClass(targetExpr.nameAsString)
+        val isMemberVariableFromThisClass = flow.classInfo.isFieldFromThisClassOrSuperClass(targetExpr.nameAsString)
         // if yes, try to resolve to typedarray getter (even if nested in other methods)
         methodCallExpressions.forEach { methodCallExpr ->
             when {
@@ -61,7 +61,7 @@ class ConditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHandle
                     flow.setTypedArrayGetterForAttribute(methodCallExpr)
                     flow.addVariableAsDerivedFromAttribute(targetExpr.nameAsString, methodCallExpr)
                 }
-                flow.classInfo.isMethodCallFromThisClass(methodCallExpr) && flow.isMethodCalledWithTypedArrayAsParameter(methodCallExpr) -> {
+                flow.classInfo.isMethodCallFromThisClassOrSuperClass(methodCallExpr) && flow.isMethodCalledWithTypedArrayAsParameter(methodCallExpr) -> {
                     handleMethodCallWithTypedArrayParameter(targetExpr, methodCallExpr)
                 }
             }
@@ -70,7 +70,7 @@ class ConditionalToAttrAssignHandler(flow: AttributeFlow) : BaseAttributesHandle
     }
 
     private fun handleMethodCallWithTypedArrayParameter(targetExpr: NameExpr, methodCallExpr: MethodCallExpr) {
-        val methodInfo = flow.classInfo.getMethodInfoByCallExpr(methodCallExpr) as MethodInfo
-        flow.visitNestedMethodWithTypedArrayParameter(targetExpr, methodInfo)
+        val method = flow.classInfo.getMethodInfoByCallExpr(methodCallExpr) as XdMethod
+        flow.visitNestedMethodWithTypedArrayParameter(targetExpr, method)
     }
 }

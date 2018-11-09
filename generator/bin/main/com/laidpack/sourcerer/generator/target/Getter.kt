@@ -2,8 +2,7 @@ package com.laidpack.sourcerer.generator.target
 
 import com.github.javaparser.ast.body.FieldDeclaration
 import com.laidpack.sourcerer.generator.Store
-import com.laidpack.sourcerer.generator.peeker.MethodInfo
-import com.laidpack.sourcerer.generator.peeker.describeType
+import com.laidpack.sourcerer.generator.index.XdMethod
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeName
 import jetbrains.exodus.entitystore.Entity
@@ -39,6 +38,8 @@ data class Getter(
     val hasResolvedType: Boolean
         get() = mutableResolvedType != null
 
+    val setterHashCodes = mutableSetOf<Int>()
+
     override fun hashCode(): Int {
         return Objects.hash(
                 name,
@@ -62,19 +63,23 @@ data class Getter(
                     it.toEntity(xdGetter)
                 }
         )
+        xdGetter.setterHashCodes = this.setterHashCodes
         return xdGetter
     }
 
     companion object {
-        fun getHashCodeFromMethodInfo(method: MethodInfo): Int {
-            return Objects.hash(
-                    method.methodDeclaration.nameAsString,
-                    method.methodDeclaration.begin.get().line,
-                    /*isField*/ false,
-                    *method.methodDeclaration.parameters.map {
-                        it.describeType()
-                    }.toTypedArray()
-            )
+        fun getHashCodeFromMethod(xdMethod: XdMethod)
+        {
+            return Store.transactional {
+                Objects.hash(
+                        xdMethod.name,
+                        xdMethod.line,
+                        /*isField*/ false,
+                        *xdMethod.parameters.toList().map {
+                            it.describedType
+                        }.toTypedArray()
+                )
+            }
         }
         fun getHashCodeFromField(field: FieldDeclaration): Int {
             return Objects.hash(
@@ -99,6 +104,7 @@ class XdGetter(entity: Entity) : XdEntity(entity) {
     var typeNameAsString by xdStringProp()
     var resolvedTypeAsString by xdStringProp()
     var attribute : XdAttribute by xdParent(XdAttribute::getters)
+    var setterHashCodes by xdSetProp<XdGetter, Int>()
 
     fun toSnapshot(transaction: Boolean = true): Getter {
         val block = {
@@ -117,6 +123,7 @@ class XdGetter(entity: Entity) : XdEntity(entity) {
             if (resolvedTypeAsString != null) {
                 getter.mutableResolvedType = ClassName.bestGuess(this.resolvedTypeAsString as String)
             }
+            getter.setterHashCodes.addAll(this.setterHashCodes)
             getter
         }
         return if(transaction) Store.transactional { block() } else block()

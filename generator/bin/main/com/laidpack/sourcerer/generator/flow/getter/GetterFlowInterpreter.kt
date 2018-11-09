@@ -1,23 +1,24 @@
 package com.laidpack.sourcerer.generator.flow.getter
 
-import com.github.javaparser.ast.body.FieldDeclaration
-import com.laidpack.sourcerer.generator.target.Attribute
+import com.github.javaparser.ast.body.MethodDeclaration
 import com.laidpack.sourcerer.generator.flow.BaseFlowInterpreter
 import com.laidpack.sourcerer.generator.flow.FlowVisitor
 import com.laidpack.sourcerer.generator.flow.getter.handlers.ReturnStmtHandler
-import com.laidpack.sourcerer.generator.peeker.ClassInfo
-import com.laidpack.sourcerer.generator.peeker.MethodInfo
+import com.laidpack.sourcerer.generator.index.ClassInfo
 
 class GetterFlowInterpreter(
-        private val potentialGetter: MethodInfo,
-        field: FieldDeclaration,
+        private val getterDeclaration: MethodDeclaration,
+        variableName: String,
         conditions: Map<String, String>,
-        attribute: Attribute,
         classInfo: ClassInfo
     ) : BaseFlowInterpreter() {
 
     private val visitor = FlowVisitor(this::onNodeIteration)
-    private val flow = GetterFlow(this, potentialGetter, field, conditions, attribute, classInfo)
+    private val flow = GetterFlow(
+            variableName,
+            conditions,
+            classInfo
+    )
 
     override val handlers = listOf(
             ReturnStmtHandler(flow)
@@ -25,7 +26,7 @@ class GetterFlowInterpreter(
 
     data class EligibilityResult(val eligible: Boolean, val fulfilledConditionCount: Int = 0)
     fun checkEligibility() : EligibilityResult {
-        visitor.explore(potentialGetter.methodDeclaration)
+        visitor.explore(getterDeclaration)
         return EligibilityResult(flow.isGetterEligible, flow.conditionCount)
     }
 

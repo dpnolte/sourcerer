@@ -2,44 +2,59 @@ package com.laidpack.sourcerer.generator
 
 import com.github.javaparser.ast.Node
 import com.github.javaparser.ast.body.*
+import com.github.javaparser.ast.expr.ObjectCreationExpr
 import java.util.function.BiPredicate
 
-// from: https://tomassetti.me/resolve-method-calls-using-java-symbol-solver/
-class SpecificNodeIterator<T>(private val type: Class<T>, private val nodeHandler: (node: T) -> Boolean) {
-
-    fun explore(node: Node) {
+// based on: https://tomassetti.me/resolve-method-calls-using-java-symbol-solver/
+class SpecificNodeIterator<T>(
+        private val type: Class<T>,
+        private val nodeHandler: (node: T) -> Boolean
+) {
+    fun explore(node: Node, path: MutableList<Int> = mutableListOf()) {
         if (type.isInstance(node)) {
             if (!nodeHandler(type.cast(node))) {
                 return
             }
         }
-        for (child in node.childNodes) {
-            explore(child)
+        node.childNodes.forEachIndexed { index, child ->
+            explore(child, path)
+        }
+    }
+}
+class PathAwareNodeIterator<T>(
+        private val type: Class<T>,
+        private val nodeHandler: (node: T, path: List<Int>) -> Boolean
+) {
+    fun explore(node: Node, path: List<Int> = listOf()) {
+        if (type.isInstance(node)) {
+            if (!nodeHandler(type.cast(node), path)) {
+                return
+            }
+        }
+        node.childNodes.forEachIndexed { index, child ->
+            val nextPath = path.toMutableList()
+            nextPath.add(index)
+            explore(child, nextPath)
         }
     }
 }
 
-class SimpleNodeIterator(private val nodeHandler: (node: Node) -> Boolean) {
-    fun explore(node: Node) {
-        if (!nodeHandler(node)) {
-            return
-        }
-        for (child in node.childNodes) {
-            explore(child)
-        }
-    }
-}
-
-// this is a method extension: we had this method to the existing class "Node"
-fun <T> Node.descendantsOfType(type: Class<T>) : List<T> {
+fun <T> Node.descendantsOfType(
+        type: Class<T>,
+        predicate: (T) -> Boolean = {true}
+) : List<T> {
     val descendants = mutableListOf<T>()
-    SpecificNodeIterator(type, fun(node: T): Boolean {
-            descendants.add(node)
-            return true
-    }).explore(this)
+    SpecificNodeIterator(
+            type,
+            nodeHandler =  fun(node: T): Boolean {
+                if (predicate(node)) {
+                    descendants.add(node)
+                }
+                return true
+            }
+    ).explore(this)
     return descendants
 }
-// this is a method extension: we had this method to the existing class "Node"
 fun <T> Node.firstDescendantOfType(type: Class<T>, predicate: (T) -> Boolean = {true}) : T? {
     var descendant : T? = null
     SpecificNodeIterator(type, fun(node: T): Boolean {
@@ -52,6 +67,22 @@ fun <T> Node.firstDescendantOfType(type: Class<T>, predicate: (T) -> Boolean = {
     return descendant
 }
 
+fun <T> Node.descendantsAndPatshOfType(
+        type: Class<T>,
+        predicate: (T) -> Boolean = {true}
+) : List<Pair<T, List<Int>>> {
+    val descendants = mutableListOf<Pair<T, List<Int>>>()
+    PathAwareNodeIterator(
+            type,
+            nodeHandler =  fun(node, path): Boolean {
+                if (predicate(node)) {
+                    descendants.add(Pair(node, path))
+                }
+                return true
+            }
+    ).explore(this)
+    return descendants
+}
 
 class ReverseSpecificNodeIterator<T>(private val type: Class<T>, private val nodeHandler: (node: T) -> Boolean) {
     fun explore(node: Node) {
@@ -65,7 +96,6 @@ class ReverseSpecificNodeIterator<T>(private val type: Class<T>, private val nod
         }
     }
 }
-
 
 fun <T> Node.ancestorsOfType(type: Class<T>) : List<T> {
     val ancestors = mutableListOf<T>()
@@ -103,17 +133,5 @@ fun <T> Node.ancestorsOfTypeUntil(type: Class<T>, upToNode: Node) : List<T> {
         return true
     }).explore(this)
     return ancestors
-}
-
-
-fun ClassOrInterfaceDeclaration.getBodyDeclarationsOfThisClass() : List<BodyDeclaration<*>> {
-    val declarations = mutableListOf<BodyDeclaration<*>>()
-    SimpleNodeIterator(fun (node: Node): Boolean {
-        if (node is MethodDeclaration || node is ConstructorDeclaration || (node is FieldDeclaration && node.parentNode.get() is ClassOrInterfaceDeclaration)) {
-            declarations.add(node as BodyDeclaration<*>)
-        }
-        return node !is ClassOrInterfaceDeclaration || node == this
-    }).explore(this)
-    return declarations
 }
 

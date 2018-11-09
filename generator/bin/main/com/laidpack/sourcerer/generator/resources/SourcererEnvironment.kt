@@ -1,17 +1,8 @@
 package com.laidpack.sourcerer.generator.resources
 
-import com.laidpack.sourcerer.generator.TypePhilosopher
 import java.io.File
-import java.net.URI
-import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.zip.ZipFile
-import jdk.nashorn.internal.objects.NativeArray.forEach
-import java.nio.file.Files
-import java.util.Collections.emptyMap
-
-
 
 
 class SourcererEnvironment(args: Array<String>) {
@@ -43,10 +34,10 @@ class SourcererEnvironment(args: Array<String>) {
     val generatedPackageDir = generatedPath.resolve(
             generatedPackageName.replace(".", File.separator)
     ).toFile()
-    val stubAppProjectDir = rootPath.resolve("stub-app").toFile()
-    val stubAppPath = rootPath.resolve("stub-app/src/main/kotlin")
-    val stubAppDir = stubAppPath.toFile()
-    val stubAppGeneratedPackageDir = stubAppPath.resolve(
+    val stubModuleProjectDir = rootPath.resolve("stub-module").toFile()
+    val stubModulePath = rootPath.resolve("stub-module/src/main/kotlin")
+    val stubModuleDir = stubModulePath.toFile()
+    val stubModuleGeneratedPackageDir = stubModulePath.resolve(
             generatedPackageName.replace(".", File.separator)
     ).toFile()
     val lintReportsFilePath : Path = rootPath.resolve("stub-app/build/reports/lint-results.xml")
@@ -59,13 +50,18 @@ class SourcererEnvironment(args: Array<String>) {
     val indexedPath : Path = generatorPath.resolve("indexed")
     val indexedDir = indexedPath.toFile()
 
-    val servicePath = rootPath.resolve("service/src/main/kotlin")
+    val servicesPath = rootPath.resolve("services/src/main/kotlin")
+    val servicesDir = servicesPath.toFile()
+
+    val androidResourceManager = AndroidResourceManager(this)
 
     companion object {
-        var printSourceTreeVisitOutput = false
-        const val servicePackageName =  "com.laidpack.sourcerer.service"
-        const val serviceApiPackageName = "$servicePackageName.api"
-        const val generatedPackageName = "com.laidpack.sourcerer.generated"
+        var printFlowInterpreterTrace = false
+        const val rootPackageName = "com.laidpack.sourcerer"
+        const val servicePackageName =  "$rootPackageName.services"
+        const val servicesApiPackageName = "$servicePackageName.api"
+        const val servicesAdaptersPackageName = "$servicePackageName.adapters"
+        const val generatedPackageName = "$rootPackageName.generated"
         val generatedPackagePathAsString = generatedPackageName.replace(".", File.separator)
     }
 

@@ -1,7 +1,8 @@
 package com.laidpack.sourcerer.generator
 
-import com.laidpack.sourcerer.generator.peeker.*
+import com.laidpack.sourcerer.generator.index.*
 import com.laidpack.sourcerer.generator.resources.*
+import com.laidpack.sourcerer.generator.resources.widgets.XdWidgetSource
 import com.laidpack.sourcerer.generator.target.*
 import jetbrains.exodus.database.TransientEntityStore
 import jetbrains.exodus.database.TransientStoreSession
@@ -18,9 +19,9 @@ object Store {
         XdModel.registerNodes(
                 XdSourcererResult,
                 XdClassCategory,
-                IndexedClass,
-                IndexedFile,
-                IndexedPackage,
+                XdDeclaredType,
+                XdFile,
+                XdPackage,
                 Widget,
                 XdWidgetSource,
                 XdFormat,
@@ -34,8 +35,16 @@ object Store {
                 XdCodeBlock,
                 XdGetter,
                 XdResolvedStatus,
+                XdCallSignatureMap,
                 XdAttributeToParameterIndex,
-                XdConstructorExpression
+                XdConstructorExpression,
+                XdConstructor,
+                XdField,
+                XdIntDefAnnotation,
+                XdIntDefAnnotationValue,
+                XdMethod,
+                XdConstructorOrMethodParameter,
+                XdEnumEntry
         )
 
         val store = StaticStoreContainer.init(
@@ -44,8 +53,8 @@ object Store {
         )
 
         initMetaData(XdModel.hierarchy, store)
-
         instance = store
+        AndroidResourceManager(env).ensureResourceClassIsIndexed()
     }
 
     operator fun invoke(): TransientEntityStore {
@@ -62,10 +71,10 @@ object Store {
 
     fun deleteAll() {
         instance.transactional {
-            IndexedFile.all().toList().forEach { f ->
+            XdFile.all().toList().forEach { f ->
                 f.delete()
             }
-            IndexedPackage.all().toList().forEach { p ->
+            XdPackage.all().toList().forEach { p ->
                 p.delete()
             }
         }
@@ -73,8 +82,8 @@ object Store {
 
     fun deleteSourcererResult(simpleName: String) {
         instance.transactional {
-            val indexedClasses = IndexedClass.query(
-                    IndexedClass::simpleName eq simpleName
+            val indexedClasses = XdDeclaredType.query(
+                    XdDeclaredType::simpleName eq simpleName
             ).toList()
             if (indexedClasses.size == 1) {
                 val xdResult = indexedClasses.first().sourcererResult as XdSourcererResult
@@ -99,13 +108,14 @@ object Store {
 
     fun deleteSourcererResults() {
         instance.transactional {
-            IndexedClass.query(
-                    IndexedClass::sourcererResult ne null
+            XdDeclaredType.query(
+                    XdDeclaredType::sourcererResult ne null
             ).asSequence().forEach {
                 it.sourcererResult = null
             }
             XdGetter.all().entityIterable.forEach { e -> e.delete() }
             XdAttributeToParameterIndex.all().entityIterable.forEach { e -> e.delete() }
+            XdCallSignatureMap.all().entityIterable.forEach { e -> e.delete() }
             XdAttributeTypesForSetter.all().entityIterable.forEach { e -> e.delete() }
             XdParameter.all().entityIterable.forEach { e -> e.delete() }
             XdSetter.all().entityIterable.forEach { e -> e.delete() }

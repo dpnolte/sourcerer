@@ -1,6 +1,6 @@
 package com.laidpack.sourcerer.generator
 
-import com.laidpack.sourcerer.generator.peeker.ClassInfo
+import com.laidpack.sourcerer.generator.index.ClassInfo
 import com.laidpack.sourcerer.generator.target.Attribute
 import com.laidpack.sourcerer.generator.target.CodeBlock
 import com.laidpack.sourcerer.generator.target.Setter
@@ -9,8 +9,8 @@ class CodeBlockCollector(private val classInfo: ClassInfo, private val attribute
     fun reflectOnCodeBlockSociety(attributes: Map<String, Attribute>, setters: Map<Int, Setter>): List<CodeBlock> {
         val codeBlocks = mutableListOf<CodeBlock>()
 
-        // Find all attributes that share a setter..
-        // example: methodA(param1, param2) + methodB(param2, param3) --> code block should contain param1-3 and setters method A & B
+        // Find all attributes that share setters..
+        // example: methodA(attr1, attr2) + methodB(attr2, attr3) --> code block should contain attr1-3 and setters method A & B
         val processedAttributes = mutableSetOf<String>()
         for(attribute in attributes.values) {
             if (processedAttributes.contains(attribute.name)) continue
@@ -33,7 +33,7 @@ class CodeBlockCollector(private val classInfo: ClassInfo, private val attribute
             )
             if (codeBlockAttributes.size == 1 && codeBlockSetters.size > 1) {
                 val singleAttribute = codeBlockAttributes.values.first()
-                if (singleAttribute.formats.size  == 1) {
+                if (!singleAttribute.oneFormatRequiresMultipleSetters && singleAttribute.formats.size  == 1) {
                     // select most appropriate setter for single formatted attributes (least parameters)
                     val selectedSetter : Int = codeBlockSetters.values.sortedBy { it.parameters.size }.first().hashCode()
                     for (setterHashCode in singleAttribute.setterHashCodes) {
@@ -73,7 +73,7 @@ class CodeBlockCollector(private val classInfo: ClassInfo, private val attribute
             if (!codeBlockSetters.containsKey(setterKey)) {
                 val setter = setters[setterKey] as Setter
                 codeBlockSetters[setterKey] = setter
-                setter.attributeToParameter.keys.forEach {
+                setter.callSignatureMaps.getCallSignatureMap(attribute.name).keys.forEach {
                     if (it != attribute.name) {
                         recursiveCodeBlockFind(
                                 attributes[it] as Attribute,

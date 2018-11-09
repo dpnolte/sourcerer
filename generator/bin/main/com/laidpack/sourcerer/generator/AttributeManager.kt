@@ -1,53 +1,61 @@
 package com.laidpack.sourcerer.generator
 
+import com.github.javaparser.ast.CompilationUnit
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.MethodDeclaration
-import com.github.javaparser.ast.expr.MethodCallExpr
+import com.github.javaparser.ast.expr.*
 import com.laidpack.sourcerer.generator.flow.getter.GetterFlowInterpreter
 import com.laidpack.sourcerer.generator.flow.setter.SetterFlowInterpreter
-import com.laidpack.sourcerer.generator.javadoc.JavaDocAttributeToMethodMatcher
-import com.laidpack.sourcerer.generator.peeker.*
+import com.laidpack.sourcerer.generator.index.*
+import com.laidpack.sourcerer.generator.resources.AndroidResourceManager
 import com.laidpack.sourcerer.generator.resources.StyleableAttributeFormat
+import com.laidpack.sourcerer.generator.resources.StyleableAttributeManager
 import com.laidpack.sourcerer.generator.resources.WidgetRegistry
 import com.laidpack.sourcerer.generator.target.*
 import kotlinx.dnq.query.*
 
 class AttributeManager(
         private val classInfo: ClassInfo,
-        private val attributesFromXml: Map<String, Attribute>,
-        private val classRegistry: ClassRegistry
+        private val attributesFromXml: MutableMap<String, Attribute>,
+        private val defaultStylableName: String,
+        private val attrsXmlManager: StyleableAttributeManager,
+        private val androidResourceManager: AndroidResourceManager
 ) {
 
-    private val potentialGetters = classInfo.potentialGetters
-    private val potentialGettersForJavaDocAnalysis = potentialGetters.filter{
-        it.methodDeclaration.nameAsString.startsWith("get")
-        && it.methodDeclaration.parameters.isEmpty()
-        && it.javadoc.blockTags.any { it.tagName == "attr" }
-    }.associateBy { it.methodDeclaration.nameAsString }
-    private val javaDocAttributeNamesPerPotentialGetter = potentialGettersForJavaDocAnalysis.values.associate {
-        Pair(
-                it.methodDeclaration.nameAsString,
-                it.javadoc.blockTags.asSequence().filter { blockTag ->  blockTag.tagName == "attr" }
-                        .map { blockTag ->
-                            JavaDocAttributeToMethodMatcher.getAttributeNameFromBlockTag(blockTag, classInfo)
-                        }.toList()
-        )
-    }
-
-    fun linkAttributeAndSetter(attribute: Attribute, setter: Setter, parameterIndex: Int) {
+    fun linkAttributeAndSetter(
+            attribute: Attribute,
+            setter: Setter,
+            parameterIndex: Int,
+            otherAttributeNames: List<String>
+    ) {
         val setterHashCode = setter.hashCode()
         attribute.setterHashCodes.add(setterHashCode)
-        setter.attributeToParameter[attribute.name] = parameterIndex
+        setter.addCallSignatureMap(attribute, parameterIndex, otherAttributeNames)
+    }
+    fun linkAttributesAndSetter(
+            attributesToParameters: Map<Attribute, Int /* parameter index */>,
+            setter: Setter
+    ) {
+        val setterHashCode = setter.hashCode()
+        for (attribute in attributesToParameters.keys) {
+            attribute.setterHashCodes.add(setterHashCode)
+        }
+        val map = attributesToParameters.mapKeys { it.key.name }.toMutableMap()
+        if (!setter.callSignatureMaps.hasCallSignatureMap(map)) {
+            setter.addCallSignatureMap(map)
+        }
     }
 
     fun canResolveGetter(
             attribute: Attribute,
-            setter: Setter
+            setter: Setter,
+            providedParameterIndex: Int? = null
     ): Boolean {
         return setter.isField
                 || analyzeJavaDocToFindGetter(attribute, setter).success
-                || bestGuessMatchingGetterByName(attribute, setter).success
-                || analyzeSetterFlowToFindGetter(attribute, setter).success
+                || bestGuessMatchingGetterByName(attribute, setter, providedParameterIndex).success
+                || analyzeSetterFlowToFindGetter(attribute, setter, providedParameterIndex).success
     }
 
     fun getResolvedGetters(
@@ -63,10 +71,11 @@ class AttributeManager(
 
     private fun getGetterForSetterField(setter: Setter): Getter {
         if (!setter.isField) throw IllegalStateException("Setter is not a field")
-        val field = classInfo.fieldDeclarations[setter.name] ?: throw IllegalStateException("Field '${setter.name}' not found in class ${classInfo.targetClassName}")
+        val field = classInfo.getFieldDeclarationFromThisClassOrSuperClass(setter.name)
+                ?: throw IllegalStateException("Field '${setter.name}' not found in class ${classInfo.xdDeclaredType.targetClassName}")
         return Getter(
                 setter.name,
-                field.describeType(),
+                field.describeType(setter.name),
                 listOf(),
                 field.begin.get().line,
                 isField = true
@@ -77,69 +86,86 @@ class AttributeManager(
         var result = analyzeJavaDocToFindGetter(attribute, setter)
         if (!result.success) result = bestGuessMatchingGetterByName(attribute, setter)
         if (!result.success) result = analyzeSetterFlowToFindGetter(attribute, setter)
-        if (!result.success) throw IllegalStateException("Could not match getter with setterCall. Setter methods name: '${setter.name}', Attribute: '${attribute.name}'")
+        if (!result.success) throw TypePhilosopher.UnmatchedGetterTypeException("Could not match getter with setterCall. Setter methods name: '${setter.name}', Attribute: '${attribute.name}'")
 
         return when {
             result.type == GetterType.METHOD -> {
                 val getters = mutableListOf<Getter>()
                 val method = result.methods.first()
-                val parameters = getParameters(method.methodDeclaration)
+                Store.transactional {
+                    val parameters = getParameters(
+                            classInfo.getResolvedMethodDeclarationFromThisClassOrSuperClass(method)
+                    )
 
-                getters.add(Getter(
-                        method.methodDeclaration.nameAsString,
-                        method.describeReturnType(),
-                        parameters,
-                        method.line
-                ))
+                    getters.add(Getter(
+                            method.name,
+                            method.describedReturnType,
+                            parameters,
+                            method.line,
+                            isField = false
+                    ))
+                }
                 getters
             }
             else /*result.type == GetterType.FIELD*/ -> {
-                val field = result.field as FieldDeclaration
-                listOf(Getter(
-                        field.variables.first().nameAsString,
-                        field.describeType(),
-                        listOf(),
-                        field.begin.get().line,
-                        isField = true
-                ))
+                val field = result.field as XdField
+                return Store.transactional {
+                    listOf(Getter(
+                            field.name,
+                            field.describedType,
+                            listOf(),
+                            field.line,
+                            isField = true
+                    ))
+                }
             }
         }
     }
 
-    private fun analyzeSetterFlowToFindGetter(attribute: Attribute, setter: Setter): MatchGetterResult {
-        val setterInfo = classInfo.getSetterMethodInfo(setter)
-        val setterInterpreter = SetterFlowInterpreter(setterInfo, setter, attribute, classInfo)
+    private fun analyzeSetterFlowToFindGetter(
+            attribute: Attribute,
+            setter: Setter,
+            providedParameterIndex: Int? = null
+    ): MatchGetterResult {
+        val setterMethod = classInfo.getSetterFromThisClassOrSuperClass(setter)
+        if (setterMethod is XdField) {
+            return MatchGetterResult(false)
+        }
+        val setterMethodDeclaration = classInfo.getResolvedMethodDeclarationFromThisClassOrSuperClass(setterMethod as XdMethod)
+        val setterInterpreter = SetterFlowInterpreter(setterMethodDeclaration, setter, attribute, classInfo, providedParameterIndex)
         val getterRequirements = setterInterpreter.resolveGetterRequirements()
         if (getterRequirements.fields.isEmpty()) {
             return MatchGetterResult(false)
         }
-        val eligibleGetters = mutableMapOf<FieldDeclaration, MethodInfo>()
+        val eligibleGetters = mutableMapOf<FieldDeclaration, XdMethod>()
         val eligibilityResults = mutableMapOf<FieldDeclaration, GetterFlowInterpreter.EligibilityResult>()
         if (getterRequirements.fields.isNotEmpty()) {
-            for(field in getterRequirements.fields) {
-                val potentialGetters = classInfo.getPotentialGettersForField(field)
+            for((variableName, field) in getterRequirements.fields) {
+                val potentialGetters = classInfo.getPotentialGettersForField(field, variableName)
                 for(potentialGetter in potentialGetters) {
-                    val getterInterpreter = GetterFlowInterpreter(
-                            potentialGetter,
-                            field,
-                            getterRequirements.conditions,
-                            attribute,
-                            classInfo
-                    )
-                    val result =getterInterpreter.checkEligibility()
-                    if (result.eligible) {
-                        // replace if more conditions are met
-                        when {
-                            eligibleGetters.containsKey(field) -> {
-                                val previousResult = eligibilityResults[field] as GetterFlowInterpreter.EligibilityResult
-                                if (previousResult.fulfilledConditionCount < result.fulfilledConditionCount) {
+                    if (potentialGetter is XdMethod) {
+                        val getterDeclaration = classInfo.getResolvedMethodDeclarationFromThisClassOrSuperClass(potentialGetter)
+                        val getterInterpreter = GetterFlowInterpreter(
+                                getterDeclaration,
+                                variableName,
+                                getterRequirements.conditions,
+                                classInfo
+                        )
+                        val result = getterInterpreter.checkEligibility()
+                        if (result.eligible) {
+                            // replace if more conditions are met
+                            when {
+                                eligibleGetters.containsKey(field) -> {
+                                    val previousResult = eligibilityResults[field] as GetterFlowInterpreter.EligibilityResult
+                                    if (previousResult.fulfilledConditionCount < result.fulfilledConditionCount) {
+                                        eligibilityResults[field] = result
+                                        eligibleGetters[field] = potentialGetter
+                                    }
+                                }
+                                else -> {
                                     eligibilityResults[field] = result
                                     eligibleGetters[field] = potentialGetter
                                 }
-                            }
-                            else -> {
-                                eligibilityResults[field] = result
-                                eligibleGetters[field] = potentialGetter
                             }
                         }
                     }
@@ -160,21 +186,22 @@ class AttributeManager(
     private data class MatchGetterResult (
             val success : Boolean,
             val type: GetterType? = null,
-            val methods: List<MethodInfo> = listOf(),
-            val field: FieldDeclaration? = null
+            val methods: List<XdMethod> = listOf(),
+            val field: XdField? = null
     )
     private fun bestGuessMatchingGetterByName(
             attribute: Attribute,
-            setter: Setter
+            setter: Setter,
+            providedParameterIndex: Int? = null
     ): MatchGetterResult {
         val typesForThisSetter = attribute.typesPerSetter[setter.hashCode()] as AttributeTypesForSetter
 
         // let's do simple name matching first.. getter can be set->get or set->is
-        val getterTargetClassNames = if(typesForThisSetter.unassociatedToParameter) {
-            typesForThisSetter.attributeCanonicalNames
-        } else listOf(typesForThisSetter.setterClassName)
+        val getterTargetCanonicalNames = if(typesForThisSetter.unassociatedToParameter) {
+            typesForThisSetter.formats.map { it.toClass().java.canonicalName }.toSet()
+        } else setOf(typesForThisSetter.setterCanonicalName)
 
-        val targetsBoolean = getterTargetClassNames.any { it.toLowerCase().contains("boolean") }
+        val targetsBoolean = getterTargetCanonicalNames.any { it.toLowerCase().contains("boolean") }
         val guesses = mutableListOf<String>()
         val setterMethodNameBase = setter.name.substring(setter.name.indexOfFirstCapitalChar())
         guesses.addAll(getGuessesForBase(setterMethodNameBase, targetsBoolean))
@@ -183,26 +210,25 @@ class AttributeManager(
         } else attribute.name.capitalize()
         guesses.addAll(getGuessesForBase(attrNameBase, targetsBoolean))
         if (!typesForThisSetter.unassociatedToParameter) {
-            val parameter = setter.parameters[setter.attributeToParameter[attribute.name] as Int]
+            val parameterIndex = providedParameterIndex ?: setter.callSignatureMaps[attribute.name]
+            val parameter = setter.parameters[parameterIndex]
             val parameterNameBase = parameter.name.capitalize()
             guesses.addAll(getGuessesForBase(parameterNameBase, targetsBoolean))
         }
 
-        for (classInfo in classRegistry.getClassAndSuperClasses(classInfo)) {
-            for (getterNameGuess in guesses) {
-                when {
-                    classInfo.methodDeclarations.containsKey(getterNameGuess) -> {
-                        val methods = classInfo.methodDeclarations[getterNameGuess] as List<MethodInfo>
-                        val method = methods.first()
-                        if (isEligibleMethod(method, getterTargetClassNames)) {
-                            return MatchGetterResult(true, GetterType.METHOD, listOf(method), null)
-                        }
+        val potentialGetters = classInfo.getPotentialGettersForAnyOfTheseNames(guesses)
+        for (potentialGetter in potentialGetters) {
+            when (potentialGetter) {
+                is XdMethod  -> {
+                    val describedReturnType = Store.transactional { potentialGetter.describedReturnType }
+                    if (getterTargetCanonicalNames.any { isAttributeAssignableToGetter(it, describedReturnType) }) {
+                        return MatchGetterResult(true, GetterType.METHOD, listOf(potentialGetter), null)
                     }
-                    classInfo.fieldDeclarations.containsKey(getterNameGuess) -> {
-                        val field = classInfo.fieldDeclarations[getterNameGuess] as FieldDeclaration
-                        if (isEligibleField(field, getterTargetClassNames)) {
-                            return MatchGetterResult(true, GetterType.FIELD, listOf(), field)
-                        }
+                }
+                is XdField -> {
+                    val describedType = Store.transactional { potentialGetter.describedType }
+                    if (getterTargetCanonicalNames.any { isAttributeAssignableToGetter(it, describedType) }) {
+                        return MatchGetterResult(true, GetterType.FIELD, listOf(), potentialGetter)
                     }
                 }
             }
@@ -211,36 +237,25 @@ class AttributeManager(
         return MatchGetterResult(false)
     }
 
-    private fun analyzeJavaDocToFindGetter(attribute: Attribute, setter: Setter): MatchGetterResult {
-        var selectedGetter : MethodInfo? = null
-        val numberOfDesiredAttributes = setOf(1, setter.attributeToParameter.size)
-        for (potentialGetterName in javaDocAttributeNamesPerPotentialGetter.keys) {
-            val attributeNames = javaDocAttributeNamesPerPotentialGetter[potentialGetterName] as List<String>
-            if (numberOfDesiredAttributes.contains(attributeNames.size)
-                    && attributeNames.any { it == attribute.name }) {
-                selectedGetter = potentialGettersForJavaDocAnalysis[potentialGetterName]
-            }
+    private fun analyzeJavaDocToFindGetter(
+            attribute: Attribute,
+            setter: Setter
+    ): MatchGetterResult {
+        val numberOfDesiredAttributes = setOf(
+                1,
+                if (setter.callSignatureMaps.containsAttribute(attribute.name)) {
+                    setter.callSignatureMaps.size(attribute)
+                } else 1
+        )
+        val selectedGetter : XdMember? = classInfo.getAnyGetterByJavaDoc(attribute, numberOfDesiredAttributes)
+        return when {
+            selectedGetter != null && selectedGetter is XdMethod
+                -> MatchGetterResult(true, GetterType.METHOD, listOf(selectedGetter), null)
+            selectedGetter != null && selectedGetter is XdField
+                -> MatchGetterResult(true, GetterType.FIELD, listOf(), selectedGetter)
+            else -> MatchGetterResult(false)
         }
-        return if (selectedGetter != null) {
-            MatchGetterResult(true, GetterType.METHOD, listOf(selectedGetter), null)
-        } else MatchGetterResult(false)
     }
-
-    private fun isEligibleMethod(method: MethodInfo, getterTargetClassNames: List<String>): Boolean {
-        if (ClassInfo.isEligibleMethod(method)) {
-            val returnTypeString = method.describeReturnType()
-            return getterTargetClassNames.any { isAttributeAssignableToGetter(it, returnTypeString) }
-        }
-        return false
-    }
-
-    private fun isEligibleField(field: FieldDeclaration, getterTargetClassNames: List<String>): Boolean {
-        if (ClassInfo.isEligibleField(field)) {
-            return getterTargetClassNames.any { isAttributeAssignableToGetter(it, field.describeType()) }
-        }
-        return false
-    }
-
 
     private fun getGuessesForBase(base: String, targetsBoolean: Boolean = false): List<String> {
         val guesses = mutableListOf(
@@ -263,34 +278,63 @@ class AttributeManager(
         return guesses
     }
 
-    fun getSetter(setters: Map<Int, Setter>, setterInfo: MethodInfo, setterCall: MethodCallExpr? = null): Setter {
+    fun getSetter(setters: Map<Int, Setter>, setterMethod: XdMethod, setterCall: MethodCallExpr? = null): Setter {
         // setter already exists?
-        val hashCode = Setter.getHashCodeFromMethodInfo(setterInfo)
+        val hashCode = Setter.getHashCodeFromMethodInfo(setterMethod)
         if (setters.containsKey(hashCode)) return setters[hashCode] as Setter
 
-        val setterParameters = getParameters(setterInfo.methodDeclaration, setterCall)
+        val setterDeclaration = classInfo.getResolvedMethodDeclarationFromThisClassOrSuperClass(setterMethod)
+        val setterParameters = getParameters(setterDeclaration, setterCall)
+
         return Setter(
-                setterInfo.methodDeclaration.nameAsString,
+                setterDeclaration.nameAsString,
                 setterParameters,
-                setterInfo.methodDeclaration.begin.get().line,
-                isField = false
+                setterDeclaration.begin.get().line,
+                isField = false,
+                isStaticSetter =  false
         )
 
     }
 
-    fun getSetter(setters: Map<Int, Setter>, field: FieldDeclaration): Setter {
+    fun getSetter(setters: Map<Int, Setter>, xdField: XdField): Setter {
         // setter already exists?
-        val hashCode = Setter.getHashCodeFromField(field)
+        val hashCode = Store.transactional { xdField.accessorHashCode }
         if (setters.containsKey(hashCode)) return setters[hashCode] as Setter
 
-        val variableName = field.variables.first().nameAsString
-        return Setter(
-                variableName,
-                listOf(),
-                field.begin.get().line,
-                isField = true
-        )
+        return Store.transactional {
+            Setter(
+                    xdField.name,
+                    listOf(),
+                    xdField.line,
+                    isField = true,
+                    isStaticSetter = false
+            )
+        }
 
+    }
+
+    fun getStaticSetter(
+            setters: Map<Int, Setter>,
+            classDeclaration: ClassOrInterfaceDeclaration,
+            methodDeclaration: MethodDeclaration,
+            setterCall: MethodCallExpr?
+    ): Setter {
+        // setter already exists?
+        val hashCode = Setter.getHashCodeFromMethodDeclaration(methodDeclaration)
+        if (setters.containsKey(hashCode)) return setters[hashCode] as Setter
+
+        val setterParameters = getParameters(methodDeclaration, setterCall)
+        val cu = classDeclaration.findRootNode() as CompilationUnit
+        val className = DeclaredSymbolResolver.determineClassName(classDeclaration, cu.packageDeclaration.get())
+
+        return Setter(
+                methodDeclaration.nameAsString,
+                setterParameters,
+                methodDeclaration.begin.get().line,
+                isField = false,
+                isStaticSetter =  true,
+                scopeClassName = className
+        )
     }
 
     fun getResolvedSetterPropertyName(setter: Setter): String? {
@@ -299,56 +343,46 @@ class AttributeManager(
         if (!setter.name.startsWith("set")
                 || setter.parameters.size != 1
                 || setter.parameters.first().isVarArgs
+                || setter.isStaticSetter
         ) {
             return null
         }
-        val methodInfo = classInfo.getSetterMethodInfo(setter)
-        val parameter = methodInfo.methodDeclaration.parameters.first()
-        val requiresNullableGetter = parameter.annotations.any { it.nameAsString == "Nullable" }
-
-        // in right formats, but check if we have a matching getter for the setter (based on name and type)
-        val classAndSuperClasses = mutableListOf(classInfo)
-        classAndSuperClasses.addAll(classInfo.superClassNames.map { classRegistry[it] as ClassInfo })
-
+        val xdMethod = classInfo.getSetterFromThisClassOrSuperClass(setter) as XdMethod
         // check if we have a matching getter for the setter (based on name and type)
         val matchingGetterNames = listOf(
                 "get$setterMethodNameBase",
                 "is$setterMethodNameBase"
         )
-
         val isBooleanRequired = setter.parameters.first().format == StyleableAttributeFormat.Boolean
-        val setterParameterDescribedType = parameter.describeType()
-        val checkNullability = if (requiresNullableGetter) {
-            this::hasNullableReturn
-        } else this::hasNonNullableReturn
-        for (selectedClassInfo in classAndSuperClasses) {
-            val matchingGetters = mutableListOf<MethodInfo>()
-            if (selectedClassInfo.methodDeclarations.containsKey(matchingGetterNames[0])) {
-                matchingGetters.addAll(selectedClassInfo.methodDeclarations[matchingGetterNames[0]] as List<MethodInfo>)
-            }
-            if (selectedClassInfo.methodDeclarations.containsKey(matchingGetterNames[1])) {
-                matchingGetters.addAll(selectedClassInfo.methodDeclarations[matchingGetterNames[1]] as List<MethodInfo>)
-            }
+
+        val matchingGetters = classInfo.getPotentialGettersForAnyOfTheseNames(matchingGetterNames)
+
+        return Store.transactional {
+            val xdParameter = xdMethod.parameters.first()
+            val checkNullability = if (xdParameter.nullable) {
+                this::hasNullableReturn
+            } else this::hasNonNullableReturn
+
             for (matchingGetter in matchingGetters) {
-                if (!matchingGetter.methodDeclaration.isStatic && checkNullability(matchingGetter)) {
-                    val methodName = matchingGetter.methodDeclaration.nameAsString
-                    if (methodName.startsWith("is") && isBooleanRequired) {
-                        return "is$setterMethodNameBase"
-                    } else if (methodName.startsWith("get")
-                        && matchingGetter.describeReturnType() == setterParameterDescribedType
+                if (!matchingGetter.isStatic && checkNullability(matchingGetter)) {
+                    if (matchingGetter.name.startsWith("is") && isBooleanRequired) {
+                        return@transactional "is$setterMethodNameBase"
+                    } else if (matchingGetter is XdMethod && matchingGetter.name.startsWith("get")
+                            && matchingGetter.describedReturnType == xdParameter.describedType
                     ) {
-                        return setterMethodNameBase.decapitalize()
+                        return@transactional setterMethodNameBase.decapitalize()
                     }
                 }
             }
+            return@transactional null
         }
-        return null
+
     }
-    private fun hasNullableReturn(method: MethodInfo): Boolean {
-        return method.methodDeclaration.annotations.any { it.nameAsString == "Nullable" }
+    private fun hasNullableReturn(xdMember: XdMember): Boolean {
+        return xdMember.nullable
     }
-    private fun hasNonNullableReturn(method: MethodInfo): Boolean {
-        return method.methodDeclaration.annotations.all { it.nameAsString != "Nullable" }
+    private fun hasNonNullableReturn(xdMember: XdMember): Boolean {
+        return !xdMember.nullable
     }
 
 
@@ -382,26 +416,26 @@ class AttributeManager(
         return parameters
     }
 
-    fun getAttributeTypesForSetter(targetClassNames: List<String>, defaultValue: String, parameterIndex: Int, isField: Boolean = false): AttributeTypesForSetter {
+    fun getAttributeTypesForSetter(targetCanonicalName: String, defaultValue: String, parameterIndex: Int, isField: Boolean = false): AttributeTypesForSetter {
 
         return AttributeTypesForSetter(
-                targetClassNames,
+                targetCanonicalName,
                 defaultValue,
                 parameterIndex == Parameter.UNASSOCIATED_TO_PARAMETER,
                 isField
         )
     }
 
-    fun getNameFromResourceId(resourceId: String): String {
+    fun getAttributeNameFromResourceName(resourceId: String): String {
         val subject = if (resourceId.contains('.')) {
             resourceId.substring(resourceId.indexOfLast { c -> c == '.' } + 1)
         } else resourceId
-        return if (classInfo.classCategory == ClassCategory.LayoutParams) {
-            val lpSimpleName = classInfo.targetClassName.simpleName.replace("LayoutParams", "Layout")
+        return if (classInfo.classCategory != null && classInfo.classCategory == ClassCategory.LayoutParams) {
+            val lpSimpleName = classInfo.xdDeclaredType.targetClassName.simpleName.replace("LayoutParams", "Layout")
             val viewClassName = WidgetRegistry.getWidgetViewClassName(classInfo)
             subject.replace("${viewClassName.simpleName}_${lpSimpleName}_", "")
         } else {
-            subject.replace("${classInfo.targetClassName.simpleName}_", "")
+            subject.replace("${Store.transactional { classInfo.xdDeclaredType.simpleName }}_", "")
         }
     }
 
@@ -467,30 +501,16 @@ class AttributeManager(
     }
 
     private fun getAttributeDeclaredInSuperClass(attribute: Attribute, classInfo: ClassInfo): XdAttribute? {
-        when {
-            classInfo.superClassNames.isEmpty() -> return null
-            else -> {
-                val superClassNamesAsString = classInfo.superClassNames.map { it.canonicalName }
-                return Store.transactional {
-                    // sort by inheritance order (base class first)
-                    val xdSuperClassResults = XdSourcererResult.query(
-                            (XdSourcererResult::targetClassCanonicalName.inValues(superClassNamesAsString))
-
-                    ).asSequence().sortedBy {xdResult ->
-                        xdResult.targetClass.superClasses.size()
-                    }
-                    for (xdResult in xdSuperClassResults) {
-                        val xdAttributes = XdAttribute.query(
-                                (XdAttribute::name eq attribute.name)
-                                        and (XdAttribute::classCanonicalName eq xdResult.targetClassCanonicalName)
-                        ).toList()
-                        when {
-                            xdAttributes.size == 1 -> {
-                                return@transactional xdAttributes.first()
-                            }
-                            xdAttributes.size > 1 -> {
-                                throw IllegalStateException("Multiple attributes stored with name '${attribute.name}' for class '${xdResult.targetClassCanonicalName}'")
-                            }
+        return Store.transactional {
+            when {
+                classInfo.xdDeclaredType.superClasses.isEmpty -> return@transactional null
+                else -> {
+                    for (xdSuperClass in classInfo.xdDeclaredType.superClasses) {
+                        if (xdSuperClass.sourcererResult != null) {
+                            val xdResult = xdSuperClass.sourcererResult as XdSourcererResult
+                            return@transactional xdResult.attributes.query(
+                                    (XdAttribute::name eq attribute.name)
+                            ).firstOrNull() ?: continue
                         }
                     }
                     return@transactional null
@@ -499,19 +519,47 @@ class AttributeManager(
         }
     }
 
-    private fun String.indexOfFirstCapitalChar(): Int {
-        for (index in 0 until this.length) {
-            if (this[index].isUpperCase()) {
-                return index
+    fun getAnyNonDefaultAttributeObtained(valueExpressions: List<Expression>): List<Attribute> {
+        val attributes = mutableListOf<Attribute>()
+        for (valueExpression in valueExpressions) {
+            when (valueExpression) {
+                is FieldAccessExpr -> {
+                    if (valueExpression.nameAsString != defaultStylableName) {
+                        val attrs = attrsXmlManager.getAttributesFromXml(valueExpression.nameAsString, classInfo)
+                        attributes.addAll(attrs)
+                    }
+                }
+                is IntegerLiteralExpr -> {
+                    val resourceId = valueExpression.asInt()
+                    val attrName = androidResourceManager.getAttributeResourceNameById(resourceId)
+                    val attrs = attrsXmlManager.getAttributesFromXml(attrName, classInfo)
+                    attributes.addAll(attrs)
+                }
+                else -> throw IllegalStateException("Could not convert expression type ${valueExpression::class.java.canonicalName} into attribute. Expression content: $valueExpression")
             }
         }
-        return 0
+        return attributes
+    }
+    fun addNonDefaultAttributeIfNew(attribute: Attribute): Boolean {
+        return if (attributesFromXml.containsKey(attribute.name)) {
+            val existingAttribute = attributesFromXml[attribute.name] as Attribute
+            var hasAddedFormat = false
+            for (newFormat in attribute.formats) {
+                if (newFormat != StyleableAttributeFormat.Unspecified && !existingAttribute.formats.contains(newFormat)) {
+                    existingAttribute.formats.add(newFormat)
+                    hasAddedFormat = true
+                }
+            }
+            if (existingAttribute.formats.size > 1 && existingAttribute.formats.contains(StyleableAttributeFormat.Unspecified)) {
+                existingAttribute.formats.remove(StyleableAttributeFormat.Unspecified)
+            }
+            hasAddedFormat
+        } else {
+            attributesFromXml[attribute.name] = attribute
+            true
+        }
     }
 
-    private fun String.splitByCapitalChar(): List<String> {
-        return Regex("[A-Z]+[a-z0-9]*").findAll(this).map {
-            it.value
-        }.toList()
-    }
+
 
 }

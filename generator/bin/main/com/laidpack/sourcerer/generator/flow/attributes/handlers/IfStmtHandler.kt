@@ -12,7 +12,7 @@ internal class IfStmtHandler(flow: AttributeFlow): BaseAttributesHandler<IfStmt>
     override val handler = ::onIfStmt
 
     private fun onIfStmt(node: IfStmt): Boolean {
-        // TODO: findOrCreate conditional to attribute for if statements
+        // TODO: find conditional to attribute for if statements?
         val variableNameExpressions = node.condition.descendantsOfType(NameExpr::class.java)
         variableNameExpressions.forEach { variableNameExpr ->
             if (flow.isVariableAssignedInCurrentMethod(variableNameExpr.nameAsString)) {

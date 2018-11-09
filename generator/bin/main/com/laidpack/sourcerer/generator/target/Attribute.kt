@@ -2,7 +2,6 @@ package com.laidpack.sourcerer.generator.target
 
 import com.laidpack.sourcerer.generator.Store
 import com.laidpack.sourcerer.generator.XdSourcererResult
-import com.laidpack.sourcerer.generator.peeker.IndexedClass
 import com.laidpack.sourcerer.generator.resources.*
 import com.squareup.kotlinpoet.ClassName
 import jetbrains.exodus.entitystore.Entity
@@ -18,6 +17,7 @@ open class Attribute(
         val enumValues: MutableList<StyleableAttributeEnumValue> = mutableListOf(),
         var resolvedStatus: ResolvedStatus = ResolvedStatus.NONE
 ) {
+    var resolvedByInterpreter: String = "None"
     var localVariableName = ""
     val setterHashCodes = mutableSetOf<Int>()
     val typesPerSetter = mutableMapOf<Int /* setter hash code */, AttributeTypesForSetter>()
@@ -35,18 +35,19 @@ open class Attribute(
             return getters.first()
         }
 
-    val formatsUsedBySetters : Set<StyleableAttributeFormat>
-        get () {
-            val formats = mutableSetOf<StyleableAttributeFormat>()
-            for (typesForSetter in typesPerSetter.values) {
-                for(format in typesForSetter.formats) {
-                    if (!formats.contains(format)) {
-                        formats.add(format)
-                    }
+    var oneFormatRequiresMultipleSetters = false
+
+    val formatsUsedBySetters : Set<StyleableAttributeFormat> by lazy {
+        val formats = mutableSetOf<StyleableAttributeFormat>()
+        for (typesForSetter in typesPerSetter.values) {
+            for(format in typesForSetter.formats) {
+                if (!formats.contains(format)) {
+                    formats.add(format)
                 }
             }
-            return formats
         }
+        formats
+    }
 
     var mutableAttributeDeclaredInSuperClass : Attribute? = null
     var mutableDeclarationClassName: ClassName = className

@@ -3,7 +3,6 @@ package com.laidpack.sourcerer.generator.generators
 import android.content.Context
 import android.os.Build
 import com.laidpack.sourcerer.generator.target.CodeBlock
-import com.laidpack.sourcerer.generator.peeker.ClassCategory
 import com.laidpack.sourcerer.generator.generators.delegates.MultiAttributesAndMultiSettersGenerator
 import com.laidpack.sourcerer.generator.generators.delegates.MultiAttributesAndSingleSetterGenerator
 import com.laidpack.sourcerer.generator.generators.delegates.SingleAttributeAndMultiSettersGenerator
@@ -15,55 +14,38 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import kotlin.reflect.KClass
 
 abstract class BaseFactoryGenerator(
-        protected val targetClassName: ClassName,
-        protected val superClassName: ClassName?,
+        private val targetPackageName: String,
+        private val targetClassName: ClassName,
+        private val viewClassName: TypeName,
+        private val factoryClassName: ClassName,
+        private val superFactoryClassName: ClassName?,
+        attributesClassName: ClassName,
         private val baseClassType: KClass<*>,
         private val codeBlocks: List<CodeBlock>,
-        classCategory: ClassCategory,
-        numberOfTypeVariables: Int,
         private val minimumApiLevel: Int,
         private val minSdkVersion: Int,
-        private val isFinal: Boolean
+        private val isFinal: Boolean,
+        private val elementType: String
 ) {
-    private val hasSuperClass = superClassName != null
-    private val attributesClassName = AttributesGenerator.getAttributesClassName(targetClassName, classCategory)
+    private val hasSuperClass = superFactoryClassName != null
     private val attributesTypeVariable = TypeVariableName("TAttributes", attributesClassName)
-    protected val viewClassName = if (numberOfTypeVariables > 0) {
-        val stars = mutableListOf<TypeName>()
-        for(i in 1..numberOfTypeVariables) {
-            stars.add(WildcardTypeName.STAR)
-        }
-        targetClassName.parameterizedBy(*stars.toTypedArray())
-    } else targetClassName
+
     private val viewClazzClassName
         get() = ClassName("java.lang", "Class")
             .parameterizedBy(viewTypeVariable)
     private val attributesClazzClassName = ClassName("java.lang", "Class")
             .parameterizedBy(attributesTypeVariable)
-    private val elementType = if (classCategory == ClassCategory.View) {
-        targetClassName.simpleName.decapitalize()
-    } else targetClassName.canonicalName
-
-
-
-    private val factoryClassName
-        get() = getFactoryClassName(targetClassName)
     private val baseFactoryClassName : TypeName
         get() {
-            return if (superClassName != null) {
-                getFactoryClassName(superClassName).parameterizedBy(
-                        if (isFinal) viewClassName else viewTypeVariable,
-                        attributesTypeVariable
-                )
-            } else {
-                rootFactoryClassName.parameterizedBy(
-                        if (isFinal) viewClassName else viewTypeVariable,
-                        attributesTypeVariable
-                )
-            }
+            return superFactoryClassName?.parameterizedBy(
+                    if (isFinal) viewClassName else viewTypeVariable,
+                    attributesTypeVariable
+            ) ?: rootFactoryClassName.parameterizedBy(
+                    if (isFinal) viewClassName else viewTypeVariable,
+                    attributesTypeVariable
+            )
         }
 
-    abstract fun getFactoryClassName(originalClassName: ClassName): ClassName
     abstract val rootFactoryClassName: ClassName
     abstract val viewTypeVariable: TypeVariableName
     abstract val viewParam : ParameterSpec
@@ -73,7 +55,7 @@ abstract class BaseFactoryGenerator(
 
     fun generateFile(): FileSpec {
 
-        val file = FileSpec.builder(factoryClassName.packageName, factoryClassName.simpleName)
+        val file = FileSpec.builder(targetPackageName, factoryClassName.simpleName)
         file.addType(
                 getClassSpec()
                 .build()
@@ -83,6 +65,7 @@ abstract class BaseFactoryGenerator(
 
     open fun getClassSpec(): TypeSpec.Builder {
         return TypeSpec.classBuilder(factoryClassName)
+                .addAnnotation(getElementAnnotationSpec())
                 .addModifiers(KModifier.OPEN)
                 .primaryConstructor(getPrimaryConstructor())
                 .addSuperClassParameters()
@@ -91,13 +74,13 @@ abstract class BaseFactoryGenerator(
                 .addProperty(
                         PropertySpec.builder(
                                 "elementType",
-                                String::class.asTypeName(),
+                                String::class,
                                 KModifier.OVERRIDE
-                        ).initializer("%S", elementType)
+                        ).initializer("Companion.%N", "elementType")
                                 .build()
                 )
-                .addFunction(generateCreateInstanceFunc())
-                .addInitFuncIfRequired()
+                .addCreateInstanceFuncIfRequired()
+                .addInitFunIfRequired()
                 .addType(getCompanionSpec())
     }
 
@@ -120,27 +103,17 @@ abstract class BaseFactoryGenerator(
                 .addStatement(invokeFunStmtExpression, *invokeFuncStmtArgs.toTypedArray())
                 .build()
 
-        val initBlockStmtArgs = mutableListOf<Any>()
-        val initBlockStmtExpression = if (isFinal) {
-            initBlockStmtArgs.add(inflaterComponentClassName)
-            initBlockStmtArgs.add(factoryClassName)
-            initBlockStmtArgs.add(attributesClassName)
-            "%T.addFactory(%T<%T>())"
-        } else {
-            initBlockStmtArgs.add(inflaterComponentClassName)
-            initBlockStmtArgs.add(factoryClassName)
-            initBlockStmtArgs.add(viewClassName)
-            initBlockStmtArgs.add(attributesClassName)
-            "%T.addFactory(%T<%T, %T>())"
-        }
-        val initBlock = com.squareup.kotlinpoet.CodeBlock.Builder()
-                .addStatement(initBlockStmtExpression, *initBlockStmtArgs.toTypedArray())
-
         return TypeSpec.companionObjectBuilder()
                 .addFunction(invokeFunc)
-                .addInitializerBlock(initBlock.build())
+                .addProperty(PropertySpec.builder("elementType", String::class)
+                        .addModifiers(KModifier.CONST)
+                        .initializer("%S", elementType)
+                        .build()
+                )
                 .build()
     }
+
+    abstract fun getElementAnnotationSpec(): AnnotationSpec
 
     open fun getPrimaryConstructor(): FunSpec {
         val funSpec =FunSpec.constructorBuilder()
@@ -170,7 +143,7 @@ abstract class BaseFactoryGenerator(
         return this
     }
 
-    abstract fun generateCreateInstanceFunc(): FunSpec
+    abstract fun generateCreateInstanceFunc(): FunSpec?
 
     protected fun FunSpec.Builder.wrapInMininumApiLevelCheckIfNeeded(
             minApiLevel: Int,
@@ -192,7 +165,14 @@ abstract class BaseFactoryGenerator(
         }
         return this
     }
-    private fun TypeSpec.Builder.addInitFuncIfRequired() : TypeSpec.Builder {
+    private fun TypeSpec.Builder.addCreateInstanceFuncIfRequired() : TypeSpec.Builder {
+        val funSpec = generateCreateInstanceFunc()
+        if (funSpec != null) {
+            this.addFunction(funSpec)
+        }
+        return this
+    }
+    private fun TypeSpec.Builder.addInitFunIfRequired() : TypeSpec.Builder {
         if (codeBlocks.isNotEmpty() || !hasSuperClass) {
             val funSpec = FunSpec.builder("init")
                     .addModifiers(KModifier.OVERRIDE)
@@ -204,7 +184,7 @@ abstract class BaseFactoryGenerator(
             if (codeBlocks.isNotEmpty()) {
                 funSpec.wrapInMininumApiLevelCheckIfNeeded(minimumApiLevel, ifStatements = {
                     this.wrapInViewIsTypeCheckIfRequired {
-                        this.beginControlFlow("%N.%T", viewParam, initTypeName)
+                        this.beginControlFlow("%N.apply", viewParam)
                             .addInitializeAttributeCodeBlocks()
                             .endControlFlow()
                     }
@@ -272,8 +252,7 @@ abstract class BaseFactoryGenerator(
     }
 
     companion object {
-        private val initTypeName = ClassName(SourcererEnvironment.serviceApiPackageName, "init")
-        private val inflaterComponentClassName = ClassName(SourcererEnvironment.servicePackageName, "InflaterComponent")
+        private val initTypeName = ClassName(SourcererEnvironment.servicesApiPackageName, "init")
     }
 
 }
