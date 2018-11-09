@@ -2,13 +2,14 @@
   "name": "sourcerer-js",
   "version": "0.0.1",
   "description": "data objects and typescript definitions for the generated android json adapters",
-  "types": "./js/base.elements.d.ts",
+  "main": "./js/index.ts",
+  "types": "./js/index.types.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dpnolte/sourcerer.git/js"
+    "url": "git+https://github.com/dpnolte/sourcerer.git"
   },
   "devDependencies": {
     "typescript": "latest"
