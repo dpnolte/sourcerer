@@ -5,7 +5,8 @@
   "main": "./js/index.ts",
   "types": "./js/index.types.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "postinstall": "tsc"
   },
   "repository": {
     "type": "git",
