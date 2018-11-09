@@ -1,14 +1,16 @@
 {
   "name": "sourcerer-android",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "data objects and typescript definitions for the generated android json adapters",
-  "main": "./js/index.ts",
-  "types": "./js/index.types.d.ts",
+  "main": "./js-dist/index.js",
+  "types": "./js-dist/index.d.ts",
   "files": [
-    "./js/*"
+    "js",
+    "js-dist"
   ],
   "scripts": {
     "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "tsc"
   },
   "repository": {
