@@ -1,4 +1,6 @@
-/* generated @ 2018-11-09T15:28:26.173 */
+/* generated @ 2018-11-09T18:38:57.620 */
+/// <reference path='./main.types.d.ts' />
+
 declare namespace AppcompatTypes {
   interface ActionMenuViewAttributes extends LinearLayoutCompatAttributes {
   }

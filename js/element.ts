@@ -1,13 +1,13 @@
-import { ElementNode, LayoutMap, ElementMap, ViewBase } from "./element.types";
+/// <reference path='./element.types.d.ts' /> 
 
 export const element = <ViewAttributes extends {}, LayoutAttributes extends {}> (
   type: string,
   providedAttributes?: ViewAttributes & LayoutAttributes,
-  providedChildren?: Array<ElementNode<unknown, unknown>>
-): ElementNode<ViewAttributes, LayoutAttributes>  => {
+  providedChildren?: Array<ElementTypes.ElementNode<unknown, unknown>>
+): ElementTypes.ElementNode<ViewAttributes, LayoutAttributes>  => {
   const attributes = typeof providedAttributes !== 'undefined' ? providedAttributes : {};
   const children = typeof providedChildren !== 'undefined' ? providedChildren : [];
-  const buildRoot = (): LayoutMap  => {
+  const buildRoot = (): ElementTypes.LayoutMap  => {
     const map = flatMapNodes(type, attributes, children);
     return { map, toJson: () => mapToJson(map) };
   };
@@ -22,10 +22,10 @@ export const element = <ViewAttributes extends {}, LayoutAttributes extends {}> 
 const flatMapNodes = (
   type: string,
   attributes: any,
-  childElements:  Array<ElementNode<unknown, unknown>>,
-  map: ElementMap = {},
+  childElements:  Array<ElementTypes.ElementNode<unknown, unknown>>,
+  map: ElementTypes.ElementMap = {},
   keyPrefix: string = ''
-): ElementMap => {
+): ElementTypes.ElementMap => {
   const key = keyPrefix !== '' ? `${keyPrefix}_${type}` : type;
   const children: any[] = [];
   map[key]  = {

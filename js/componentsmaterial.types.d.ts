@@ -1,4 +1,9 @@
-/* generated @ 2018-11-09T15:28:35.563 */
+/* generated @ 2018-11-09T18:39:08.755 */
+/// <reference path='./main.types.d.ts' />
+/// <reference path='./cardview.types.d.ts' />
+/// <reference path='./appcompat.types.d.ts' />
+/// <reference path='./coordinatorlayout.types.d.ts' />
+
 declare namespace ComponentsMaterialTypes {
   interface AppBarLayoutAttributes extends MainTypes.LinearLayoutAttributes {
     android_background?: number;

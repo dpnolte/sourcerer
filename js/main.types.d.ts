@@ -1,4 +1,5 @@
-/* generated @ 2018-11-09T15:28:23.065 */
+/* generated @ 2018-11-09T18:38:53.580 */
+
 declare namespace MainTypes {
   interface AbsListViewAttributes extends AdapterViewAttributes {
     cacheColorHint?: string;

@@ -1,4 +1,6 @@
-/* generated @ 2018-11-09T15:28:42.649 */
+/* generated @ 2018-11-09T18:39:17.273 */
+/// <reference path='./main.types.d.ts' />
+
 declare namespace ViewpagerTypes {
   interface PagerTabStripAttributes extends PagerTitleStripAttributes {
   }

@@ -1,4 +1,6 @@
-/* generated @ 2018-11-09T15:28:53.881 */
+/* generated @ 2018-11-09T18:39:31.052 */
+/// <reference path='./main.types.d.ts' />
+
 declare namespace EmojiTypes {
   interface EmojiButtonAttributes extends MainTypes.ButtonAttributes {
   }

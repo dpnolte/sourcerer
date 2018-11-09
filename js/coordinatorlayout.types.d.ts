@@ -1,4 +1,6 @@
-/* generated @ 2018-11-09T15:28:29.820 */
+/* generated @ 2018-11-09T18:38:59.432 */
+/// <reference path='./main.types.d.ts' />
+
 declare namespace CoordinatorlayoutTypes {
   interface CoordinatorLayoutAttributes extends MainTypes.ViewGroupAttributes {
   }

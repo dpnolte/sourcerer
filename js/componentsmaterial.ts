@@ -1,130 +1,132 @@
-/* generated @ 2018-11-09T15:28:35.579 */
-import { element } from "./element";
-import { ElementNode } from "./element.types";
-import { LayoutParamAttributes } from "./index.types";
+/* generated @ 2018-11-09T18:39:08.765 */
+import { element } from './element';
+/// <reference path='./element.types.d.ts' />
+/// <reference path='./layoutparams.types.d.ts' />
+/// <reference path='./componentsmaterial.types.d.ts' />
+
 export const TabLayout = (
-  attributes?: ComponentsMaterialTypes.TabLayoutAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.TabLayoutAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.TabLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.TabLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('tabLayout', attributes, children);
 };
 export const BottomNavigationView = (
-  attributes?: ComponentsMaterialTypes.BottomNavigationViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.BottomNavigationViewAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.BottomNavigationViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.BottomNavigationViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('bottomNavigationView', attributes, children);
 };
 export const CircularRevealCardView = (
-  attributes?: ComponentsMaterialTypes.CircularRevealCardViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.CircularRevealCardViewAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.CircularRevealCardViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.CircularRevealCardViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('circularRevealCardView', attributes, children);
 };
 export const TextInputLayout = (
-  attributes?: ComponentsMaterialTypes.TextInputLayoutAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.TextInputLayoutAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.TextInputLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.TextInputLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('textInputLayout', attributes, children);
 };
 export const CircularRevealFrameLayout = (
-  attributes?: ComponentsMaterialTypes.CircularRevealFrameLayoutAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.CircularRevealFrameLayoutAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.CircularRevealFrameLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.CircularRevealFrameLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('circularRevealFrameLayout', attributes, children);
 };
 export const TransformationChildLayout = (
-  attributes?: ComponentsMaterialTypes.TransformationChildLayoutAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.TransformationChildLayoutAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.TransformationChildLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.TransformationChildLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('transformationChildLayout', attributes, children);
 };
 export const ChipGroup = (
-  attributes?: ComponentsMaterialTypes.ChipGroupAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.ChipGroupAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.ChipGroupAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.ChipGroupAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('chipGroup', attributes, children);
 };
 export const NavigationView = (
-  attributes?: ComponentsMaterialTypes.NavigationViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.NavigationViewAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.NavigationViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.NavigationViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('navigationView', attributes, children);
 };
 export const CircularRevealLinearLayout = (
-  attributes?: ComponentsMaterialTypes.CircularRevealLinearLayoutAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.CircularRevealLinearLayoutAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.CircularRevealLinearLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.CircularRevealLinearLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('circularRevealLinearLayout', attributes, children);
 };
 export const AppBarLayout = (
-  attributes?: ComponentsMaterialTypes.AppBarLayoutAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.AppBarLayoutAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.AppBarLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.AppBarLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appBarLayout', attributes, children);
 };
 export const CircularRevealRelativeLayout = (
-  attributes?: ComponentsMaterialTypes.CircularRevealRelativeLayoutAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.CircularRevealRelativeLayoutAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.CircularRevealRelativeLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.CircularRevealRelativeLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('circularRevealRelativeLayout', attributes, children);
 };
 export const CircularRevealCoordinatorLayout = (
-  attributes?: ComponentsMaterialTypes.CircularRevealCoordinatorLayoutAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.CircularRevealCoordinatorLayoutAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.CircularRevealCoordinatorLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.CircularRevealCoordinatorLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('circularRevealCoordinatorLayout', attributes, children);
 };
 export const TransformationChildCard = (
-  attributes?: ComponentsMaterialTypes.TransformationChildCardAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.TransformationChildCardAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.TransformationChildCardAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.TransformationChildCardAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('transformationChildCard', attributes, children);
 };
 export const BottomAppBar = (
-  attributes?: ComponentsMaterialTypes.BottomAppBarAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.BottomAppBarAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.BottomAppBarAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.BottomAppBarAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('bottomAppBar', attributes, children);
 };
 export const CollapsingToolbarLayout = (
-  attributes?: ComponentsMaterialTypes.CollapsingToolbarLayoutAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.CollapsingToolbarLayoutAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.CollapsingToolbarLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.CollapsingToolbarLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('collapsingToolbarLayout', attributes, children);
 };
 export const MaterialCardView = (
-  attributes?: ComponentsMaterialTypes.MaterialCardViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.MaterialCardViewAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.MaterialCardViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.MaterialCardViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('materialCardView', attributes, children);
 };
 export const TextInputEditText = (
-  attributes?: ComponentsMaterialTypes.TextInputEditTextAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.TextInputEditTextAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.TextInputEditTextAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.TextInputEditTextAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('textInputEditText', attributes, children);
 };
 export const TabItem = (
-  attributes?: ComponentsMaterialTypes.TabItemAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.TabItemAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.TabItemAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.TabItemAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('tabItem', attributes, children);
 };
 export const Chip = (
-  attributes?: ComponentsMaterialTypes.ChipAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.ChipAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.ChipAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.ChipAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('chip', attributes, children);
 };
 export const FloatingActionButton = (
-  attributes?: ComponentsMaterialTypes.FloatingActionButtonAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.FloatingActionButtonAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.FloatingActionButtonAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.FloatingActionButtonAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('floatingActionButton', attributes, children);
 };
 export const MaterialButton = (
-  attributes?: ComponentsMaterialTypes.MaterialButtonAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ComponentsMaterialTypes.MaterialButtonAttributes, LayoutParamAttributes> => {
+  attributes?: ComponentsMaterialTypes.MaterialButtonAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ComponentsMaterialTypes.MaterialButtonAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('materialButton', attributes, children);
 };

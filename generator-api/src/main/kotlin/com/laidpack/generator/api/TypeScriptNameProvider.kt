@@ -25,7 +25,7 @@ object TypeScriptNameProvider {
     }
     const val fileTypeDefinitionsExtension = ".d.ts"
     const val fileTypeScriptExtension = ".ts"
-    const val indexTypeDefinitionsFileName = "index.types.d.ts"
+    const val layoutParamsDefinitionsFileName = "layoutparams.types.d.ts"
     const val indexFileName = "index.ts"
     private const val generatedPackageSimpleName = "Generated"
 }

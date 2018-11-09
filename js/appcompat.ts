@@ -1,112 +1,114 @@
-/* generated @ 2018-11-09T15:28:26.185 */
-import { element } from "./element";
-import { ElementNode } from "./element.types";
-import { LayoutParamAttributes } from "./index.types";
+/* generated @ 2018-11-09T18:38:57.644 */
+import { element } from './element';
+/// <reference path='./element.types.d.ts' />
+/// <reference path='./layoutparams.types.d.ts' />
+/// <reference path='./appcompat.types.d.ts' />
+
 export const AppcompatSearchView = (
-  attributes?: AppcompatTypes.SearchViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.SearchViewAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.SearchViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.SearchViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appcompat.searchView', attributes, children);
 };
 export const LinearLayoutCompat = (
-  attributes?: AppcompatTypes.LinearLayoutCompatAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.LinearLayoutCompatAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.LinearLayoutCompatAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.LinearLayoutCompatAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('linearLayoutCompat', attributes, children);
 };
 export const AppcompatToolbar = (
-  attributes?: AppcompatTypes.ToolbarAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.ToolbarAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.ToolbarAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.ToolbarAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appcompat.toolbar', attributes, children);
 };
 export const AppcompatActionMenuView = (
-  attributes?: AppcompatTypes.ActionMenuViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.ActionMenuViewAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.ActionMenuViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.ActionMenuViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appcompat.actionMenuView', attributes, children);
 };
 export const AppCompatSpinner = (
-  attributes?: AppcompatTypes.AppCompatSpinnerAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.AppCompatSpinnerAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.AppCompatSpinnerAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.AppCompatSpinnerAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appCompatSpinner', attributes, children);
 };
 export const AppCompatImageView = (
-  attributes?: AppcompatTypes.AppCompatImageViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.AppCompatImageViewAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.AppCompatImageViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.AppCompatImageViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appCompatImageView', attributes, children);
 };
 export const AppCompatRatingBar = (
-  attributes?: AppcompatTypes.AppCompatRatingBarAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.AppCompatRatingBarAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.AppCompatRatingBarAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.AppCompatRatingBarAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appCompatRatingBar', attributes, children);
 };
 export const AppCompatTextView = (
-  attributes?: AppcompatTypes.AppCompatTextViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.AppCompatTextViewAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.AppCompatTextViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.AppCompatTextViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appCompatTextView', attributes, children);
 };
 export const AppCompatSeekBar = (
-  attributes?: AppcompatTypes.AppCompatSeekBarAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.AppCompatSeekBarAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.AppCompatSeekBarAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.AppCompatSeekBarAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appCompatSeekBar', attributes, children);
 };
 export const AppCompatAutoCompleteTextView = (
-  attributes?: AppcompatTypes.AppCompatAutoCompleteTextViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.AppCompatAutoCompleteTextViewAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.AppCompatAutoCompleteTextViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.AppCompatAutoCompleteTextViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appCompatAutoCompleteTextView', attributes, children);
 };
 export const AppCompatRadioButton = (
-  attributes?: AppcompatTypes.AppCompatRadioButtonAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.AppCompatRadioButtonAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.AppCompatRadioButtonAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.AppCompatRadioButtonAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appCompatRadioButton', attributes, children);
 };
 export const SwitchCompat = (
-  attributes?: AppcompatTypes.SwitchCompatAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.SwitchCompatAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.SwitchCompatAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.SwitchCompatAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('switchCompat', attributes, children);
 };
 export const AppCompatImageButton = (
-  attributes?: AppcompatTypes.AppCompatImageButtonAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.AppCompatImageButtonAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.AppCompatImageButtonAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.AppCompatImageButtonAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appCompatImageButton', attributes, children);
 };
 export const AppCompatEditText = (
-  attributes?: AppcompatTypes.AppCompatEditTextAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.AppCompatEditTextAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.AppCompatEditTextAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.AppCompatEditTextAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appCompatEditText', attributes, children);
 };
 export const AppCompatButton = (
-  attributes?: AppcompatTypes.AppCompatButtonAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.AppCompatButtonAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.AppCompatButtonAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.AppCompatButtonAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appCompatButton', attributes, children);
 };
 export const AppCompatCheckedTextView = (
-  attributes?: AppcompatTypes.AppCompatCheckedTextViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.AppCompatCheckedTextViewAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.AppCompatCheckedTextViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.AppCompatCheckedTextViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appCompatCheckedTextView', attributes, children);
 };
 export const AppCompatMultiAutoCompleteTextView = (
-  attributes?: AppcompatTypes.AppCompatMultiAutoCompleteTextViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.AppCompatMultiAutoCompleteTextViewAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.AppCompatMultiAutoCompleteTextViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.AppCompatMultiAutoCompleteTextViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appCompatMultiAutoCompleteTextView', attributes, children);
 };
 export const AppCompatCheckBox = (
-  attributes?: AppcompatTypes.AppCompatCheckBoxAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<AppcompatTypes.AppCompatCheckBoxAttributes, LayoutParamAttributes> => {
+  attributes?: AppcompatTypes.AppCompatCheckBoxAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<AppcompatTypes.AppCompatCheckBoxAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('appCompatCheckBox', attributes, children);
 };

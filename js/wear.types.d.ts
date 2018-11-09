@@ -1,4 +1,7 @@
-/* generated @ 2018-11-09T15:28:41.158 */
+/* generated @ 2018-11-09T18:39:15.338 */
+/// <reference path='./recyclerview.types.d.ts' />
+/// <reference path='./main.types.d.ts' />
+
 declare namespace WearTypes {
   interface BoxInsetLayoutAttributes extends MainTypes.ViewGroupAttributes {
   }

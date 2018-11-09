@@ -1,22 +1,24 @@
-/* generated @ 2018-11-09T15:28:42.655 */
-import { element } from "./element";
-import { ElementNode } from "./element.types";
-import { LayoutParamAttributes } from "./index.types";
+/* generated @ 2018-11-09T18:39:17.278 */
+import { element } from './element';
+/// <reference path='./element.types.d.ts' />
+/// <reference path='./layoutparams.types.d.ts' />
+/// <reference path='./viewpager.types.d.ts' />
+
 export const PagerTabStrip = (
-  attributes?: ViewpagerTypes.PagerTabStripAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ViewpagerTypes.PagerTabStripAttributes, LayoutParamAttributes> => {
+  attributes?: ViewpagerTypes.PagerTabStripAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ViewpagerTypes.PagerTabStripAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('pagerTabStrip', attributes, children);
 };
 export const PagerTitleStrip = (
-  attributes?: ViewpagerTypes.PagerTitleStripAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ViewpagerTypes.PagerTitleStripAttributes, LayoutParamAttributes> => {
+  attributes?: ViewpagerTypes.PagerTitleStripAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ViewpagerTypes.PagerTitleStripAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('pagerTitleStrip', attributes, children);
 };
 export const ViewPager = (
-  attributes?: ViewpagerTypes.ViewPagerAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<ViewpagerTypes.ViewPagerAttributes, LayoutParamAttributes> => {
+  attributes?: ViewpagerTypes.ViewPagerAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<ViewpagerTypes.ViewPagerAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('viewPager', attributes, children);
 };

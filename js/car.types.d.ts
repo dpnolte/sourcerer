@@ -1,4 +1,6 @@
-/* generated @ 2018-11-09T15:28:55.755 */
+/* generated @ 2018-11-09T18:39:33.265 */
+/// <reference path='./main.types.d.ts' />
+
 declare namespace CarTypes {
   interface ActionBarAttributes extends MainTypes.RelativeLayoutAttributes {
   }

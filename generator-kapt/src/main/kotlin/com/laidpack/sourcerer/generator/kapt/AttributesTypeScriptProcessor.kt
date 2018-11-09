@@ -18,7 +18,7 @@ class AttributesTypeScriptProcessor : BaseTypeScriptProcessor(
                 TypeTransformer({ t -> t.annotationNames.contains("$servicesApiPackageName.FlagsQualifier")}, "string", Nullability.Null)
         ),
         constrainToCurrentModulePackage = true,
-        /*filePreProcessors = listOf({ targetTypes, rootPackageNames, _ ->
+        filePreProcessors = listOf({ targetTypes, rootPackageNames, _ ->
             var result = ""
             val processedImports = mutableSetOf<String>()
             for (targetType in targetTypes.values) {
@@ -28,15 +28,15 @@ class AttributesTypeScriptProcessor : BaseTypeScriptProcessor(
                         val dependencyModuleName = TypeScriptNameProvider.getModuleName(superType.className.packageName)
                         if (!processedImports.contains(dependencyModuleName)) {
                             val typeFileName = TypeScriptNameProvider.getAttributesFileName(superType.className.packageName)
-                                    .replace(TypeScriptNameProvider.fileTypeDefinitionsExtension, "")
                             processedImports.add(dependencyModuleName)
-                            result += "import { $dependencyModuleName } from \"./$typeFileName\";\n"
+                            //result += "import { $dependencyModuleName } from \"./$typeFileName\";\n"
+                            result += "/// <reference path='./$typeFileName' />\n"
                         }
                     }
                 }
             }
             return@listOf "$result\n"
-        }),*/
+        }),
         superTypeTransformer = {className, currentModuleName ->
             val superTypeModuleName = TypeScriptNameProvider.getModuleName(className.packageName)
             if (superTypeModuleName != currentModuleName) {

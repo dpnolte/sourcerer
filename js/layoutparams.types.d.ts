@@ -1,4 +1,15 @@
-export
+/// <reference path='./gridlayout.types.d.ts' />
+/// <reference path='./leanback.types.d.ts' />
+/// <reference path='./slidingpanelayout.types.d.ts' />
+/// <reference path='./viewpager.types.d.ts' />
+/// <reference path='./wear.types.d.ts' />
+/// <reference path='./recyclerview.types.d.ts' />
+/// <reference path='./componentsmaterial.types.d.ts' />
+/// <reference path='./drawerlayout.types.d.ts' />
+/// <reference path='./coordinatorlayout.types.d.ts' />
+/// <reference path='./appcompat.types.d.ts' />
+/// <reference path='./main.types.d.ts' />
+declare namespace LayoutParamsTypes {
   type LayoutParamAttributes = {}
     | MainTypes.TableLayoutLayoutParamsAttributes
     | MainTypes.ActionMenuViewLayoutParamsAttributes
@@ -28,3 +39,4 @@ export
     | SlidingpanelayoutTypes.SlidingPaneLayoutLayoutParamsAttributes
     | LeanbackTypes.BaseCardViewLayoutParamsAttributes
     | GridlayoutTypes.GridLayoutLayoutParamsAttributes;
+}

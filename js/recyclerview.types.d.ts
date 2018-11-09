@@ -1,4 +1,6 @@
-/* generated @ 2018-11-09T15:28:39.299 */
+/* generated @ 2018-11-09T18:39:13.421 */
+/// <reference path='./main.types.d.ts' />
+
 declare namespace RecyclerviewTypes {
   interface GridLayoutManagerLayoutParamsAttributes extends RecyclerViewLayoutParamsAttributes {
   }

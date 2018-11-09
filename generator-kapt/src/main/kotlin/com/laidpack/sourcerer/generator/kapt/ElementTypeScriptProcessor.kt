@@ -58,17 +58,17 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
 
     private fun processLayoutParamAttributes(roundEnv: RoundEnvironment): Boolean {
         val layoutParamAttributeTypes = mutableListOf<String>()
-        val layoutParamModules = mutableSetOf<String>()
+        val layoutAttributeFiles = mutableSetOf<String>()
         for (element in roundEnv.getElementsAnnotatedWith(layoutParamsAnnotation)) {
             val attributesClassName = getAttributeClassName(element, layoutParamsAnnotation)
-            val moduleName = TypeScriptNameProvider.getModuleName(attributesClassName.packageName)
-            if (!layoutParamModules.contains(moduleName)) {
-                layoutParamModules.add(moduleName)
+            val attributeFileName = TypeScriptNameProvider.getAttributesFileName(attributesClassName.packageName)
+            if (!layoutAttributeFiles.contains(attributeFileName)) {
+                layoutAttributeFiles.add(attributeFileName)
             }
             layoutParamAttributeTypes.add("$moduleName.${attributesClassName.simpleName}")
         }
         return if (layoutParamAttributeTypes.isNotEmpty()) {
-            extendLayoutParamsTypeInIndexFile(layoutParamAttributeTypes, layoutParamModules)
+            extendLayoutParamsTypeInIndexFile(layoutParamAttributeTypes, layoutAttributeFiles)
         } else true
     }
 
@@ -94,9 +94,9 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
         val attributesSimpleName = "$moduleName.${attributesClassName.simpleName}"
         return """
             |export const $elementName = (
-            |${indent}attributes?: $attributesSimpleName & LayoutParamAttributes,
-            |${indent}children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-            |): ElementNode<$attributesSimpleName, LayoutParamAttributes> => {
+            |${indent}attributes?: $attributesSimpleName & $layoutParamAttributesSimpleName,
+            |${indent}children?: Array<ElementTypes.ElementNode<unknown, $layoutParamAttributesSimpleName>>
+            |): ElementTypes.ElementNode<$attributesSimpleName, $layoutParamAttributesSimpleName> => {
             |${indent}return element('$elementType', attributes, children);
             |};
         """.trimMargin()
@@ -128,12 +128,10 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
 
     private fun generateFileContents(elements: List<String>): String {
         val timestamp = "/* generated @ ${LocalDateTime.now()} */\n"
-        /* val attributesFileNameWithoutExtension =
-                attributeTypesFileName.replace(TypeScriptNameProvider.fileTypeDefinitionsExtension, "") */
-        val imports = "import { element } from \"./element\";\n" +
-                "import { ElementNode } from \"./element.types\";\n" +
-                "import { LayoutParamAttributes } from \"./index.types\";\n" /*+
-                "import { $moduleName } from \"$attributesFileNameWithoutExtension\";\n\n"*/
+        val imports = "import { element } from './element';\n" +
+                "/// <reference path='./element.types.d.ts' />\n" +
+                "/// <reference path='./layoutparams.types.d.ts' />\n" +
+                "/// <reference path='./$attributeTypesFileName' />\n\n"
         val moduleContent = elements.joinToString("\n")
 
         return timestamp + imports + moduleContent
@@ -141,9 +139,9 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
 
     private fun extendLayoutParamsTypeInIndexFile(
             attributeTypes: List<String>,
-            moduleNames: Set<String>
+            attributeFiles: Set<String>
     ): Boolean {
-        val path = Paths.get(outputDir).resolve(TypeScriptNameProvider.indexTypeDefinitionsFileName)
+        val path = Paths.get(outputDir).resolve(TypeScriptNameProvider.layoutParamsDefinitionsFileName)
         if (!Files.exists(path)) {
             messager.printMessage(Diagnostic.Kind.ERROR, "Path '$path' doesn't exist")
             return false
@@ -151,15 +149,16 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
 
         val file = path.toFile()
         var contents = file.readText()
-        /*for(moduleName in moduleNames) {
-            val importStatement = "import * as $moduleName from \"$moduleName\";\n"
-            if (!contents.contains(importStatement)) {
-                contents = importStatement + contents
+        for(attributeFile in attributeFiles) {
+            //val importStatement = "import * as $moduleName from \"$moduleName\";\n"
+            val referencePathStatement = "/// <reference path='./$attributeFile' />\n"
+            if (!contents.contains(referencePathStatement)) {
+                contents = referencePathStatement + contents
             }
-        }*/
+        }
         val match = layoutAttributesTypeRegex.find(contents)
         if (match == null) {
-            messager.printMessage(Diagnostic.Kind.NOTE, "$outputDir${TypeScriptNameProvider.indexTypeDefinitionsFileName} does not contain type LayoutParamAttributes")
+            messager.printMessage(Diagnostic.Kind.NOTE, "$outputDir${TypeScriptNameProvider.layoutParamsDefinitionsFileName} does not contain type LayoutParamAttributes")
             return false
         }
         var types = match.groupValues[1]
@@ -199,6 +198,7 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
         val viewAnnotation = ViewElement::class.java
         val layoutParamsAnnotation = LayoutParamsElement::class.java
 
+        private const val layoutParamAttributesSimpleName = "LayoutParamsTypes.LayoutParamAttributes"
         private val layoutAttributesTypeRegex = Regex("\\s*type LayoutParamAttributes = (.+)?;\\s*", RegexOption.DOT_MATCHES_ALL)
     }
 

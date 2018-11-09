@@ -1,16 +1,18 @@
-/* generated @ 2018-11-09T15:28:30.891 */
-import { element } from "./element";
-import { ElementNode } from "./element.types";
-import { LayoutParamAttributes } from "./index.types";
+/* generated @ 2018-11-09T18:39:00.807 */
+import { element } from './element';
+/// <reference path='./element.types.d.ts' />
+/// <reference path='./layoutparams.types.d.ts' />
+/// <reference path='./core.types.d.ts' />
+
 export const NestedScrollView = (
-  attributes?: CoreTypes.NestedScrollViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<CoreTypes.NestedScrollViewAttributes, LayoutParamAttributes> => {
+  attributes?: CoreTypes.NestedScrollViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<CoreTypes.NestedScrollViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('nestedScrollView', attributes, children);
 };
 export const ContentLoadingProgressBar = (
-  attributes?: CoreTypes.ContentLoadingProgressBarAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<CoreTypes.ContentLoadingProgressBarAttributes, LayoutParamAttributes> => {
+  attributes?: CoreTypes.ContentLoadingProgressBarAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<CoreTypes.ContentLoadingProgressBarAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('contentLoadingProgressBar', attributes, children);
 };

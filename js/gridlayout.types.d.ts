@@ -1,4 +1,6 @@
-/* generated @ 2018-11-09T15:28:50.882 */
+/* generated @ 2018-11-09T18:39:27.391 */
+/// <reference path='./main.types.d.ts' />
+
 declare namespace GridlayoutTypes {
   enum AlignmentModeEnum_ { 'alignBounds', 'alignMargins' }
 

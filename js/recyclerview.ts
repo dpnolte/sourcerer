@@ -1,10 +1,12 @@
-/* generated @ 2018-11-09T15:28:39.303 */
-import { element } from "./element";
-import { ElementNode } from "./element.types";
-import { LayoutParamAttributes } from "./index.types";
+/* generated @ 2018-11-09T18:39:13.427 */
+import { element } from './element';
+/// <reference path='./element.types.d.ts' />
+/// <reference path='./layoutparams.types.d.ts' />
+/// <reference path='./recyclerview.types.d.ts' />
+
 export const RecyclerView = (
-  attributes?: RecyclerviewTypes.RecyclerViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<RecyclerviewTypes.RecyclerViewAttributes, LayoutParamAttributes> => {
+  attributes?: RecyclerviewTypes.RecyclerViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<RecyclerviewTypes.RecyclerViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('recyclerView', attributes, children);
 };

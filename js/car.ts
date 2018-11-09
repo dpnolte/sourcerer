@@ -1,28 +1,30 @@
-/* generated @ 2018-11-09T15:28:55.764 */
-import { element } from "./element";
-import { ElementNode } from "./element.types";
-import { LayoutParamAttributes } from "./index.types";
+/* generated @ 2018-11-09T18:39:33.274 */
+import { element } from './element';
+/// <reference path='./element.types.d.ts' />
+/// <reference path='./layoutparams.types.d.ts' />
+/// <reference path='./car.types.d.ts' />
+
 export const ColumnCardView = (
-  attributes?: CarTypes.ColumnCardViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<CarTypes.ColumnCardViewAttributes, LayoutParamAttributes> => {
+  attributes?: CarTypes.ColumnCardViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<CarTypes.ColumnCardViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('columnCardView', attributes, children);
 };
 export const ActionBar = (
-  attributes?: CarTypes.ActionBarAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<CarTypes.ActionBarAttributes, LayoutParamAttributes> => {
+  attributes?: CarTypes.ActionBarAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<CarTypes.ActionBarAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('actionBar', attributes, children);
 };
 export const PagedListView = (
-  attributes?: CarTypes.PagedListViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<CarTypes.PagedListViewAttributes, LayoutParamAttributes> => {
+  attributes?: CarTypes.PagedListViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<CarTypes.PagedListViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('pagedListView', attributes, children);
 };
 export const PagedScrollBarView = (
-  attributes?: CarTypes.PagedScrollBarViewAttributes & LayoutParamAttributes,
-  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
-): ElementNode<CarTypes.PagedScrollBarViewAttributes, LayoutParamAttributes> => {
+  attributes?: CarTypes.PagedScrollBarViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
+  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
+): ElementTypes.ElementNode<CarTypes.PagedScrollBarViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
   return element('pagedScrollBarView', attributes, children);
 };

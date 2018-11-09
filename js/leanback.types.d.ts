@@ -1,4 +1,7 @@
-/* generated @ 2018-11-09T15:28:47.300 */
+/* generated @ 2018-11-09T18:39:23.497 */
+/// <reference path='./main.types.d.ts' />
+/// <reference path='./recyclerview.types.d.ts' />
+
 declare namespace LeanbackTypes {
   interface BaseCardViewAttributes extends MainTypes.FrameLayoutAttributes {
     lbcardBackground?: number;
