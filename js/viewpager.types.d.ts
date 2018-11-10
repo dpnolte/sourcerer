@@ -1,18 +1,18 @@
-/* generated @ 2018-11-09T18:39:17.273 */
+/* generated @ 2018-11-10T13:56:03.373 */
 /// <reference path='./main.types.d.ts' />
 
 declare namespace ViewpagerTypes {
-  interface PagerTabStripAttributes extends PagerTitleStripAttributes {
+  export interface PagerTabStripAttributes extends PagerTitleStripAttributes {
   }
 
-  interface PagerTitleStripAttributes extends MainTypes.ViewGroupAttributes {
+  export interface PagerTitleStripAttributes extends MainTypes.ViewGroupAttributes {
     gravity?: string;
   }
 
-  interface ViewPagerAttributes extends MainTypes.ViewGroupAttributes {
+  export interface ViewPagerAttributes extends MainTypes.ViewGroupAttributes {
   }
 
-  interface ViewPagerLayoutParamsAttributes extends MainTypes.ViewGroupLayoutParamsAttributes {
+  export interface ViewPagerLayoutParamsAttributes extends MainTypes.ViewGroupLayoutParamsAttributes {
     layout_gravity?: any;
   }
 }

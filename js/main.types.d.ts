@@ -1,7 +1,7 @@
-/* generated @ 2018-11-09T18:38:53.580 */
+/* generated @ 2018-11-10T13:55:09.502 */
 
 declare namespace MainTypes {
-  interface AbsListViewAttributes extends AdapterViewAttributes {
+  export interface AbsListViewAttributes extends AdapterViewAttributes {
     cacheColorHint?: string;
     choiceMode?: ChoiceModeEnum;
     drawSelectorOnTop?: boolean;
@@ -16,10 +16,10 @@ declare namespace MainTypes {
     transcriptMode?: TranscriptModeEnum;
   }
 
-  interface AbsListViewLayoutParamsAttributes extends ViewGroupLayoutParamsAttributes {
+  export interface AbsListViewLayoutParamsAttributes extends ViewGroupLayoutParamsAttributes {
   }
 
-  interface AbsSeekBarAttributes extends ProgressBarAttributes {
+  export interface AbsSeekBarAttributes extends ProgressBarAttributes {
     SeekBar_splitTrack?: boolean;
     SeekBar_thumb?: number;
     SeekBar_thumbOffset?: string;
@@ -34,32 +34,32 @@ declare namespace MainTypes {
     tickMarkTintMode?: TickMarkTintModeEnum;
   }
 
-  interface AbsSpinnerAttributes extends AdapterViewAttributes {
+  export interface AbsSpinnerAttributes extends AdapterViewAttributes {
   }
 
-  interface ActionMenuViewAttributes extends LinearLayoutAttributes {
+  export interface ActionMenuViewAttributes extends LinearLayoutAttributes {
   }
 
-  interface ActionMenuViewLayoutParamsAttributes extends LinearLayoutLayoutParamsAttributes {
+  export interface ActionMenuViewLayoutParamsAttributes extends LinearLayoutLayoutParamsAttributes {
   }
 
-  interface AdapterViewAnimatorAttributes extends AdapterViewAttributes {
+  export interface AdapterViewAnimatorAttributes extends AdapterViewAttributes {
     animateFirstView?: boolean;
     inAnimation?: number;
     outAnimation?: number;
   }
 
-  interface AdapterViewAttributes extends ViewGroupAttributes {
+  export interface AdapterViewAttributes extends ViewGroupAttributes {
   }
 
-  interface AdapterViewFlipperAttributes extends AdapterViewAnimatorAttributes {
+  export interface AdapterViewFlipperAttributes extends AdapterViewAnimatorAttributes {
     autoStart?: boolean;
     flipInterval?: number;
   }
 
-  enum AlignmentModeEnum { 'alignBounds', 'alignMargins' }
+  export enum AlignmentModeEnum { 'alignBounds', 'alignMargins' }
 
-  interface AutoCompleteTextViewAttributes extends EditTextAttributes {
+  export interface AutoCompleteTextViewAttributes extends EditTextAttributes {
     completionHint?: string;
     completionThreshold?: number;
     dropDownAnchor?: string;
@@ -69,18 +69,18 @@ declare namespace MainTypes {
     dropDownWidth?: any;
   }
 
-  enum AutoSizeTextTypeEnum { 'none', 'uniform' }
+  export enum AutoSizeTextTypeEnum { 'none', 'uniform' }
 
-  enum BackgroundTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum BackgroundTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 
-  enum BreakStrategyEnum { 'simple', 'high_quality', 'balanced' }
+  export enum BreakStrategyEnum { 'simple', 'high_quality', 'balanced' }
 
-  interface ButtonAttributes extends TextViewAttributes {
+  export interface ButtonAttributes extends TextViewAttributes {
   }
 
-  enum ButtonTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum ButtonTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 
-  interface CalendarViewAttributes extends FrameLayoutAttributes {
+  export interface CalendarViewAttributes extends FrameLayoutAttributes {
     dateTextAppearance?: string;
     firstDayOfWeek?: number;
     focusedMonthDateColor?: string;
@@ -96,62 +96,62 @@ declare namespace MainTypes {
     weekSeparatorLineColor?: string;
   }
 
-  interface CheckBoxAttributes extends CompoundButtonAttributes {
+  export interface CheckBoxAttributes extends CompoundButtonAttributes {
   }
 
-  enum CheckMarkTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum CheckMarkTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 
-  interface CheckedTextViewAttributes extends TextViewAttributes {
+  export interface CheckedTextViewAttributes extends TextViewAttributes {
     checkMark?: string;
     checkMarkTint?: string;
     checkMarkTintMode?: CheckMarkTintModeEnum;
     checked?: boolean;
   }
 
-  enum ChoiceModeEnum { 'none', 'singleChoice', 'multipleChoice', 'multipleChoiceModal' }
+  export enum ChoiceModeEnum { 'none', 'singleChoice', 'multipleChoice', 'multipleChoiceModal' }
 
-  interface ChronometerAttributes extends TextViewAttributes {
+  export interface ChronometerAttributes extends TextViewAttributes {
     countDown?: boolean;
     format?: string;
   }
 
-  interface CompoundButtonAttributes extends ButtonAttributes {
+  export interface CompoundButtonAttributes extends ButtonAttributes {
     button?: string;
     buttonTint?: string;
     buttonTintMode?: ButtonTintModeEnum;
     checked?: boolean;
   }
 
-  interface DatePickerAttributes extends FrameLayoutAttributes {
+  export interface DatePickerAttributes extends FrameLayoutAttributes {
     firstDayOfWeek?: number;
   }
 
-  enum DrawableTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum DrawableTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 
-  enum DrawingCacheQualityEnum { 'auto', 'low', 'high' }
+  export enum DrawingCacheQualityEnum { 'auto', 'low', 'high' }
 
-  interface EditTextAttributes extends TextViewAttributes {
+  export interface EditTextAttributes extends TextViewAttributes {
   }
 
-  enum EllipsizeEnum { 'none', 'start', 'middle', 'end', 'marquee' }
+  export enum EllipsizeEnum { 'none', 'start', 'middle', 'end', 'marquee' }
 
-  interface ExpandableListViewAttributes extends ListViewAttributes {
+  export interface ExpandableListViewAttributes extends ListViewAttributes {
     childDivider?: any;
     childIndicator?: string;
     groupIndicator?: string;
   }
 
-  enum ForegroundTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum ForegroundTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 
-  interface FrameLayoutAttributes extends ViewGroupAttributes {
+  export interface FrameLayoutAttributes extends ViewGroupAttributes {
     measureAllChildren?: boolean;
   }
 
-  interface FrameLayoutLayoutParamsAttributes extends ViewGroupMarginLayoutParamsAttributes {
+  export interface FrameLayoutLayoutParamsAttributes extends ViewGroupMarginLayoutParamsAttributes {
     layout_gravity?: string;
   }
 
-  interface GridLayoutAttributes extends ViewGroupAttributes {
+  export interface GridLayoutAttributes extends ViewGroupAttributes {
     alignmentMode?: AlignmentModeEnum;
     columnCount?: number;
     columnOrderPreserved?: boolean;
@@ -161,10 +161,10 @@ declare namespace MainTypes {
     useDefaultMargins?: boolean;
   }
 
-  interface GridLayoutLayoutParamsAttributes extends ViewGroupMarginLayoutParamsAttributes {
+  export interface GridLayoutLayoutParamsAttributes extends ViewGroupMarginLayoutParamsAttributes {
   }
 
-  interface GridViewAttributes extends AbsListViewAttributes {
+  export interface GridViewAttributes extends AbsListViewAttributes {
     columnWidth?: string;
     gravity?: string;
     horizontalSpacing?: string;
@@ -173,19 +173,19 @@ declare namespace MainTypes {
     verticalSpacing?: string;
   }
 
-  interface HorizontalScrollViewAttributes extends FrameLayoutAttributes {
+  export interface HorizontalScrollViewAttributes extends FrameLayoutAttributes {
     fillViewport?: boolean;
   }
 
-  enum HyphenationFrequencyEnum { 'none', 'normal', 'full' }
+  export enum HyphenationFrequencyEnum { 'none', 'normal', 'full' }
 
-  interface ImageButtonAttributes extends ImageViewAttributes {
+  export interface ImageButtonAttributes extends ImageViewAttributes {
   }
 
-  interface ImageSwitcherAttributes extends ViewSwitcherAttributes {
+  export interface ImageSwitcherAttributes extends ViewSwitcherAttributes {
   }
 
-  interface ImageViewAttributes extends ViewAttributes {
+  export interface ImageViewAttributes extends ViewAttributes {
     adjustViewBounds?: boolean;
     baseline?: string;
     baselineAlignBottom?: boolean;
@@ -199,17 +199,17 @@ declare namespace MainTypes {
     tintMode?: number;
   }
 
-  enum IndeterminateTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum IndeterminateTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 
-  enum JustificationModeEnum { 'none', 'inter_word' }
+  export enum JustificationModeEnum { 'none', 'inter_word' }
 
-  enum LayerTypeEnum { 'none', 'software', 'hardware' }
+  export enum LayerTypeEnum { 'none', 'software', 'hardware' }
 
-  enum LayoutDirectionEnum { 'ltr', 'rtl', 'inherit', 'locale' }
+  export enum LayoutDirectionEnum { 'ltr', 'rtl', 'inherit', 'locale' }
 
-  enum LayoutModeEnum { 'clipBounds', 'opticalBounds' }
+  export enum LayoutModeEnum { 'clipBounds', 'opticalBounds' }
 
-  interface LinearLayoutAttributes extends ViewGroupAttributes {
+  export interface LinearLayoutAttributes extends ViewGroupAttributes {
     baselineAligned?: boolean;
     baselineAlignedChildIndex?: number;
     divider?: number;
@@ -220,12 +220,12 @@ declare namespace MainTypes {
     showDividers?: string;
   }
 
-  interface LinearLayoutLayoutParamsAttributes extends ViewGroupMarginLayoutParamsAttributes {
+  export interface LinearLayoutLayoutParamsAttributes extends ViewGroupMarginLayoutParamsAttributes {
     layout_gravity?: any;
     layout_weight?: number;
   }
 
-  interface ListViewAttributes extends AbsListViewAttributes {
+  export interface ListViewAttributes extends AbsListViewAttributes {
     divider?: any;
     dividerHeight?: string;
     footerDividersEnabled?: boolean;
@@ -234,26 +234,26 @@ declare namespace MainTypes {
     overScrollHeader?: any;
   }
 
-  interface MediaControllerAttributes extends FrameLayoutAttributes {
+  export interface MediaControllerAttributes extends FrameLayoutAttributes {
   }
 
-  interface MultiAutoCompleteTextViewAttributes extends AutoCompleteTextViewAttributes {
+  export interface MultiAutoCompleteTextViewAttributes extends AutoCompleteTextViewAttributes {
   }
 
-  interface NumberPickerAttributes extends LinearLayoutAttributes {
+  export interface NumberPickerAttributes extends LinearLayoutAttributes {
     internalMinHeight?: string;
     internalMinWidth?: string;
   }
 
-  enum OrientationEnum { 'horizontal', 'vertical' }
+  export enum OrientationEnum { 'horizontal', 'vertical' }
 
-  enum OrientationEnum_ { 'horizontal', 'vertical' }
+  export enum OrientationEnum_ { 'horizontal', 'vertical' }
 
-  enum OverScrollModeEnum { 'always', 'ifContentScrolls', 'never' }
+  export enum OverScrollModeEnum { 'always', 'ifContentScrolls', 'never' }
 
-  enum ProgressBackgroundTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum ProgressBackgroundTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 
-  interface ProgressBarAttributes extends ViewAttributes {
+  export interface ProgressBarAttributes extends ViewAttributes {
     indeterminate?: boolean;
     indeterminateDrawable?: string;
     indeterminateTint?: string;
@@ -272,44 +272,44 @@ declare namespace MainTypes {
     secondaryProgressTintMode?: SecondaryProgressTintModeEnum;
   }
 
-  enum ProgressTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum ProgressTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 
-  interface QuickContactBadgeAttributes extends ImageViewAttributes {
+  export interface QuickContactBadgeAttributes extends ImageViewAttributes {
   }
 
-  interface RadioButtonAttributes extends CompoundButtonAttributes {
+  export interface RadioButtonAttributes extends CompoundButtonAttributes {
   }
 
-  interface RadioGroupAttributes extends LinearLayoutAttributes {
+  export interface RadioGroupAttributes extends LinearLayoutAttributes {
   }
 
-  interface RadioGroupLayoutParamsAttributes extends LinearLayoutLayoutParamsAttributes {
+  export interface RadioGroupLayoutParamsAttributes extends LinearLayoutLayoutParamsAttributes {
   }
 
-  interface RatingBarAttributes extends AbsSeekBarAttributes {
+  export interface RatingBarAttributes extends AbsSeekBarAttributes {
     isIndicator?: boolean;
     numStars?: number;
     rating?: number;
     stepSize?: number;
   }
 
-  interface RelativeLayoutAttributes extends ViewGroupAttributes {
+  export interface RelativeLayoutAttributes extends ViewGroupAttributes {
     gravity?: string;
     ignoreGravity?: string;
   }
 
-  interface RelativeLayoutLayoutParamsAttributes extends ViewGroupMarginLayoutParamsAttributes {
+  export interface RelativeLayoutLayoutParamsAttributes extends ViewGroupMarginLayoutParamsAttributes {
   }
 
-  enum ScaleTypeEnum { 'matrix', 'fitXY', 'fitStart', 'fitCenter', 'fitEnd', 'center', 'centerCrop', 'centerInside' }
+  export enum ScaleTypeEnum { 'matrix', 'fitXY', 'fitStart', 'fitCenter', 'fitEnd', 'center', 'centerCrop', 'centerInside' }
 
-  interface ScrollViewAttributes extends FrameLayoutAttributes {
+  export interface ScrollViewAttributes extends FrameLayoutAttributes {
     fillViewport?: boolean;
   }
 
-  enum ScrollbarStyleEnum { 'insideOverlay', 'insideInset', 'outsideOverlay', 'outsideInset' }
+  export enum ScrollbarStyleEnum { 'insideOverlay', 'insideInset', 'outsideOverlay', 'outsideInset' }
 
-  interface SearchViewAttributes extends LinearLayoutAttributes {
+  export interface SearchViewAttributes extends LinearLayoutAttributes {
     iconifiedByDefault?: boolean;
     imeOptions?: number;
     inputType?: number;
@@ -317,29 +317,29 @@ declare namespace MainTypes {
     queryHint?: string;
   }
 
-  enum SecondaryProgressTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum SecondaryProgressTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 
-  interface SeekBarAttributes extends AbsSeekBarAttributes {
+  export interface SeekBarAttributes extends AbsSeekBarAttributes {
   }
 
-  interface SpaceAttributes extends ViewAttributes {
+  export interface SpaceAttributes extends ViewAttributes {
   }
 
-  interface SpinnerAttributes extends AbsSpinnerAttributes {
+  export interface SpinnerAttributes extends AbsSpinnerAttributes {
     dropDownWidth?: number;
     gravity?: string;
     popupBackground?: number;
   }
 
-  interface StackViewAttributes extends AdapterViewAnimatorAttributes {
+  export interface StackViewAttributes extends AdapterViewAnimatorAttributes {
   }
 
-  enum StretchModeEnum { 'none', 'spacingWidth', 'columnWidth', 'spacingWidthUniform' }
+  export enum StretchModeEnum { 'none', 'spacingWidth', 'columnWidth', 'spacingWidthUniform' }
 
-  interface SurfaceViewAttributes extends ViewAttributes {
+  export interface SurfaceViewAttributes extends ViewAttributes {
   }
 
-  interface SwitchAttributes extends CompoundButtonAttributes {
+  export interface SwitchAttributes extends CompoundButtonAttributes {
     showText?: boolean;
     splitTrack?: boolean;
     switchMinWidth?: string;
@@ -356,39 +356,39 @@ declare namespace MainTypes {
     trackTintMode?: TrackTintModeEnum;
   }
 
-  interface TabHostAttributes extends FrameLayoutAttributes {
+  export interface TabHostAttributes extends FrameLayoutAttributes {
   }
 
-  interface TabWidgetAttributes extends LinearLayoutAttributes {
+  export interface TabWidgetAttributes extends LinearLayoutAttributes {
     tabStripEnabled?: boolean;
     tabStripLeft?: string;
     tabStripRight?: string;
   }
 
-  interface TableLayoutAttributes extends LinearLayoutAttributes {
+  export interface TableLayoutAttributes extends LinearLayoutAttributes {
   }
 
-  interface TableLayoutLayoutParamsAttributes extends LinearLayoutLayoutParamsAttributes {
+  export interface TableLayoutLayoutParamsAttributes extends LinearLayoutLayoutParamsAttributes {
   }
 
-  interface TableRowAttributes extends LinearLayoutAttributes {
+  export interface TableRowAttributes extends LinearLayoutAttributes {
   }
 
-  interface TableRowLayoutParamsAttributes extends LinearLayoutLayoutParamsAttributes {
+  export interface TableRowLayoutParamsAttributes extends LinearLayoutLayoutParamsAttributes {
     TableRow_Cell_layout_column?: number;
     TableRow_Cell_layout_span?: number;
   }
 
-  interface TextClockAttributes extends TextViewAttributes {
+  export interface TextClockAttributes extends TextViewAttributes {
     format12Hour?: string;
     format24Hour?: string;
     timeZone?: string;
   }
 
-  interface TextSwitcherAttributes extends ViewSwitcherAttributes {
+  export interface TextSwitcherAttributes extends ViewSwitcherAttributes {
   }
 
-  interface TextViewAttributes extends ViewAttributes {
+  export interface TextViewAttributes extends ViewAttributes {
     View_clickable?: boolean;
     View_longClickable?: boolean;
     autoLink?: string;
@@ -448,22 +448,22 @@ declare namespace MainTypes {
     width?: string;
   }
 
-  interface TextureViewAttributes extends ViewAttributes {
+  export interface TextureViewAttributes extends ViewAttributes {
   }
 
-  enum ThumbTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum ThumbTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 
-  enum TickMarkTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum TickMarkTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 
-  interface TimePickerAttributes extends FrameLayoutAttributes {
+  export interface TimePickerAttributes extends FrameLayoutAttributes {
   }
 
-  interface ToggleButtonAttributes extends CompoundButtonAttributes {
+  export interface ToggleButtonAttributes extends CompoundButtonAttributes {
     textOff?: string;
     textOn?: string;
   }
 
-  interface ToolbarAttributes extends ViewGroupAttributes {
+  export interface ToolbarAttributes extends ViewGroupAttributes {
     contentInsetEnd?: string;
     contentInsetEndWithActions?: string;
     contentInsetLeft?: string;
@@ -486,26 +486,26 @@ declare namespace MainTypes {
     titleTextColor?: string;
   }
 
-  interface ToolbarLayoutParamsAttributes extends ViewGroupLayoutParamsAttributes {
+  export interface ToolbarLayoutParamsAttributes extends ViewGroupLayoutParamsAttributes {
   }
 
-  enum TrackTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum TrackTintModeEnum { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 
-  enum TranscriptModeEnum { 'disabled', 'normal', 'alwaysScroll' }
+  export enum TranscriptModeEnum { 'disabled', 'normal', 'alwaysScroll' }
 
-  enum VerticalScrollbarPositionEnum { 'defaultPosition', 'left', 'right' }
+  export enum VerticalScrollbarPositionEnum { 'defaultPosition', 'left', 'right' }
 
-  interface VideoViewAttributes extends SurfaceViewAttributes {
+  export interface VideoViewAttributes extends SurfaceViewAttributes {
   }
 
-  interface ViewAnimatorAttributes extends FrameLayoutAttributes {
+  export interface ViewAnimatorAttributes extends FrameLayoutAttributes {
     FrameLayout_measureAllChildren?: boolean;
     animateFirstView?: boolean;
     inAnimation?: string;
     outAnimation?: string;
   }
 
-  interface ViewAttributes {
+  export interface ViewAttributes {
     accessibilityHeading?: boolean;
     accessibilityLiveRegion?: any;
     accessibilityPaneTitle?: string;
@@ -591,12 +591,12 @@ declare namespace MainTypes {
     visibility?: VisibilityEnum;
   }
 
-  interface ViewFlipperAttributes extends ViewAnimatorAttributes {
+  export interface ViewFlipperAttributes extends ViewAnimatorAttributes {
     autoStart?: boolean;
     flipInterval?: number;
   }
 
-  interface ViewGroupAttributes extends ViewAttributes {
+  export interface ViewGroupAttributes extends ViewAttributes {
     addStatesFromChildren?: boolean;
     alwaysDrawnWithCache?: boolean;
     animateLayoutChanges?: boolean;
@@ -610,12 +610,12 @@ declare namespace MainTypes {
     transitionGroup?: boolean;
   }
 
-  interface ViewGroupLayoutParamsAttributes {
+  export interface ViewGroupLayoutParamsAttributes {
     layout_height?: any;
     layout_width?: any;
   }
 
-  interface ViewGroupMarginLayoutParamsAttributes extends ViewGroupLayoutParamsAttributes {
+  export interface ViewGroupMarginLayoutParamsAttributes extends ViewGroupLayoutParamsAttributes {
     layout_marginBottom?: string;
     layout_marginEnd?: string;
     layout_marginLeft?: string;
@@ -624,16 +624,16 @@ declare namespace MainTypes {
     layout_marginTop?: string;
   }
 
-  interface ViewStubAttributes extends ViewAttributes {
+  export interface ViewStubAttributes extends ViewAttributes {
     inflatedId?: string;
     layout?: string;
   }
 
-  interface ViewSwitcherAttributes extends ViewAnimatorAttributes {
+  export interface ViewSwitcherAttributes extends ViewAnimatorAttributes {
   }
 
-  enum VisibilityEnum { 'visible', 'invisible', 'gone' }
+  export enum VisibilityEnum { 'visible', 'invisible', 'gone' }
 
-  interface ZoomControlsAttributes extends LinearLayoutAttributes {
+  export interface ZoomControlsAttributes extends LinearLayoutAttributes {
   }
 }

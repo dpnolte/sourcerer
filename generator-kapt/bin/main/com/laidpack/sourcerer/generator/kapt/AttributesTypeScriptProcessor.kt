@@ -42,7 +42,8 @@ class AttributesTypeScriptProcessor : BaseTypeScriptProcessor(
             if (superTypeModuleName != currentModuleName) {
                 "$superTypeModuleName.${className.simpleName}"
             } else className.simpleName
-        }
+        },
+        exportDefinitions = true
 ) {
         companion object {
             private const val servicesPackageName = "com.laidpack.sourcerer.services"

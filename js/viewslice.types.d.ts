@@ -1,7 +1,7 @@
-/* generated @ 2018-11-09T18:39:11.506 */
+/* generated @ 2018-11-10T13:55:57.762 */
 /// <reference path='./main.types.d.ts' />
 
 declare namespace ViewSliceTypes {
-  interface SliceViewAttributes extends MainTypes.ViewGroupAttributes {
+  export interface SliceViewAttributes extends MainTypes.ViewGroupAttributes {
   }
 }

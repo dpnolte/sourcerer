@@ -1,10 +1,10 @@
-/* generated @ 2018-11-09T18:39:27.391 */
+/* generated @ 2018-11-10T13:56:12.624 */
 /// <reference path='./main.types.d.ts' />
 
 declare namespace GridlayoutTypes {
-  enum AlignmentModeEnum_ { 'alignBounds', 'alignMargins' }
+  export enum AlignmentModeEnum_ { 'alignBounds', 'alignMargins' }
 
-  interface GridLayoutAttributes extends MainTypes.ViewGroupAttributes {
+  export interface GridLayoutAttributes extends MainTypes.ViewGroupAttributes {
     alignmentMode?: AlignmentModeEnum_;
     columnCount?: number;
     columnOrderPreserved?: boolean;
@@ -14,8 +14,8 @@ declare namespace GridlayoutTypes {
     useDefaultMargins?: boolean;
   }
 
-  interface GridLayoutLayoutParamsAttributes extends MainTypes.ViewGroupMarginLayoutParamsAttributes {
+  export interface GridLayoutLayoutParamsAttributes extends MainTypes.ViewGroupMarginLayoutParamsAttributes {
   }
 
-  enum OrientationEnum__ { 'horizontal', 'vertical' }
+  export enum OrientationEnum__ { 'horizontal', 'vertical' }
 }

@@ -1,9 +1,9 @@
-/* generated @ 2018-11-09T18:39:23.497 */
+/* generated @ 2018-11-10T13:56:09.420 */
 /// <reference path='./main.types.d.ts' />
 /// <reference path='./recyclerview.types.d.ts' />
 
 declare namespace LeanbackTypes {
-  interface BaseCardViewAttributes extends MainTypes.FrameLayoutAttributes {
+  export interface BaseCardViewAttributes extends MainTypes.FrameLayoutAttributes {
     lbcardBackground?: number;
     lbcardForeground?: number;
     lbcardType?: number;
@@ -11,67 +11,67 @@ declare namespace LeanbackTypes {
     lbinfoVisibility?: number;
   }
 
-  interface BaseCardViewLayoutParamsAttributes extends MainTypes.FrameLayoutLayoutParamsAttributes {
+  export interface BaseCardViewLayoutParamsAttributes extends MainTypes.FrameLayoutLayoutParamsAttributes {
     lblayout_viewType?: number;
   }
 
-  interface BaseGridViewAttributes extends RecyclerviewTypes.RecyclerViewAttributes {
+  export interface BaseGridViewAttributes extends RecyclerviewTypes.RecyclerViewAttributes {
     lbandroid_gravity?: number;
     lbandroid_horizontalSpacing?: string;
     lbandroid_verticalSpacing?: string;
   }
 
-  interface BrowseFrameLayoutAttributes extends MainTypes.FrameLayoutAttributes {
+  export interface BrowseFrameLayoutAttributes extends MainTypes.FrameLayoutAttributes {
   }
 
-  interface GuidedActionEditTextAttributes extends MainTypes.EditTextAttributes {
+  export interface GuidedActionEditTextAttributes extends MainTypes.EditTextAttributes {
   }
 
-  interface HorizontalGridViewAttributes extends BaseGridViewAttributes {
+  export interface HorizontalGridViewAttributes extends BaseGridViewAttributes {
     lbnumberOfRows?: number;
     lbrowHeight?: number;
   }
 
-  interface ImageCardViewAttributes extends BaseCardViewAttributes {
+  export interface ImageCardViewAttributes extends BaseCardViewAttributes {
     lbinfoAreaBackground?: number;
   }
 
-  interface ListRowHoverCardViewAttributes extends MainTypes.LinearLayoutAttributes {
+  export interface ListRowHoverCardViewAttributes extends MainTypes.LinearLayoutAttributes {
   }
 
-  interface ListRowViewAttributes extends MainTypes.LinearLayoutAttributes {
+  export interface ListRowViewAttributes extends MainTypes.LinearLayoutAttributes {
   }
 
-  interface PickerAttributes extends MainTypes.FrameLayoutAttributes {
+  export interface PickerAttributes extends MainTypes.FrameLayoutAttributes {
   }
 
-  interface RowHeaderViewAttributes extends MainTypes.TextViewAttributes {
+  export interface RowHeaderViewAttributes extends MainTypes.TextViewAttributes {
   }
 
-  interface SearchBarAttributes extends MainTypes.RelativeLayoutAttributes {
+  export interface SearchBarAttributes extends MainTypes.RelativeLayoutAttributes {
   }
 
-  interface SearchEditTextAttributes extends MainTypes.EditTextAttributes {
+  export interface SearchEditTextAttributes extends MainTypes.EditTextAttributes {
   }
 
-  interface SearchOrbViewAttributes extends MainTypes.FrameLayoutAttributes {
+  export interface SearchOrbViewAttributes extends MainTypes.FrameLayoutAttributes {
     lbsearchOrbIcon?: number;
   }
 
-  interface ShadowOverlayContainerAttributes extends MainTypes.FrameLayoutAttributes {
+  export interface ShadowOverlayContainerAttributes extends MainTypes.FrameLayoutAttributes {
   }
 
-  interface SpeechOrbViewAttributes extends SearchOrbViewAttributes {
+  export interface SpeechOrbViewAttributes extends SearchOrbViewAttributes {
   }
 
-  interface TimePickerAttributes extends PickerAttributes {
+  export interface TimePickerAttributes extends PickerAttributes {
     lbis24HourFormat?: boolean;
   }
 
-  interface TitleViewAttributes extends MainTypes.FrameLayoutAttributes {
+  export interface TitleViewAttributes extends MainTypes.FrameLayoutAttributes {
   }
 
-  interface VerticalGridViewAttributes extends BaseGridViewAttributes {
+  export interface VerticalGridViewAttributes extends BaseGridViewAttributes {
     lbcolumnWidth?: number;
     lbnumberOfColumns?: number;
   }

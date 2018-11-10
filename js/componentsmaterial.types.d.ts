@@ -1,28 +1,28 @@
-/* generated @ 2018-11-09T18:39:08.755 */
+/* generated @ 2018-11-10T13:55:20.393 */
 /// <reference path='./main.types.d.ts' />
 /// <reference path='./cardview.types.d.ts' />
 /// <reference path='./appcompat.types.d.ts' />
 /// <reference path='./coordinatorlayout.types.d.ts' />
 
 declare namespace ComponentsMaterialTypes {
-  interface AppBarLayoutAttributes extends MainTypes.LinearLayoutAttributes {
+  export interface AppBarLayoutAttributes extends MainTypes.LinearLayoutAttributes {
     android_background?: number;
     android_keyboardNavigationCluster?: boolean;
     android_touchscreenBlocksFocus?: boolean;
     liftOnScroll?: boolean;
   }
 
-  interface AppBarLayoutLayoutParamsAttributes extends MainTypes.LinearLayoutLayoutParamsAttributes {
+  export interface AppBarLayoutLayoutParamsAttributes extends MainTypes.LinearLayoutLayoutParamsAttributes {
     layout_scrollFlags?: string;
     layout_scrollInterpolator?: string;
   }
 
-  interface BottomAppBarAttributes extends AppcompatTypes.ToolbarAttributes {
+  export interface BottomAppBarAttributes extends AppcompatTypes.ToolbarAttributes {
     fabAlignmentMode?: FabAlignmentModeEnum;
     hideOnScroll?: boolean;
   }
 
-  interface BottomNavigationViewAttributes extends MainTypes.FrameLayoutAttributes {
+  export interface BottomNavigationViewAttributes extends MainTypes.FrameLayoutAttributes {
     itemBackground?: string;
     itemIconSize?: string;
     itemIconTint?: number;
@@ -30,36 +30,36 @@ declare namespace ComponentsMaterialTypes {
     labelVisibilityMode?: LabelVisibilityModeEnum;
   }
 
-  interface ChipAttributes extends AppcompatTypes.AppCompatCheckBoxAttributes {
+  export interface ChipAttributes extends AppcompatTypes.AppCompatCheckBoxAttributes {
     chipIconTint?: string;
   }
 
-  interface ChipGroupAttributes extends MainTypes.ViewGroupAttributes {
+  export interface ChipGroupAttributes extends MainTypes.ViewGroupAttributes {
     chipSpacingHorizontal?: string;
     chipSpacingVertical?: string;
     singleLine?: boolean;
     singleSelection?: boolean;
   }
 
-  interface ChipGroupLayoutParamsAttributes extends MainTypes.ViewGroupMarginLayoutParamsAttributes {
+  export interface ChipGroupLayoutParamsAttributes extends MainTypes.ViewGroupMarginLayoutParamsAttributes {
   }
 
-  interface CircularRevealCardViewAttributes extends CardviewTypes.CardViewAttributes {
+  export interface CircularRevealCardViewAttributes extends CardviewTypes.CardViewAttributes {
   }
 
-  interface CircularRevealCoordinatorLayoutAttributes extends CoordinatorlayoutTypes.CoordinatorLayoutAttributes {
+  export interface CircularRevealCoordinatorLayoutAttributes extends CoordinatorlayoutTypes.CoordinatorLayoutAttributes {
   }
 
-  interface CircularRevealFrameLayoutAttributes extends MainTypes.FrameLayoutAttributes {
+  export interface CircularRevealFrameLayoutAttributes extends MainTypes.FrameLayoutAttributes {
   }
 
-  interface CircularRevealLinearLayoutAttributes extends MainTypes.LinearLayoutAttributes {
+  export interface CircularRevealLinearLayoutAttributes extends MainTypes.LinearLayoutAttributes {
   }
 
-  interface CircularRevealRelativeLayoutAttributes extends MainTypes.RelativeLayoutAttributes {
+  export interface CircularRevealRelativeLayoutAttributes extends MainTypes.RelativeLayoutAttributes {
   }
 
-  interface CollapsingToolbarLayoutAttributes extends MainTypes.FrameLayoutAttributes {
+  export interface CollapsingToolbarLayoutAttributes extends MainTypes.FrameLayoutAttributes {
     collapsedTitleGravity?: string;
     collapsedTitleTextAppearance?: string;
     contentScrim?: string;
@@ -76,16 +76,16 @@ declare namespace ComponentsMaterialTypes {
     titleEnabled?: boolean;
   }
 
-  interface CollapsingToolbarLayoutLayoutParamsAttributes extends MainTypes.FrameLayoutLayoutParamsAttributes {
+  export interface CollapsingToolbarLayoutLayoutParamsAttributes extends MainTypes.FrameLayoutLayoutParamsAttributes {
     layout_collapseMode?: LayoutCollapseModeEnum;
     layout_collapseParallaxMultiplier?: number;
   }
 
-  enum FabAlignmentModeEnum { 'center', 'end' }
+  export enum FabAlignmentModeEnum { 'center', 'end' }
 
-  enum FabSizeEnum { 'auto', 'normal', 'mini' }
+  export enum FabSizeEnum { 'auto', 'normal', 'mini' }
 
-  interface FloatingActionButtonAttributes extends MainTypes.ImageButtonAttributes {
+  export interface FloatingActionButtonAttributes extends MainTypes.ImageButtonAttributes {
     fabCustomSize?: string;
     fabSize?: FabSizeEnum;
     hideMotionSpec?: number;
@@ -96,11 +96,11 @@ declare namespace ComponentsMaterialTypes {
     useCompatPadding?: boolean;
   }
 
-  enum LabelVisibilityModeEnum { 'auto', 'selected', 'labeled', 'unlabeled' }
+  export enum LabelVisibilityModeEnum { 'auto', 'selected', 'labeled', 'unlabeled' }
 
-  enum LayoutCollapseModeEnum { 'none', 'pin', 'parallax' }
+  export enum LayoutCollapseModeEnum { 'none', 'pin', 'parallax' }
 
-  interface MaterialButtonAttributes extends AppcompatTypes.AppCompatButtonAttributes {
+  export interface MaterialButtonAttributes extends AppcompatTypes.AppCompatButtonAttributes {
     cornerRadius?: string;
     icon?: string;
     iconGravity?: string;
@@ -113,10 +113,10 @@ declare namespace ComponentsMaterialTypes {
     strokeWidth?: number;
   }
 
-  interface MaterialCardViewAttributes extends CardviewTypes.CardViewAttributes {
+  export interface MaterialCardViewAttributes extends CardviewTypes.CardViewAttributes {
   }
 
-  interface NavigationViewAttributes extends MainTypes.FrameLayoutAttributes {
+  export interface NavigationViewAttributes extends MainTypes.FrameLayoutAttributes {
     itemBackground?: string;
     itemHorizontalPadding?: string;
     itemIconPadding?: string;
@@ -124,14 +124,14 @@ declare namespace ComponentsMaterialTypes {
     itemTextColor?: string;
   }
 
-  enum TabGravityEnum { 'fill', 'center' }
+  export enum TabGravityEnum { 'fill', 'center' }
 
-  enum TabIndicatorGravityEnum { 'bottom', 'center', 'top', 'stretch' }
+  export enum TabIndicatorGravityEnum { 'bottom', 'center', 'top', 'stretch' }
 
-  interface TabItemAttributes extends MainTypes.ViewAttributes {
+  export interface TabItemAttributes extends MainTypes.ViewAttributes {
   }
 
-  interface TabLayoutAttributes extends MainTypes.HorizontalScrollViewAttributes {
+  export interface TabLayoutAttributes extends MainTypes.HorizontalScrollViewAttributes {
     tabGravity?: TabGravityEnum;
     tabIndicatorColor?: string;
     tabIndicatorFullWidth?: boolean;
@@ -143,12 +143,12 @@ declare namespace ComponentsMaterialTypes {
     tabUnboundedRipple?: boolean;
   }
 
-  enum TabModeEnum { 'scrollable', 'fixed' }
+  export enum TabModeEnum { 'scrollable', 'fixed' }
 
-  interface TextInputEditTextAttributes extends AppcompatTypes.AppCompatEditTextAttributes {
+  export interface TextInputEditTextAttributes extends AppcompatTypes.AppCompatEditTextAttributes {
   }
 
-  interface TextInputLayoutAttributes extends MainTypes.LinearLayoutAttributes {
+  export interface TextInputLayoutAttributes extends MainTypes.LinearLayoutAttributes {
     counterEnabled?: boolean;
     counterMaxLength?: number;
     errorEnabled?: boolean;
@@ -160,9 +160,9 @@ declare namespace ComponentsMaterialTypes {
     passwordToggleEnabled?: boolean;
   }
 
-  interface TransformationChildCardAttributes extends CircularRevealCardViewAttributes {
+  export interface TransformationChildCardAttributes extends CircularRevealCardViewAttributes {
   }
 
-  interface TransformationChildLayoutAttributes extends CircularRevealFrameLayoutAttributes {
+  export interface TransformationChildLayoutAttributes extends CircularRevealFrameLayoutAttributes {
   }
 }

@@ -1,10 +1,10 @@
-/* generated @ 2018-11-09T18:39:25.710 */
+/* generated @ 2018-11-10T13:56:11.298 */
 /// <reference path='./main.types.d.ts' />
 
 declare namespace WidgetMediaTypes {
-  interface MediaControlView2Attributes extends MainTypes.ViewGroupAttributes {
+  export interface MediaControlView2Attributes extends MainTypes.ViewGroupAttributes {
   }
 
-  interface VideoView2Attributes extends MainTypes.ViewGroupAttributes {
+  export interface VideoView2Attributes extends MainTypes.ViewGroupAttributes {
   }
 }

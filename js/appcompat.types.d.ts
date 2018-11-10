@@ -1,56 +1,56 @@
-/* generated @ 2018-11-09T18:38:57.620 */
+/* generated @ 2018-11-10T13:55:13.947 */
 /// <reference path='./main.types.d.ts' />
 
 declare namespace AppcompatTypes {
-  interface ActionMenuViewAttributes extends LinearLayoutCompatAttributes {
+  export interface ActionMenuViewAttributes extends LinearLayoutCompatAttributes {
   }
 
-  interface ActionMenuViewLayoutParamsAttributes extends LinearLayoutCompatLayoutParamsAttributes {
+  export interface ActionMenuViewLayoutParamsAttributes extends LinearLayoutCompatLayoutParamsAttributes {
   }
 
-  interface AppCompatAutoCompleteTextViewAttributes extends MainTypes.AutoCompleteTextViewAttributes {
+  export interface AppCompatAutoCompleteTextViewAttributes extends MainTypes.AutoCompleteTextViewAttributes {
     popupBackground?: number;
   }
 
-  interface AppCompatButtonAttributes extends MainTypes.ButtonAttributes {
+  export interface AppCompatButtonAttributes extends MainTypes.ButtonAttributes {
   }
 
-  interface AppCompatCheckBoxAttributes extends MainTypes.CheckBoxAttributes {
+  export interface AppCompatCheckBoxAttributes extends MainTypes.CheckBoxAttributes {
   }
 
-  interface AppCompatCheckedTextViewAttributes extends MainTypes.CheckedTextViewAttributes {
+  export interface AppCompatCheckedTextViewAttributes extends MainTypes.CheckedTextViewAttributes {
   }
 
-  interface AppCompatEditTextAttributes extends MainTypes.EditTextAttributes {
+  export interface AppCompatEditTextAttributes extends MainTypes.EditTextAttributes {
   }
 
-  interface AppCompatImageButtonAttributes extends MainTypes.ImageButtonAttributes {
+  export interface AppCompatImageButtonAttributes extends MainTypes.ImageButtonAttributes {
   }
 
-  interface AppCompatImageViewAttributes extends MainTypes.ImageViewAttributes {
+  export interface AppCompatImageViewAttributes extends MainTypes.ImageViewAttributes {
   }
 
-  interface AppCompatMultiAutoCompleteTextViewAttributes extends MainTypes.MultiAutoCompleteTextViewAttributes {
+  export interface AppCompatMultiAutoCompleteTextViewAttributes extends MainTypes.MultiAutoCompleteTextViewAttributes {
     popupBackground?: number;
   }
 
-  interface AppCompatRadioButtonAttributes extends MainTypes.RadioButtonAttributes {
+  export interface AppCompatRadioButtonAttributes extends MainTypes.RadioButtonAttributes {
   }
 
-  interface AppCompatRatingBarAttributes extends MainTypes.RatingBarAttributes {
+  export interface AppCompatRatingBarAttributes extends MainTypes.RatingBarAttributes {
   }
 
-  interface AppCompatSeekBarAttributes extends MainTypes.SeekBarAttributes {
+  export interface AppCompatSeekBarAttributes extends MainTypes.SeekBarAttributes {
   }
 
-  interface AppCompatSpinnerAttributes extends MainTypes.SpinnerAttributes {
+  export interface AppCompatSpinnerAttributes extends MainTypes.SpinnerAttributes {
     Spinner_android_dropDownWidth?: number;
   }
 
-  interface AppCompatTextViewAttributes extends MainTypes.TextViewAttributes {
+  export interface AppCompatTextViewAttributes extends MainTypes.TextViewAttributes {
   }
 
-  interface LinearLayoutCompatAttributes extends MainTypes.ViewGroupAttributes {
+  export interface LinearLayoutCompatAttributes extends MainTypes.ViewGroupAttributes {
     android_baselineAligned?: boolean;
     android_baselineAlignedChildIndex?: number;
     android_gravity?: number;
@@ -61,12 +61,12 @@ declare namespace AppcompatTypes {
     showDividers?: string;
   }
 
-  interface LinearLayoutCompatLayoutParamsAttributes extends MainTypes.ViewGroupMarginLayoutParamsAttributes {
+  export interface LinearLayoutCompatLayoutParamsAttributes extends MainTypes.ViewGroupMarginLayoutParamsAttributes {
     android_layout_gravity?: number;
     android_layout_weight?: number;
   }
 
-  interface SearchViewAttributes extends LinearLayoutCompatAttributes {
+  export interface SearchViewAttributes extends LinearLayoutCompatAttributes {
     android_focusable?: boolean;
     android_imeOptions?: number;
     android_inputType?: number;
@@ -75,7 +75,7 @@ declare namespace AppcompatTypes {
     queryHint?: string;
   }
 
-  interface SwitchCompatAttributes extends MainTypes.CompoundButtonAttributes {
+  export interface SwitchCompatAttributes extends MainTypes.CompoundButtonAttributes {
     android_textOff?: string;
     android_textOn?: string;
     android_thumb?: number;
@@ -92,9 +92,9 @@ declare namespace AppcompatTypes {
     trackTintMode?: TrackTintModeEnum_;
   }
 
-  enum ThumbTintModeEnum_ { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum ThumbTintModeEnum_ { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 
-  interface ToolbarAttributes extends MainTypes.ViewGroupAttributes {
+  export interface ToolbarAttributes extends MainTypes.ViewGroupAttributes {
     contentInsetEnd?: string;
     contentInsetEndWithActions?: string;
     contentInsetLeft?: string;
@@ -116,8 +116,8 @@ declare namespace AppcompatTypes {
     titleTextColor?: string;
   }
 
-  interface ToolbarLayoutParamsAttributes extends MainTypes.ViewGroupLayoutParamsAttributes {
+  export interface ToolbarLayoutParamsAttributes extends MainTypes.ViewGroupLayoutParamsAttributes {
   }
 
-  enum TrackTintModeEnum_ { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
+  export enum TrackTintModeEnum_ { 'src_over', 'src_in', 'src_atop', 'multiply', 'screen', 'add' }
 }

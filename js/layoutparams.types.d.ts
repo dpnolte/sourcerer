@@ -10,7 +10,7 @@
 /// <reference path='./appcompat.types.d.ts' />
 /// <reference path='./main.types.d.ts' />
 declare namespace LayoutParamsTypes {
-  type LayoutParamAttributes = {}
+  export type LayoutParamAttributes = {}
     | MainTypes.TableLayoutLayoutParamsAttributes
     | MainTypes.ActionMenuViewLayoutParamsAttributes
     | MainTypes.RelativeLayoutLayoutParamsAttributes

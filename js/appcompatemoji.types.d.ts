@@ -1,15 +1,15 @@
-/* generated @ 2018-11-09T18:39:29.075 */
+/* generated @ 2018-11-10T13:56:14.171 */
 /// <reference path='./appcompat.types.d.ts' />
 /// <reference path='./main.types.d.ts' />
 
 declare namespace AppcompatEmojiTypes {
-  interface EmojiAppCompatButtonAttributes extends AppcompatTypes.AppCompatButtonAttributes {
+  export interface EmojiAppCompatButtonAttributes extends AppcompatTypes.AppCompatButtonAttributes {
   }
 
-  interface EmojiAppCompatEditTextAttributes extends AppcompatTypes.AppCompatEditTextAttributes {
+  export interface EmojiAppCompatEditTextAttributes extends AppcompatTypes.AppCompatEditTextAttributes {
     maxEmojiCount?: number;
   }
 
-  interface EmojiAppCompatTextViewAttributes extends AppcompatTypes.AppCompatTextViewAttributes {
+  export interface EmojiAppCompatTextViewAttributes extends AppcompatTypes.AppCompatTextViewAttributes {
   }
 }

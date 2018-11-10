@@ -134,7 +134,7 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
                 "/// <reference path='./$attributeTypesFileName' />\n\n"
         val moduleContent = elements.joinToString("\n")
 
-        return timestamp + imports + moduleContent
+        return timestamp + imports + moduleContent + "\n"
     }
 
     private fun extendLayoutParamsTypeInIndexFile(
@@ -169,7 +169,7 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
         }
         contents = layoutAttributesTypeRegex.replace(
                 contents,
-                "\n${indent}type LayoutParamAttributes = $types;\n"
+                "\n${indent}export type LayoutParamAttributes = $types;\n"
         )
         file.writeText(contents)
         return true
@@ -199,7 +199,7 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
         val layoutParamsAnnotation = LayoutParamsElement::class.java
 
         private const val layoutParamAttributesSimpleName = "LayoutParamsTypes.LayoutParamAttributes"
-        private val layoutAttributesTypeRegex = Regex("\\s*type LayoutParamAttributes = (.+)?;\\s*", RegexOption.DOT_MATCHES_ALL)
+        private val layoutAttributesTypeRegex = Regex("\\s*export type LayoutParamAttributes = (.+)?;\\s*", RegexOption.DOT_MATCHES_ALL)
     }
 
 }

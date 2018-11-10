@@ -1,11 +1,11 @@
-/* generated @ 2018-11-09T18:39:33.265 */
+/* generated @ 2018-11-10T13:56:18.137 */
 /// <reference path='./main.types.d.ts' />
 
 declare namespace CarTypes {
-  interface ActionBarAttributes extends MainTypes.RelativeLayoutAttributes {
+  export interface ActionBarAttributes extends MainTypes.RelativeLayoutAttributes {
   }
 
-  interface CardViewAttributes extends MainTypes.FrameLayoutAttributes {
+  export interface CardViewAttributes extends MainTypes.FrameLayoutAttributes {
     android_minHeight?: string;
     android_minWidth?: string;
     cardBackgroundColor?: string;
@@ -20,15 +20,15 @@ declare namespace CarTypes {
     contentPaddingTop?: string;
   }
 
-  interface ColumnCardViewAttributes extends CardviewTypes.CardViewAttributes {
+  export interface ColumnCardViewAttributes extends CardviewTypes.CardViewAttributes {
     columnSpan?: number;
   }
 
-  enum DayNightStyleEnum { 'auto', 'auto_inverse', 'always_light', 'always_dark' }
+  export enum DayNightStyleEnum { 'auto', 'auto_inverse', 'always_light', 'always_dark' }
 
-  enum GutterEnum { 'none', 'start', 'end', 'both' }
+  export enum GutterEnum { 'none', 'start', 'end', 'both' }
 
-  interface PagedListViewAttributes extends MainTypes.FrameLayoutAttributes {
+  export interface PagedListViewAttributes extends MainTypes.FrameLayoutAttributes {
     dayNightStyle?: DayNightStyleEnum;
     downButtonIcon?: string;
     gutter?: GutterEnum;
@@ -39,6 +39,6 @@ declare namespace CarTypes {
     upButtonIcon?: string;
   }
 
-  interface PagedScrollBarViewAttributes extends MainTypes.ViewGroupAttributes {
+  export interface PagedScrollBarViewAttributes extends MainTypes.ViewGroupAttributes {
   }
 }

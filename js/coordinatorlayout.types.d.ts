@@ -1,11 +1,11 @@
-/* generated @ 2018-11-09T18:38:59.432 */
+/* generated @ 2018-11-10T13:55:15.315 */
 /// <reference path='./main.types.d.ts' />
 
 declare namespace CoordinatorlayoutTypes {
-  interface CoordinatorLayoutAttributes extends MainTypes.ViewGroupAttributes {
+  export interface CoordinatorLayoutAttributes extends MainTypes.ViewGroupAttributes {
   }
 
-  interface CoordinatorLayoutLayoutParamsAttributes extends MainTypes.ViewGroupMarginLayoutParamsAttributes {
+  export interface CoordinatorLayoutLayoutParamsAttributes extends MainTypes.ViewGroupMarginLayoutParamsAttributes {
     android_layout_gravity?: number;
     layout_anchor?: string;
     layout_anchorGravity?: any;
@@ -15,5 +15,5 @@ declare namespace CoordinatorlayoutTypes {
     layout_keyline?: number;
   }
 
-  enum LayoutInsetEdgeEnum { 'none', 'top', 'bottom', 'left', 'right', 'start', 'end' }
+  export enum LayoutInsetEdgeEnum { 'none', 'top', 'bottom', 'left', 'right', 'start', 'end' }
 }
