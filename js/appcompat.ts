@@ -2,7 +2,7 @@
 import { element } from './element';
 /// <reference path='./element.types.d.ts' />
 /// <reference path='./layoutparams.types.d.ts' />
-/// <reference path='./appcompat.types.d.ts' />
+/// <reference path='./appcompat.d.ts' />
 
 export const AppcompatSearchView = (
   attributes?: AppcompatTypes.SearchViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
