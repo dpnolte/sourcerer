@@ -2,7 +2,7 @@ import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from "./main";
 // types
-/* generated @ 2018-11-12T13:41:44.816 */
+/* generated @ 2018-11-12T15:41:37.594 */
 export namespace ViewpagerTypes {
   export enum GravityFlagsEnum {
     bottom = 'bottom',

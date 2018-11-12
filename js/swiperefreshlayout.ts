@@ -2,7 +2,7 @@ import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from "./main";
 // types
-/* generated @ 2018-11-12T13:41:46.149 */
+/* generated @ 2018-11-12T15:41:32.635 */
 export namespace SwiperefreshlayoutTypes {
   export interface SwipeRefreshLayoutAttributes extends MainTypes.ViewGroupAttributes {
     enabled?: boolean;

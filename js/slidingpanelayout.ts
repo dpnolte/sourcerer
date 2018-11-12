@@ -2,7 +2,7 @@ import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from "./main";
 // types
-/* generated @ 2018-11-12T13:41:47.407 */
+/* generated @ 2018-11-12T15:41:25.615 */
 export namespace SlidingpanelayoutTypes {
   export interface SlidingPaneLayoutAttributes extends MainTypes.ViewGroupAttributes {
   }
