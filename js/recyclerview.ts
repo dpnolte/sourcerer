@@ -1,12 +1,22 @@
-/* generated @ 2018-11-10T13:55:59.430 */
-import { element } from './element';
-/// <reference path='./element.types.d.ts' />
-/// <reference path='./layoutparams.types.d.ts' />
-/// <reference path='./recyclerview.types.d.ts' />
-
+import { ElementNode, element } from './element';
+import { LayoutParamAttributes } from './layoutparams';
+import { MainTypes } from "./main";
+// types
+/* generated @ 2018-11-12T14:29:31.524 */
+export namespace RecyclerviewTypes {
+  export interface GridLayoutManagerLayoutParamsAttributes extends RecyclerViewLayoutParamsAttributes {
+  }
+  export interface RecyclerViewAttributes extends MainTypes.ViewGroupAttributes {
+  }
+  export interface RecyclerViewLayoutParamsAttributes extends MainTypes.ViewGroupMarginLayoutParamsAttributes {
+  }
+  export interface StaggeredGridLayoutManagerLayoutParamsAttributes extends RecyclerViewLayoutParamsAttributes {
+  }
+}
+// elements
 export const RecyclerView = (
-  attributes?: RecyclerviewTypes.RecyclerViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<RecyclerviewTypes.RecyclerViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: RecyclerviewTypes.RecyclerViewAttributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<RecyclerviewTypes.RecyclerViewAttributes, LayoutParamAttributes> => {
   return element('recyclerView', attributes, children);
 };

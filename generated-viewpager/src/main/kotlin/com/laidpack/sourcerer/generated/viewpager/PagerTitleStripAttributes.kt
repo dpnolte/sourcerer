@@ -12,10 +12,12 @@ import com.laidpack.sourcerer.generated.VerticalScrollbarPositionEnum
 import com.laidpack.sourcerer.generated.ViewGroupAttributes
 import com.laidpack.sourcerer.generated.VisibilityEnum
 import com.laidpack.sourcerer.services.api.AttributeEnum
+import com.laidpack.sourcerer.services.api.DimensionQualifier
 import com.laidpack.sourcerer.services.api.FlagsAccumulator
 import com.laidpack.sourcerer.services.api.Format
 import com.laidpack.sourcerer.services.api.IAttributes
 import com.laidpack.sourcerer.services.api.MultiFormat
+import com.laidpack.sourcerer.services.api.MultiFormatQualifier
 import com.laidpack.typescript.annotation.TypeScript
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -27,7 +29,8 @@ import kotlin.String
 @JsonClass(generateAdapter = true)
 @TypeScript
 open class PagerTitleStripAttributes(
-    val gravity: FlagsAccumulator? = null,
+    @field:DimensionQualifier val textSize: Int? = null,
+    @field:MultiFormatQualifier(formats = [Format.Integer, Format.Flags], flagsType = GravityFlagsEnum::class) val gravity: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Flags)),
     animateLayoutChanges: Boolean? = null,
     clipChildren: Boolean? = null,
     clipToPadding: Boolean? = null,
@@ -125,7 +128,8 @@ open class PagerTitleStripAttributes(
 ) : ViewGroupAttributes(animateLayoutChanges = animateLayoutChanges, clipChildren = clipChildren, clipToPadding = clipToPadding, animationCache = animationCache, persistentDrawingCache = persistentDrawingCache, alwaysDrawnWithCache = alwaysDrawnWithCache, addStatesFromChildren = addStatesFromChildren, touchscreenBlocksFocus = touchscreenBlocksFocus, splitMotionEvents = splitMotionEvents, layoutMode = layoutMode, transitionGroup = transitionGroup, id = id, tag = tag, scrollX = scrollX, scrollY = scrollY, background = background, paddingLeft = paddingLeft, paddingBottom = paddingBottom, paddingEnd = paddingEnd, paddingStart = paddingStart, paddingTop = paddingTop, paddingRight = paddingRight, focusable = focusable, autofillHints = autofillHints, importantForAutofill = importantForAutofill, focusableInTouchMode = focusableInTouchMode, visibility = visibility, fitsSystemWindows = fitsSystemWindows, scrollbarStyle = scrollbarStyle, isScrollContainer = isScrollContainer, fadeScrollbars = fadeScrollbars, scrollbarFadeDuration = scrollbarFadeDuration, scrollbarDefaultDelayBeforeFade = scrollbarDefaultDelayBeforeFade, scrollbarSize = scrollbarSize, nextFocusLeft = nextFocusLeft, nextFocusRight = nextFocusRight, nextFocusUp = nextFocusUp, nextFocusDown = nextFocusDown, nextFocusForward = nextFocusForward, clickable = clickable, longClickable = longClickable, contextClickable = contextClickable, saveEnabled = saveEnabled, filterTouchesWhenObscured = filterTouchesWhenObscured, drawingCacheQuality = drawingCacheQuality, keepScreenOn = keepScreenOn, minHeight = minHeight, minWidth = minWidth, soundEffectsEnabled = soundEffectsEnabled, hapticFeedbackEnabled = hapticFeedbackEnabled, contentDescription = contentDescription, accessibilityTraversalBefore = accessibilityTraversalBefore, accessibilityTraversalAfter = accessibilityTraversalAfter, overScrollMode = overScrollMode, alpha = alpha, elevation = elevation, translationX = translationX, translationY = translationY, translationZ = translationZ, transformPivotX = transformPivotX, transformPivotY = transformPivotY, rotation = rotation, rotationX = rotationX, rotationY = rotationY, scaleX = scaleX, scaleY = scaleY, verticalScrollbarPosition = verticalScrollbarPosition, layerType = layerType, layoutDirection = layoutDirection, textDirection = textDirection, textAlignment = textAlignment, importantForAccessibility = importantForAccessibility, accessibilityLiveRegion = accessibilityLiveRegion, labelFor = labelFor, transitionName = transitionName, nestedScrollingEnabled = nestedScrollingEnabled, backgroundTint = backgroundTint, backgroundTintMode = backgroundTintMode, foreground = foreground, foregroundGravity = foregroundGravity, foregroundTint = foregroundTint, foregroundTintMode = foregroundTintMode, scrollIndicators = scrollIndicators, forceHasOverlappingRendering = forceHasOverlappingRendering, tooltipText = tooltipText, keyboardNavigationCluster = keyboardNavigationCluster, nextClusterForward = nextClusterForward, focusedByDefault = focusedByDefault, defaultFocusHighlightEnabled = defaultFocusHighlightEnabled, screenReaderFocusable = screenReaderFocusable, accessibilityPaneTitle = accessibilityPaneTitle, accessibilityHeading = accessibilityHeading, outlineSpotShadowColor = outlineSpotShadowColor, outlineAmbientShadowColor = outlineAmbientShadowColor),
         IAttributes
 
-enum class GravityFlagsEnum_____(override val key: String, override val value: Int) : AttributeEnum {
+@TypeScript
+enum class GravityFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "top")
     Top("top", 48),
 

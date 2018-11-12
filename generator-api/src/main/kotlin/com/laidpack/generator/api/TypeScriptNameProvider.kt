@@ -2,14 +2,14 @@ package com.laidpack.generator.api
 
 object TypeScriptNameProvider {
     fun getAttributesFileName(packageName: String): String {
-        val fileBase = getModuleName(packageName).toLowerCase().replace("types", "")
+        val fileBase = getNamespace(packageName).toLowerCase().replace("types", "")
 
-        return "$fileBase.types$fileTypeDefinitionsExtension"
+        return "$fileBase$fileTypeScriptExtension"
     }
     fun getElementsFileName(attributesFileName: String): String {
-        return attributesFileName.replace(".types$fileTypeDefinitionsExtension", fileTypeScriptExtension)
+        return attributesFileName
     }
-    fun getModuleName(packageName: String): String {
+    fun getNamespace(packageName: String): String {
         val names = packageName.split(".").toMutableList()
         var phrase = ""
         var selectedName = names.last().capitalize()
@@ -23,9 +23,8 @@ object TypeScriptNameProvider {
             "MainTypes"
         } else "${phrase}Types"
     }
-    const val fileTypeDefinitionsExtension = ".d.ts"
     const val fileTypeScriptExtension = ".ts"
-    const val layoutParamsDefinitionsFileName = "layoutparams.types.d.ts"
+    const val layoutParamsFileName = "layoutparams.ts"
     const val indexFileName = "index.ts"
     private const val generatedPackageSimpleName = "Generated"
 }

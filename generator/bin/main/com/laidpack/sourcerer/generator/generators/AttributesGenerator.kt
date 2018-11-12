@@ -61,14 +61,6 @@ class AttributesGenerator(
         return this
     }
 
-    private fun TypeSpec.Builder.addAllPropertySpecs(): TypeSpec.Builder {
-        this.addProperties(getPropertySpecsForClass(attributesClassName, attributes))
-        for ((className, attrs) in superClassAttributes) {
-            this.addProperties(getPropertySpecsForClass(className, attrs))
-        }
-        return this
-    }
-
     private fun getPropertySpecsForClass(
             className: ClassName,
             attributes: Map<String, Attribute>
@@ -111,7 +103,6 @@ class AttributesGenerator(
                                     attribute.name,
                                     getPropertyType(className, attribute)
                             )
-                            .addModifiers(className)
                             .addDefaultValue(attribute)
                             .build()
             )
@@ -131,12 +122,6 @@ class AttributesGenerator(
             )
         }
     }
-    private fun ParameterSpec.Builder.addModifiers(className: ClassName): ParameterSpec.Builder {
-        /*return if (className != attributesClassName) {
-            this.addModifiers(KModifier.OVERRIDE, KModifier.OPEN)
-        } else this.addModifiers(KModifier.OPEN)*/
-        return this
-    }
 
     private fun FileSpec.Builder.addEnumTypesForAttribute(attribute: Attribute): FileSpec.Builder {
         val createEnumForFormats = attribute.formats.filter {
@@ -150,6 +135,7 @@ class AttributesGenerator(
                     attribute.typesForFirstSetter
             )
             val enumTypeSpecBuilder = TypeSpec.enumBuilder(enumClassName)
+                    .addAnnotation(TypeScript::class.java)
                     .primaryConstructor(FunSpec.constructorBuilder()
                             .addParameter("key", String::class, KModifier.OVERRIDE)
                             .addParameter("value", Int::class, KModifier.OVERRIDE)
@@ -201,12 +187,10 @@ class AttributesGenerator(
                     }
                 }
             }
-
         }
         return this
     }
 
-    /** we want unique enum class simple names for typescript **/
     private fun getEnumClassName(
             attributeClassName: ClassName,
             attribute: Attribute,
@@ -217,10 +201,10 @@ class AttributesGenerator(
             return enumClassNameRegistry[key] as ClassName
         }
         var className = ClassName(attributeClassName.packageName, (typesForThisSetter.enumClassName as ClassName).simpleName)
-        while (usedEnumClassNames.contains(className.simpleName)) {
+        while (usedEnumClassNames.contains(className)) {
             className = ClassName(attributeClassName.packageName, className.simpleName + "_")
         }
-        usedEnumClassNames.add(className.simpleName)
+        usedEnumClassNames.add(className)
         enumClassNameRegistry[key] = className
         return className
     }
@@ -244,7 +228,6 @@ class AttributesGenerator(
                 -> firstFormat.toClass().asTypeName().asNullable()
         }
     }
-
 
     private fun PropertySpec.Builder.addQualifierAnnotationIfNeeded(className: ClassName, attribute: Attribute): PropertySpec.Builder {
         // check if we have different formats, then use multiqualifier..
@@ -308,11 +291,12 @@ class AttributesGenerator(
         }
 
         private val enumClassNameRegistry = mutableMapOf<String/* target class name + attribute name */, ClassName /* class name with new package and check for dupes*/>()
-        private val usedEnumClassNames = mutableSetOf<String /* class simple names */>()
+        private val usedEnumClassNames = mutableSetOf<ClassName /* class simple names */>()
         private val attributesInterfaceName = ClassName(SourcererEnvironment.servicesApiPackageName, "IAttributes")
         private val flagsAccumulatorClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "FlagsAccumulator")
         val enumInterfaceName = ClassName(SourcererEnvironment.servicesApiPackageName, "AttributeEnum")
         val flagsAccumalatorClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "FlagsAccumulator")
+        private val enumForFlagsAnnotationClassName = ClassName(SourcererEnvironment.servicesApiPackageName, "EnumForFlags")
 
     }
 

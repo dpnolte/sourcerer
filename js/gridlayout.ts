@@ -1,12 +1,33 @@
-/* generated @ 2018-11-10T13:56:12.631 */
-import { element } from './element';
-/// <reference path='./element.types.d.ts' />
-/// <reference path='./layoutparams.types.d.ts' />
-/// <reference path='./gridlayout.types.d.ts' />
-
+import { ElementNode, element } from './element';
+import { LayoutParamAttributes } from './layoutparams';
+import { MainTypes } from "./main";
+// types
+/* generated @ 2018-11-12T14:29:10.068 */
+export namespace GridlayoutTypes {
+  export enum AlignmentModeEnum {
+    alignBounds = 'alignBounds',
+    alignMargins = 'alignMargins'
+  }
+  export interface GridLayoutAttributes extends MainTypes.ViewGroupAttributes {
+    alignmentMode?: AlignmentModeEnum;
+    columnCount?: number;
+    columnOrderPreserved?: boolean;
+    orientation?: OrientationEnum;
+    rowCount?: number;
+    rowOrderPreserved?: boolean;
+    useDefaultMargins?: boolean;
+  }
+  export interface GridLayoutLayoutParamsAttributes extends MainTypes.ViewGroupMarginLayoutParamsAttributes {
+  }
+  export enum OrientationEnum {
+    horizontal = 'horizontal',
+    vertical = 'vertical'
+  }
+}
+// elements
 export const GridlayoutGridLayout = (
-  attributes?: GridlayoutTypes.GridLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<GridlayoutTypes.GridLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: GridlayoutTypes.GridLayoutAttributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<GridlayoutTypes.GridLayoutAttributes, LayoutParamAttributes> => {
   return element('gridlayout.gridLayout', attributes, children);
 };

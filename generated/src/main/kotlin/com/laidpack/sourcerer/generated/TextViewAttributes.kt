@@ -164,6 +164,7 @@ open class TextViewAttributes(
 ) : ViewAttributes(id = id, tag = tag, scrollX = scrollX, scrollY = scrollY, background = background, paddingLeft = paddingLeft, paddingBottom = paddingBottom, paddingEnd = paddingEnd, paddingStart = paddingStart, paddingTop = paddingTop, paddingRight = paddingRight, focusable = focusable, autofillHints = autofillHints, importantForAutofill = importantForAutofill, focusableInTouchMode = focusableInTouchMode, visibility = visibility, fitsSystemWindows = fitsSystemWindows, scrollbarStyle = scrollbarStyle, isScrollContainer = isScrollContainer, fadeScrollbars = fadeScrollbars, scrollbarFadeDuration = scrollbarFadeDuration, scrollbarDefaultDelayBeforeFade = scrollbarDefaultDelayBeforeFade, scrollbarSize = scrollbarSize, nextFocusLeft = nextFocusLeft, nextFocusRight = nextFocusRight, nextFocusUp = nextFocusUp, nextFocusDown = nextFocusDown, nextFocusForward = nextFocusForward, clickable = clickable, longClickable = longClickable, contextClickable = contextClickable, saveEnabled = saveEnabled, filterTouchesWhenObscured = filterTouchesWhenObscured, drawingCacheQuality = drawingCacheQuality, keepScreenOn = keepScreenOn, minHeight = minHeight, minWidth = minWidth, soundEffectsEnabled = soundEffectsEnabled, hapticFeedbackEnabled = hapticFeedbackEnabled, contentDescription = contentDescription, accessibilityTraversalBefore = accessibilityTraversalBefore, accessibilityTraversalAfter = accessibilityTraversalAfter, overScrollMode = overScrollMode, alpha = alpha, elevation = elevation, translationX = translationX, translationY = translationY, translationZ = translationZ, transformPivotX = transformPivotX, transformPivotY = transformPivotY, rotation = rotation, rotationX = rotationX, rotationY = rotationY, scaleX = scaleX, scaleY = scaleY, verticalScrollbarPosition = verticalScrollbarPosition, layerType = layerType, layoutDirection = layoutDirection, textDirection = textDirection, textAlignment = textAlignment, importantForAccessibility = importantForAccessibility, accessibilityLiveRegion = accessibilityLiveRegion, labelFor = labelFor, transitionName = transitionName, nestedScrollingEnabled = nestedScrollingEnabled, backgroundTint = backgroundTint, backgroundTintMode = backgroundTintMode, foreground = foreground, foregroundGravity = foregroundGravity, foregroundTint = foregroundTint, foregroundTintMode = foregroundTintMode, scrollIndicators = scrollIndicators, forceHasOverlappingRendering = forceHasOverlappingRendering, tooltipText = tooltipText, keyboardNavigationCluster = keyboardNavigationCluster, nextClusterForward = nextClusterForward, focusedByDefault = focusedByDefault, defaultFocusHighlightEnabled = defaultFocusHighlightEnabled, screenReaderFocusable = screenReaderFocusable, accessibilityPaneTitle = accessibilityPaneTitle, accessibilityHeading = accessibilityHeading, outlineSpotShadowColor = outlineSpotShadowColor, outlineAmbientShadowColor = outlineAmbientShadowColor),
         IAttributes
 
+@TypeScript
 enum class GravityFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "top")
     Top("top", 48),
@@ -208,6 +209,7 @@ enum class GravityFlagsEnum(override val key: String, override val value: Int) :
     End("end", 8388613);
 }
 
+@TypeScript
 enum class AutoLinkFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),
@@ -228,6 +230,7 @@ enum class AutoLinkFlagsEnum(override val key: String, override val value: Int) 
     All("all", 15);
 }
 
+@TypeScript
 enum class EllipsizeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),
@@ -245,6 +248,7 @@ enum class EllipsizeEnum(override val key: String, override val value: Int) : At
     Marquee("marquee", 4);
 }
 
+@TypeScript
 enum class DrawableTintModeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "src_over")
     SrcOver("src_over", 3),
@@ -265,11 +269,13 @@ enum class DrawableTintModeEnum(override val key: String, override val value: In
     Add("add", 16);
 }
 
+@TypeScript
 enum class MarqueeRepeatLimitEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "marquee_forever")
     MarqueeForever("marquee_forever", -1);
 }
 
+@TypeScript
 enum class InputTypeFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),
@@ -368,6 +374,7 @@ enum class InputTypeFlagsEnum(override val key: String, override val value: Int)
     Time("time", 36);
 }
 
+@TypeScript
 enum class ImeOptionsFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "normal")
     Normal("normal", 0),
@@ -418,6 +425,7 @@ enum class ImeOptionsFlagsEnum(override val key: String, override val value: Int
     FlagNoEnterAction("flagNoEnterAction", 1073741824);
 }
 
+@TypeScript
 enum class BreakStrategyEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "simple")
     Simple("simple", 0),
@@ -429,6 +437,7 @@ enum class BreakStrategyEnum(override val key: String, override val value: Int) 
     Balanced("balanced", 2);
 }
 
+@TypeScript
 enum class HyphenationFrequencyEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),
@@ -440,6 +449,7 @@ enum class HyphenationFrequencyEnum(override val key: String, override val value
     Full("full", 2);
 }
 
+@TypeScript
 enum class AutoSizeTextTypeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),
@@ -448,6 +458,7 @@ enum class AutoSizeTextTypeEnum(override val key: String, override val value: In
     Uniform("uniform", 1);
 }
 
+@TypeScript
 enum class JustificationModeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),

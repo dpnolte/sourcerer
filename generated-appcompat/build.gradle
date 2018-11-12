@@ -59,7 +59,7 @@ kapt {
     arguments {
         arg("typescript.namespace", "AppcompatTypes") // becomes: declare namespace "..."
         arg("typescript.outputDir", "${rootDir}/js") // where the file will be saved
-        arg("typescript.filename", "appcompat.types.d.ts") // where the file will be saved
+        arg("typescript.filename", "appcompat.ts") // where the file will be saved
         arg("typescript.indent", "  ") // indentation (defaults to 2 spaces)
     }
 }

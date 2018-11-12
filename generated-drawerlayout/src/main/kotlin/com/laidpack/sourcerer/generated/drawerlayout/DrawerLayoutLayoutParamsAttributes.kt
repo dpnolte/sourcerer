@@ -15,7 +15,7 @@ import kotlin.String
 @JsonClass(generateAdapter = true)
 @TypeScript
 open class DrawerLayoutLayoutParamsAttributes(
-    @field:MultiFormatQualifier(formats = [Format.Integer, Format.Flags], flagsType = LayoutGravityFlagsEnum__::class) val layout_gravity: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Flags)),
+    @field:MultiFormatQualifier(formats = [Format.Integer, Format.Flags], flagsType = LayoutGravityFlagsEnum::class) val layout_gravity: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Flags)),
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_marginLeft: Int? = null,
@@ -27,7 +27,8 @@ open class DrawerLayoutLayoutParamsAttributes(
 ) : ViewGroupMarginLayoutParamsAttributes(layout_width = layout_width, layout_height = layout_height, layout_marginLeft = layout_marginLeft, layout_marginBottom = layout_marginBottom, layout_marginRight = layout_marginRight, layout_marginTop = layout_marginTop, layout_marginStart = layout_marginStart, layout_marginEnd = layout_marginEnd),
         IAttributes
 
-enum class LayoutGravityFlagsEnum__(override val key: String, override val value: Int) : AttributeEnum {
+@TypeScript
+enum class LayoutGravityFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "top")
     Top("top", 48),
 

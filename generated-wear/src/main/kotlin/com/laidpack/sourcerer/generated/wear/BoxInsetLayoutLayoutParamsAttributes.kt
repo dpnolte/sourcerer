@@ -22,6 +22,7 @@ open class BoxInsetLayoutLayoutParamsAttributes(
 ) : ViewGroupLayoutParamsAttributes(layout_width = layout_width, layout_height = layout_height),
         IAttributes
 
+@TypeScript
 enum class BoxedEdgesFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),

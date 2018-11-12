@@ -60,7 +60,8 @@
     "js"
   ],
   "exclude": [
-    "node_modules",
-    "js-dist"
+    "**/__tests__/*",
+    "**/*.test.ts",
+    "**/*.spec.ts",
   ]
 }

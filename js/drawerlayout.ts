@@ -1,12 +1,36 @@
-/* generated @ 2018-11-10T13:55:17.289 */
-import { element } from './element';
-/// <reference path='./element.types.d.ts' />
-/// <reference path='./layoutparams.types.d.ts' />
-/// <reference path='./drawerlayout.types.d.ts' />
-
+import { ElementNode, element } from './element';
+import { LayoutParamAttributes } from './layoutparams';
+import { MainTypes } from "./main";
+// types
+/* generated @ 2018-11-12T14:27:44.875 */
+export namespace DrawerlayoutTypes {
+  export interface DrawerLayoutAttributes extends MainTypes.ViewGroupAttributes {
+    colorPrimaryDark?: string;
+  }
+  export interface DrawerLayoutLayoutParamsAttributes extends MainTypes.ViewGroupMarginLayoutParamsAttributes {
+    layout_gravity?: number | LayoutGravityFlagsEnum[];
+  }
+  export enum LayoutGravityFlagsEnum {
+    bottom = 'bottom',
+    center = 'center',
+    center_horizontal = 'center_horizontal',
+    center_vertical = 'center_vertical',
+    clip_horizontal = 'clip_horizontal',
+    clip_vertical = 'clip_vertical',
+    end = 'end',
+    fill = 'fill',
+    fill_horizontal = 'fill_horizontal',
+    fill_vertical = 'fill_vertical',
+    left = 'left',
+    right = 'right',
+    start = 'start',
+    top = 'top'
+  }
+}
+// elements
 export const DrawerLayout = (
-  attributes?: DrawerlayoutTypes.DrawerLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<DrawerlayoutTypes.DrawerLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: DrawerlayoutTypes.DrawerLayoutAttributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<DrawerlayoutTypes.DrawerLayoutAttributes, LayoutParamAttributes> => {
   return element('drawerLayout', attributes, children);
 };

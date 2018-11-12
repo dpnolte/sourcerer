@@ -509,10 +509,9 @@ class AttributeFlow (
         attribute.typesPerSetter[setterHashCode] = typesForThisSetter
     }
 
-    fun addSetterByDerivedVariables(methodCallExpr: MethodCallExpr, variablesNames: List<String>) {
-        ensureListIsNotEmpty(variablesNames)
+    fun addSetterByDerivedVariables(methodCallExpr: MethodCallExpr, parameterIndexToVariable: Map<Int, String>) {
         val attributes = mutableMapOf<Int, AttributeInSource>()
-        variablesNames.forEachIndexed { parameterIndex, name ->
+        for ((parameterIndex, name) in parameterIndexToVariable) {
             variableNameToAttribute[name]?.let { attributeNames ->
                 attributeNames.forEach {
                     val attribute = getAttribute(it)
@@ -521,7 +520,7 @@ class AttributeFlow (
                         VariableImpact.ASSIGNED -> attributes[parameterIndex] = attribute
                         VariableImpact.CHAINED -> attributes[parameterIndex] = attribute
                         // currently unused -->
-                        //VariableImpact.IF_TRUE -> addSetterWithTransformingCode(methodCallExpr, variablesNames, attribute)
+                        //VariableImpact.IF_TRUE -> addSetterWithTransformingCode(methodCallExpr, parameterIndexToVariable, attribute)
                         else -> throw IllegalStateException("Could not convert variable impact '$impact' to a setter")
                     }
                 }

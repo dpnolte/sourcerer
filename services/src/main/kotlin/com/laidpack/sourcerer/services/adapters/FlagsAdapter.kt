@@ -26,15 +26,32 @@ internal class FlagsAdapterFactory : JsonAdapter.Factory {
 
 
 internal class FlagsAdapter(
-        private val flagsType: KClass<out AttributeEnum>
+        flagsType: KClass<out AttributeEnum>
 ) : JsonAdapter<FlagsAccumulator>() {
+    private val allPossibleFlagValues = flagsType.java.enumConstants.associateBy { it.key }
+
     override fun fromJson(reader: JsonReader): FlagsAccumulator? {
-        val providedString = reader.nextString()
-        val allPossibleFlagValues = flagsType.java.enumConstants.associateBy { it.key }
-        val stringValues = providedString.split("|")
+        val token = reader.peek()
+        return when (token) {
+            JsonReader.Token.STRING -> accumulateFlagsFromString(reader.nextString())
+            JsonReader.Token.BEGIN_ARRAY -> accumulateFlagsFromSet(arrayToStringSet(reader))
+            else -> throw JsonDataException("Invalid flags format format. Expected either string or array, received ${token.name}.")
+        }
+    }
+
+    private fun accumulateFlagsFromString(input: String): FlagsAccumulator {
+        val stringValues = input.split("|")
+        return accumulateFlags(stringValues)
+    }
+
+    private fun accumulateFlagsFromSet(input: Set<String>): FlagsAccumulator {
+        return accumulateFlags(input)
+    }
+
+    private fun accumulateFlags(flags: Collection<String>): FlagsAccumulator {
         var accumulatedValue = 0
         val flagValues = mutableListOf<AttributeEnum>()
-        for (stringValue in stringValues) {
+        for (stringValue in flags) {
             if (!allPossibleFlagValues.containsKey(stringValue)) {
                 throw JsonDataException("'$stringValue' is not a valid flag key. Allowed keys: ${allPossibleFlagValues.keys.joinToString()}")
             }
@@ -47,6 +64,19 @@ internal class FlagsAdapter(
                 accumulatedValue,
                 flagValues
         )
+    }
+
+    private fun arrayToStringSet(reader: JsonReader): Set<String> {
+        val result = mutableSetOf<String>()
+        reader.beginArray()
+        while(reader.hasNext()) {
+            val flag = reader.nextString()
+            if (!result.contains(flag)) {
+                result.add(flag)
+            }
+        }
+        reader.endArray()
+        return result
     }
 
     override fun toJson(writer: JsonWriter, value: FlagsAccumulator?) {

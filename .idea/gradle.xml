@@ -7,8 +7,6 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$USER_HOME$/javaProjects/ts-rhymer/annotation" />
-            <option value="$USER_HOME$/javaProjects/ts-rhymer/codegen-impl" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/generated" />
             <option value="$PROJECT_DIR$/generated-appcompat" />

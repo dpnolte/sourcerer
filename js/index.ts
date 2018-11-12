@@ -1,4 +1,3 @@
-export * from "./main";
 export * from "./car";
 export * from "./emoji";
 export * from "./appcompatemoji";
@@ -13,8 +12,9 @@ export * from "./recyclerview";
 export * from "./viewslice";
 export * from "./componentsmaterial";
 export * from "./cardview";
-export * from "./coordinatorlayout";
-export * from "./appcompat";
 export * from "./drawerlayout";
 export * from "./core";
+export * from "./coordinatorlayout";
+export * from "./appcompat";
+export * from "./main";
 export * from "./element";

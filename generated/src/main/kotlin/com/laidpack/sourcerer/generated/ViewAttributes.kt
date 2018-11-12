@@ -106,11 +106,13 @@ open class ViewAttributes(
     @field:ColorQualifier val outlineAmbientShadowColor: Int? = null
 ) : IAttributes
 
+@TypeScript
 enum class FocusableEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "auto")
     Auto("auto", 16);
 }
 
+@TypeScript
 enum class ImportantForAutofillFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "auto")
     Auto("auto", 0),
@@ -128,6 +130,7 @@ enum class ImportantForAutofillFlagsEnum(override val key: String, override val 
     NoExcludeDescendants("noExcludeDescendants", 8);
 }
 
+@TypeScript
 enum class VisibilityEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "visible")
     Visible("visible", 0),
@@ -139,6 +142,7 @@ enum class VisibilityEnum(override val key: String, override val value: Int) : A
     Gone("gone", 2);
 }
 
+@TypeScript
 enum class ScrollbarStyleEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "insideOverlay")
     InsideOverlay("insideOverlay", 0),
@@ -153,6 +157,7 @@ enum class ScrollbarStyleEnum(override val key: String, override val value: Int)
     OutsideInset("outsideInset", 50331648);
 }
 
+@TypeScript
 enum class DrawingCacheQualityEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "auto")
     Auto("auto", 0),
@@ -164,6 +169,7 @@ enum class DrawingCacheQualityEnum(override val key: String, override val value:
     High("high", 2);
 }
 
+@TypeScript
 enum class OverScrollModeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "always")
     Always("always", 0),
@@ -175,6 +181,7 @@ enum class OverScrollModeEnum(override val key: String, override val value: Int)
     Never("never", 2);
 }
 
+@TypeScript
 enum class VerticalScrollbarPositionEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "defaultPosition")
     DefaultPosition("defaultPosition", 0),
@@ -186,6 +193,7 @@ enum class VerticalScrollbarPositionEnum(override val key: String, override val 
     Right("right", 2);
 }
 
+@TypeScript
 enum class LayerTypeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),
@@ -197,6 +205,7 @@ enum class LayerTypeEnum(override val key: String, override val value: Int) : At
     Hardware("hardware", 2);
 }
 
+@TypeScript
 enum class LayoutDirectionEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "ltr")
     Ltr("ltr", 0),
@@ -211,6 +220,7 @@ enum class LayoutDirectionEnum(override val key: String, override val value: Int
     Locale("locale", 3);
 }
 
+@TypeScript
 enum class TextDirectionEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "inherit")
     Inherit("inherit", 0),
@@ -237,6 +247,7 @@ enum class TextDirectionEnum(override val key: String, override val value: Int) 
     FirstStrongRtl("firstStrongRtl", 7);
 }
 
+@TypeScript
 enum class TextAlignmentEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "inherit")
     Inherit("inherit", 0),
@@ -260,6 +271,7 @@ enum class TextAlignmentEnum(override val key: String, override val value: Int) 
     ViewEnd("viewEnd", 6);
 }
 
+@TypeScript
 enum class ImportantForAccessibilityEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "auto")
     Auto("auto", 0),
@@ -274,6 +286,7 @@ enum class ImportantForAccessibilityEnum(override val key: String, override val 
     NoHideDescendants("noHideDescendants", 4);
 }
 
+@TypeScript
 enum class AccessibilityLiveRegionEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),
@@ -285,6 +298,7 @@ enum class AccessibilityLiveRegionEnum(override val key: String, override val va
     Assertive("assertive", 2);
 }
 
+@TypeScript
 enum class BackgroundTintModeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "src_over")
     SrcOver("src_over", 3),
@@ -305,6 +319,7 @@ enum class BackgroundTintModeEnum(override val key: String, override val value: 
     Add("add", 16);
 }
 
+@TypeScript
 enum class ForegroundGravityFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "top")
     Top("top", 48),
@@ -343,6 +358,7 @@ enum class ForegroundGravityFlagsEnum(override val key: String, override val val
     ClipHorizontal("clip_horizontal", 8);
 }
 
+@TypeScript
 enum class ForegroundTintModeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "src_over")
     SrcOver("src_over", 3),
@@ -363,6 +379,7 @@ enum class ForegroundTintModeEnum(override val key: String, override val value: 
     Add("add", 16);
 }
 
+@TypeScript
 enum class ScrollIndicatorsFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),

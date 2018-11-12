@@ -54,8 +54,11 @@ open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(i
                         columnWidth = it
                     }
                 }
-                attributes.gravity?.let {
-                    val localGravity = it.value
+                if (attributes.gravity.hasInteger || attributes.gravity.hasFlags) {
+                    val localGravity = when {
+                        attributes.gravity.hasInteger -> attributes.gravity.integer
+                        else -> attributes.gravity.flags
+                    }
                     if (gravity != localGravity) {
                         gravity = localGravity
                     }

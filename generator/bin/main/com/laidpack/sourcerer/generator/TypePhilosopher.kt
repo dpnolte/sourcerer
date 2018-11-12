@@ -236,10 +236,16 @@ class TypePhilosopher(
             val directlyMatchingFormat = getFormatThatMatchesDirectlyWithSetter(setter, attribute, format)
             val isFormatSpecified = parameter != null && parameter.format != StyleableAttributeFormat.Unspecified
             when {
-                !isFormatSpecified && formatTypeName.toString() == setterType.toString() -> formats.add(format)
-                !isFormatSpecified && allowedFormatToTypeTransformations.contains(Pair(format, setterType)) -> formats.add(format)
-                directlyMatchingFormat != null -> formats.add(format)
-                parameterFormatTypeName != null && allowedFormatToTypeTransformations.contains(Pair(format, parameterFormatTypeName)) -> formats.add(format)
+                setterType == intClassName && (format == StyleableAttributeFormat.Flags || format == StyleableAttributeFormat.Enum)
+                    -> formats.add(format)
+                !isFormatSpecified && formatTypeName == setterType
+                    -> formats.add(format)
+                !isFormatSpecified && allowedFormatToTypeTransformations.contains(Pair(format, setterType))
+                    -> formats.add(format)
+                directlyMatchingFormat != null
+                    -> formats.add(format)
+                parameterFormatTypeName != null && allowedFormatToTypeTransformations.contains(Pair(format, parameterFormatTypeName))
+                    -> formats.add(format)
             }
         }
         if (formats.isEmpty())
@@ -440,6 +446,7 @@ class TypePhilosopher(
         private val allowedTypeToFormatTransformations = DelegateGeneratorBase.transformTypeToFormatMap.keys
         private val allowedArrayAccessorTransformations = DelegateGeneratorBase.transformArrayAccessorMap.keys
         private val formatCanonicalNames = enumValues<StyleableAttributeFormat>().map { it.toClass().java.canonicalName }.toSet()
+        private val intClassName = Int::class.asClassName()
 
         fun isFormatToTypeConversionAvailable(format: StyleableAttributeFormat, typeName: TypeName): Boolean {
             return allowedFormatToTypeTransformations.contains(Pair(format,typeName))

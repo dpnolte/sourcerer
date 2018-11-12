@@ -3,21 +3,26 @@
   "version": "0.0.2",
   "description": "data objects and typescript definitions for the generated android json adapters",
   "main": "./js-dist/index.js",
-  "types": "./js/index.d.ts",
   "files": [
-    "js",
     "js-dist"
   ],
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "tsc"
+    "test": "jest",
+    "prepare" : "yarn build",
+    "prepublishOnly": "yarn test"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dpnolte/sourcerer.git"
   },
   "devDependencies": {
+    "@babel/core": "^7.1.5",
+    "@types/jest": "^23.3.9",
+    "babel-core": "^6.26.3",
+    "babel-jest": "^23.6.0",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.4",
     "typescript": "latest"
   },
   "keywords": [
@@ -32,5 +37,25 @@
   "bugs": {
     "url": "https://github.com/dpnolte/sourcerer/issues"
   },
-  "homepage": "https://github.com/dpnolte/sourcerer#readme"
+  "homepage": "https://github.com/dpnolte/sourcerer#readme",
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "globals": {
+      "__TEST__": true
+    },
+    "transform": {
+      "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest",
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "testPathIgnorePatterns": [
+      "\\.snap$",
+      "<rootDir>/node_modules/"
+    ],
+    "cacheDirectory": ".jest/cache"
+  }
 }

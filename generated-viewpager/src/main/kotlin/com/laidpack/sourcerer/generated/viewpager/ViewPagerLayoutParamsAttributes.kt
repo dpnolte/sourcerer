@@ -15,13 +15,14 @@ import kotlin.String
 @JsonClass(generateAdapter = true)
 @TypeScript
 open class ViewPagerLayoutParamsAttributes(
-    @field:MultiFormatQualifier(formats = [Format.Integer, Format.Flags], flagsType = LayoutGravityFlagsEnum___::class) val layout_gravity: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Flags)),
+    @field:MultiFormatQualifier(formats = [Format.Integer, Format.Flags], flagsType = LayoutGravityFlagsEnum::class) val layout_gravity: MultiFormat = MultiFormat(setOf(Format.Integer, Format.Flags)),
     layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)),
     layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum))
 ) : ViewGroupLayoutParamsAttributes(layout_width = layout_width, layout_height = layout_height),
         IAttributes
 
-enum class LayoutGravityFlagsEnum___(override val key: String, override val value: Int) : AttributeEnum {
+@TypeScript
+enum class LayoutGravityFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "top")
     Top("top", 48),
 

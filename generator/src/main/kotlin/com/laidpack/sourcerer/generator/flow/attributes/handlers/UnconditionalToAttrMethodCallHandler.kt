@@ -40,12 +40,12 @@ internal class UnconditionalToAttrMethodCallHandler(flow: AttributeFlow): BaseAt
     private fun handleSetterCall(node: MethodCallExpr): Boolean {
         // check if argument used for setter (i.e., method call) are variables that are derived from an attribute
         var isValidSetter = false
-        val variableNames = mutableListOf<String>()
-        node.arguments.forEach{ arg ->
+        val variableNames = mutableMapOf<Int /* param index */, String /* var name */>()
+        node.arguments.forEachIndexed { index, arg ->
             // is method from this class called with a variable derived from attribute?
             if (arg.isNameExpr){
                 val nameExpr = arg.asNameExpr()
-                variableNames.add(nameExpr.nameAsString)
+                variableNames[index] = nameExpr.nameAsString
                 if (!isValidSetter && flow.isVariableDerivedFromAnyAttribute(nameExpr.nameAsString)) {
                     isValidSetter = true
                 }

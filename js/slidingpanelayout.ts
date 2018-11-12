@@ -1,12 +1,19 @@
-/* generated @ 2018-11-10T13:56:06.062 */
-import { element } from './element';
-/// <reference path='./element.types.d.ts' />
-/// <reference path='./layoutparams.types.d.ts' />
-/// <reference path='./slidingpanelayout.types.d.ts' />
-
+import { ElementNode, element } from './element';
+import { LayoutParamAttributes } from './layoutparams';
+import { MainTypes } from "./main";
+// types
+/* generated @ 2018-11-12T13:41:47.407 */
+export namespace SlidingpanelayoutTypes {
+  export interface SlidingPaneLayoutAttributes extends MainTypes.ViewGroupAttributes {
+  }
+  export interface SlidingPaneLayoutLayoutParamsAttributes extends MainTypes.ViewGroupMarginLayoutParamsAttributes {
+    layout_weight?: number;
+  }
+}
+// elements
 export const SlidingPaneLayout = (
-  attributes?: SlidingpanelayoutTypes.SlidingPaneLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<SlidingpanelayoutTypes.SlidingPaneLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: SlidingpanelayoutTypes.SlidingPaneLayoutAttributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<SlidingpanelayoutTypes.SlidingPaneLayoutAttributes, LayoutParamAttributes> => {
   return element('slidingPaneLayout', attributes, children);
 };

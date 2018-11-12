@@ -397,6 +397,14 @@ class AttributeManager(
                 defaultValue = when {
                     argument.isLiteralStringValueExpr -> argument.asLiteralStringValueExpr().value
                     argument.isNullLiteralExpr -> "null"
+                    argument.isFieldAccessExpr || argument.isNameExpr || argument.isBinaryExpr -> {
+                        // try to extract int value
+                        try {
+                            IntValueExtractor.resolveIntValueFromNode(argument).toString() + " /* $argument */"
+                        } catch (e: Exception) {
+                            ""
+                        }
+                    }
                     else -> ""
                 }
             }

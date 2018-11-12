@@ -7,15 +7,16 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
 import androidx.core.content.ContextCompat
-import com.laidpack.generator.api.ViewElement
+import com.laidpack.generator.api.ViewGroupElement
 import com.laidpack.sourcerer.services.api.BaseViewFactory
 import com.laidpack.sourcerer.services.api.toPorterDuffMode
 import java.lang.Class
 import kotlin.String
 
-@ViewElement(
+@ViewGroupElement(
         elementType = ViewFactory.elementType,
-        attributesClazz = ViewAttributes::class
+        attributesClazz = ViewAttributes::class,
+        layoutParamAttributesClazz = ViewGroupLayoutParamsAttributes::class
 )
 open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType: Class<TView>, attributesType: Class<TAttributes>) : BaseViewFactory<TView, TAttributes>(instanceType, attributesType) {
     override val elementType: String = Companion.elementType

@@ -1,9 +1,9 @@
-include ':codegen-impl', ':generator-api'
+/*include ':codegen-impl',
 project(":codegen-impl").projectDir = file("/Users/derk/javaProjects/ts-rhymer/codegen-impl")
 include ':annotation'
-project(":annotation").projectDir = file("/Users/derk/javaProjects/ts-rhymer/annotation")
+project(":annotation").projectDir = file("/Users/derk/javaProjects/ts-rhymer/annotation")*/
 
-include ':generator', ':sample-server', ':generator-kapt',
+include ':generator', ':sample-server', ':generator-kapt', ':generator-api',
 		':sample-app',
         ':stub-module',
 		':services',

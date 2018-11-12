@@ -1,18 +1,24 @@
-/* generated @ 2018-11-10T13:56:11.308 */
-import { element } from './element';
-/// <reference path='./element.types.d.ts' />
-/// <reference path='./layoutparams.types.d.ts' />
-/// <reference path='./widgetmedia.types.d.ts' />
-
+import { ElementNode, element } from './element';
+import { LayoutParamAttributes } from './layoutparams';
+import { MainTypes } from "./main";
+// types
+/* generated @ 2018-11-12T13:41:52.721 */
+export namespace WidgetMediaTypes {
+  export interface MediaControlView2Attributes extends MainTypes.ViewGroupAttributes {
+  }
+  export interface VideoView2Attributes extends MainTypes.ViewGroupAttributes {
+  }
+}
+// elements
 export const VideoView2 = (
-  attributes?: WidgetMediaTypes.VideoView2Attributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<WidgetMediaTypes.VideoView2Attributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: WidgetMediaTypes.VideoView2Attributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<WidgetMediaTypes.VideoView2Attributes, LayoutParamAttributes> => {
   return element('videoView2', attributes, children);
 };
 export const MediaControlView2 = (
-  attributes?: WidgetMediaTypes.MediaControlView2Attributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<WidgetMediaTypes.MediaControlView2Attributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: WidgetMediaTypes.MediaControlView2Attributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<WidgetMediaTypes.MediaControlView2Attributes, LayoutParamAttributes> => {
   return element('mediaControlView2', attributes, children);
 };

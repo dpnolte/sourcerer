@@ -59,7 +59,7 @@ kapt {
     arguments {
         arg("typescript.namespace", "RecyclerviewTypes") // becomes: declare namespace "..."
         arg("typescript.outputDir", "${rootDir}/js") // where the file will be saved
-        arg("typescript.filename", "recyclerview.types.d.ts") // where the file will be saved
+        arg("typescript.filename", "recyclerview.ts") // where the file will be saved
         arg("typescript.indent", "  ") // indentation (defaults to 2 spaces)
     }
 }

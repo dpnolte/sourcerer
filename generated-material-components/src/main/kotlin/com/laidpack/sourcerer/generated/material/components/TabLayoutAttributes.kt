@@ -137,6 +137,7 @@ open class TabLayoutAttributes(
 ) : HorizontalScrollViewAttributes(fillViewport = fillViewport, measureAllChildren = measureAllChildren, animateLayoutChanges = animateLayoutChanges, clipChildren = clipChildren, clipToPadding = clipToPadding, animationCache = animationCache, persistentDrawingCache = persistentDrawingCache, alwaysDrawnWithCache = alwaysDrawnWithCache, addStatesFromChildren = addStatesFromChildren, touchscreenBlocksFocus = touchscreenBlocksFocus, splitMotionEvents = splitMotionEvents, layoutMode = layoutMode, transitionGroup = transitionGroup, id = id, tag = tag, scrollX = scrollX, scrollY = scrollY, background = background, paddingLeft = paddingLeft, paddingBottom = paddingBottom, paddingEnd = paddingEnd, paddingStart = paddingStart, paddingTop = paddingTop, paddingRight = paddingRight, focusable = focusable, autofillHints = autofillHints, importantForAutofill = importantForAutofill, focusableInTouchMode = focusableInTouchMode, visibility = visibility, fitsSystemWindows = fitsSystemWindows, scrollbarStyle = scrollbarStyle, isScrollContainer = isScrollContainer, fadeScrollbars = fadeScrollbars, scrollbarFadeDuration = scrollbarFadeDuration, scrollbarDefaultDelayBeforeFade = scrollbarDefaultDelayBeforeFade, scrollbarSize = scrollbarSize, nextFocusLeft = nextFocusLeft, nextFocusRight = nextFocusRight, nextFocusUp = nextFocusUp, nextFocusDown = nextFocusDown, nextFocusForward = nextFocusForward, clickable = clickable, longClickable = longClickable, contextClickable = contextClickable, saveEnabled = saveEnabled, filterTouchesWhenObscured = filterTouchesWhenObscured, drawingCacheQuality = drawingCacheQuality, keepScreenOn = keepScreenOn, minHeight = minHeight, minWidth = minWidth, soundEffectsEnabled = soundEffectsEnabled, hapticFeedbackEnabled = hapticFeedbackEnabled, contentDescription = contentDescription, accessibilityTraversalBefore = accessibilityTraversalBefore, accessibilityTraversalAfter = accessibilityTraversalAfter, overScrollMode = overScrollMode, alpha = alpha, elevation = elevation, translationX = translationX, translationY = translationY, translationZ = translationZ, transformPivotX = transformPivotX, transformPivotY = transformPivotY, rotation = rotation, rotationX = rotationX, rotationY = rotationY, scaleX = scaleX, scaleY = scaleY, verticalScrollbarPosition = verticalScrollbarPosition, layerType = layerType, layoutDirection = layoutDirection, textDirection = textDirection, textAlignment = textAlignment, importantForAccessibility = importantForAccessibility, accessibilityLiveRegion = accessibilityLiveRegion, labelFor = labelFor, transitionName = transitionName, nestedScrollingEnabled = nestedScrollingEnabled, backgroundTint = backgroundTint, backgroundTintMode = backgroundTintMode, foreground = foreground, foregroundGravity = foregroundGravity, foregroundTint = foregroundTint, foregroundTintMode = foregroundTintMode, scrollIndicators = scrollIndicators, forceHasOverlappingRendering = forceHasOverlappingRendering, tooltipText = tooltipText, keyboardNavigationCluster = keyboardNavigationCluster, nextClusterForward = nextClusterForward, focusedByDefault = focusedByDefault, defaultFocusHighlightEnabled = defaultFocusHighlightEnabled, screenReaderFocusable = screenReaderFocusable, accessibilityPaneTitle = accessibilityPaneTitle, accessibilityHeading = accessibilityHeading, outlineSpotShadowColor = outlineSpotShadowColor, outlineAmbientShadowColor = outlineAmbientShadowColor),
         IAttributes
 
+@TypeScript
 enum class TabIndicatorGravityEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "bottom")
     Bottom("bottom", 0),
@@ -151,6 +152,7 @@ enum class TabIndicatorGravityEnum(override val key: String, override val value:
     Stretch("stretch", 3);
 }
 
+@TypeScript
 enum class TabModeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "scrollable")
     Scrollable("scrollable", 0),
@@ -159,6 +161,7 @@ enum class TabModeEnum(override val key: String, override val value: Int) : Attr
     Fixed("fixed", 1);
 }
 
+@TypeScript
 enum class TabGravityEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "fill")
     Fill("fill", 0),

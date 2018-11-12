@@ -7,10 +7,10 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     kapt "com.google.auto.service:auto-service:1.0-rc2"
-    //implementation "com.github.dpnolte.ts-rhymer:codegen-impl:$tsRhymerVersion"
     api project(":generator-api")
-    implementation project(":codegen-impl")
-    //implementation project(":generator")
+    //implementation project(":codegen-impl")
+    api "com.github.dpnolte.ts-rhymer:annotation:$tsRhymerVersion"
+    implementation "com.github.dpnolte.ts-rhymer:codegen-impl:$tsRhymerVersion"
 }
 
 sourceSets {

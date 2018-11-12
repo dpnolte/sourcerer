@@ -31,7 +31,7 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
     // typescript annotation
     api "com.github.dpnolte.ts-rhymer:annotation:$tsRhymerVersion"
-    api project(":generator-kapt")
+    api project(":generator-api")
     // lint
     implementation "com.android.tools.lint:lint:$lintVersion"
     // colored print

@@ -27,11 +27,11 @@ import kotlin.String
 @JsonClass(generateAdapter = true)
 @TypeScript
 open class GridLayoutAttributes(
-    val orientation: OrientationEnum__? = null,
+    val orientation: OrientationEnum? = null,
     val rowCount: Int? = null,
     val columnCount: Int? = null,
     val useDefaultMargins: Boolean? = null,
-    val alignmentMode: AlignmentModeEnum_? = null,
+    val alignmentMode: AlignmentModeEnum? = null,
     val rowOrderPreserved: Boolean? = null,
     val columnOrderPreserved: Boolean? = null,
     animateLayoutChanges: Boolean? = null,
@@ -131,7 +131,8 @@ open class GridLayoutAttributes(
 ) : ViewGroupAttributes(animateLayoutChanges = animateLayoutChanges, clipChildren = clipChildren, clipToPadding = clipToPadding, animationCache = animationCache, persistentDrawingCache = persistentDrawingCache, alwaysDrawnWithCache = alwaysDrawnWithCache, addStatesFromChildren = addStatesFromChildren, touchscreenBlocksFocus = touchscreenBlocksFocus, splitMotionEvents = splitMotionEvents, layoutMode = layoutMode, transitionGroup = transitionGroup, id = id, tag = tag, scrollX = scrollX, scrollY = scrollY, background = background, paddingLeft = paddingLeft, paddingBottom = paddingBottom, paddingEnd = paddingEnd, paddingStart = paddingStart, paddingTop = paddingTop, paddingRight = paddingRight, focusable = focusable, autofillHints = autofillHints, importantForAutofill = importantForAutofill, focusableInTouchMode = focusableInTouchMode, visibility = visibility, fitsSystemWindows = fitsSystemWindows, scrollbarStyle = scrollbarStyle, isScrollContainer = isScrollContainer, fadeScrollbars = fadeScrollbars, scrollbarFadeDuration = scrollbarFadeDuration, scrollbarDefaultDelayBeforeFade = scrollbarDefaultDelayBeforeFade, scrollbarSize = scrollbarSize, nextFocusLeft = nextFocusLeft, nextFocusRight = nextFocusRight, nextFocusUp = nextFocusUp, nextFocusDown = nextFocusDown, nextFocusForward = nextFocusForward, clickable = clickable, longClickable = longClickable, contextClickable = contextClickable, saveEnabled = saveEnabled, filterTouchesWhenObscured = filterTouchesWhenObscured, drawingCacheQuality = drawingCacheQuality, keepScreenOn = keepScreenOn, minHeight = minHeight, minWidth = minWidth, soundEffectsEnabled = soundEffectsEnabled, hapticFeedbackEnabled = hapticFeedbackEnabled, contentDescription = contentDescription, accessibilityTraversalBefore = accessibilityTraversalBefore, accessibilityTraversalAfter = accessibilityTraversalAfter, overScrollMode = overScrollMode, alpha = alpha, elevation = elevation, translationX = translationX, translationY = translationY, translationZ = translationZ, transformPivotX = transformPivotX, transformPivotY = transformPivotY, rotation = rotation, rotationX = rotationX, rotationY = rotationY, scaleX = scaleX, scaleY = scaleY, verticalScrollbarPosition = verticalScrollbarPosition, layerType = layerType, layoutDirection = layoutDirection, textDirection = textDirection, textAlignment = textAlignment, importantForAccessibility = importantForAccessibility, accessibilityLiveRegion = accessibilityLiveRegion, labelFor = labelFor, transitionName = transitionName, nestedScrollingEnabled = nestedScrollingEnabled, backgroundTint = backgroundTint, backgroundTintMode = backgroundTintMode, foreground = foreground, foregroundGravity = foregroundGravity, foregroundTint = foregroundTint, foregroundTintMode = foregroundTintMode, scrollIndicators = scrollIndicators, forceHasOverlappingRendering = forceHasOverlappingRendering, tooltipText = tooltipText, keyboardNavigationCluster = keyboardNavigationCluster, nextClusterForward = nextClusterForward, focusedByDefault = focusedByDefault, defaultFocusHighlightEnabled = defaultFocusHighlightEnabled, screenReaderFocusable = screenReaderFocusable, accessibilityPaneTitle = accessibilityPaneTitle, accessibilityHeading = accessibilityHeading, outlineSpotShadowColor = outlineSpotShadowColor, outlineAmbientShadowColor = outlineAmbientShadowColor),
         IAttributes
 
-enum class OrientationEnum__(override val key: String, override val value: Int) : AttributeEnum {
+@TypeScript
+enum class OrientationEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "horizontal")
     Horizontal("horizontal", 0),
 
@@ -139,7 +140,8 @@ enum class OrientationEnum__(override val key: String, override val value: Int) 
     Vertical("vertical", 1);
 }
 
-enum class AlignmentModeEnum_(override val key: String, override val value: Int) : AttributeEnum {
+@TypeScript
+enum class AlignmentModeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "alignBounds")
     AlignBounds("alignBounds", 0),
 

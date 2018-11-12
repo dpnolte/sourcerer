@@ -37,10 +37,10 @@ import kotlin.String
 @TypeScript
 open class SwitchCompatAttributes(
     @field:ColorQualifier val thumbTint: Int? = null,
-    val thumbTintMode: ThumbTintModeEnum_? = null,
+    val thumbTintMode: ThumbTintModeEnum? = null,
     @field:ReferenceQualifier val track: Int? = null,
     @field:ColorQualifier val trackTint: Int? = null,
-    val trackTintMode: TrackTintModeEnum_? = null,
+    val trackTintMode: TrackTintModeEnum? = null,
     @field:DimensionQualifier val thumbTextPadding: Int? = null,
     @field:ReferenceQualifier val switchTextAppearance: Int? = null,
     @field:DimensionQualifier val switchMinWidth: Int? = null,
@@ -197,7 +197,8 @@ open class SwitchCompatAttributes(
 ) : CompoundButtonAttributes(text = text, hint = hint, textColor = textColor, textColorHighlight = textColorHighlight, textColorHint = textColorHint, textSize = textSize, textScaleX = textScaleX, textColorLink = textColorLink, cursorVisible = cursorVisible, maxLines = maxLines, maxHeight = maxHeight, lines = lines, height = height, minLines = minLines, maxEms = maxEms, maxWidth = maxWidth, ems = ems, width = width, minEms = minEms, gravity = gravity, enabled = enabled, includeFontPadding = includeFontPadding, shadowColor = shadowColor, shadowDx = shadowDx, shadowDy = shadowDy, shadowRadius = shadowRadius, autoLink = autoLink, linksClickable = linksClickable, freezesText = freezesText, ellipsize = ellipsize, drawableTop = drawableTop, drawableLeft = drawableLeft, drawableBottom = drawableBottom, drawableRight = drawableRight, drawablePadding = drawablePadding, drawableTint = drawableTint, drawableTintMode = drawableTintMode, lineHeight = lineHeight, firstBaselineToTopHeight = firstBaselineToTopHeight, lastBaselineToBottomHeight = lastBaselineToBottomHeight, marqueeRepeatLimit = marqueeRepeatLimit, inputType = inputType, imeOptions = imeOptions, privateImeOptions = privateImeOptions, editorExtras = editorExtras, textIsSelectable = textIsSelectable, textAllCaps = textAllCaps, elegantTextHeight = elegantTextHeight, fallbackLineSpacing = fallbackLineSpacing, letterSpacing = letterSpacing, fontFeatureSettings = fontFeatureSettings, breakStrategy = breakStrategy, hyphenationFrequency = hyphenationFrequency, autoSizeTextType = autoSizeTextType, justificationMode = justificationMode, View_clickable = View_clickable, View_longClickable = View_longClickable, checked = checked, button = button, buttonTint = buttonTint, buttonTintMode = buttonTintMode, id = id, tag = tag, scrollX = scrollX, scrollY = scrollY, background = background, paddingLeft = paddingLeft, paddingBottom = paddingBottom, paddingEnd = paddingEnd, paddingStart = paddingStart, paddingTop = paddingTop, paddingRight = paddingRight, focusable = focusable, autofillHints = autofillHints, importantForAutofill = importantForAutofill, focusableInTouchMode = focusableInTouchMode, visibility = visibility, fitsSystemWindows = fitsSystemWindows, scrollbarStyle = scrollbarStyle, isScrollContainer = isScrollContainer, fadeScrollbars = fadeScrollbars, scrollbarFadeDuration = scrollbarFadeDuration, scrollbarDefaultDelayBeforeFade = scrollbarDefaultDelayBeforeFade, scrollbarSize = scrollbarSize, nextFocusLeft = nextFocusLeft, nextFocusRight = nextFocusRight, nextFocusUp = nextFocusUp, nextFocusDown = nextFocusDown, nextFocusForward = nextFocusForward, clickable = clickable, longClickable = longClickable, contextClickable = contextClickable, saveEnabled = saveEnabled, filterTouchesWhenObscured = filterTouchesWhenObscured, drawingCacheQuality = drawingCacheQuality, keepScreenOn = keepScreenOn, minHeight = minHeight, minWidth = minWidth, soundEffectsEnabled = soundEffectsEnabled, hapticFeedbackEnabled = hapticFeedbackEnabled, contentDescription = contentDescription, accessibilityTraversalBefore = accessibilityTraversalBefore, accessibilityTraversalAfter = accessibilityTraversalAfter, overScrollMode = overScrollMode, alpha = alpha, elevation = elevation, translationX = translationX, translationY = translationY, translationZ = translationZ, transformPivotX = transformPivotX, transformPivotY = transformPivotY, rotation = rotation, rotationX = rotationX, rotationY = rotationY, scaleX = scaleX, scaleY = scaleY, verticalScrollbarPosition = verticalScrollbarPosition, layerType = layerType, layoutDirection = layoutDirection, textDirection = textDirection, textAlignment = textAlignment, importantForAccessibility = importantForAccessibility, accessibilityLiveRegion = accessibilityLiveRegion, labelFor = labelFor, transitionName = transitionName, nestedScrollingEnabled = nestedScrollingEnabled, backgroundTint = backgroundTint, backgroundTintMode = backgroundTintMode, foreground = foreground, foregroundGravity = foregroundGravity, foregroundTint = foregroundTint, foregroundTintMode = foregroundTintMode, scrollIndicators = scrollIndicators, forceHasOverlappingRendering = forceHasOverlappingRendering, tooltipText = tooltipText, keyboardNavigationCluster = keyboardNavigationCluster, nextClusterForward = nextClusterForward, focusedByDefault = focusedByDefault, defaultFocusHighlightEnabled = defaultFocusHighlightEnabled, screenReaderFocusable = screenReaderFocusable, accessibilityPaneTitle = accessibilityPaneTitle, accessibilityHeading = accessibilityHeading, outlineSpotShadowColor = outlineSpotShadowColor, outlineAmbientShadowColor = outlineAmbientShadowColor),
         IAttributes
 
-enum class ThumbTintModeEnum_(override val key: String, override val value: Int) : AttributeEnum {
+@TypeScript
+enum class ThumbTintModeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "src_over")
     SrcOver("src_over", 3),
 
@@ -217,7 +218,8 @@ enum class ThumbTintModeEnum_(override val key: String, override val value: Int)
     Add("add", 16);
 }
 
-enum class TrackTintModeEnum_(override val key: String, override val value: Int) : AttributeEnum {
+@TypeScript
+enum class TrackTintModeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "src_over")
     SrcOver("src_over", 3),
 

@@ -15,6 +15,7 @@ import kotlin.String
 @TypeScript
 open class ViewGroupLayoutParamsAttributes(@field:MultiFormatQualifier(formats = [Format.Dimension, Format.Enum], enumType = LayoutWidthEnum::class) val layout_width: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum)), @field:MultiFormatQualifier(formats = [Format.Dimension, Format.Enum], enumType = LayoutHeightEnum::class) val layout_height: MultiFormat = MultiFormat(setOf(Format.Dimension, Format.Enum))) : IAttributes
 
+@TypeScript
 enum class LayoutWidthEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "fill_parent")
     FillParent("fill_parent", -1),
@@ -26,6 +27,7 @@ enum class LayoutWidthEnum(override val key: String, override val value: Int) : 
     WrapContent("wrap_content", -2);
 }
 
+@TypeScript
 enum class LayoutHeightEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "fill_parent")
     FillParent("fill_parent", -1),

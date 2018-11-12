@@ -61,7 +61,7 @@ $extraDependencies
 
 kapt {
     arguments {
-        arg("typescript.namespace", "${TypeScriptNameProvider.getModuleName(packageName)}") // becomes: declare namespace "..."
+        arg("typescript.namespace", "${TypeScriptNameProvider.getNamespace(packageName)}") // becomes: declare namespace "..."
         arg("typescript.outputDir", "${'$'}{rootDir}/js") // where the file will be saved
         arg("typescript.filename", "${TypeScriptNameProvider.getAttributesFileName(packageName)}") // where the file will be saved
         arg("typescript.indent", "  ") // indentation (defaults to 2 spaces)

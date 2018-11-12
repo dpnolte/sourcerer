@@ -36,6 +36,7 @@ open class CoordinatorLayoutLayoutParamsAttributes(
 ) : ViewGroupMarginLayoutParamsAttributes(layout_width = layout_width, layout_height = layout_height, layout_marginLeft = layout_marginLeft, layout_marginBottom = layout_marginBottom, layout_marginRight = layout_marginRight, layout_marginTop = layout_marginTop, layout_marginStart = layout_marginStart, layout_marginEnd = layout_marginEnd),
         IAttributes
 
+@TypeScript
 enum class LayoutAnchorGravityFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "top")
     Top("top", 48),
@@ -80,6 +81,7 @@ enum class LayoutAnchorGravityFlagsEnum(override val key: String, override val v
     End("end", 8388613);
 }
 
+@TypeScript
 enum class LayoutInsetEdgeEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),
@@ -103,6 +105,7 @@ enum class LayoutInsetEdgeEnum(override val key: String, override val value: Int
     End("end", 8388613);
 }
 
+@TypeScript
 enum class LayoutDodgeInsetEdgesFlagsEnum(override val key: String, override val value: Int) : AttributeEnum {
     @Json(name = "none")
     None("none", 0),

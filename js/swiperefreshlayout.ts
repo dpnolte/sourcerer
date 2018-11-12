@@ -1,12 +1,17 @@
-/* generated @ 2018-11-10T13:56:04.791 */
-import { element } from './element';
-/// <reference path='./element.types.d.ts' />
-/// <reference path='./layoutparams.types.d.ts' />
-/// <reference path='./swiperefreshlayout.types.d.ts' />
-
+import { ElementNode, element } from './element';
+import { LayoutParamAttributes } from './layoutparams';
+import { MainTypes } from "./main";
+// types
+/* generated @ 2018-11-12T13:41:46.149 */
+export namespace SwiperefreshlayoutTypes {
+  export interface SwipeRefreshLayoutAttributes extends MainTypes.ViewGroupAttributes {
+    enabled?: boolean;
+  }
+}
+// elements
 export const SwipeRefreshLayout = (
-  attributes?: SwiperefreshlayoutTypes.SwipeRefreshLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<SwiperefreshlayoutTypes.SwipeRefreshLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: SwiperefreshlayoutTypes.SwipeRefreshLayoutAttributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<SwiperefreshlayoutTypes.SwipeRefreshLayoutAttributes, LayoutParamAttributes> => {
   return element('swipeRefreshLayout', attributes, children);
 };

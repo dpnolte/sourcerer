@@ -292,14 +292,15 @@ class SerializationServiceTest {
         val json = """
             |[
             |   { "id": "test1", "children": ["test2"], "type": "dummyElement2", "attributes":{ "dimensionOrFlags": "value1" }},
-            |   { "id": "test2", "children": ["test3"], "type": "dummyElement2", "attributes":{ "dimensionOrFlags": "12sp" }},
-            |   { "id": "test3", "children": [], "type": "dummyElement2", "attributes":{ "dimensionOrFlags": "value1|value2" }}
+            |   { "id": "test2", "children": ["test3", "test4"], "type": "dummyElement2", "attributes":{ "dimensionOrFlags": "12sp" }},
+            |   { "id": "test3", "children": [], "type": "dummyElement2", "attributes":{ "dimensionOrFlags": "value1|value2" }},
+            |   { "id": "test4", "children": [], "type": "dummyElement2", "attributes":{ "dimensionOrFlags": ["value1", "value2", "value1"] }}
             |]""".trimMargin()
         val result = serializerService.deserialize(LayoutMap::class, json)
 
         result shouldBeInstanceOf LayoutMap::class
         val map = result as LayoutMap
-        map.size shouldEqualTo 3
+        map.size shouldEqualTo 4
         map.forEachIndexed { index, element ->
             element.attributes shouldBeInstanceOf DummyMultiFormatWithFlagsElement::class
             val attrs = element.attributes as DummyMultiFormatWithFlagsElement
@@ -307,6 +308,7 @@ class SerializationServiceTest {
                 0 -> attrs.dimensionOrFlags.flags shouldEqualTo 1
                 1 -> attrs.dimensionOrFlags.dimension shouldEqualTo 24
                 2 -> attrs.dimensionOrFlags.flags shouldEqualTo (1.or(2))
+                3 -> attrs.dimensionOrFlags.flags shouldEqualTo (1.or(2))
             }
         }
     }

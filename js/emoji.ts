@@ -1,30 +1,47 @@
-/* generated @ 2018-11-10T13:56:15.876 */
-import { element } from './element';
-/// <reference path='./element.types.d.ts' />
-/// <reference path='./layoutparams.types.d.ts' />
-/// <reference path='./emoji.types.d.ts' />
-
+import { ElementNode, element } from './element';
+import { LayoutParamAttributes } from './layoutparams';
+import { MainTypes } from "./main";
+// types
+/* generated @ 2018-11-12T14:28:05.924 */
+export namespace EmojiTypes {
+  export interface EmojiButtonAttributes extends MainTypes.ButtonAttributes {
+  }
+  export interface EmojiEditTextAttributes extends MainTypes.EditTextAttributes {
+    maxEmojiCount?: number;
+  }
+  export interface EmojiExtractTextLayoutAttributes extends MainTypes.LinearLayoutAttributes {
+    emojiReplaceStrategy?: number | EmojiReplaceStrategyEnum;
+  }
+  export enum EmojiReplaceStrategyEnum {
+    all = 'all',
+    defaultStrategy = 'defaultStrategy',
+    nonExistent = 'nonExistent'
+  }
+  export interface EmojiTextViewAttributes extends MainTypes.TextViewAttributes {
+  }
+}
+// elements
 export const EmojiExtractTextLayout = (
-  attributes?: EmojiTypes.EmojiExtractTextLayoutAttributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<EmojiTypes.EmojiExtractTextLayoutAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: EmojiTypes.EmojiExtractTextLayoutAttributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<EmojiTypes.EmojiExtractTextLayoutAttributes, LayoutParamAttributes> => {
   return element('emojiExtractTextLayout', attributes, children);
 };
 export const EmojiButton = (
-  attributes?: EmojiTypes.EmojiButtonAttributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<EmojiTypes.EmojiButtonAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: EmojiTypes.EmojiButtonAttributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<EmojiTypes.EmojiButtonAttributes, LayoutParamAttributes> => {
   return element('emojiButton', attributes, children);
 };
 export const EmojiEditText = (
-  attributes?: EmojiTypes.EmojiEditTextAttributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<EmojiTypes.EmojiEditTextAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: EmojiTypes.EmojiEditTextAttributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<EmojiTypes.EmojiEditTextAttributes, LayoutParamAttributes> => {
   return element('emojiEditText', attributes, children);
 };
 export const EmojiTextView = (
-  attributes?: EmojiTypes.EmojiTextViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<EmojiTypes.EmojiTextViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: EmojiTypes.EmojiTextViewAttributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<EmojiTypes.EmojiTextViewAttributes, LayoutParamAttributes> => {
   return element('emojiTextView', attributes, children);
 };

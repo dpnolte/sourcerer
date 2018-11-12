@@ -1,24 +1,34 @@
-/* generated @ 2018-11-10T13:56:14.176 */
-import { element } from './element';
-/// <reference path='./element.types.d.ts' />
-/// <reference path='./layoutparams.types.d.ts' />
-/// <reference path='./appcompatemoji.types.d.ts' />
-
+import { ElementNode, element } from './element';
+import { LayoutParamAttributes } from './layoutparams';
+import { AppcompatTypes } from "./appcompat";
+import { MainTypes } from "./main";
+// types
+/* generated @ 2018-11-12T14:28:36.957 */
+export namespace AppcompatEmojiTypes {
+  export interface EmojiAppCompatButtonAttributes extends AppcompatTypes.AppCompatButtonAttributes {
+  }
+  export interface EmojiAppCompatEditTextAttributes extends AppcompatTypes.AppCompatEditTextAttributes {
+    maxEmojiCount?: number;
+  }
+  export interface EmojiAppCompatTextViewAttributes extends AppcompatTypes.AppCompatTextViewAttributes {
+  }
+}
+// elements
 export const EmojiAppCompatTextView = (
-  attributes?: AppcompatEmojiTypes.EmojiAppCompatTextViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<AppcompatEmojiTypes.EmojiAppCompatTextViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: AppcompatEmojiTypes.EmojiAppCompatTextViewAttributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<AppcompatEmojiTypes.EmojiAppCompatTextViewAttributes, LayoutParamAttributes> => {
   return element('emojiAppCompatTextView', attributes, children);
 };
 export const EmojiAppCompatEditText = (
-  attributes?: AppcompatEmojiTypes.EmojiAppCompatEditTextAttributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<AppcompatEmojiTypes.EmojiAppCompatEditTextAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: AppcompatEmojiTypes.EmojiAppCompatEditTextAttributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<AppcompatEmojiTypes.EmojiAppCompatEditTextAttributes, LayoutParamAttributes> => {
   return element('emojiAppCompatEditText', attributes, children);
 };
 export const EmojiAppCompatButton = (
-  attributes?: AppcompatEmojiTypes.EmojiAppCompatButtonAttributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<AppcompatEmojiTypes.EmojiAppCompatButtonAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: AppcompatEmojiTypes.EmojiAppCompatButtonAttributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<AppcompatEmojiTypes.EmojiAppCompatButtonAttributes, LayoutParamAttributes> => {
   return element('emojiAppCompatButton', attributes, children);
 };

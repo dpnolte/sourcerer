@@ -46,9 +46,13 @@ open class MaterialButtonFactory<TView : MaterialButton, TAttributes : MaterialB
                         iconPadding = it
                     }
                 }
-                attributes.iconGravity?.let {
-                    if (iconGravity != it.value) {
-                        iconGravity = it.value
+                if (attributes.iconGravity.hasInteger || attributes.iconGravity.hasFlags) {
+                    val localIconGravity = when {
+                        attributes.iconGravity.hasInteger -> attributes.iconGravity.integer
+                        else -> attributes.iconGravity.flags
+                    }
+                    if (iconGravity != localIconGravity) {
+                        iconGravity = localIconGravity
                     }
                 }
                 attributes.iconTint?.let {

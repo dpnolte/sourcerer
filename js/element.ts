@@ -1,13 +1,30 @@
-/// <reference path='./element.types.d.ts' /> 
-
+export interface ElementNode<ViewAttributes, LayoutAttributes> {
+  attributes: ViewAttributes & LayoutAttributes | {};
+  type: string;
+  children: Array<ElementNode<unknown, unknown>>;
+  build: () => LayoutMap;
+}
+export interface ElementMap {
+  [key: string]: ViewBase<unknown, unknown>
+}
+export interface LayoutMap {
+  map: ElementMap;
+  toJson: () => string;
+}
+export interface ViewBase<ViewAttributes, LayoutAttributes = {}> {
+  id: string;
+  attributes: ViewAttributes & LayoutAttributes;
+  type: string;
+  children?: Array<String>;
+}
 export const element = <ViewAttributes extends {}, LayoutAttributes extends {}> (
   type: string,
   providedAttributes?: ViewAttributes & LayoutAttributes,
-  providedChildren?: Array<ElementTypes.ElementNode<unknown, unknown>>
-): ElementTypes.ElementNode<ViewAttributes, LayoutAttributes>  => {
+  providedChildren?: Array<ElementNode<unknown, unknown>>
+): ElementNode<ViewAttributes, LayoutAttributes>  => {
   const attributes = typeof providedAttributes !== 'undefined' ? providedAttributes : {};
   const children = typeof providedChildren !== 'undefined' ? providedChildren : [];
-  const buildRoot = (): ElementTypes.LayoutMap  => {
+  const buildRoot = (): LayoutMap  => {
     const map = flatMapNodes(type, attributes, children);
     return { map, toJson: () => mapToJson(map) };
   };
@@ -22,10 +39,10 @@ export const element = <ViewAttributes extends {}, LayoutAttributes extends {}> 
 const flatMapNodes = (
   type: string,
   attributes: any,
-  childElements:  Array<ElementTypes.ElementNode<unknown, unknown>>,
-  map: ElementTypes.ElementMap = {},
+  childElements:  Array<ElementNode<unknown, unknown>>,
+  map: ElementMap = {},
   keyPrefix: string = ''
-): ElementTypes.ElementMap => {
+): ElementMap => {
   const key = keyPrefix !== '' ? `${keyPrefix}_${type}` : type;
   const children: any[] = [];
   map[key]  = {

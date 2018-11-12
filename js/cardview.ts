@@ -1,12 +1,28 @@
-/* generated @ 2018-11-10T13:55:18.175 */
-import { element } from './element';
-/// <reference path='./element.types.d.ts' />
-/// <reference path='./layoutparams.types.d.ts' />
-/// <reference path='./cardview.types.d.ts' />
-
+import { ElementNode, element } from './element';
+import { LayoutParamAttributes } from './layoutparams';
+import { MainTypes } from "./main";
+// types
+/* generated @ 2018-11-12T14:26:02.409 */
+export namespace CardviewTypes {
+  export interface CardViewAttributes extends MainTypes.FrameLayoutAttributes {
+    android_minHeight?: string;
+    android_minWidth?: string;
+    cardBackgroundColor?: string;
+    cardCornerRadius?: string;
+    cardElevation?: string;
+    cardMaxElevation?: string;
+    cardPreventCornerOverlap?: boolean;
+    cardUseCompatPadding?: boolean;
+    contentPaddingBottom?: string;
+    contentPaddingLeft?: string;
+    contentPaddingRight?: string;
+    contentPaddingTop?: string;
+  }
+}
+// elements
 export const CardView = (
-  attributes?: CardviewTypes.CardViewAttributes & LayoutParamsTypes.LayoutParamAttributes,
-  children?: Array<ElementTypes.ElementNode<unknown, LayoutParamsTypes.LayoutParamAttributes>>
-): ElementTypes.ElementNode<CardviewTypes.CardViewAttributes, LayoutParamsTypes.LayoutParamAttributes> => {
+  attributes?: CardviewTypes.CardViewAttributes & LayoutParamAttributes,
+  children?: Array<ElementNode<unknown, LayoutParamAttributes>>
+): ElementNode<CardviewTypes.CardViewAttributes, LayoutParamAttributes> => {
   return element('cardView', attributes, children);
 };

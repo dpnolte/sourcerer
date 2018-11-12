@@ -27,8 +27,16 @@ open class PagerTitleStripFactory<TView : PagerTitleStrip, TAttributes : PagerTi
         super.init(view, context, attributes)
         if (view is PagerTitleStrip) {
             view.apply {
-                attributes.gravity?.let {
-                    setGravity(it.value)
+                attributes.textSize?.let {
+                    val localTextSize = it.toFloat()
+                    setTextSize(0 /* TypedValue.COMPLEX_UNIT_PX */, localTextSize)
+                }
+                if (attributes.gravity.hasInteger || attributes.gravity.hasFlags) {
+                    val localGravity = when {
+                        attributes.gravity.hasInteger -> attributes.gravity.integer
+                        else -> attributes.gravity.flags
+                    }
+                    setGravity(localGravity)
                 }
             }
         }
