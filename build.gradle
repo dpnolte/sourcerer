@@ -41,7 +41,7 @@ allprojects {
     }
     ext {
         // defined in build script --> kotlin_version
-        minSdkVersion = 24
+        minSdkVersion = 15
         targetSdkVersion = 28
         compileSdkVersion = 28
         sdkDir = definedSdkDir
