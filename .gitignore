@@ -11,3 +11,4 @@
 .externalNativeBuild
 /js-dist
 /node_modules
+.jest
