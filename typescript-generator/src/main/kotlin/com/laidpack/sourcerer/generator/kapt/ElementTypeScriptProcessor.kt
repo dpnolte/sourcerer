@@ -118,7 +118,7 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
         }
 
         val file = File(outputDir, attributeTypesFileName)
-        AttributesFileWriter.writeElements(file, elements.joinToString("\n"))
+        AttributesFileWriter.writeElements(file, elements.joinToString("\n") + "\n")
         messager.printMessage(Diagnostic.Kind.NOTE, "TypeScript elements saved at $file")
         return true
     }
