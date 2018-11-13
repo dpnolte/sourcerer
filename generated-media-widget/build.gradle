@@ -9,7 +9,7 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
+        minSdkVersion 19
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
@@ -47,9 +47,9 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$androidX"
     implementation "com.squareup.moshi:moshi:$moshi"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi"
-    compileOnly project(":generator-api")
-    compileOnly "com.github.dpnolte.ts-rhymer:annotation:$tsRhymerVersion"
-    kapt project(":generator-kapt")
+    compileOnly "com.github.dpnolte.ts-rhymer:api:$tsRhymerVersion"
+    compileOnly project(':typescript-api')
+    kapt project(':typescript-generator')
 	implementation "androidx.media:media-widget:$androidXmediaWidget"
 	implementation project(":services")
 	implementation project(":generated")
@@ -61,5 +61,6 @@ kapt {
         arg("typescript.outputDir", "${rootDir}/js") // where the file will be saved
         arg("typescript.filename", "widgetmedia.ts") // where the file will be saved
         arg("typescript.indent", "  ") // indentation (defaults to 2 spaces)
+        arg("typescript.import_within_module", "true") // generates imports from within npm module
     }
 }

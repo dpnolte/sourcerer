@@ -28,12 +28,12 @@
             <option value="$PROJECT_DIR$/generated-viewpager" />
             <option value="$PROJECT_DIR$/generated-wear" />
             <option value="$PROJECT_DIR$/generator" />
-            <option value="$PROJECT_DIR$/generator-api" />
-            <option value="$PROJECT_DIR$/generator-kapt" />
             <option value="$PROJECT_DIR$/sample-app" />
             <option value="$PROJECT_DIR$/sample-server" />
             <option value="$PROJECT_DIR$/services" />
             <option value="$PROJECT_DIR$/stub-module" />
+            <option value="$PROJECT_DIR$/typescript-api" />
+            <option value="$PROJECT_DIR$/typescript-generator" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

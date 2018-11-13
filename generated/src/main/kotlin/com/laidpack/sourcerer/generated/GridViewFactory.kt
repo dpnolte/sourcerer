@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.os.Build
 import android.view.View
 import android.widget.GridView
 import com.laidpack.generator.api.ViewGroupElement
@@ -39,28 +40,30 @@ open class GridViewFactory<TView : GridView, TAttributes : GridViewAttributes>(i
                         numColumns = localNumColumns
                     }
                 }
-                attributes.horizontalSpacing?.let {
-                    if (horizontalSpacing != it) {
-                        horizontalSpacing = it
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.horizontalSpacing?.let {
+                        if (horizontalSpacing != it) {
+                            horizontalSpacing = it
+                        }
                     }
-                }
-                attributes.verticalSpacing?.let {
-                    if (verticalSpacing != it) {
-                        verticalSpacing = it
+                    attributes.verticalSpacing?.let {
+                        if (verticalSpacing != it) {
+                            verticalSpacing = it
+                        }
                     }
-                }
-                attributes.columnWidth?.let {
-                    if (columnWidth != it) {
-                        columnWidth = it
+                    attributes.columnWidth?.let {
+                        if (columnWidth != it) {
+                            columnWidth = it
+                        }
                     }
-                }
-                if (attributes.gravity.hasInteger || attributes.gravity.hasFlags) {
-                    val localGravity = when {
-                        attributes.gravity.hasInteger -> attributes.gravity.integer
-                        else -> attributes.gravity.flags
-                    }
-                    if (gravity != localGravity) {
-                        gravity = localGravity
+                    if (attributes.gravity.hasInteger || attributes.gravity.hasFlags) {
+                        val localGravity = when {
+                            attributes.gravity.hasInteger -> attributes.gravity.integer
+                            else -> attributes.gravity.flags
+                        }
+                        if (gravity != localGravity) {
+                            gravity = localGravity
+                        }
                     }
                 }
             }

@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.os.Build
 import android.view.View
 import android.widget.SearchView
 import com.laidpack.generator.api.ViewGroupElement
@@ -30,24 +31,26 @@ open class SearchViewFactory<TView : SearchView, TAttributes : SearchViewAttribu
                         setIconifiedByDefault(it)
                     }
                 }
-                attributes.queryHint?.let {
-                    if (queryHint != it) {
-                        queryHint = it
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.queryHint?.let {
+                        if (queryHint != it) {
+                            queryHint = it
+                        }
                     }
-                }
-                attributes.maxWidth?.let {
-                    if (maxWidth != it) {
-                        maxWidth = it
+                    attributes.maxWidth?.let {
+                        if (maxWidth != it) {
+                            maxWidth = it
+                        }
                     }
-                }
-                attributes.imeOptions?.let {
-                    if (imeOptions != it) {
-                        imeOptions = it
+                    attributes.imeOptions?.let {
+                        if (imeOptions != it) {
+                            imeOptions = it
+                        }
                     }
-                }
-                attributes.inputType?.let {
-                    if (inputType != it) {
-                        inputType = it
+                    attributes.inputType?.let {
+                        if (inputType != it) {
+                            inputType = it
+                        }
                     }
                 }
             }

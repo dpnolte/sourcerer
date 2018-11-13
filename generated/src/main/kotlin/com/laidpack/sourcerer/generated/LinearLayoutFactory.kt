@@ -2,6 +2,7 @@ package com.laidpack.sourcerer.generated
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
@@ -58,16 +59,20 @@ open class LinearLayoutFactory<TView : LinearLayout, TAttributes : LinearLayoutA
                         dividerPadding = it
                     }
                 }
-                attributes.divider?.let {
-                    val localDivider = ContextCompat.getDrawable(context, it) as Drawable
-                    if (dividerDrawable != localDivider) {
-                        dividerDrawable = localDivider
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.divider?.let {
+                        val localDivider = ContextCompat.getDrawable(context, it) as Drawable
+                        if (dividerDrawable != localDivider) {
+                            dividerDrawable = localDivider
+                        }
                     }
                 }
-                attributes.gravity?.let {
-                    val localGravity = it.value
-                    if (gravity != localGravity) {
-                        gravity = localGravity
+                if (Build.VERSION.SDK_INT >= 24) {
+                    attributes.gravity?.let {
+                        val localGravity = it.value
+                        if (gravity != localGravity) {
+                            gravity = localGravity
+                        }
                     }
                 }
             }

@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.os.Build
 import android.view.View
 import android.widget.DatePicker
 import com.laidpack.generator.api.ViewGroupElement
@@ -25,9 +26,11 @@ open class DatePickerFactory<TView : DatePicker, TAttributes : DatePickerAttribu
         super.init(view, context, attributes)
         if (view is DatePicker) {
             view.apply {
-                attributes.firstDayOfWeek?.let {
-                    if (firstDayOfWeek != it) {
-                        firstDayOfWeek = it
+                if (Build.VERSION.SDK_INT >= 21) {
+                    attributes.firstDayOfWeek?.let {
+                        if (firstDayOfWeek != it) {
+                            firstDayOfWeek = it
+                        }
                     }
                 }
             }

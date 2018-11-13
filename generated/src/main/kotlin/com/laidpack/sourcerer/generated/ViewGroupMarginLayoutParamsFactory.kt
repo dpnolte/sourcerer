@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.os.Build
 import android.view.ViewGroup
 import com.laidpack.generator.api.LayoutParamsElement
 import java.lang.Class
@@ -59,14 +60,16 @@ open class ViewGroupMarginLayoutParamsFactory<TLayoutParams : ViewGroup.MarginLa
                         topMargin = localLayoutMarginTopDimension
                     }
                 }
-                attributes.layout_marginStart?.let {
-                    if (marginStart != it) {
-                        marginStart = it
+                if (Build.VERSION.SDK_INT >= 17) {
+                    attributes.layout_marginStart?.let {
+                        if (marginStart != it) {
+                            marginStart = it
+                        }
                     }
-                }
-                attributes.layout_marginEnd?.let {
-                    if (marginEnd != it) {
-                        marginEnd = it
+                    attributes.layout_marginEnd?.let {
+                        if (marginEnd != it) {
+                            marginEnd = it
+                        }
                     }
                 }
             }

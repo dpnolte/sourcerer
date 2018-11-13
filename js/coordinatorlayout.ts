@@ -2,7 +2,7 @@ import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from "./main";
 // types
-/* generated @ 2018-11-12T14:26:57.620 */
+/* generated @ 2018-11-13T11:39:21.558 */
 export namespace CoordinatorlayoutTypes {
   export interface CoordinatorLayoutAttributes extends MainTypes.ViewGroupAttributes {
   }

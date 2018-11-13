@@ -206,195 +206,209 @@ open class ViewFactory<TView : View, TAttributes : ViewAttributes>(instanceType:
                     setLayerType(it.value, null)
                 }
             }
-            if (attributes.background.hasColor || attributes.background.hasReference) {
-                val localBackground = when {
-                    attributes.background.hasColor -> ColorDrawable(attributes.background.color)
-                    else -> ContextCompat.getDrawable(context, attributes.background.reference) as Drawable
+            if (Build.VERSION.SDK_INT >= 16) {
+                if (attributes.background.hasColor || attributes.background.hasReference) {
+                    val localBackground = when {
+                        attributes.background.hasColor -> ColorDrawable(attributes.background.color)
+                        else -> ContextCompat.getDrawable(context, attributes.background.reference) as Drawable
+                    }
+                    if (background != localBackground) {
+                        background = localBackground
+                    }
                 }
-                if (background != localBackground) {
-                    background = localBackground
+                attributes.fitsSystemWindows?.let {
+                    if (fitsSystemWindows != it) {
+                        fitsSystemWindows = it
+                    }
                 }
-            }
-            attributes.fitsSystemWindows?.let {
-                if (fitsSystemWindows != it) {
-                    fitsSystemWindows = it
+                attributes.isScrollContainer?.let {
+                    if (isScrollContainer != it) {
+                        isScrollContainer = it
+                    }
                 }
-            }
-            attributes.isScrollContainer?.let {
-                if (isScrollContainer != it) {
-                    isScrollContainer = it
+                attributes.scrollbarFadeDuration?.let {
+                    if (scrollBarFadeDuration != it) {
+                        scrollBarFadeDuration = it
+                    }
                 }
-            }
-            attributes.scrollbarFadeDuration?.let {
-                if (scrollBarFadeDuration != it) {
-                    scrollBarFadeDuration = it
+                attributes.scrollbarDefaultDelayBeforeFade?.let {
+                    if (scrollBarDefaultDelayBeforeFade != it) {
+                        scrollBarDefaultDelayBeforeFade = it
+                    }
                 }
-            }
-            attributes.scrollbarDefaultDelayBeforeFade?.let {
-                if (scrollBarDefaultDelayBeforeFade != it) {
-                    scrollBarDefaultDelayBeforeFade = it
+                attributes.scrollbarSize?.let {
+                    if (scrollBarSize != it) {
+                        scrollBarSize = it
+                    }
                 }
-            }
-            attributes.scrollbarSize?.let {
-                if (scrollBarSize != it) {
-                    scrollBarSize = it
+                attributes.minHeight?.let {
+                    if (minimumHeight != it) {
+                        minimumHeight = it
+                    }
                 }
-            }
-            attributes.minHeight?.let {
-                if (minimumHeight != it) {
-                    minimumHeight = it
+                attributes.minWidth?.let {
+                    if (minimumWidth != it) {
+                        minimumWidth = it
+                    }
                 }
-            }
-            attributes.minWidth?.let {
-                if (minimumWidth != it) {
-                    minimumWidth = it
-                }
-            }
-            if (attributes.importantForAccessibility.hasInteger || attributes.importantForAccessibility.hasEnum) {
-                val localImportantForAccessibility = when {
-                    attributes.importantForAccessibility.hasInteger -> attributes.importantForAccessibility.integer
-                    else -> attributes.importantForAccessibility.enum
-                }
-                if (importantForAccessibility != localImportantForAccessibility) {
-                    importantForAccessibility = localImportantForAccessibility
-                }
-            }
-            if (attributes.paddingLeft != null || attributes.paddingBottom != null || attributes.paddingEnd != null || attributes.paddingStart != null || attributes.paddingTop != null || attributes.paddingRight != null) {
-                val localPaddingBottomDimension = attributes.paddingBottom ?: bottom
-                val localPaddingLeftDimension = attributes.paddingLeft ?: left
-                val localPaddingRightDimension = attributes.paddingRight ?: right
-                val localPaddingTopDimension = attributes.paddingTop ?: top
-                if (bottom != localPaddingBottomDimension || left != localPaddingLeftDimension || right != localPaddingRightDimension || top != localPaddingTopDimension) {
-                    setPadding(localPaddingLeftDimension, localPaddingTopDimension, localPaddingRightDimension, localPaddingBottomDimension)
-                }
-                val localPaddingEndDimension = attributes.paddingEnd ?: paddingEnd
-                val localPaddingStartDimension = attributes.paddingStart ?: paddingStart
-                if (bottom != localPaddingBottomDimension || paddingEnd != localPaddingEndDimension || paddingStart != localPaddingStartDimension || top != localPaddingTopDimension) {
-                    setPaddingRelative(localPaddingStartDimension, localPaddingTopDimension, localPaddingEndDimension, localPaddingBottomDimension)
+                if (attributes.importantForAccessibility.hasInteger || attributes.importantForAccessibility.hasEnum) {
+                    val localImportantForAccessibility = when {
+                        attributes.importantForAccessibility.hasInteger -> attributes.importantForAccessibility.integer
+                        else -> attributes.importantForAccessibility.enum
+                    }
+                    if (importantForAccessibility != localImportantForAccessibility) {
+                        importantForAccessibility = localImportantForAccessibility
+                    }
                 }
             }
-            attributes.layoutDirection?.let {
-                if (layoutDirection != it.value) {
-                    layoutDirection = it.value
+            if (Build.VERSION.SDK_INT >= 17) {
+                if (attributes.paddingLeft != null || attributes.paddingBottom != null || attributes.paddingEnd != null || attributes.paddingStart != null || attributes.paddingTop != null || attributes.paddingRight != null) {
+                    val localPaddingBottomDimension = attributes.paddingBottom ?: bottom
+                    val localPaddingLeftDimension = attributes.paddingLeft ?: left
+                    val localPaddingRightDimension = attributes.paddingRight ?: right
+                    val localPaddingTopDimension = attributes.paddingTop ?: top
+                    if (bottom != localPaddingBottomDimension || left != localPaddingLeftDimension || right != localPaddingRightDimension || top != localPaddingTopDimension) {
+                        setPadding(localPaddingLeftDimension, localPaddingTopDimension, localPaddingRightDimension, localPaddingBottomDimension)
+                    }
+                    val localPaddingEndDimension = attributes.paddingEnd ?: paddingEnd
+                    val localPaddingStartDimension = attributes.paddingStart ?: paddingStart
+                    if (bottom != localPaddingBottomDimension || paddingEnd != localPaddingEndDimension || paddingStart != localPaddingStartDimension || top != localPaddingTopDimension) {
+                        setPaddingRelative(localPaddingStartDimension, localPaddingTopDimension, localPaddingEndDimension, localPaddingBottomDimension)
+                    }
+                }
+                attributes.layoutDirection?.let {
+                    if (layoutDirection != it.value) {
+                        layoutDirection = it.value
+                    }
+                }
+                if (attributes.textDirection.hasInteger || attributes.textDirection.hasEnum) {
+                    val localTextDirection = when {
+                        attributes.textDirection.hasInteger -> attributes.textDirection.integer
+                        else -> attributes.textDirection.enum
+                    }
+                    if (textDirection != localTextDirection) {
+                        textDirection = localTextDirection
+                    }
+                }
+                if (attributes.textAlignment.hasInteger || attributes.textAlignment.hasEnum) {
+                    val localTextAlignment = when {
+                        attributes.textAlignment.hasInteger -> attributes.textAlignment.integer
+                        else -> attributes.textAlignment.enum
+                    }
+                    if (textAlignment != localTextAlignment) {
+                        textAlignment = localTextAlignment
+                    }
+                }
+                attributes.labelFor?.let {
+                    if (labelFor != it) {
+                        labelFor = it
+                    }
                 }
             }
-            if (attributes.textDirection.hasInteger || attributes.textDirection.hasEnum) {
-                val localTextDirection = when {
-                    attributes.textDirection.hasInteger -> attributes.textDirection.integer
-                    else -> attributes.textDirection.enum
-                }
-                if (textDirection != localTextDirection) {
-                    textDirection = localTextDirection
-                }
-            }
-            if (attributes.textAlignment.hasInteger || attributes.textAlignment.hasEnum) {
-                val localTextAlignment = when {
-                    attributes.textAlignment.hasInteger -> attributes.textAlignment.integer
-                    else -> attributes.textAlignment.enum
-                }
-                if (textAlignment != localTextAlignment) {
-                    textAlignment = localTextAlignment
+            if (Build.VERSION.SDK_INT >= 19) {
+                if (attributes.accessibilityLiveRegion.hasInteger || attributes.accessibilityLiveRegion.hasEnum) {
+                    val localAccessibilityLiveRegion = when {
+                        attributes.accessibilityLiveRegion.hasInteger -> attributes.accessibilityLiveRegion.integer
+                        else -> attributes.accessibilityLiveRegion.enum
+                    }
+                    if (accessibilityLiveRegion != localAccessibilityLiveRegion) {
+                        accessibilityLiveRegion = localAccessibilityLiveRegion
+                    }
                 }
             }
-            attributes.labelFor?.let {
-                if (labelFor != it) {
-                    labelFor = it
+            if (Build.VERSION.SDK_INT >= 21) {
+                attributes.elevation?.let {
+                    val localElevation = it.toFloat()
+                    if (elevation != localElevation) {
+                        elevation = localElevation
+                    }
+                }
+                attributes.translationZ?.let {
+                    val localTranslationZ = it.toFloat()
+                    if (translationZ != localTranslationZ) {
+                        translationZ = localTranslationZ
+                    }
+                }
+                attributes.transitionName?.let {
+                    if (transitionName != it) {
+                        transitionName = it
+                    }
+                }
+                attributes.nestedScrollingEnabled?.let {
+                    if (isEnabled != it) {
+                        isNestedScrollingEnabled = it
+                    }
+                }
+                attributes.backgroundTint?.let {
+                    val localBackgroundTint = ColorStateList.valueOf(it)
+                    if (backgroundTintList != localBackgroundTint) {
+                        backgroundTintList = localBackgroundTint
+                    }
+                }
+                attributes.backgroundTintMode?.let {
+                    val localBackgroundTintMode = it.value.toPorterDuffMode()
+                    if (backgroundTintMode != localBackgroundTintMode) {
+                        backgroundTintMode = localBackgroundTintMode
+                    }
                 }
             }
-            if (attributes.accessibilityLiveRegion.hasInteger || attributes.accessibilityLiveRegion.hasEnum) {
-                val localAccessibilityLiveRegion = when {
-                    attributes.accessibilityLiveRegion.hasInteger -> attributes.accessibilityLiveRegion.integer
-                    else -> attributes.accessibilityLiveRegion.enum
+            if (Build.VERSION.SDK_INT >= 22) {
+                attributes.accessibilityTraversalBefore?.let {
+                    if (accessibilityTraversalBefore != it) {
+                        accessibilityTraversalBefore = it
+                    }
                 }
-                if (accessibilityLiveRegion != localAccessibilityLiveRegion) {
-                    accessibilityLiveRegion = localAccessibilityLiveRegion
-                }
-            }
-            attributes.elevation?.let {
-                val localElevation = it.toFloat()
-                if (elevation != localElevation) {
-                    elevation = localElevation
+                attributes.accessibilityTraversalAfter?.let {
+                    if (accessibilityTraversalAfter != it) {
+                        accessibilityTraversalAfter = it
+                    }
                 }
             }
-            attributes.translationZ?.let {
-                val localTranslationZ = it.toFloat()
-                if (translationZ != localTranslationZ) {
-                    translationZ = localTranslationZ
+            if (Build.VERSION.SDK_INT >= 23) {
+                attributes.contextClickable?.let {
+                    if (isContextClickable != it) {
+                        isContextClickable = it
+                    }
+                }
+                if (attributes.foreground.hasColor || attributes.foreground.hasReference) {
+                    val localForeground = when {
+                        attributes.foreground.hasColor -> ColorDrawable(attributes.foreground.color)
+                        else -> ContextCompat.getDrawable(context, attributes.foreground.reference) as Drawable
+                    }
+                    if (foreground != localForeground) {
+                        foreground = localForeground
+                    }
+                }
+                attributes.foregroundGravity?.let {
+                    val localForegroundGravity = it.value
+                    if (foregroundGravity != localForegroundGravity) {
+                        foregroundGravity = localForegroundGravity
+                    }
+                }
+                attributes.foregroundTint?.let {
+                    val localForegroundTint = ColorStateList.valueOf(it)
+                    if (foregroundTintList != localForegroundTint) {
+                        foregroundTintList = localForegroundTint
+                    }
+                }
+                attributes.foregroundTintMode?.let {
+                    val localForegroundTintMode = it.value.toPorterDuffMode()
+                    if (foregroundTintMode != localForegroundTintMode) {
+                        foregroundTintMode = localForegroundTintMode
+                    }
+                }
+                attributes.scrollIndicators?.let {
+                    val localScrollIndicators = it.value
+                    if (scrollIndicators != localScrollIndicators) {
+                        scrollIndicators = localScrollIndicators
+                    }
                 }
             }
-            attributes.transitionName?.let {
-                if (transitionName != it) {
-                    transitionName = it
-                }
-            }
-            attributes.nestedScrollingEnabled?.let {
-                if (isEnabled != it) {
-                    isNestedScrollingEnabled = it
-                }
-            }
-            attributes.backgroundTint?.let {
-                val localBackgroundTint = ColorStateList.valueOf(it)
-                if (backgroundTintList != localBackgroundTint) {
-                    backgroundTintList = localBackgroundTint
-                }
-            }
-            attributes.backgroundTintMode?.let {
-                val localBackgroundTintMode = it.value.toPorterDuffMode()
-                if (backgroundTintMode != localBackgroundTintMode) {
-                    backgroundTintMode = localBackgroundTintMode
-                }
-            }
-            attributes.accessibilityTraversalBefore?.let {
-                if (accessibilityTraversalBefore != it) {
-                    accessibilityTraversalBefore = it
-                }
-            }
-            attributes.accessibilityTraversalAfter?.let {
-                if (accessibilityTraversalAfter != it) {
-                    accessibilityTraversalAfter = it
-                }
-            }
-            attributes.contextClickable?.let {
-                if (isContextClickable != it) {
-                    isContextClickable = it
-                }
-            }
-            if (attributes.foreground.hasColor || attributes.foreground.hasReference) {
-                val localForeground = when {
-                    attributes.foreground.hasColor -> ColorDrawable(attributes.foreground.color)
-                    else -> ContextCompat.getDrawable(context, attributes.foreground.reference) as Drawable
-                }
-                if (foreground != localForeground) {
-                    foreground = localForeground
-                }
-            }
-            attributes.foregroundGravity?.let {
-                val localForegroundGravity = it.value
-                if (foregroundGravity != localForegroundGravity) {
-                    foregroundGravity = localForegroundGravity
-                }
-            }
-            attributes.foregroundTint?.let {
-                val localForegroundTint = ColorStateList.valueOf(it)
-                if (foregroundTintList != localForegroundTint) {
-                    foregroundTintList = localForegroundTint
-                }
-            }
-            attributes.foregroundTintMode?.let {
-                val localForegroundTintMode = it.value.toPorterDuffMode()
-                if (foregroundTintMode != localForegroundTintMode) {
-                    foregroundTintMode = localForegroundTintMode
-                }
-            }
-            attributes.scrollIndicators?.let {
-                val localScrollIndicators = it.value
-                if (scrollIndicators != localScrollIndicators) {
-                    scrollIndicators = localScrollIndicators
-                }
-            }
-            attributes.forceHasOverlappingRendering?.let {
-                if (hasOverlappingRendering != it) {
-                    forceHasOverlappingRendering(it)
+            if (Build.VERSION.SDK_INT >= 24) {
+                attributes.forceHasOverlappingRendering?.let {
+                    if (hasOverlappingRendering != it) {
+                        forceHasOverlappingRendering(it)
+                    }
                 }
             }
             if (Build.VERSION.SDK_INT >= 26) {

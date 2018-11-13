@@ -3,7 +3,7 @@ import { LayoutParamAttributes } from './layoutparams';
 import { RecyclerviewTypes } from "./recyclerview";
 import { MainTypes } from "./main";
 // types
-/* generated @ 2018-11-12T15:41:45.371 */
+/* generated @ 2018-11-13T11:38:28.533 */
 export namespace WearTypes {
   export interface BoxInsetLayoutAttributes extends MainTypes.ViewGroupAttributes {
   }

@@ -3,7 +3,7 @@ import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from "./main";
 import { CardviewTypes } from "./cardview";
 // types
-/* generated @ 2018-11-12T14:26:06.712 */
+/* generated @ 2018-11-13T11:42:35.465 */
 export namespace CarTypes {
   export interface ActionBarAttributes extends MainTypes.RelativeLayoutAttributes {
   }

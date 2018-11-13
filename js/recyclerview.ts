@@ -2,7 +2,7 @@ import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from "./main";
 // types
-/* generated @ 2018-11-12T14:29:31.524 */
+/* generated @ 2018-11-13T11:38:20.232 */
 export namespace RecyclerviewTypes {
   export interface GridLayoutManagerLayoutParamsAttributes extends RecyclerViewLayoutParamsAttributes {
   }

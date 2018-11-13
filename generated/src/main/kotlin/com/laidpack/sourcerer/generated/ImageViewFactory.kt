@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
@@ -55,41 +56,45 @@ open class ImageViewFactory<TView : ImageView, TAttributes : ImageViewAttributes
                         baseline = it
                     }
                 }
-                attributes.adjustViewBounds?.let {
-                    if (adjustViewBounds != it) {
-                        adjustViewBounds = it
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.adjustViewBounds?.let {
+                        if (adjustViewBounds != it) {
+                            adjustViewBounds = it
+                        }
+                    }
+                    attributes.maxWidth?.let {
+                        if (maxWidth != it) {
+                            maxWidth = it
+                        }
+                    }
+                    attributes.maxHeight?.let {
+                        if (maxHeight != it) {
+                            maxHeight = it
+                        }
+                    }
+                    attributes.cropToPadding?.let {
+                        if (cropToPadding != it) {
+                            cropToPadding = it
+                        }
+                    }
+                    attributes.drawableAlpha?.let {
+                        if (imageAlpha != it) {
+                            imageAlpha = it
+                        }
                     }
                 }
-                attributes.maxWidth?.let {
-                    if (maxWidth != it) {
-                        maxWidth = it
+                if (Build.VERSION.SDK_INT >= 21) {
+                    attributes.tint?.let {
+                        val localTint = ColorStateList.valueOf(it)
+                        if (imageTintList != localTint) {
+                            imageTintList = localTint
+                        }
                     }
-                }
-                attributes.maxHeight?.let {
-                    if (maxHeight != it) {
-                        maxHeight = it
-                    }
-                }
-                attributes.cropToPadding?.let {
-                    if (cropToPadding != it) {
-                        cropToPadding = it
-                    }
-                }
-                attributes.drawableAlpha?.let {
-                    if (imageAlpha != it) {
-                        imageAlpha = it
-                    }
-                }
-                attributes.tint?.let {
-                    val localTint = ColorStateList.valueOf(it)
-                    if (imageTintList != localTint) {
-                        imageTintList = localTint
-                    }
-                }
-                attributes.tintMode?.let {
-                    val localTintMode = it.toPorterDuffMode()
-                    if (imageTintMode != localTintMode) {
-                        imageTintMode = localTintMode
+                    attributes.tintMode?.let {
+                        val localTintMode = it.toPorterDuffMode()
+                        if (imageTintMode != localTintMode) {
+                            imageTintMode = localTintMode
+                        }
                     }
                 }
             }

@@ -3,7 +3,7 @@ import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from "./main";
 import { RecyclerviewTypes } from "./recyclerview";
 // types
-/* generated @ 2018-11-12T14:29:35.966 */
+/* generated @ 2018-11-13T11:41:27.775 */
 export namespace LeanbackTypes {
   export interface BaseCardViewAttributes extends MainTypes.FrameLayoutAttributes {
     lbcardBackground?: number;

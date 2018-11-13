@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.os.Build
 import android.view.View
 import android.widget.RelativeLayout
 import com.laidpack.generator.api.ViewGroupElement
@@ -28,10 +29,12 @@ open class RelativeLayoutFactory<TView : RelativeLayout, TAttributes : RelativeL
                 attributes.ignoreGravity?.let {
                     setIgnoreGravity(it)
                 }
-                attributes.gravity?.let {
-                    val localGravity = it.value
-                    if (gravity != localGravity) {
-                        gravity = localGravity
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.gravity?.let {
+                        val localGravity = it.value
+                        if (gravity != localGravity) {
+                            gravity = localGravity
+                        }
                     }
                 }
             }

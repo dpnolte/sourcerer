@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.os.Build
 import android.view.View
 import android.widget.ViewAnimator
 import com.laidpack.generator.api.ViewGroupElement
@@ -36,9 +37,11 @@ open class ViewAnimatorFactory<TView : ViewAnimator, TAttributes : ViewAnimatorA
                         measureAllChildren = it
                     }
                 }
-                attributes.animateFirstView?.let {
-                    if (animateFirstView != it) {
-                        animateFirstView = it
+                if (Build.VERSION.SDK_INT >= 17) {
+                    attributes.animateFirstView?.let {
+                        if (animateFirstView != it) {
+                            animateFirstView = it
+                        }
                     }
                 }
             }

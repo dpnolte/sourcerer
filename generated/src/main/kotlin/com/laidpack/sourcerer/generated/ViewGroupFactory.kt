@@ -2,6 +2,7 @@ package com.laidpack.sourcerer.generated
 
 import android.animation.LayoutTransition
 import android.content.Context
+import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import com.laidpack.generator.api.ViewGroupElement
@@ -56,29 +57,33 @@ open class ViewGroupFactory<TView : ViewGroup, TAttributes : ViewGroupAttributes
                         isMotionEventSplittingEnabled = it
                     }
                 }
-                attributes.clipChildren?.let {
-                    if (clipChildren != it) {
-                        clipChildren = it
+                if (Build.VERSION.SDK_INT >= 18) {
+                    attributes.clipChildren?.let {
+                        if (clipChildren != it) {
+                            clipChildren = it
+                        }
+                    }
+                    attributes.layoutMode?.let {
+                        if (layoutMode != it.value) {
+                            layoutMode = it.value
+                        }
                     }
                 }
-                attributes.layoutMode?.let {
-                    if (layoutMode != it.value) {
-                        layoutMode = it.value
+                if (Build.VERSION.SDK_INT >= 21) {
+                    attributes.clipToPadding?.let {
+                        if (clipToPadding != it) {
+                            clipToPadding = it
+                        }
                     }
-                }
-                attributes.clipToPadding?.let {
-                    if (clipToPadding != it) {
-                        clipToPadding = it
+                    attributes.touchscreenBlocksFocus?.let {
+                        if (touchscreenBlocksFocus != it) {
+                            touchscreenBlocksFocus = it
+                        }
                     }
-                }
-                attributes.touchscreenBlocksFocus?.let {
-                    if (touchscreenBlocksFocus != it) {
-                        touchscreenBlocksFocus = it
-                    }
-                }
-                attributes.transitionGroup?.let {
-                    if (isTransitionGroup != it) {
-                        isTransitionGroup = it
+                    attributes.transitionGroup?.let {
+                        if (isTransitionGroup != it) {
+                            isTransitionGroup = it
+                        }
                     }
                 }
             }

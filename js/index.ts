@@ -18,3 +18,4 @@ export * from "./coordinatorlayout";
 export * from "./appcompat";
 export * from "./main";
 export * from "./element";
+export * from "./layoutparams";

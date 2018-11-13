@@ -21,6 +21,7 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
     private lateinit var outputDir: String
     private lateinit var indent: String
     private lateinit var namespace: String
+    private var importWithinModule = false
 
     override fun getSupportedAnnotationTypes() = setOf(viewAnnotation.canonicalName, viewGroupAnnotation.canonicalName)
 
@@ -30,7 +31,8 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
             BaseTypeScriptProcessor.OPTION_OUTPUTDIR,
             BaseTypeScriptProcessor.OPTION_FILENAME,
             BaseTypeScriptProcessor.OPTION_MODULE,
-            BaseTypeScriptProcessor.OPTION_INDENT
+            BaseTypeScriptProcessor.OPTION_INDENT,
+            BaseTypeScriptProcessor.OPTION_IMPORT_WITHIN_MODULE
     )
 
     override fun init(processingEnv: ProcessingEnvironment) {
@@ -43,6 +45,8 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
                 ?: throw IllegalStateException("Missing required kapt argument 'namespace'. Argument key: ${BaseTypeScriptProcessor.OPTION_NAMESPACE}")
         indent = processingEnv.options[BaseTypeScriptProcessor.OPTION_INDENT]
                 ?: "  "
+        importWithinModule = processingEnv.options[BaseTypeScriptProcessor.OPTION_IMPORT_WITHIN_MODULE]?.toBoolean()
+                ?: false
     }
 
     override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
@@ -123,58 +127,62 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
             attributeTypes: List<String>,
             attributeFiles: Set<String>
     ): Boolean {
-        val path = Paths.get(outputDir).resolve(TypeScriptNameProvider.layoutParamsFileName)
-        if (!Files.exists(path)) {
-            messager.printMessage(Diagnostic.Kind.ERROR, "Path '$path' doesn't exist")
-            return false
-        }
+        if (importWithinModule) {
+            val path = Paths.get(outputDir).resolve(TypeScriptNameProvider.layoutParamsFileName)
+            if (!Files.exists(path)) {
+                messager.printMessage(Diagnostic.Kind.ERROR, "Path '$path' doesn't exist")
+                return false
+            }
 
-        val file = path.toFile()
-        var contents = file.readText()
-        for(attributeFile in attributeFiles) {
-            val fileNameWithoutExtension = attributeFile
-                    .replace(TypeScriptNameProvider.fileTypeScriptExtension, "")
-            val importStatement = "import { $namespace } from \"./$fileNameWithoutExtension\";\n"
-            //val referencePathStatement = "/// <reference path='./$attributeFile' />\n"
-            if (!contents.contains(importStatement)) {
-                contents = importStatement + contents
+            val file = path.toFile()
+            var contents = file.readText()
+            for (attributeFile in attributeFiles) {
+                val fileNameWithoutExtension = attributeFile
+                        .replace(TypeScriptNameProvider.fileTypeScriptExtension, "")
+                val importStatement = "import { $namespace } from \"./$fileNameWithoutExtension\";\n"
+                //val referencePathStatement = "/// <reference path='./$attributeFile' />\n"
+                if (!contents.contains(importStatement)) {
+                    contents = importStatement + contents
+                }
             }
-        }
-        val match = layoutAttributesTypeRegex.find(contents)
-        if (match == null) {
-            messager.printMessage(Diagnostic.Kind.NOTE, "$outputDir${TypeScriptNameProvider.layoutParamsFileName} does not contain type LayoutParamAttributes")
-            return false
-        }
-        var types = match.groupValues[1]
-        for (attributeType in attributeTypes) {
-            if (!types.contains(attributeType)) {
-                types += "\n${indent+indent}| $attributeType"
+            val match = layoutAttributesTypeRegex.find(contents)
+            if (match == null) {
+                messager.printMessage(Diagnostic.Kind.NOTE, "$outputDir${TypeScriptNameProvider.layoutParamsFileName} does not contain type LayoutParamAttributes")
+                return false
             }
+            var types = match.groupValues[1]
+            for (attributeType in attributeTypes) {
+                if (!types.contains(attributeType)) {
+                    types += "\n${indent + indent}| $attributeType"
+                }
+            }
+            contents = layoutAttributesTypeRegex.replace(
+                    contents,
+                    "\nexport type LayoutParamAttributes = $types;\n"
+            )
+            file.writeText(contents)
         }
-        contents = layoutAttributesTypeRegex.replace(
-                contents,
-                "\nexport type LayoutParamAttributes = $types;\n"
-        )
-        file.writeText(contents)
         return true
     }
 
     private fun extendExportedElementTypeInIndexFile(): Boolean {
-        val path = Paths.get(outputDir).resolve(TypeScriptNameProvider.indexFileName)
-        if (!Files.exists(path)) {
-            messager.printMessage(Diagnostic.Kind.ERROR, "Path '$path' doesn't exist")
-            return false
-        }
+        if (importWithinModule) {
+            val path = Paths.get(outputDir).resolve(TypeScriptNameProvider.indexFileName)
+            if (!Files.exists(path)) {
+                messager.printMessage(Diagnostic.Kind.ERROR, "Path '$path' doesn't exist")
+                return false
+            }
 
-        val file = path.toFile()
-        var contents = file.readText()
-        val fileNameWithoutExtension = attributeTypesFileName
-                .replace(TypeScriptNameProvider.fileTypeScriptExtension, "")
-        val exportStatement = "export * from \"./$fileNameWithoutExtension\";\n"
-        if (!contents.contains(exportStatement)) {
-            contents = exportStatement + contents
+            val file = path.toFile()
+            var contents = file.readText()
+            val fileNameWithoutExtension = attributeTypesFileName
+                    .replace(TypeScriptNameProvider.fileTypeScriptExtension, "")
+            val exportStatement = "export * from \"./$fileNameWithoutExtension\";\n"
+            if (!contents.contains(exportStatement)) {
+                contents = exportStatement + contents
+            }
+            file.writeText(contents)
         }
-        file.writeText(contents)
         return true
     }
 

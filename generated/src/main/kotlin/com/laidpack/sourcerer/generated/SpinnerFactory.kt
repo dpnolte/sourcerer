@@ -2,6 +2,7 @@ package com.laidpack.sourcerer.generated
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.View
 import android.widget.Spinner
 import androidx.core.content.ContextCompat
@@ -27,21 +28,23 @@ open class SpinnerFactory<TView : Spinner, TAttributes : SpinnerAttributes>(inst
         super.init(view, context, attributes)
         if (view is Spinner) {
             view.apply {
-                attributes.popupBackground?.let {
-                    val localPopupBackground = ContextCompat.getDrawable(context, it) as Drawable
-                    if (background != localPopupBackground) {
-                        setPopupBackgroundDrawable(localPopupBackground)
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.popupBackground?.let {
+                        val localPopupBackground = ContextCompat.getDrawable(context, it) as Drawable
+                        if (background != localPopupBackground) {
+                            setPopupBackgroundDrawable(localPopupBackground)
+                        }
                     }
-                }
-                attributes.dropDownWidth?.let {
-                    if (dropDownWidth != it) {
-                        dropDownWidth = it
+                    attributes.dropDownWidth?.let {
+                        if (dropDownWidth != it) {
+                            dropDownWidth = it
+                        }
                     }
-                }
-                attributes.gravity?.let {
-                    val localGravity = it.value
-                    if (gravity != localGravity) {
-                        gravity = localGravity
+                    attributes.gravity?.let {
+                        val localGravity = it.value
+                        if (gravity != localGravity) {
+                            gravity = localGravity
+                        }
                     }
                 }
             }

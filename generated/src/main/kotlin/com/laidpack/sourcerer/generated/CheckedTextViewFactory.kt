@@ -3,6 +3,7 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.View
 import android.widget.CheckedTextView
 import androidx.core.content.ContextCompat
@@ -33,22 +34,26 @@ open class CheckedTextViewFactory<TView : CheckedTextView, TAttributes : Checked
                         isChecked = it
                     }
                 }
-                attributes.checkMark?.let {
-                    val localCheckMark = ContextCompat.getDrawable(context, it) as Drawable
-                    if (checkMarkDrawable != localCheckMark) {
-                        setCheckMarkDrawable(localCheckMark)
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.checkMark?.let {
+                        val localCheckMark = ContextCompat.getDrawable(context, it) as Drawable
+                        if (checkMarkDrawable != localCheckMark) {
+                            setCheckMarkDrawable(localCheckMark)
+                        }
                     }
                 }
-                attributes.checkMarkTint?.let {
-                    val localCheckMarkTint = ColorStateList.valueOf(it)
-                    if (checkMarkTintList != localCheckMarkTint) {
-                        checkMarkTintList = localCheckMarkTint
+                if (Build.VERSION.SDK_INT >= 21) {
+                    attributes.checkMarkTint?.let {
+                        val localCheckMarkTint = ColorStateList.valueOf(it)
+                        if (checkMarkTintList != localCheckMarkTint) {
+                            checkMarkTintList = localCheckMarkTint
+                        }
                     }
-                }
-                attributes.checkMarkTintMode?.let {
-                    val localCheckMarkTintMode = it.value.toPorterDuffMode()
-                    if (checkMarkTintMode != localCheckMarkTintMode) {
-                        checkMarkTintMode = localCheckMarkTintMode
+                    attributes.checkMarkTintMode?.let {
+                        val localCheckMarkTintMode = it.value.toPorterDuffMode()
+                        if (checkMarkTintMode != localCheckMarkTintMode) {
+                            checkMarkTintMode = localCheckMarkTintMode
+                        }
                     }
                 }
             }

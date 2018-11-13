@@ -178,114 +178,120 @@ open class TextViewFactory<TView : TextView, TAttributes : TextViewAttributes>(i
                 attributes.textIsSelectable?.let {
                     setTextIsSelectable(it)
                 }
-                attributes.textColorHighlight?.let {
-                    if (highlightColor != it) {
-                        highlightColor = it
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.textColorHighlight?.let {
+                        if (highlightColor != it) {
+                            highlightColor = it
+                        }
+                    }
+                    attributes.cursorVisible?.let {
+                        if (isCursorVisible != it) {
+                            isCursorVisible = it
+                        }
+                    }
+                    attributes.maxLines?.let {
+                        if (maxLines != it) {
+                            maxLines = it
+                        }
+                    }
+                    attributes.maxHeight?.let {
+                        if (maxHeight != it) {
+                            maxHeight = it
+                        }
+                    }
+                    attributes.minLines?.let {
+                        if (minLines != it) {
+                            minLines = it
+                        }
+                    }
+                    attributes.minHeight?.let {
+                        if (minHeight != it) {
+                            minHeight = it
+                        }
+                    }
+                    attributes.maxEms?.let {
+                        if (maxEms != it) {
+                            maxEms = it
+                        }
+                    }
+                    attributes.maxWidth?.let {
+                        if (maxWidth != it) {
+                            maxWidth = it
+                        }
+                    }
+                    attributes.ems?.let {
+                        if (maxEms != it) {
+                            setEms(it)
+                        }
+                    }
+                    attributes.minEms?.let {
+                        if (minEms != it) {
+                            minEms = it
+                        }
+                    }
+                    attributes.minWidth?.let {
+                        if (minWidth != it) {
+                            minWidth = it
+                        }
+                    }
+                    attributes.includeFontPadding?.let {
+                        if (includeFontPadding != it) {
+                            includeFontPadding = it
+                        }
+                    }
+                    if (attributes.shadowColor != null || attributes.shadowDx != null || attributes.shadowDy != null || attributes.shadowRadius != null) {
+                        val localShadowColor = attributes.shadowColor ?: shadowColor
+                        val localShadowDx = attributes.shadowDx ?: shadowDx
+                        val localShadowDy = attributes.shadowDy ?: shadowDy
+                        val localShadowRadius = attributes.shadowRadius ?: shadowRadius
+                        if (shadowColor != localShadowColor || shadowDx != localShadowDx || shadowDy != localShadowDy || shadowRadius != localShadowRadius) {
+                            setShadowLayer(localShadowRadius, localShadowDx, localShadowDy, localShadowColor)
+                        }
+                    }
+                    if (attributes.marqueeRepeatLimit.hasInteger || attributes.marqueeRepeatLimit.hasEnum) {
+                        val localMarqueeRepeatLimit = when {
+                            attributes.marqueeRepeatLimit.hasInteger -> attributes.marqueeRepeatLimit.integer
+                            else -> attributes.marqueeRepeatLimit.enum
+                        }
+                        if (marqueeRepeatLimit != localMarqueeRepeatLimit) {
+                            marqueeRepeatLimit = localMarqueeRepeatLimit
+                        }
                     }
                 }
-                attributes.cursorVisible?.let {
-                    if (isCursorVisible != it) {
-                        isCursorVisible = it
+                if (Build.VERSION.SDK_INT >= 21) {
+                    attributes.letterSpacing?.let {
+                        if (letterSpacing != it) {
+                            letterSpacing = it
+                        }
+                    }
+                    attributes.fontFeatureSettings?.let {
+                        if (fontFeatureSettings != it) {
+                            fontFeatureSettings = it
+                        }
                     }
                 }
-                attributes.maxLines?.let {
-                    if (maxLines != it) {
-                        maxLines = it
+                if (Build.VERSION.SDK_INT >= 23) {
+                    attributes.drawableTint?.let {
+                        val localDrawableTint = ColorStateList.valueOf(it)
+                        if (compoundDrawableTintList != localDrawableTint) {
+                            setCompoundDrawableTintList(localDrawableTint)
+                        }
                     }
-                }
-                attributes.maxHeight?.let {
-                    if (maxHeight != it) {
-                        maxHeight = it
+                    attributes.drawableTintMode?.let {
+                        val localDrawableTintMode = it.value.toPorterDuffMode()
+                        if (compoundDrawableTintMode != localDrawableTintMode) {
+                            setCompoundDrawableTintMode(localDrawableTintMode)
+                        }
                     }
-                }
-                attributes.minLines?.let {
-                    if (minLines != it) {
-                        minLines = it
+                    attributes.breakStrategy?.let {
+                        if (breakStrategy != it.value) {
+                            breakStrategy = it.value
+                        }
                     }
-                }
-                attributes.minHeight?.let {
-                    if (minHeight != it) {
-                        minHeight = it
-                    }
-                }
-                attributes.maxEms?.let {
-                    if (maxEms != it) {
-                        maxEms = it
-                    }
-                }
-                attributes.maxWidth?.let {
-                    if (maxWidth != it) {
-                        maxWidth = it
-                    }
-                }
-                attributes.ems?.let {
-                    if (maxEms != it) {
-                        setEms(it)
-                    }
-                }
-                attributes.minEms?.let {
-                    if (minEms != it) {
-                        minEms = it
-                    }
-                }
-                attributes.minWidth?.let {
-                    if (minWidth != it) {
-                        minWidth = it
-                    }
-                }
-                attributes.includeFontPadding?.let {
-                    if (includeFontPadding != it) {
-                        includeFontPadding = it
-                    }
-                }
-                if (attributes.shadowColor != null || attributes.shadowDx != null || attributes.shadowDy != null || attributes.shadowRadius != null) {
-                    val localShadowColor = attributes.shadowColor ?: shadowColor
-                    val localShadowDx = attributes.shadowDx ?: shadowDx
-                    val localShadowDy = attributes.shadowDy ?: shadowDy
-                    val localShadowRadius = attributes.shadowRadius ?: shadowRadius
-                    if (shadowColor != localShadowColor || shadowDx != localShadowDx || shadowDy != localShadowDy || shadowRadius != localShadowRadius) {
-                        setShadowLayer(localShadowRadius, localShadowDx, localShadowDy, localShadowColor)
-                    }
-                }
-                if (attributes.marqueeRepeatLimit.hasInteger || attributes.marqueeRepeatLimit.hasEnum) {
-                    val localMarqueeRepeatLimit = when {
-                        attributes.marqueeRepeatLimit.hasInteger -> attributes.marqueeRepeatLimit.integer
-                        else -> attributes.marqueeRepeatLimit.enum
-                    }
-                    if (marqueeRepeatLimit != localMarqueeRepeatLimit) {
-                        marqueeRepeatLimit = localMarqueeRepeatLimit
-                    }
-                }
-                attributes.letterSpacing?.let {
-                    if (letterSpacing != it) {
-                        letterSpacing = it
-                    }
-                }
-                attributes.fontFeatureSettings?.let {
-                    if (fontFeatureSettings != it) {
-                        fontFeatureSettings = it
-                    }
-                }
-                attributes.drawableTint?.let {
-                    val localDrawableTint = ColorStateList.valueOf(it)
-                    if (compoundDrawableTintList != localDrawableTint) {
-                        setCompoundDrawableTintList(localDrawableTint)
-                    }
-                }
-                attributes.drawableTintMode?.let {
-                    val localDrawableTintMode = it.value.toPorterDuffMode()
-                    if (compoundDrawableTintMode != localDrawableTintMode) {
-                        setCompoundDrawableTintMode(localDrawableTintMode)
-                    }
-                }
-                attributes.breakStrategy?.let {
-                    if (breakStrategy != it.value) {
-                        breakStrategy = it.value
-                    }
-                }
-                attributes.hyphenationFrequency?.let {
-                    if (hyphenationFrequency != it.value) {
-                        hyphenationFrequency = it.value
+                    attributes.hyphenationFrequency?.let {
+                        if (hyphenationFrequency != it.value) {
+                            hyphenationFrequency = it.value
+                        }
                     }
                 }
                 if (Build.VERSION.SDK_INT >= 26) {

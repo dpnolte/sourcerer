@@ -3,6 +3,7 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.View
 import android.widget.ListView
 import androidx.core.content.ContextCompat
@@ -60,14 +61,16 @@ open class ListViewFactory<TView : ListView, TAttributes : ListViewAttributes>(i
                         overscrollFooter = localOverScrollFooter
                     }
                 }
-                attributes.headerDividersEnabled?.let {
-                    if (areHeaderDividersEnabled() != it) {
-                        setHeaderDividersEnabled(it)
+                if (Build.VERSION.SDK_INT >= 19) {
+                    attributes.headerDividersEnabled?.let {
+                        if (areHeaderDividersEnabled() != it) {
+                            setHeaderDividersEnabled(it)
+                        }
                     }
-                }
-                attributes.footerDividersEnabled?.let {
-                    if (areFooterDividersEnabled() != it) {
-                        setFooterDividersEnabled(it)
+                    attributes.footerDividersEnabled?.let {
+                        if (areFooterDividersEnabled() != it) {
+                            setFooterDividersEnabled(it)
+                        }
                     }
                 }
             }

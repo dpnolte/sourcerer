@@ -2,7 +2,8 @@ package com.laidpack.sourcerer.generator.resources.templates
 
 import com.laidpack.generator.api.TypeScriptNameProvider
 
-fun getBuildGradleContent(packageName: String, extraDependencies: String): String {
+fun getBuildGradleContent(packageName: String, extraDependencies: String, providedMinSdkVersion: Int?): String {
+    val minSdkVersion = providedMinSdkVersion ?: "rootProject.ext.minSdkVersion"
     return """
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
@@ -15,7 +16,7 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
+        minSdkVersion $minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
@@ -53,9 +54,9 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${'$'}androidX"
     implementation "com.squareup.moshi:moshi:${'$'}moshi"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:${'$'}moshi"
-    compileOnly project(":generator-api")
-    compileOnly "com.github.dpnolte.ts-rhymer:annotation:${'$'}tsRhymerVersion"
-    kapt project(":generator-kapt")
+    compileOnly "com.github.dpnolte.ts-rhymer:api:${'$'}tsRhymerVersion"
+    compileOnly project(':typescript-api')
+    kapt project(':typescript-generator')
 $extraDependencies
 }
 
@@ -65,6 +66,7 @@ kapt {
         arg("typescript.outputDir", "${'$'}{rootDir}/js") // where the file will be saved
         arg("typescript.filename", "${TypeScriptNameProvider.getAttributesFileName(packageName)}") // where the file will be saved
         arg("typescript.indent", "  ") // indentation (defaults to 2 spaces)
+        arg("typescript.import_within_module", "true") // generates imports from within npm module
     }
 }
 """.trimIndent()

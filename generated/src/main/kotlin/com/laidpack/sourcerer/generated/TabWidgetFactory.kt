@@ -2,6 +2,7 @@ package com.laidpack.sourcerer.generated
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.View
 import android.widget.TabWidget
 import androidx.core.content.ContextCompat
@@ -32,22 +33,26 @@ open class TabWidgetFactory<TView : TabWidget, TAttributes : TabWidgetAttributes
                         isStripEnabled = it
                     }
                 }
-                attributes.divider?.let {
-                    val localDivider = ContextCompat.getDrawable(context, it) as Drawable
-                    if (dividerDrawable != localDivider) {
-                        setDividerDrawable(localDivider)
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.divider?.let {
+                        val localDivider = ContextCompat.getDrawable(context, it) as Drawable
+                        if (dividerDrawable != localDivider) {
+                            setDividerDrawable(localDivider)
+                        }
                     }
                 }
-                attributes.tabStripLeft?.let {
-                    val localTabStripLeft = ContextCompat.getDrawable(context, it) as Drawable
-                    if (leftStripDrawable != localTabStripLeft) {
-                        leftStripDrawable = localTabStripLeft
+                if (Build.VERSION.SDK_INT >= 24) {
+                    attributes.tabStripLeft?.let {
+                        val localTabStripLeft = ContextCompat.getDrawable(context, it) as Drawable
+                        if (leftStripDrawable != localTabStripLeft) {
+                            leftStripDrawable = localTabStripLeft
+                        }
                     }
-                }
-                attributes.tabStripRight?.let {
-                    val localTabStripRight = ContextCompat.getDrawable(context, it) as Drawable
-                    if (rightStripDrawable != localTabStripRight) {
-                        rightStripDrawable = localTabStripRight
+                    attributes.tabStripRight?.let {
+                        val localTabStripRight = ContextCompat.getDrawable(context, it) as Drawable
+                        if (rightStripDrawable != localTabStripRight) {
+                            rightStripDrawable = localTabStripRight
+                        }
                     }
                 }
             }

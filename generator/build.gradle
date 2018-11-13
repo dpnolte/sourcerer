@@ -12,6 +12,7 @@ dependencies {
     implementation files("$sdkDir/platforms/android-$compileSdkVersion/android.jar")
     // bug -> https://youtrack.jetbrains.com/issue/KT-23744
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // override reflect version number in xodus dnq and kotlin poet
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'com.squareup:kotlinpoet:1.0.0-RC1'
@@ -30,8 +31,8 @@ dependencies {
     implementation 'org.jetbrains.xodus:dnq:1.1.325'
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
     // typescript annotation
-    api "com.github.dpnolte.ts-rhymer:annotation:$tsRhymerVersion"
-    api project(":generator-api")
+    api "com.github.dpnolte.ts-rhymer:api:$tsRhymerVersion"
+    api project(':typescript-api')
     // lint
     implementation "com.android.tools.lint:lint:$lintVersion"
     // colored print
@@ -40,6 +41,8 @@ dependencies {
     testImplementation "com.nhaarman:mockito-kotlin:1.6.0"
     testImplementation 'org.amshove.kluent:kluent:1.37'
     testImplementation 'org.amshove.kluent:kluent-android:1.37'
+    // override reflection number in mockito and in kluent
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     testImplementation 'junit:junit:4.12'
 }
 
@@ -53,7 +56,11 @@ idea {
 evaluationDependsOn(':stub-module')
 def componentIds = project(":stub-module").configurations.debugCompileClasspath.incoming.resolutionResult.allDependencies
         .findAll {
-           it.selected.id instanceof ModuleComponentIdentifier && (it.selected.id.group == "com.google.android.material" || it.selected.id.group.startsWith("androidx."))
+            if (it instanceof UnresolvedDependencyResult) {
+              print("Unresolved dependency: ${it.getAttempted().displayName}. Reason: ${it.getFailure().localizedMessage}.")
+            } else {
+              it.selected.id instanceof ModuleComponentIdentifier && (it.selected.id.group == "com.google.android.material" || it.selected.id.group.startsWith("androidx."))
+            }
         }
         .collect {
             it.selected.id
@@ -142,7 +149,7 @@ task printEnvArguments(type: JavaExec) {
         classpath.each {
             println "file in classpath: $it"
         }
-        project(":stub-app").configurations.debugCompileClasspath.incoming.resolutionResult.allDependencies.each {
+        project(":stub-module").configurations.debugCompileClasspath.incoming.resolutionResult.allDependencies.each {
             println "dependency: $it, variant: ${it.selected.variant.displayName}"
 
         }

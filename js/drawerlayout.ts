@@ -2,7 +2,7 @@ import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from "./main";
 // types
-/* generated @ 2018-11-12T14:27:44.875 */
+/* generated @ 2018-11-13T11:39:31.167 */
 export namespace DrawerlayoutTypes {
   export interface DrawerLayoutAttributes extends MainTypes.ViewGroupAttributes {
     colorPrimaryDark?: string;

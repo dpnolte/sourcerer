@@ -2,7 +2,7 @@ import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from "./main";
 // types
-/* generated @ 2018-11-12T14:29:10.068 */
+/* generated @ 2018-11-13T11:42:08.738 */
 export namespace GridlayoutTypes {
   export enum AlignmentModeEnum {
     alignBounds = 'alignBounds',

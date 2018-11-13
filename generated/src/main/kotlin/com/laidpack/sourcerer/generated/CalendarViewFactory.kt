@@ -2,6 +2,7 @@ package com.laidpack.sourcerer.generated
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.View
 import android.widget.CalendarView
 import androidx.core.content.ContextCompat
@@ -49,50 +50,52 @@ open class CalendarViewFactory<TView : CalendarView, TAttributes : CalendarViewA
                         showWeekNumber = it
                     }
                 }
-                attributes.weekDayTextAppearance?.let {
-                    if (weekDayTextAppearance != it) {
-                        weekDayTextAppearance = it
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.weekDayTextAppearance?.let {
+                        if (weekDayTextAppearance != it) {
+                            weekDayTextAppearance = it
+                        }
                     }
-                }
-                attributes.dateTextAppearance?.let {
-                    if (dateTextAppearance != it) {
-                        dateTextAppearance = it
+                    attributes.dateTextAppearance?.let {
+                        if (dateTextAppearance != it) {
+                            dateTextAppearance = it
+                        }
                     }
-                }
-                attributes.shownWeekCount?.let {
-                    if (shownWeekCount != it) {
-                        shownWeekCount = it
+                    attributes.shownWeekCount?.let {
+                        if (shownWeekCount != it) {
+                            shownWeekCount = it
+                        }
                     }
-                }
-                attributes.selectedWeekBackgroundColor?.let {
-                    if (selectedWeekBackgroundColor != it) {
-                        selectedWeekBackgroundColor = it
+                    attributes.selectedWeekBackgroundColor?.let {
+                        if (selectedWeekBackgroundColor != it) {
+                            selectedWeekBackgroundColor = it
+                        }
                     }
-                }
-                attributes.focusedMonthDateColor?.let {
-                    if (focusedMonthDateColor != it) {
-                        focusedMonthDateColor = it
+                    attributes.focusedMonthDateColor?.let {
+                        if (focusedMonthDateColor != it) {
+                            focusedMonthDateColor = it
+                        }
                     }
-                }
-                attributes.unfocusedMonthDateColor?.let {
-                    if (unfocusedMonthDateColor != it) {
-                        unfocusedMonthDateColor = it
+                    attributes.unfocusedMonthDateColor?.let {
+                        if (unfocusedMonthDateColor != it) {
+                            unfocusedMonthDateColor = it
+                        }
                     }
-                }
-                attributes.weekNumberColor?.let {
-                    if (weekNumberColor != it) {
-                        weekNumberColor = it
+                    attributes.weekNumberColor?.let {
+                        if (weekNumberColor != it) {
+                            weekNumberColor = it
+                        }
                     }
-                }
-                attributes.weekSeparatorLineColor?.let {
-                    if (weekSeparatorLineColor != it) {
-                        weekSeparatorLineColor = it
+                    attributes.weekSeparatorLineColor?.let {
+                        if (weekSeparatorLineColor != it) {
+                            weekSeparatorLineColor = it
+                        }
                     }
-                }
-                attributes.selectedDateVerticalBar?.let {
-                    val localSelectedDateVerticalBar = ContextCompat.getDrawable(context, it) as Drawable
-                    if (selectedDateVerticalBar != localSelectedDateVerticalBar) {
-                        selectedDateVerticalBar = localSelectedDateVerticalBar
+                    attributes.selectedDateVerticalBar?.let {
+                        val localSelectedDateVerticalBar = ContextCompat.getDrawable(context, it) as Drawable
+                        if (selectedDateVerticalBar != localSelectedDateVerticalBar) {
+                            selectedDateVerticalBar = localSelectedDateVerticalBar
+                        }
                     }
                 }
             }

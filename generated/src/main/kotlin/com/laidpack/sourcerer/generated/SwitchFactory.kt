@@ -3,6 +3,7 @@ package com.laidpack.sourcerer.generated
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.View
 import android.widget.Switch
 import androidx.core.content.ContextCompat
@@ -42,65 +43,71 @@ open class SwitchFactory<TView : Switch, TAttributes : SwitchAttributes>(instanc
                 attributes.switchTextAppearance?.let {
                     setSwitchTextAppearance(context, it)
                 }
-                attributes.thumb?.let {
-                    val localThumb = ContextCompat.getDrawable(context, it) as Drawable
-                    if (thumbDrawable != localThumb) {
-                        thumbDrawable = localThumb
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.thumb?.let {
+                        val localThumb = ContextCompat.getDrawable(context, it) as Drawable
+                        if (thumbDrawable != localThumb) {
+                            thumbDrawable = localThumb
+                        }
+                    }
+                    attributes.track?.let {
+                        val localTrack = ContextCompat.getDrawable(context, it) as Drawable
+                        if (trackDrawable != localTrack) {
+                            trackDrawable = localTrack
+                        }
+                    }
+                    attributes.thumbTextPadding?.let {
+                        if (thumbTextPadding != it) {
+                            thumbTextPadding = it
+                        }
+                    }
+                    attributes.switchMinWidth?.let {
+                        if (switchMinWidth != it) {
+                            switchMinWidth = it
+                        }
+                    }
+                    attributes.switchPadding?.let {
+                        if (switchPadding != it) {
+                            switchPadding = it
+                        }
                     }
                 }
-                attributes.track?.let {
-                    val localTrack = ContextCompat.getDrawable(context, it) as Drawable
-                    if (trackDrawable != localTrack) {
-                        trackDrawable = localTrack
+                if (Build.VERSION.SDK_INT >= 21) {
+                    attributes.splitTrack?.let {
+                        if (splitTrack != it) {
+                            splitTrack = it
+                        }
+                    }
+                    attributes.showText?.let {
+                        if (showText != it) {
+                            showText = it
+                        }
                     }
                 }
-                attributes.thumbTextPadding?.let {
-                    if (thumbTextPadding != it) {
-                        thumbTextPadding = it
+                if (Build.VERSION.SDK_INT >= 23) {
+                    attributes.thumbTint?.let {
+                        val localThumbTint = ResourcesCompat.getColorStateList(context.resources, it, null)
+                        if (thumbTintList != localThumbTint) {
+                            thumbTintList = localThumbTint
+                        }
                     }
-                }
-                attributes.switchMinWidth?.let {
-                    if (switchMinWidth != it) {
-                        switchMinWidth = it
+                    attributes.thumbTintMode?.let {
+                        val localThumbTintMode = it.toPorterDuffMode()
+                        if (thumbTintMode != localThumbTintMode) {
+                            thumbTintMode = localThumbTintMode
+                        }
                     }
-                }
-                attributes.switchPadding?.let {
-                    if (switchPadding != it) {
-                        switchPadding = it
+                    attributes.trackTint?.let {
+                        val localTrackTint = ColorStateList.valueOf(it)
+                        if (trackTintList != localTrackTint) {
+                            trackTintList = localTrackTint
+                        }
                     }
-                }
-                attributes.splitTrack?.let {
-                    if (splitTrack != it) {
-                        splitTrack = it
-                    }
-                }
-                attributes.showText?.let {
-                    if (showText != it) {
-                        showText = it
-                    }
-                }
-                attributes.thumbTint?.let {
-                    val localThumbTint = ResourcesCompat.getColorStateList(context.resources, it, null)
-                    if (thumbTintList != localThumbTint) {
-                        thumbTintList = localThumbTint
-                    }
-                }
-                attributes.thumbTintMode?.let {
-                    val localThumbTintMode = it.toPorterDuffMode()
-                    if (thumbTintMode != localThumbTintMode) {
-                        thumbTintMode = localThumbTintMode
-                    }
-                }
-                attributes.trackTint?.let {
-                    val localTrackTint = ColorStateList.valueOf(it)
-                    if (trackTintList != localTrackTint) {
-                        trackTintList = localTrackTint
-                    }
-                }
-                attributes.trackTintMode?.let {
-                    val localTrackTintMode = it.value.toPorterDuffMode()
-                    if (trackTintMode != localTrackTintMode) {
-                        trackTintMode = localTrackTintMode
+                    attributes.trackTintMode?.let {
+                        val localTrackTintMode = it.value.toPorterDuffMode()
+                        if (trackTintMode != localTrackTintMode) {
+                            trackTintMode = localTrackTintMode
+                        }
                     }
                 }
             }

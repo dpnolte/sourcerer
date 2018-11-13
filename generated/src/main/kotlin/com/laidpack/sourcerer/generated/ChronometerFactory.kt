@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.os.Build
 import android.view.View
 import android.widget.Chronometer
 import com.laidpack.generator.api.ViewElement
@@ -29,9 +30,11 @@ open class ChronometerFactory<TView : Chronometer, TAttributes : ChronometerAttr
                         format = it
                     }
                 }
-                attributes.countDown?.let {
-                    if (isCountDown != it) {
-                        isCountDown = it
+                if (Build.VERSION.SDK_INT >= 24) {
+                    attributes.countDown?.let {
+                        if (isCountDown != it) {
+                            isCountDown = it
+                        }
                     }
                 }
             }

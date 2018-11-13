@@ -5,7 +5,7 @@ import { CardviewTypes } from "./cardview";
 import { AppcompatTypes } from "./appcompat";
 import { CoordinatorlayoutTypes } from "./coordinatorlayout";
 // types
-/* generated @ 2018-11-12T14:30:46.025 */
+/* generated @ 2018-11-13T11:39:54.240 */
 export namespace ComponentsMaterialTypes {
   export interface AppBarLayoutAttributes extends MainTypes.LinearLayoutAttributes {
     android_background?: number;

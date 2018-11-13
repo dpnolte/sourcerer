@@ -1,6 +1,7 @@
 package com.laidpack.sourcerer.generated
 
 import android.content.Context
+import android.os.Build
 import android.view.View
 import android.widget.AdapterViewFlipper
 import com.laidpack.generator.api.ViewGroupElement
@@ -30,9 +31,11 @@ open class AdapterViewFlipperFactory<TView : AdapterViewFlipper, TAttributes : A
                         isAutoStart = it
                     }
                 }
-                attributes.flipInterval?.let {
-                    if (flipInterval != it) {
-                        flipInterval = it
+                if (Build.VERSION.SDK_INT >= 16) {
+                    attributes.flipInterval?.let {
+                        if (flipInterval != it) {
+                            flipInterval = it
+                        }
                     }
                 }
             }
