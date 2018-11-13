@@ -5,29 +5,39 @@ import com.laidpack.sourcerer.generator.resources.templates.getAndroidManifestTe
 import com.laidpack.sourcerer.generator.resources.templates.getBuildGradleContent
 import com.laidpack.sourcerer.generator.resources.templates.getProguardRulesTemplate
 import com.laidpack.sourcerer.generator.resources.templates.getStringXmlTemplate
+import com.laidpack.sourcerer.generator.resources.widgets.WidgetConnoisseur
 import java.io.File
 import java.nio.file.Path
+
+typealias gradleFileGenerator = (
+        modulePath: Path,
+        extraDependencies: List<String>,
+        packageName: String,
+        widget: Widget,
+        connoisseur: WidgetConnoisseur
+) -> Unit
 
 class GradleModuleManager(private val env: SourcererEnvironment, private val widgetRegistry: WidgetRegistry) {
     private val updatedModules = mutableSetOf<String /* module name */>()
 
     fun getModuleDirForWidget(widget: Widget): File {
-        val parser = widgetRegistry[widget]
-        val moduleName = parser.getModuleName(widget)
+        val connoisseur = widgetRegistry[widget]
+        val moduleName = connoisseur.getModuleName(widget)
         val sourcePath = env.rootPath.resolve("$moduleName/src/main/kotlin")
         val flagFilePath = env.rootPath.resolve("$moduleName/$generatedFlagFileName")
         val packageName = widgetRegistry.getPackageName(widget)
         if (!sourcePath.toFile().exists()) {
             generateModule(
                     moduleName,
-                    parser.getDependencies(widget),
+                    connoisseur,
+                    widget,
                     packageName
             )
             updatedModules.add(moduleName)
         } else if (!updatedModules.contains(moduleName)) {
             // always update the following:
             val modulePath = getModulePath(moduleName)
-            generateBuildGradleFile(modulePath, parser.getDependencies(widget), packageName)
+            generateBuildGradleFile(modulePath, connoisseur.getDependencies(widget), packageName, widget, connoisseur)
             generateProguardRulesFile(modulePath)
             val mainPath = modulePath.resolve("src/main")
             generateAndroidManifest(mainPath, packageName)
@@ -38,13 +48,14 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
         return sourcePath.toFile()
     }
 
-
-    fun generateModule(
+    private fun generateModule(
             moduleName: String,
-            extraDependencies: List<String>,
+            connoisseur: WidgetConnoisseur,
+            widget: Widget,
             packageName: String,
-            generateGradleFile: (modulePath: Path, extraDependencies: List<String>, packageName: String) -> Unit = this::generateBuildGradleFile
+            generateGradleFile: gradleFileGenerator = this::generateBuildGradleFile
     ) {
+        val extraDependencies = connoisseur.getDependencies(widget)
         val modulePath = getModulePath(moduleName)
         val mainPath = modulePath.resolve("src/main")
         val paths = mapOf(
@@ -59,7 +70,7 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
         }
 
         generateGitIgnoreFile(modulePath)
-        generateGradleFile(modulePath, extraDependencies, packageName)
+        generateGradleFile(modulePath, extraDependencies, packageName, widget, connoisseur)
         generateProguardRulesFile(modulePath)
         generateAndroidManifest(mainPath, packageName)
         generateStringXmlFile(paths["valuesPath"] as Path)
@@ -76,7 +87,14 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
         file.writeText("/build\n")
     }
 
-    private fun generateBuildGradleFile(modulePath: Path, extraDependencies: List<String>, packageName: String) {
+    private fun generateBuildGradleFile(
+            modulePath: Path,
+            extraDependencies: List<String>,
+            packageName: String,
+            widget: Widget,
+            connoisseur: WidgetConnoisseur
+    ) {
+        val minSdkVersion = widgetRegistry.getMinSdkVersion(widget, connoisseur)
         val path = modulePath.resolve("build.gradle")
         val file = path.getExistingOrCreateFile()
         file.writeText(
@@ -87,7 +105,8 @@ class GradleModuleManager(private val env: SourcererEnvironment, private val wid
                                 it
                             } else "\"$it\""
                             "\timplementation $dependency"
-                        }
+                        },
+                        minSdkVersion
                 )
         )
     }

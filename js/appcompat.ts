@@ -2,7 +2,7 @@ import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from './main';
 // types
-/* generated @ 2018-11-13T17:08:50.257 */
+/* generated @ 2018-11-13T17:52:38.671 */
 export namespace AppcompatTypes {
   export interface ActionMenuViewAttributes extends LinearLayoutCompatAttributes {
   }

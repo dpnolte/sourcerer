@@ -42,7 +42,7 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
         outputDir = processingEnv.options[BaseTypeScriptProcessor.OPTION_OUTPUTDIR]
             ?: throw IllegalStateException("Missing required kapt argument 'outputdir'. Argument key: ${BaseTypeScriptProcessor.OPTION_FILENAME}")
         namespace = processingEnv.options[BaseTypeScriptProcessor.OPTION_NAMESPACE]
-                ?: throw IllegalStateException("Missing required kapt argument 'namespace'. Argument key: ${BaseTypeScriptProcessor.OPTION_NAMESPACE}")
+                ?: ""
         indent = processingEnv.options[BaseTypeScriptProcessor.OPTION_INDENT]
                 ?: "  "
         importWithinModule = processingEnv.options[BaseTypeScriptProcessor.OPTION_IMPORT_WITHIN_MODULE]?.toBoolean()
@@ -89,7 +89,9 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
 
     private fun getViewElement(elementType: String, attributesClassName: ClassName): String {
         val elementName = elementType.capitalize().split(".").joinToString("") { it.capitalize() }
-        val attributesSimpleName = "$namespace.${attributesClassName.simpleName}"
+        val attributesSimpleName = if(namespace.isNotBlank()) {
+            "$namespace.${attributesClassName.simpleName}"
+        } else attributesClassName.simpleName
         return """
             |export const $elementName = (
             |${indent}attributes?: $attributesSimpleName & $layoutParamAttributesSimpleName,
@@ -136,13 +138,15 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
 
             val file = path.toFile()
             var contents = file.readText()
-            for (attributeFile in attributeFiles) {
-                val fileNameWithoutExtension = attributeFile
-                        .replace(TypeScriptNameProvider.fileTypeScriptExtension, "")
-                val importStatement = "import { $namespace } from './$fileNameWithoutExtension';\n"
-                //val referencePathStatement = "/// <reference path='./$attributeFile' />\n"
-                if (!contents.contains(importStatement)) {
-                    contents = importStatement + contents
+            if (namespace.isNotBlank()) {
+                for (attributeFile in attributeFiles) {
+                    val fileNameWithoutExtension = attributeFile
+                            .replace(TypeScriptNameProvider.fileTypeScriptExtension, "")
+                    val importStatement = "import { $namespace } from './$fileNameWithoutExtension';\n"
+                    //val referencePathStatement = "/// <reference path='./$attributeFile' />\n"
+                    if (!contents.contains(importStatement)) {
+                        contents = importStatement + contents
+                    }
                 }
             }
             val match = layoutAttributesTypeRegex.find(contents)

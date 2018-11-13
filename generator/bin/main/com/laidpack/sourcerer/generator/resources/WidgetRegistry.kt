@@ -13,6 +13,7 @@ import com.squareup.kotlinpoet.ClassName
 import kotlinx.dnq.query.*
 import java.lang.IllegalArgumentException
 import java.nio.file.Path
+import java.util.jar.JarFile
 
 class WidgetRegistry(
         private val env: SourcererEnvironment,
@@ -65,6 +66,35 @@ class WidgetRegistry(
             ).firstOrNull() ?: throw  IllegalArgumentException("No widget for sourcerer result '${sourcererResult.targetClassName}' found")
         }
     }
+    fun getMinSdkVersion(widget: Widget, connoisseur: WidgetConnoisseur): Int? {
+        return when (connoisseur) {
+            is AndroidWidgetConnoisseur -> null
+            is MaterialDesignWidgetConnoisseur -> null
+            is SupportWidgetConnoisseur -> {
+                val sourceJarPath = Store.transactional {
+                    widget.file.scanPath
+                }
+                val commonPath = sourceJarPath.parent.parent
+                val libPath = env.supportLibPaths.first {
+                    it.startsWith(commonPath)
+                }
+                val jarFile = JarFile(libPath.toFile())
+                val manifestEntry = jarFile.getEntry("AndroidManifest.xml")
+                val manifestContent = jarFile.getInputStream(manifestEntry).bufferedReader().use {
+                    it.readText()
+                }
+                val match = usesSdkRegex.find(manifestContent)
+                if (match != null) {
+                    val requiresSdk = match.groupValues[1].toInt()
+                    if (requiresSdk > env.minSdkVersion) {
+                        requiresSdk
+                    } else null
+                } else null
+            }
+            else -> null
+        }
+    }
+
     fun getModuleName(widget: Widget): String {
         val parser = this[widget]
         return parser.getModuleName(widget)
@@ -111,6 +141,7 @@ class WidgetRegistry(
                 MaterialDesignWidgetConnoisseur(),
                 SupportWidgetConnoisseur()
         )
+        private val usesSdkRegex = Regex(".*?<uses-sdk android:minSdkVersion=\"(\\d+)\"\\s*/>.*?")
         fun create(
                 env: SourcererEnvironment,
                 widgetConnoisseurs: List<WidgetConnoisseur> = defaultWidgetConnoisseurs

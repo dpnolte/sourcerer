@@ -94,6 +94,14 @@ class AttributesTypeScriptProcessor : BaseTypeScriptProcessor() {
     }
 
     private fun getImports(targetTypes: HashMap<String, ITargetType>, rootPackageNames: Set<String>, packageNames: Set<String>): String {
+        if (importWithinModule) {
+            getImportsFromWithModule(targetTypes, rootPackageNames)
+        } else {
+            getImportsExternallyFromModule(targetTypes, rootPackageNames)
+        }
+        return ""
+    }
+    private fun getImportsFromWithModule(targetTypes: HashMap<String, ITargetType>, rootPackageNames: Set<String>) {
         imports.add("import { ElementNode, element } from './element';")
         imports.add("import { LayoutParamAttributes } from './layoutparams';")
         val processedImports = mutableSetOf<String>()
@@ -106,14 +114,35 @@ class AttributesTypeScriptProcessor : BaseTypeScriptProcessor() {
                         val typeFileName = TypeScriptNameProvider.getAttributesFileName(superType.className.packageName)
                                 .replace(TypeScriptNameProvider.fileTypeScriptExtension, "")
                         processedImports.add(dependentNamespace)
-                        imports.add("import { $dependentNamespace } from \"./$typeFileName\";")
+                        imports.add("import { $dependentNamespace } from './$typeFileName';")
                         //result += "/// <reference path='./$typeFileName' />\n"
                     }
                 }
             }
         }
-        return ""
     }
+    private fun getImportsExternallyFromModule(targetTypes: HashMap<String, ITargetType>, rootPackageNames: Set<String>) {
+        val importItems = mutableSetOf(
+                "ElementNode",
+                "element",
+                "LayoutParamAttributes"
+        )
+        val processedImports = mutableSetOf<String>()
+        for (targetType in targetTypes.values) {
+            for(superType in targetType.superTypes) {
+                if (!rootPackageNames.contains(superType.className.packageName)
+                        && rootPackageNames.all { !superType.className.packageName.startsWith("$it.") }) {
+                    val dependentNamespace = TypeScriptNameProvider.getNamespace(superType.className.packageName)
+                    if (!processedImports.contains(dependentNamespace)) {
+                        processedImports.add(dependentNamespace)
+                        importItems.add(dependentNamespace)
+                    }
+                }
+            }
+        }
+        imports.add("import { ${importItems.joinToString(", ")} } from 'sourcerer-android';")
+    }
+
     private val imports = mutableSetOf<String>()
 
     companion object {
