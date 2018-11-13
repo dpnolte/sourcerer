@@ -3,7 +3,7 @@ import { LayoutParamAttributes } from './layoutparams';
 import { AppcompatTypes } from './appcompat';
 import { MainTypes } from './main';
 // types
-/* generated @ 2018-11-13T12:44:34.435 */
+/* generated @ 2018-11-13T17:10:01.252 */
 export namespace AppcompatEmojiTypes {
   export interface EmojiAppCompatButtonAttributes extends AppcompatTypes.AppCompatButtonAttributes {
   }

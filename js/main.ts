@@ -1,7 +1,7 @@
 import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
 // types
-/* generated @ 2018-11-13T16:22:14.963 */
+/* generated @ 2018-11-13T17:07:16.394 */
 export namespace MainTypes {
   export interface AbsListViewAttributes extends AdapterViewAttributes {
     cacheColorHint?: string;

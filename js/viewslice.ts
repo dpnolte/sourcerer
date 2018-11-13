@@ -2,7 +2,7 @@ import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from './main';
 // types
-/* generated @ 2018-11-13T12:44:26.877 */
+/* generated @ 2018-11-13T17:11:45.832 */
 export namespace ViewSliceTypes {
   export interface SliceViewAttributes extends MainTypes.ViewGroupAttributes {
   }

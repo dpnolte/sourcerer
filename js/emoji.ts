@@ -2,7 +2,7 @@ import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from './main';
 // types
-/* generated @ 2018-11-13T12:44:40.234 */
+/* generated @ 2018-11-13T17:09:52.783 */
 export namespace EmojiTypes {
   export interface EmojiButtonAttributes extends MainTypes.ButtonAttributes {
   }

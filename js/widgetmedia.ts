@@ -2,7 +2,7 @@ import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from './main';
 // types
-/* generated @ 2018-11-13T12:44:29.290 */
+/* generated @ 2018-11-13T17:11:40.076 */
 export namespace WidgetMediaTypes {
   export interface MediaControlView2Attributes extends MainTypes.ViewGroupAttributes {
   }
