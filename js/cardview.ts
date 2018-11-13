@@ -1,8 +1,8 @@
 import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
-import { MainTypes } from "./main";
+import { MainTypes } from './main';
 // types
-/* generated @ 2018-11-13T11:39:35.407 */
+/* generated @ 2018-11-13T12:44:14.014 */
 export namespace CardviewTypes {
   export interface CardViewAttributes extends MainTypes.FrameLayoutAttributes {
     android_minHeight?: string;

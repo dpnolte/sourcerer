@@ -1,9 +1,9 @@
 import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
-import { AppcompatTypes } from "./appcompat";
-import { MainTypes } from "./main";
+import { AppcompatTypes } from './appcompat';
+import { MainTypes } from './main';
 // types
-/* generated @ 2018-11-13T11:42:16.567 */
+/* generated @ 2018-11-13T12:44:34.435 */
 export namespace AppcompatEmojiTypes {
   export interface EmojiAppCompatButtonAttributes extends AppcompatTypes.AppCompatButtonAttributes {
   }

@@ -1,9 +1,9 @@
 import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
-import { RecyclerviewTypes } from "./recyclerview";
-import { MainTypes } from "./main";
+import { RecyclerviewTypes } from './recyclerview';
+import { MainTypes } from './main';
 // types
-/* generated @ 2018-11-13T11:38:28.533 */
+/* generated @ 2018-11-13T12:44:20.949 */
 export namespace WearTypes {
   export interface BoxInsetLayoutAttributes extends MainTypes.ViewGroupAttributes {
   }

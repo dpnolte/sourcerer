@@ -139,7 +139,7 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
             for (attributeFile in attributeFiles) {
                 val fileNameWithoutExtension = attributeFile
                         .replace(TypeScriptNameProvider.fileTypeScriptExtension, "")
-                val importStatement = "import { $namespace } from \"./$fileNameWithoutExtension\";\n"
+                val importStatement = "import { $namespace } from './$fileNameWithoutExtension';\n"
                 //val referencePathStatement = "/// <reference path='./$attributeFile' />\n"
                 if (!contents.contains(importStatement)) {
                     contents = importStatement + contents
@@ -177,7 +177,7 @@ class ElementTypeScriptProcessor : KotlinAbstractProcessor() {
             var contents = file.readText()
             val fileNameWithoutExtension = attributeTypesFileName
                     .replace(TypeScriptNameProvider.fileTypeScriptExtension, "")
-            val exportStatement = "export * from \"./$fileNameWithoutExtension\";\n"
+            val exportStatement = "export * from './$fileNameWithoutExtension';\n"
             if (!contents.contains(exportStatement)) {
                 contents = exportStatement + contents
             }

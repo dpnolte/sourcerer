@@ -114,7 +114,7 @@ class AttributesTypeScriptProcessor : BaseTypeScriptProcessor() {
                         val typeFileName = TypeScriptNameProvider.getAttributesFileName(superType.className.packageName)
                                 .replace(TypeScriptNameProvider.fileTypeScriptExtension, "")
                         processedImports.add(dependentNamespace)
-                        imports.add("import { $dependentNamespace } from \"./$typeFileName\";")
+                        imports.add("import { $dependentNamespace } from './$typeFileName';")
                         //result += "/// <reference path='./$typeFileName' />\n"
                     }
                 }
@@ -122,9 +122,7 @@ class AttributesTypeScriptProcessor : BaseTypeScriptProcessor() {
         }
     }
     private fun getImportsExternallyFromModule(targetTypes: HashMap<String, ITargetType>, rootPackageNames: Set<String>) {
-        imports.add("import { ElementNode, element } from './element';")
-        imports.add("import { LayoutParamAttributes } from './layoutparams';")
-        val importItems = mutableSetOf<String>(
+        val importItems = mutableSetOf(
                 "ElementNode",
                 "element",
                 "LayoutParamAttributes"
@@ -137,13 +135,12 @@ class AttributesTypeScriptProcessor : BaseTypeScriptProcessor() {
                     val dependentNamespace = TypeScriptNameProvider.getNamespace(superType.className.packageName)
                     if (!processedImports.contains(dependentNamespace)) {
                         processedImports.add(dependentNamespace)
-                        importItems.add("$dependentNamespace")
-                        //result += "/// <reference path='./$typeFileName' />\n"
+                        importItems.add(dependentNamespace)
                     }
                 }
             }
         }
-        imports.add("import { ${importItems.joinToString(", ")} } from \"sourcerer-android\";")
+        imports.add("import { ${importItems.joinToString(", ")} } from 'sourcerer-android';")
     }
 
     private val imports = mutableSetOf<String>()

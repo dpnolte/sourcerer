@@ -1,8 +1,8 @@
 import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
-import { MainTypes } from "./main";
+import { MainTypes } from './main';
 // types
-/* generated @ 2018-11-13T11:41:56.272 */
+/* generated @ 2018-11-13T12:44:40.234 */
 export namespace EmojiTypes {
   export interface EmojiButtonAttributes extends MainTypes.ButtonAttributes {
   }

@@ -1,11 +1,11 @@
 import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
-import { MainTypes } from "./main";
-import { CardviewTypes } from "./cardview";
-import { AppcompatTypes } from "./appcompat";
-import { CoordinatorlayoutTypes } from "./coordinatorlayout";
+import { MainTypes } from './main';
+import { CardviewTypes } from './cardview';
+import { AppcompatTypes } from './appcompat';
+import { CoordinatorlayoutTypes } from './coordinatorlayout';
 // types
-/* generated @ 2018-11-13T11:39:54.240 */
+/* generated @ 2018-11-13T12:44:16.736 */
 export namespace ComponentsMaterialTypes {
   export interface AppBarLayoutAttributes extends MainTypes.LinearLayoutAttributes {
     android_background?: number;

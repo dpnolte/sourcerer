@@ -1,14 +1,14 @@
-import { GridlayoutTypes } from "./gridlayout";
-import { LeanbackTypes } from "./leanback";
-import { SlidingpanelayoutTypes } from "./slidingpanelayout";
-import { ViewpagerTypes } from "./viewpager";
-import { WearTypes } from "./wear";
-import { RecyclerviewTypes } from "./recyclerview";
-import { ComponentsMaterialTypes } from "./componentsmaterial";
-import { DrawerlayoutTypes } from "./drawerlayout";
-import { CoordinatorlayoutTypes } from "./coordinatorlayout";
-import { AppcompatTypes } from "./appcompat";
-import { MainTypes } from "./main";
+import { GridlayoutTypes } from './gridlayout';
+import { LeanbackTypes } from './leanback';
+import { ViewpagerTypes } from './viewpager';
+import { SlidingpanelayoutTypes } from './slidingpanelayout';
+import { WearTypes } from './wear';
+import { RecyclerviewTypes } from './recyclerview';
+import { ComponentsMaterialTypes } from './componentsmaterial';
+import { DrawerlayoutTypes } from './drawerlayout';
+import { CoordinatorlayoutTypes } from './coordinatorlayout';
+import { AppcompatTypes } from './appcompat';
+import { MainTypes } from './main';
 export type LayoutParamAttributes = {}
     | MainTypes.TableLayoutLayoutParamsAttributes
     | MainTypes.ActionMenuViewLayoutParamsAttributes
@@ -34,7 +34,7 @@ export type LayoutParamAttributes = {}
     | RecyclerviewTypes.RecyclerViewLayoutParamsAttributes
     | RecyclerviewTypes.StaggeredGridLayoutManagerLayoutParamsAttributes
     | WearTypes.BoxInsetLayoutLayoutParamsAttributes
-    | ViewpagerTypes.ViewPagerLayoutParamsAttributes
     | SlidingpanelayoutTypes.SlidingPaneLayoutLayoutParamsAttributes
+    | ViewpagerTypes.ViewPagerLayoutParamsAttributes
     | LeanbackTypes.BaseCardViewLayoutParamsAttributes
     | GridlayoutTypes.GridLayoutLayoutParamsAttributes;

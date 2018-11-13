@@ -1,9 +1,9 @@
 import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
-import { MainTypes } from "./main";
-import { CardviewTypes } from "./cardview";
+import { MainTypes } from './main';
+import { CardviewTypes } from './cardview';
 // types
-/* generated @ 2018-11-13T11:42:35.465 */
+/* generated @ 2018-11-13T12:44:44.313 */
 export namespace CarTypes {
   export interface ActionBarAttributes extends MainTypes.RelativeLayoutAttributes {
   }
