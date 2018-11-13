@@ -2,7 +2,7 @@ import { ElementNode, element } from './element';
 import { LayoutParamAttributes } from './layoutparams';
 import { MainTypes } from './main';
 // types
-/* generated @ 2018-11-13T12:44:11.105 */
+/* generated @ 2018-11-13T16:22:21.364 */
 export namespace CoreTypes {
   export interface ContentLoadingProgressBarAttributes extends MainTypes.ProgressBarAttributes {
   }
